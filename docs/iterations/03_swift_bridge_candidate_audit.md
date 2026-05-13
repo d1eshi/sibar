@@ -1,14 +1,14 @@
-# Iteration 03: Swift Bridge Candidate Audit
+# Iteration 03: Swift Bridge Core
 
 ## Goal
 
-Evaluate the minimum Swift bridge needed later, without copying Swift code in this iteration.
+Copy and adapt the minimum Swift bridge from `sibar-agent` into `/Users/d1eshi/projects/startup/sibar` after the runtime moat audit trimmed the TypeScript command surface.
 
-Swift is a native surface candidate. It is not the v0.1 moat.
+Swift is a native surface candidate. It is not the v0.1 moat and must not own runtime state.
 
 ## Bridge Decision
 
-The desired bridge is thin:
+The bridge is thin:
 
 ```text
 Swift UI later
@@ -18,19 +18,41 @@ Swift UI later
   -> Swift renders returned data only
 ```
 
-## Candidate Scope
+## Source Scope
 
-Only these source files may be considered for a future port:
+Use only these source candidates:
 
 1. `sibar-agent/Sources/SibiCore/RuntimeClient.swift`
 2. `sibar-agent/Sources/SibiCore/RuntimeModels.swift`
 3. `sibar-agent/Tests/SibiCoreTests/RuntimeClientTests.swift`
 
-Everything else is out of scope until after the TS runtime passes the moat audit.
+Everything else remains out of scope for this iteration.
+
+## Implemented Local Scope
+
+Create/adapt only:
+
+1. `Package.swift`
+2. `Sources/SibiCore/RuntimeClient.swift`
+3. `Sources/SibiCore/RuntimeModels.swift`
+4. `Tests/SibiCoreTests/RuntimeClientTests.swift`
+5. `.gitignore` entries for SwiftPM build output
+
+## Runtime Commands To Bridge
+
+Expose exactly these Swift methods:
+
+1. `declareIntent` -> `declare_intent`
+2. `prepareCodeQuestion` -> `prepare_code_question`
+3. `generateQuestions` -> `generate_questions`
+4. `answerQuestion` -> `answer_question`
+5. `getSessionSummary` -> `get_session_summary`
+
+Do not expose notes, resource capture, reading, code review, shell, UI, or observer commands in `SibiCore`.
 
 ## Explicit Exclusions
 
-Do not copy or audit for implementation yet:
+Do not copy in this iteration:
 
 1. `SibiShell`
 2. `SibiShellKit`
@@ -43,54 +65,45 @@ Do not copy or audit for implementation yet:
 9. app bundle scripts
 10. macOS permission flows
 
-These may be useful later, but they are surface work, not the first bridge.
+These are surface work. They need a separate shell/panel spec because the source shell still depends on notes, reading, and code-review-plan commands that the runtime moat audit removed from the foundation.
 
-## Required Output
+## Required Audit Output
 
-Create a bridge review artifact:
+Update:
 
 ```text
 docs/triage/swift-bridge-candidate-audit.md
 ```
 
-It must answer:
+It must capture:
 
-1. Which TS runtime commands need Swift payload/result models for v0.1?
-2. Which current Swift models are still aligned with the copied runtime?
-3. Which current Swift models are old observer/shell baggage?
-4. Can `RuntimeClient` remain a process bridge, or does it need a smaller interface?
-5. What exact files should be copied if/when Swift bridge work starts?
-6. What tests would prove the bridge without launching a UI?
-
-## Default Candidate Commands
-
-For the first Swift bridge, prefer only:
-
-1. `declare_intent`
-2. `prepare_code_question`
-3. `answer_question`
-4. `get_session_summary`
-
-Add `prepare_reading_question` only if the runtime moat audit keeps it as supporting/foundation.
-
-Do not include notes, capture resource, code review, or shell commands in the first Swift bridge unless the audit proves they are needed.
+1. what was copied into the local repo
+2. which source Swift pieces were kept, adapted, or dropped
+3. the exact five-command bridge contract
+4. why TypeScript remains the state owner
+5. what ShellKit/panel/observer code can be considered later
 
 ## Non-Goals
 
-1. No Swift code copy.
-2. No Package.swift creation.
-3. No UI.
-4. No `swift build`.
-5. No app bundle.
-6. No runtime protocol redesign beyond audit recommendations.
+1. No Swift UI.
+2. No AppKit app target.
+3. No shell launch.
+4. No spotlight/OCR.
+5. No notes, reading, resource, or code-review-plan bridge.
+6. No Swift-side persistence.
+7. No Swift-side queues, readiness, memory, concept extraction, or question generation.
+
+Queue, memory, readiness, scheduling, artifact maps, concept extraction, and system state belong in TypeScript or a future Rust runtime.
 
 ## Acceptance Criteria
 
 This iteration is complete when:
 
-1. `docs/triage/swift-bridge-candidate-audit.md` exists.
-2. It names the exact Swift files allowed for the later bridge slice.
-3. It names the exact runtime commands to bridge.
-4. It explicitly keeps TypeScript as the state owner.
-5. It excludes shell/UI until after the runtime moat audit.
-
+1. `SibiCore` compiles as a Swift package target.
+2. Swift exposes only the five foundation runtime methods.
+3. Swift tests prove envelope decoding, runtime error decoding, command strings, path resolution, and model decoding.
+4. At least one Swift test calls the real TypeScript runtime through `RuntimeClient`.
+5. `npm test` passes.
+6. `npm run typecheck` passes.
+7. `swift test` passes.
+8. `docs/triage/swift-bridge-candidate-audit.md` reflects implementation status and next shell/panel boundaries.

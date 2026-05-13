@@ -9,17 +9,18 @@ The runtime moat audit is accepted as the bridge input:
 1. TypeScript owns session, question, answer evidence, signal history, and summaries.
 2. Swift is a future native surface only.
 3. The first bridge must target only the trimmed v0.1 foundation command set.
-4. No Swift code is copied or implemented in this audit.
+4. The first Swift copy is limited to `SibiCore`, not shell/UI.
 
 ## Current runtime verification
 
-Verified from `/Users/d1eshi/projects/startup/sibar` before writing this audit:
+Verified from `/Users/d1eshi/projects/startup/sibar` while writing and implementing this audit:
 
 | Check | Result |
 |---|---|
 | `git status --short --branch` | Clean `main` before edits. |
 | `npm test` | Pass, 5 tests. |
 | `npm run typecheck` | Pass. |
+| `swift test` | Pass, 12 tests. |
 | STDIO smoke | Pass with `SIBI_RUNTIME_HOME=/tmp/sibi-runtime-swift-bridge-audit`. |
 
 STDIO smoke covered:
@@ -82,7 +83,28 @@ Audited source candidates from `sibar-agent`:
 |---|---|---|---|
 | `RuntimeClient.swift` | `ProcessResult`, `ProcessRunning`, `SystemProcessRunner`, runtime envelope send/decode path, runtime path resolution, `RuntimeClientError` | Public method list must shrink to the five foundation commands. Runtime path tests should remove `SibiShell` naming. | `EmptyPayload`, methods for resource capture, notes, reading question, code review. |
 | `RuntimeModels.swift` | command envelope, error payload, operation state, declared intent, signal, code selection, foundation payload/result models | `RuntimeQuestion` should include `detected_layer` and `required_layer`; `RuntimeSessionSummary` should remove `reading_selection` and `review_plan` from the first bridge model. | resource, note, reading, review-plan, reviewed-file, highlighted-range, and non-foundation result models. |
-| `RuntimeClientTests.swift` | stub runner, success envelope decode, runtime error decode, `prepare_code_question` send/decode shape, runtime path resolution | Add command-string tests for all five foundation methods; update sample payloads to TypeScript/code-artifact examples; remove `SibiShell.app` path naming. | tests for notes, reading question, code review, resource capture, shell launch, UI, AppKit, overlay, spotlight. |
+| `RuntimeClientTests.swift` | stub runner, success envelope decode, runtime error decode, `prepare_code_question` send/decode shape, runtime path resolution | Add command-string tests for all five foundation methods; update sample payloads to TypeScript/code-artifact examples; remove old shell app path naming. | tests for notes, reading question, code review, resource capture, shell launch, UI, AppKit, overlay, spotlight. |
+
+## Implemented bridge copy
+
+Copied and adapted into `/Users/d1eshi/projects/startup/sibar`:
+
+1. `Package.swift`
+2. `Sources/SibiCore/RuntimeClient.swift`
+3. `Sources/SibiCore/RuntimeModels.swift`
+4. `Tests/SibiCoreTests/RuntimeClientTests.swift`
+
+Implementation decisions:
+
+1. Package name is `sibi`.
+2. Only the `SibiCore` library target exists.
+3. No executable, shell, AppKit, SwiftUI, overlay, spotlight, OCR, or permission target was copied.
+4. `RuntimeClient` exposes only the five foundation runtime methods.
+5. `RuntimeModels` includes only foundation payload/result/shared models.
+6. `RuntimeQuestion` includes `detected_layer` and `required_layer`, matching the TypeScript runtime.
+7. Runtime path resolution remains available through `SIBI_RUNTIME_PATH`, `SIBI_REPO_ROOT`, bundle resources, cwd, or ancestor search for `src/runtime.ts`.
+8. Swift tests include a real process call into `src/runtime.ts`, not only stubbed envelope decoding.
+9. `.build/` and `.swiftpm/` are ignored in git.
 
 ## Model surface for future bridge implementation
 
@@ -122,19 +144,20 @@ Shared models to preserve:
 
 `RuntimeQuestion` should preserve `detected_layer` and `required_layer` because the TypeScript foundation runtime returns them and they are useful for later readiness rendering.
 
-## Exact files allowed for later bridge slice
+## Local files copied for this bridge slice
 
-If bridge implementation starts, copy and adapt only:
+The bridge slice has now copied and adapted only these local files:
 
-1. `sibar-agent/Sources/SibiCore/RuntimeClient.swift`
-2. `sibar-agent/Sources/SibiCore/RuntimeModels.swift`
-3. `sibar-agent/Tests/SibiCoreTests/RuntimeClientTests.swift`
+1. `Package.swift`
+2. `Sources/SibiCore/RuntimeClient.swift`
+3. `Sources/SibiCore/RuntimeModels.swift`
+4. `Tests/SibiCoreTests/RuntimeClientTests.swift`
 
-Do not copy `SibiShell`, `SibiShellKit`, `ShellView`, overlay controllers, spotlight controllers, app bundle scripts, AppKit shell code, SwiftUI shell tests, OCR behavior, or permission flows.
+Do not copy `SibiShell`, `SibiShellKit`, `ShellView`, overlay controllers, spotlight controllers, app bundle scripts, AppKit shell code, SwiftUI shell tests, OCR behavior, or permission flows until the shell audit below is satisfied.
 
 ## Future Swift tests
 
-The bridge implementation should prove:
+The bridge implementation now proves:
 
 1. successful runtime envelope decoding
 2. runtime error envelope decoding
@@ -146,18 +169,41 @@ The bridge implementation should prove:
 8. runtime path resolves through `SIBI_RUNTIME_PATH`
 9. runtime path can resolve repo `src/runtime.ts` without `SibiShell` assumptions
 
-Do not carry forward tests for notes, reading, review plan, resource capture, shell launch, AppKit, overlay, spotlight, or UI.
+Do not carry forward tests for notes, reading, review plan, resource capture, shell launch, AppKit, overlay, spotlight, or UI into `SibiCore`.
+
+## ShellKit / panel / observer audit
+
+The source shell code is useful, but it is not safe to copy as-is after the runtime trim.
+
+| Source area | Current behavior | Decision |
+|---|---|---|
+| `ShellViewModel` | Calls notes, reading, code review plan, answer submission, session summary, and spotlight. | Adapt later. Keep only intent/code-question/answer/summary flow first. |
+| `ShellView` | Three modes: note, code review, reading. Uses visible text for workflow explanation and old sidecar language. | Adapt later. First panel should be code artifact loop only. |
+| `OverlayPanelController` | Creates floating/collapsible panel and separate code review canvas keyed to `RuntimeReviewPlan`. | Partially keep later. Panel mechanics are useful; code review canvas must be rebuilt around `RuntimeCodeSelection` + `RuntimeQuestion`. |
+| `CodeSpotlightController` | Performs screen capture + Vision OCR and draws highlight overlay. | Later. This is Swift-owned process/UI inference, but requires permission handling and should not block the first bridge. |
+| `AppDelegate` / `SibiShell` | Launches accessory app and shows overlay. | Later. Needed for a native app, not for bridge correctness. |
+
+Next Swift UI slice should copy/adapt `SibiShellKit` only after creating a narrow shell spec. The minimum shell should:
+
+1. render a floating panel
+2. call `prepareCodeQuestion`
+3. render the returned question and code selection
+4. call `answerQuestion`
+5. call `getSessionSummary`
+6. never implement queues, memory, readiness, question generation, or persistence in Swift
+
+Queue, memory, readiness, scheduling, artifact maps, concept extraction, and system state must remain in TypeScript or a future Rust runtime.
 
 ## Decision
 
 `RuntimeClient` can remain a process bridge. It should be smaller, not smarter.
 
-The next bridge implementation slice should:
+The bridge implementation slice is now complete for `SibiCore`. The next Swift slice, if chosen, should:
 
-1. create the minimum Swift package/surface only when a native caller is needed
-2. copy/adapt the three allowed files only
-3. expose only the five foundation methods
+1. create a narrow shell/panel spec before code
+2. copy/adapt only panel mechanics and code-question UI
+3. exclude notes, reading, code-review-plan, OCR spotlight, and AppKit permission flows until separately audited
 4. keep TypeScript as the state owner
-5. run Swift tests without launching any UI
+5. run Swift tests without launching UI
 
 The alternative next product slice remains `Foundation memory + readiness skeleton`, as recommended by the runtime moat audit. Choose the Swift bridge implementation only if a native surface is needed immediately.

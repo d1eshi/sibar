@@ -1,4 +1,6 @@
 node_modules/
 dist/
 .sibar/
+.build/
+.swiftpm/
 .DS_Store

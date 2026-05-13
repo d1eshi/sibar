@@ -52,11 +52,13 @@ Verification:
 3. `npm test` passes
 4. `npm run typecheck` passes
 
-## Iteration 3: Swift Bridge Candidate Audit
+## Iteration 3: Swift Bridge Core
+
+Status: complete.
 
 Specs: 03, 04, 07
 
-Evaluate only the minimum Swift bridge candidate after the TS runtime audit. Do not copy Swift code yet.
+Copy and adapt only the minimum `SibiCore` process bridge after the TS runtime audit.
 
 Spec:
 
@@ -64,9 +66,10 @@ Spec:
 
 Verification:
 
-1. exact bridge files are named
-2. exact runtime commands are named
-3. shell/UI/AppKit are explicitly excluded
+1. `SibiCore` exposes only the five foundation commands
+2. Swift tests call the real TypeScript runtime once
+3. `swift test` passes
+4. shell/UI/AppKit are explicitly excluded
 
 ## Iteration 4: Artifact Session Prototype
 
