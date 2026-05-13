@@ -3,9 +3,8 @@ import { randomUUID } from "node:crypto";
 import { Layer, type DeclaredWorkIntent, type LearningSignal } from "./pedagogy/index.ts";
 import { recordSignal } from "./store.ts";
 import type { RuntimeCodeSelection } from "./code-selection.ts";
-import type { RuntimeReadingSelection } from "./reading-selection.ts";
 import { readState, writeState } from "./runtime-state.ts";
-import { now, type RuntimeQuestion, type RuntimeReviewPlan, type RuntimeSession, type RuntimeState } from "./runtime-support.ts";
+import { now, type RuntimeQuestion, type RuntimeSession, type RuntimeState } from "./runtime-support.ts";
 
 export function createPreparedQuestionSession(input: {
   projectLabel: string;
@@ -18,8 +17,6 @@ export function createPreparedQuestionSession(input: {
   signalReason: string;
   signalEvidence: string[];
   codeSelection?: RuntimeCodeSelection;
-  readingSelection?: RuntimeReadingSelection;
-  reviewPlan?: RuntimeReviewPlan;
 }): { state: RuntimeState; session: RuntimeSession; question: RuntimeQuestion } {
   const state = readState();
   const sessionID = randomUUID();
@@ -66,10 +63,7 @@ export function createPreparedQuestionSession(input: {
     ownership_questions: [question],
     export_state: "ready_for_review",
     task_type: "make-small-change",
-    resource_ids: [],
     code_selection: input.codeSelection,
-    reading_selection: input.readingSelection,
-    review_plan: input.reviewPlan,
   };
 
   state.sessions[sessionID] = session;

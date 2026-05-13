@@ -63,7 +63,5 @@ export function toSummary(session: RuntimeSession): RuntimeSessionSummary {
     ownership_questions: session.ownership_questions,
     export_state: session.export_state,
     code_selection: session.code_selection,
-    reading_selection: session.reading_selection,
-    review_plan: session.review_plan,
   };
 }
