@@ -2,6 +2,13 @@
 
 Use these pillars to reject or accept work for v0.1.
 
+Related product docs:
+
+1. `00_foundation.md`
+2. `01_moat.md`
+3. `02_v01_scope.md`
+4. `03_versioning_and_changelog.md`
+
 ## 1. Artifact Before Course
 
 The user learns from a real software artifact, not from a generic lesson.
@@ -31,4 +38,3 @@ They are not failures, grades, or shame points.
 Sibi is successful when it can say what the user is ready to inspect, explain, modify, or own.
 
 The goal is durable technical ownership, not more generated code.
-
