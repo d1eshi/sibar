@@ -74,6 +74,32 @@ A release is ready only when all of these are true:
 Conventional Commits are useful for clean history and agent handoffs, but they
 do not automatically decide Sibi's public product version.
 
+## Atomic Commit Bridge
+
+Every commit should have one intent. The changelog records only the intents that
+matter to product progress.
+
+Update `CHANGELOG.md` in the same commit when a change affects:
+
+1. user-visible behavior
+2. a demo or documented workflow
+3. a product spec or accepted iteration
+4. release readiness or confidence
+5. the public product narrative used by the web
+
+Skip `CHANGELOG.md` for purely mechanical internal changes unless they are
+important for release confidence.
+
+Use this mapping:
+
+1. `feat` -> `Added` or `Changed`
+2. `fix` -> `Fixed`
+3. `docs` -> `Docs`
+4. release-relevant `test`, `refactor`, or `chore` -> `Internal`
+
+A behavior change that is too large to summarize in one changelog bullet should
+be split into smaller commits or attached to a spec/iteration before release.
+
 ## Changelog Rules
 
 Keep `CHANGELOG.md` as the source of truth.
