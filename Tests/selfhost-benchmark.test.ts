@@ -42,6 +42,12 @@ function withMutatedGoldIndex(
   }
 }
 
+type SelfhostBenchmarkAggregateSummary = {
+  total_mismatches: number;
+  pilot_validation_mismatch_count: number;
+  benchmark_load_mismatch_count: number;
+};
+
 test("self-hosted benchmark passes all gold cases with no mismatches", () => {
   const report = runSelfhostBenchmark();
 
@@ -51,6 +57,7 @@ test("self-hosted benchmark passes all gold cases with no mismatches", () => {
   assert.equal(report.aggregate.failed_cases, 0);
   assert.equal(report.aggregate.total_mismatches, 0);
   assert.equal(report.aggregate.pilot_validation_mismatch_count, 0);
+  assert.equal(report.aggregate.benchmark_load_mismatch_count, 0);
   assert.equal(report.aggregate.gap_precision, 1);
   assert.equal(report.aggregate.gap_recall, 1);
   assert.equal(report.aggregate.gap_type_accuracy, 1);
@@ -75,6 +82,7 @@ test("benchmark flags mismatch when a non-grounded case has an invalid expected_
     const report = runSelfhostBenchmark({ manifestPath: DEFAULT_MANIFEST_PATH, indexPath: tempPath });
     assert.equal(report.aggregate.total_mismatches > 0, true);
     assert.equal(report.aggregate.pilot_validation_mismatch_count > 0, true);
+    assert.equal(report.aggregate.benchmark_load_mismatch_count, 0);
     assert.equal(report.pilot_validation.aggregate.total_mismatches > 0, true);
     assert.ok(
       report.pilot_validation.mismatches.some((entry) =>
@@ -100,6 +108,7 @@ test("benchmark flags mismatch when correct_grounded case has expected_gap_prese
   try {
     const report = runSelfhostBenchmark({ manifestPath: DEFAULT_MANIFEST_PATH, indexPath: tempPath });
     assert.equal(report.aggregate.total_mismatches > 0, true);
+    assert.equal(report.aggregate.benchmark_load_mismatch_count, 0);
     assert.ok(
       report.pilot_validation.mismatches.some((entry) =>
         entry.code === "case_gap_present_for_correct_grounded",
@@ -126,10 +135,11 @@ test("CLI writes benchmark report with space-separated report flag", () => {
     });
 
     assert.equal(result.status, 0);
-    const aggregate = JSON.parse(result.stdout || "{}") as { total_mismatches: number };
+    const aggregate = JSON.parse(result.stdout || "{}") as SelfhostBenchmarkAggregateSummary;
     assert.equal(aggregate.total_mismatches, 0);
-    const report = JSON.parse(readFileSync(reportPath, "utf8")) as { aggregate: { total_mismatches: number } };
+    const report = JSON.parse(readFileSync(reportPath, "utf8")) as { aggregate: SelfhostBenchmarkAggregateSummary };
     assert.equal(report.aggregate.total_mismatches, 0);
+    assert.equal(report.aggregate.benchmark_load_mismatch_count, 0);
     assert.ok(existsSync(reportPath));
   } finally {
     rmSync(tempDir, { recursive: true, force: true });
@@ -157,8 +167,30 @@ test("CLI exits nonzero for temp index mutation", () => {
     });
 
     assert.equal(result.status, 1);
-    const aggregate = JSON.parse(result.stdout || "{}") as { total_mismatches: number };
+    const aggregate = JSON.parse(result.stdout || "{}") as SelfhostBenchmarkAggregateSummary;
     assert.equal(aggregate.total_mismatches > 0, true);
+    assert.equal(aggregate.benchmark_load_mismatch_count, 0);
+  } finally {
+    rmSync(tempDir, { recursive: true, force: true });
+  }
+});
+
+test("benchmark separates load mismatches from pilot validation mismatches", () => {
+  const tempDir = mkdtempSync(join(tmpdir(), "sibar-selfhost-benchmark-load-mismatch-"));
+  const tempPath = join(tempDir, "index-corrupted.json");
+  writeFileSync(tempPath, `{}\n`, "utf8");
+
+  try {
+    const report = runSelfhostBenchmark({ manifestPath: DEFAULT_MANIFEST_PATH, indexPath: tempPath });
+
+    assert.equal(report.aggregate.total_cases, 0);
+    assert.equal(report.aggregate.failed_cases, 0);
+    assert.equal(report.aggregate.benchmark_load_mismatch_count, 1);
+    assert.equal(report.aggregate.pilot_validation_mismatch_count, report.pilot_validation.aggregate.total_mismatches);
+    assert.equal(
+      report.aggregate.total_mismatches,
+      report.aggregate.pilot_validation_mismatch_count + report.aggregate.benchmark_load_mismatch_count,
+    );
   } finally {
     rmSync(tempDir, { recursive: true, force: true });
   }

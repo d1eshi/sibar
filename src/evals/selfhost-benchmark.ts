@@ -101,6 +101,7 @@ type AggregateGapStats = {
 
 export type SelfhostBenchmarkAggregate = AggregateGapStats & {
   pilot_validation_mismatch_count: number;
+  benchmark_load_mismatch_count: number;
 };
 
 export type SelfhostBenchmarkReport = {
@@ -492,6 +493,7 @@ function evaluateObservedCase(rawCasePayload: unknown, index: number): SelfhostB
 function aggregateBenchmarkResults(
   results: SelfhostBenchmarkCaseResult[],
   pilotValidationMismatches: number,
+  benchmarkLoadMismatches: number,
 ): SelfhostBenchmarkAggregate {
   const totalCases = results.length;
   const passedCases = results.filter((entry) => entry.passed).length;
@@ -508,7 +510,7 @@ function aggregateBenchmarkResults(
   const gapTypeMatches = expectedGapTypeCases.filter((entry) =>
     entry.observed_gap_type === entry.expected_gap_type
   ).length;
-  const totalMismatches = totalGapMismatches + pilotValidationMismatches;
+  const totalMismatches = totalGapMismatches + pilotValidationMismatches + benchmarkLoadMismatches;
 
   const overconfidentCases = results.filter((entry) => entry.answer_class === "overconfident_wrong");
   const overconfidentDetected = overconfidentCases.filter((entry) =>
@@ -543,6 +545,7 @@ function aggregateBenchmarkResults(
     design_issue_expected_count: designRecallDenominator,
     design_issue_detection_recall: calculateRatio(designIssueDetected, designRecallDenominator),
     pilot_validation_mismatch_count: pilotValidationMismatches,
+    benchmark_load_mismatch_count: benchmarkLoadMismatches,
   };
 }
 
@@ -673,7 +676,11 @@ export function runSelfhostBenchmark(options: SelfhostBenchmarkOptions = {}): Se
     }
   });
 
-  const aggregate = aggregateBenchmarkResults(caseResults, pilotReport.aggregate.total_mismatches + caseMismatches.length);
+  const aggregate = aggregateBenchmarkResults(
+    caseResults,
+    pilotReport.aggregate.total_mismatches,
+    caseMismatches.length,
+  );
   const report: SelfhostBenchmarkReport = {
     generated_at: new Date().toISOString(),
     validation: BENCHMARK_VALIDATION_ID,
