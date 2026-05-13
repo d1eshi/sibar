@@ -3,19 +3,30 @@ import { basename } from "node:path";
 
 import {
   Layer,
-  MINIMUM_LAYER_FOR_TASK,
-  generateQuestions,
   verifyAnswer,
   type AgentWorkSessionSummary,
   type AnswerQuality,
   type DeclaredWorkIntent,
-  type DetectedGap,
   type LearningSignal,
   type TaskType,
 } from "./pedagogy/index.ts";
-import { getConceptMap, recordSignal } from "./store.ts";
+import { recordSignal } from "./store.ts";
 import { CodeSelectionError, readCodeSelection, type RuntimeCodeSelection } from "./code-selection.ts";
+import {
+  assertArtifactAllowsPath,
+  createArtifactSessionCommand,
+  getArtifactSessionCommand,
+  resolveArtifactSessionFromPayload,
+} from "./runtime-artifact-session.ts";
+import { runProjectLearningAgentCommand } from "./runtime-agent.ts";
+import { prepareAutopsyStepCommand } from "./runtime-autopsy.ts";
+import { buildConceptGraphCommand } from "./runtime-concept-graph.ts";
+import { detectLearningGapFromAnswer, persistGapDetectionResult } from "./runtime-gap-detection.ts";
+import { getUnderstandingMemoryCommand } from "./runtime-memory.ts";
+import { generatePracticeChallengesCommand } from "./runtime-practice.ts";
 import { createPreparedQuestionSession } from "./runtime-prepared-question.ts";
+import { generateQuestionsCommand } from "./runtime-questions.ts";
+import { readinessReportCommand } from "./runtime-readiness.ts";
 import { getSession, readState, toSummary, writeState } from "./runtime-state.ts";
 import {
   RuntimeError,
@@ -23,6 +34,8 @@ import {
   fail,
   now,
   toOperationState,
+  type ConceptUnderstandingState,
+  type LearningGap,
   type RuntimeQuestion,
   type RuntimeRequest,
   type RuntimeResponse,
@@ -161,9 +174,13 @@ function prepareCodeQuestionCommand(payload: Record<string, unknown>): RuntimeSu
   operation_state: { message: string };
 }> {
   const projectLabel = String(payload.project_label || "").trim() || "code";
+  const artifactSession = resolveArtifactSessionFromPayload(payload);
+  const boundedFilePath = artifactSession
+    ? assertArtifactAllowsPath(String(payload.file_path || ""), artifactSession)
+    : String(payload.file_path || "");
   const selection = readCodeSelection({
-    project_path: typeof payload.project_path === "string" ? payload.project_path : null,
-    file_path: String(payload.file_path || ""),
+    project_path: artifactSession?.root_path ?? (typeof payload.project_path === "string" ? payload.project_path : null),
+    file_path: boundedFilePath,
     start_line: Number(payload.start_line),
     end_line: payload.end_line == null ? null : Number(payload.end_line),
   });
@@ -191,6 +208,7 @@ function prepareCodeQuestionCommand(payload: Record<string, unknown>): RuntimeSu
       why_it_matters: "Owning this code means being able to name its responsibility and reason about the risk of changing it.",
       evidence_basis: evidence,
       answer_style: selection.start_line === selection.end_line ? "short_explanation" : "risk_analysis",
+      max_followups: 1,
     },
     signalReason: "Runtime prepared a Socratic ownership question for a bounded code selection.",
     signalEvidence: evidence,
@@ -208,96 +226,11 @@ function prepareCodeQuestionCommand(payload: Record<string, unknown>): RuntimeSu
   };
 }
 
-function generateQuestionsCommand(payload: Record<string, unknown>): RuntimeSuccess<{
-  session_id: string;
-  questions: RuntimeQuestion[];
-  learning_signals: LearningSignal[];
-  operation_state: { message: string };
-}> {
-  const state = readState();
-  const session = getSession(state, payload.session_id as string | undefined);
-  const intent = session.declared_intent;
-  if (!intent) {
-    fail("missing_intent", "Session has no declared intent.");
-  }
-
-  const concept = inferConcept(intent);
-  const conceptMap = getConceptMap();
-  const detectedLayer = conceptMap[concept]?.current_layer ?? Layer.L2_ISOLATED_EXPLANATION;
-  const requiredLayer = MINIMUM_LAYER_FOR_TASK[session.task_type];
-
-  const gaps: DetectedGap[] = detectedLayer >= requiredLayer
-    ? []
-    : [{
-      concept,
-      detectedLayer,
-      requiredLayer,
-      severity: detectedLayer + 1 < requiredLayer ? "critical" : "important",
-      confidence: "high",
-      evidence: [intent.statement, intent.uncertainty],
-      layerDetection: {
-        concept,
-        highestLayer: detectedLayer,
-        observedSignals: [],
-        averageConfidence: "high",
-      },
-    }];
-
-  const generated = generateQuestions(gaps, session.session_id, 3).map(({ question }) => ({
-    ...question,
-    detected_layer: detectedLayer,
-    required_layer: requiredLayer,
-  }));
-
-  const signal: LearningSignal | null = gaps[0]
-    ? {
-      signal_id: randomUUID(),
-      created_at: now(),
-      source: "ownership_question",
-      project_label: session.project_label,
-      project_path: intent.project_path,
-      concept_or_area: concept,
-      reason: "Runtime generated a question from the declared gap.",
-      evidence: gaps[0].evidence,
-      severity: gaps[0].severity,
-      confidence: gaps[0].confidence,
-    }
-    : null;
-
-  session.ownership_questions = generated;
-  if (signal) {
-    session.learning_signals.push(signal);
-    recordSignal({
-      signal_id: signal.signal_id,
-      session_id: session.session_id,
-      concept,
-      source: signal.source,
-      evidence: signal.evidence.join(" | "),
-      confidence: signal.confidence,
-      observed_at: signal.created_at,
-    });
-  }
-  session.export_state = generated.length > 0 ? "ready_for_review" : session.export_state;
-  writeState(state);
-
-  return {
-    ok: true,
-    data: {
-      session_id: session.session_id,
-      questions: session.ownership_questions,
-      learning_signals: session.learning_signals,
-      operation_state: toOperationState(
-        generated.length > 0
-          ? "Questions generated in TypeScript runtime."
-          : "No gap detected for the current session.",
-      ),
-    },
-  };
-}
-
 function answerQuestionCommand(payload: Record<string, unknown>): RuntimeSuccess<{
   session_id: string;
   question: RuntimeQuestion;
+  learning_gap?: LearningGap;
+  confirmed_concept_state?: ConceptUnderstandingState;
   session_summary: AgentWorkSessionSummary;
   operation_state: { message: string };
 }> {
@@ -318,6 +251,8 @@ function answerQuestionCommand(payload: Record<string, unknown>): RuntimeSuccess
   const verification = verifyAnswer(asLayer(question.detected_layer), asLayer(question.required_layer), quality);
   question.answer = answer;
   question.answer_quality = quality;
+  const gapResult = detectLearningGapFromAnswer({ state, session, question, answer, quality });
+  persistGapDetectionResult(state, gapResult);
 
   const intent = session.declared_intent;
   const concept = question.target_area;
@@ -356,6 +291,9 @@ function answerQuestionCommand(payload: Record<string, unknown>): RuntimeSuccess
     data: {
       session_id: session.session_id,
       question,
+      ...(gapResult.kind === "gap"
+        ? { learning_gap: gapResult.learning_gap }
+        : { confirmed_concept_state: gapResult.confirmed_concept_state }),
       session_summary: toSummary(session),
       operation_state: toOperationState(verification.action.message),
     },
@@ -380,6 +318,22 @@ function getSessionSummaryCommand(payload: Record<string, unknown>): RuntimeSucc
 export function handleRequest(request: RuntimeRequest): RuntimeResponse<unknown> {
   try {
     switch (request.command) {
+      case "create_artifact_session":
+        return createArtifactSessionCommand(request.payload);
+      case "get_artifact_session":
+        return getArtifactSessionCommand(request.payload);
+      case "build_concept_graph":
+        return buildConceptGraphCommand(request.payload);
+      case "prepare_autopsy_step":
+        return prepareAutopsyStepCommand(request.payload);
+      case "get_understanding_memory":
+        return getUnderstandingMemoryCommand(request.payload);
+      case "readiness_report":
+        return readinessReportCommand(request.payload);
+      case "generate_practice_challenges":
+        return generatePracticeChallengesCommand(request.payload);
+      case "run_project_learning_agent":
+        return runProjectLearningAgentCommand(request.payload);
       case "declare_intent":
         return declareIntent(request.payload);
       case "generate_questions":

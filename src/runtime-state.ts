@@ -2,7 +2,13 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { homedir } from "node:os";
 import { join } from "node:path";
 
-import { fail, type RuntimeSession, type RuntimeSessionSummary, type RuntimeState } from "./runtime-support.ts";
+import {
+  fail,
+  type ArtifactSession,
+  type RuntimeSession,
+  type RuntimeSessionSummary,
+  type RuntimeState,
+} from "./runtime-support.ts";
 
 export function runtimeHome(): string {
   return process.env.SIBI_RUNTIME_HOME || join(homedir(), ".sibar");
@@ -22,13 +28,18 @@ function ensureRuntimeDir(): void {
 export function readState(): RuntimeState {
   const path = statePath();
   if (!existsSync(path)) {
-    return { sessions: {} };
+    return { sessions: {}, artifact_sessions: {} };
   }
 
   try {
-    return JSON.parse(readFileSync(path, "utf8")) as RuntimeState;
+    const parsed = JSON.parse(readFileSync(path, "utf8")) as RuntimeState;
+    return {
+      ...parsed,
+      sessions: parsed.sessions ?? {},
+      artifact_sessions: parsed.artifact_sessions ?? {},
+    };
   } catch {
-    return { sessions: {} };
+    return { sessions: {}, artifact_sessions: {} };
   }
 }
 
@@ -49,6 +60,20 @@ export function getSession(state: RuntimeState, sessionID?: string | null): Runt
   }
 
   return session;
+}
+
+export function getArtifactSession(state: RuntimeState, artifactSessionID?: string | null): ArtifactSession {
+  const resolvedID = artifactSessionID || state.current_artifact_session_id;
+  if (!resolvedID) {
+    fail("missing_artifact_session", "No active artifact session. Create an artifact session first.");
+  }
+
+  const artifactSession = state.artifact_sessions?.[resolvedID];
+  if (!artifactSession) {
+    fail("missing_artifact_session", `Artifact session ${resolvedID} was not found.`);
+  }
+
+  return artifactSession;
 }
 
 export function toSummary(session: RuntimeSession): RuntimeSessionSummary {

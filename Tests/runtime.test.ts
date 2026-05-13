@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
-import { mkdirSync, mkdtempSync, symlinkSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, realpathSync, symlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 
@@ -191,6 +191,201 @@ test("prepare_code_question keeps selected text inside surrounding_text after by
   }));
 
   assert.ok(prepared.data.selection.surrounding_text.includes(prepared.data.selection.selected_text));
+});
+
+test("create_artifact_session stores a bounded artifact session", () => {
+  withTempHome();
+  const projectPath = mkdtempSync(join(tmpdir(), "sibar-artifact-"));
+  const sourceDir = join(projectPath, "src");
+  const docsDir = join(projectPath, "docs");
+  mkdirSync(sourceDir);
+  mkdirSync(docsDir);
+  writeFileSync(join(sourceDir, "Runtime.ts"), "export const value = 1;\n");
+
+  const created = expectSuccess<{
+    artifact_session: {
+      artifact_session_id: string;
+      label: string;
+      root_path: string;
+      source_type: string;
+      learning_goal: string;
+      confidence: string;
+      included_paths: string[];
+      excluded_paths: string[];
+      created_at: string;
+    };
+  }>(handleRequest({
+    command: "create_artifact_session",
+    payload: {
+      label: "Sibi runtime",
+      root_path: projectPath,
+      source_type: "local_path",
+      learning_goal: "Understand runtime boundaries",
+      confidence: "medium",
+      included_paths: ["src"],
+      excluded_paths: ["docs"],
+    },
+  }));
+
+  assert.equal(created.data.artifact_session.label, "Sibi runtime");
+  assert.equal(created.data.artifact_session.learning_goal, "Understand runtime boundaries");
+  assert.equal(created.data.artifact_session.confidence, "medium");
+  assert.deepEqual(created.data.artifact_session.included_paths, [realpathSync(sourceDir)]);
+  assert.deepEqual(created.data.artifact_session.excluded_paths, [realpathSync(docsDir)]);
+  assert.match(created.data.artifact_session.created_at, /\d{4}-\d{2}-\d{2}T/);
+});
+
+test("artifact sessions are resumable from runtime state", () => {
+  withTempHome();
+  const projectPath = mkdtempSync(join(tmpdir(), "sibar-artifact-reload-"));
+  writeFileSync(join(projectPath, "README.md"), "# Demo\n");
+
+  const created = expectSuccess<{
+    artifact_session: { artifact_session_id: string; root_path: string; included_paths: string[] };
+  }>(handleRequest({
+    command: "create_artifact_session",
+    payload: {
+      label: "Reloadable",
+      root_path: projectPath,
+      source_type: "repository",
+      learning_goal: "Reload the boundary",
+      confidence: "high",
+      included_paths: ["."],
+      excluded_paths: [],
+    },
+  }));
+
+  const reloaded = expectSuccess<{
+    artifact_session: { artifact_session_id: string; root_path: string; included_paths: string[]; learning_goal: string };
+  }>(handleRequest({
+    command: "get_artifact_session",
+    payload: { artifact_session_id: created.data.artifact_session.artifact_session_id },
+  }));
+
+  assert.deepEqual(reloaded.data.artifact_session, {
+    ...created.data.artifact_session,
+    learning_goal: "Reload the boundary",
+  });
+});
+
+test("create_artifact_session rejects outside paths and symlink escapes", () => {
+  withTempHome();
+  const projectPath = mkdtempSync(join(tmpdir(), "sibar-artifact-root-"));
+  const sourceDir = join(projectPath, "src");
+  mkdirSync(sourceDir);
+  const outsidePath = join(mkdtempSync(join(tmpdir(), "sibar-artifact-outside-")), "outside.ts");
+  writeFileSync(outsidePath, "export const outside = true;\n");
+  const symlinkPath = join(projectPath, "linked-outside.ts");
+  symlinkSync(outsidePath, symlinkPath);
+
+  for (const includedPath of [outsidePath, "linked-outside.ts"]) {
+    const result = handleRequest({
+      command: "create_artifact_session",
+      payload: {
+        label: "Rejected",
+        root_path: projectPath,
+        source_type: "local_path",
+        learning_goal: "Reject escapes",
+        confidence: "low",
+        included_paths: [includedPath],
+        excluded_paths: [],
+      },
+    }) as { ok: false; error: { code: string } };
+    assert.equal(result.ok, false);
+    assert.equal(result.error.code, "outside_artifact");
+  }
+});
+
+test("prepare_code_question respects artifact includes and excludes", () => {
+  withTempHome();
+  const projectPath = mkdtempSync(join(tmpdir(), "sibar-artifact-selection-"));
+  const sourceDir = join(projectPath, "src");
+  const excludedDir = join(sourceDir, "generated");
+  const otherDir = join(projectPath, "other");
+  mkdirSync(sourceDir);
+  mkdirSync(excludedDir);
+  mkdirSync(otherDir);
+  const allowedPath = join(sourceDir, "Allowed.ts");
+  const excludedPath = join(excludedDir, "Generated.ts");
+  const outsideIncludedPath = join(otherDir, "Other.ts");
+  writeFileSync(allowedPath, "export const allowed = true;\n");
+  writeFileSync(excludedPath, "export const generated = true;\n");
+  writeFileSync(outsideIncludedPath, "export const other = true;\n");
+
+  const created = expectSuccess<{ artifact_session: { artifact_session_id: string } }>(handleRequest({
+    command: "create_artifact_session",
+    payload: {
+      label: "Selection",
+      root_path: projectPath,
+      source_type: "local_path",
+      learning_goal: "Bound file selection",
+      confidence: "medium",
+      included_paths: ["src"],
+      excluded_paths: ["src/generated"],
+    },
+  }));
+
+  const allowed = expectSuccess<{ selection: { file_path: string } }>(handleRequest({
+    command: "prepare_code_question",
+    payload: {
+      artifact_session_id: created.data.artifact_session.artifact_session_id,
+      file_path: allowedPath,
+      start_line: 1,
+    },
+  }));
+  assert.equal(allowed.data.selection.file_path, realpathSync(allowedPath));
+
+  for (const [filePath, code] of [
+    [excludedPath, "excluded_artifact_path"],
+    [outsideIncludedPath, "outside_artifact"],
+  ]) {
+    const result = handleRequest({
+      command: "prepare_code_question",
+      payload: {
+        artifact_session_id: created.data.artifact_session.artifact_session_id,
+        file_path: filePath,
+        start_line: 1,
+      },
+    }) as { ok: false; error: { code: string } };
+    assert.equal(result.ok, false);
+    assert.equal(result.error.code, code);
+  }
+});
+
+test("prepare_code_question requires artifact_session_id for artifact boundaries", () => {
+  withTempHome();
+  const projectPath = mkdtempSync(join(tmpdir(), "sibar-artifact-alias-"));
+  const sourceDir = join(projectPath, "src");
+  const otherDir = join(projectPath, "other");
+  mkdirSync(sourceDir);
+  mkdirSync(otherDir);
+  writeFileSync(join(sourceDir, "Allowed.ts"), "export const allowed = true;\n");
+  const otherPath = join(otherDir, "Other.ts");
+  writeFileSync(otherPath, "export const other = true;\n");
+
+  const created = expectSuccess<{ artifact_session: { artifact_session_id: string } }>(handleRequest({
+    command: "create_artifact_session",
+    payload: {
+      label: "Alias check",
+      root_path: projectPath,
+      source_type: "local_path",
+      learning_goal: "Avoid ambiguous ids",
+      confidence: "medium",
+      included_paths: ["src"],
+      excluded_paths: [],
+    },
+  }));
+
+  const prepared = expectSuccess<{ selection: { file_path: string } }>(handleRequest({
+    command: "prepare_code_question",
+    payload: {
+      session_id: created.data.artifact_session.artifact_session_id,
+      project_path: projectPath,
+      file_path: otherPath,
+      start_line: 1,
+    },
+  }));
+  assert.equal(prepared.data.selection.file_path, realpathSync(otherPath));
 });
 
 test("sibi-code-question keeps JSON stdout", () => {
