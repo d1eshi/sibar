@@ -1,8 +1,9 @@
 import { cpSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { dirname, join } from "node:path";
+import { dirname, join, resolve } from "node:path";
 import test from "node:test";
 import assert from "node:assert/strict";
+import { spawnSync } from "node:child_process";
 
 import { runSelfhostPilotEval } from "../src/evals/selfhost-pilot.ts";
 
@@ -107,4 +108,38 @@ test("validator fails when required_repo_evidence points outside manifest includ
   } finally {
     rmSync(tempDir, { recursive: true, force: true });
   }
+});
+
+test("runSelfhostPilotEval writes report when reportPath is provided", () => {
+  const tempDir = mkdtempSync(join(tmpdir(), "sibar-selfhost-pilot-report-"));
+  const reportPath = join(tempDir, "report.json");
+
+  try {
+    const report = runSelfhostPilotEval({ reportPath });
+    assert.equal(report.aggregate.total_mismatches, 0);
+    const written = JSON.parse(readFileSync(reportPath, "utf8")) as {
+      validation: string;
+      mismatches: unknown[];
+    };
+    assert.equal(written.validation, report.validation);
+    assert.equal(written.mismatches.length, report.mismatches.length);
+  } finally {
+    rmSync(tempDir, { recursive: true, force: true });
+  }
+});
+
+test("CLI accepts space-separated manifest flag and exits nonzero for missing manifest", () => {
+  const result = spawnSync(process.execPath, [
+    "--experimental-strip-types",
+    resolve("src/evals/selfhost-pilot.ts"),
+    "--manifest",
+    "does-not-exist.json",
+  ], {
+    encoding: "utf8",
+  });
+
+  assert.equal(result.status, 1);
+  const aggregate = JSON.parse(result.stdout || "{}") as { total_mismatches: number };
+  assert.equal(typeof aggregate.total_mismatches, "number");
+  assert.equal(aggregate.total_mismatches > 0, true);
 });
