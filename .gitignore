@@ -1,0 +1,4 @@
+node_modules/
+dist/
+.sibar/
+.DS_Store
