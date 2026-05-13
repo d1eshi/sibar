@@ -1,0 +1,36 @@
+{
+  "id": "GC-026",
+  "mastery_check_id": "SC-004-repair-practice-generation",
+  "concept_id": "repair_practice_generation",
+  "operation": "modify",
+  "answer_class": "correct_uncited",
+  "simulated_user_answer": "I can describe a repair mapping in general, but this answer has no concrete evidence references to the generating gap or artifact lines.",
+  "declared_confidence": "medium",
+  "expected_gap_type": "evidence_gap",
+  "expected_layer": 4,
+  "expected_severity": "important",
+  "expected_confidence": "medium",
+  "required_repo_evidence": [
+    {
+      "path": "src/runtime-practice.ts",
+      "rationale": "Shows evidence-derived challenge construction and expected evidence labels."
+    },
+    {
+      "path": "src/runtime-gap-detection.ts",
+      "rationale": "Defines evidence-coupled gap fields used for practice generation."
+    },
+    {
+      "path": "Tests/practice-challenges.test.ts",
+      "rationale": "Demonstrates expected evidence labels and persistence behavior."
+    }
+  ],
+  "forbidden_claims": [
+    "Describing a complete repair task without citing a gap source.",
+    "Assuming due_after can be inferred without severity."
+  ],
+  "acceptable_repair_task": "Ask for same mapping with exact gap_id, concept_id, and at least one evidence anchor.",
+  "acceptable_issue_candidate_type": "LearningGap",
+  "expected_readiness": "not ready yet",
+  "notes": "No gap? It is still a gap because repair must be evidence-traceable.",
+  "expected_gap_present": true
+}

@@ -1,0 +1,36 @@
+{
+  "id": "GC-004",
+  "mastery_check_id": "SC-001-artifact-boundary",
+  "concept_id": "artifact_boundary",
+  "operation": "trace",
+  "answer_class": "wrong_responsibility",
+  "simulated_user_answer": "Boundary rules belong to the readiness layer; the boundary itself is about what concepts can be explained, not which files are in or out.",
+  "declared_confidence": "high",
+  "expected_gap_type": "responsibility_gap",
+  "expected_layer": 4,
+  "expected_severity": "critical",
+  "expected_confidence": "high",
+  "required_repo_evidence": [
+    {
+      "path": "src/runtime-concept-graph.ts",
+      "rationale": "Boundary decisions happen in artifact graph and evidence inventory logic."
+    },
+    {
+      "path": "Tests/concept-graph.test.ts",
+      "rationale": "Validates file-boundary behavior independently from readiness aggregation."
+    },
+    {
+      "path": "src/runtime-support.ts",
+      "rationale": "Contains artifact session types and evidence shape tied to in-scope files."
+    }
+  ],
+  "forbidden_claims": [
+    "Assigning readiness policy and boundary policy to the same responsibility.",
+    "Claiming excluded files can be treated as authoritative evidence."
+  ],
+  "acceptable_repair_task": "Repair around responsibility separation: boundary enforcement is file selection; readiness is summary from confirmed states and gaps.",
+  "acceptable_issue_candidate_type": "LearningGap",
+  "expected_readiness": "not ready yet",
+  "notes": "Wrong responsibility assignment is a high-confidence gap despite accurate terminology elsewhere.",
+  "expected_gap_present": true
+}

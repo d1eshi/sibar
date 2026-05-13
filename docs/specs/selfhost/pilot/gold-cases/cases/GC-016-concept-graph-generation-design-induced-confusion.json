@@ -1,0 +1,36 @@
+{
+  "id": "GC-016",
+  "mastery_check_id": "SC-002-concept-graph-generation",
+  "concept_id": "concept_graph_generation",
+  "operation": "explain",
+  "answer_class": "design_induced_confusion",
+  "simulated_user_answer": "The prompt and the graph output language are overloaded, so I treated concept labels as enough and skipped the explicit evidence-to-relation mapping.",
+  "declared_confidence": "medium",
+  "expected_gap_type": "design_induced_gap",
+  "expected_layer": 4,
+  "expected_severity": "important",
+  "expected_confidence": "medium",
+  "required_repo_evidence": [
+    {
+      "path": "src/runtime-concept-graph.ts",
+      "rationale": "Contains the implemented mapping from concept evidence to relation output."
+    },
+    {
+      "path": "src/runtime-support.ts",
+      "rationale": "Defines relation labels and edge fields that the answer must reference."
+    },
+    {
+      "path": "Tests/concept-graph.test.ts",
+      "rationale": "Anchors expected explanation quality for concept graph output."
+    }
+  ],
+  "forbidden_claims": [
+    "Using naming overlap as an excuse for missing relation mapping.",
+    "Replacing evidence mapping with generic graph description."
+  ],
+  "acceptable_repair_task": "Add a design-improvement repair asking for one concrete output relation and exact evidence mapping.",
+  "acceptable_issue_candidate_type": "DesignIssue",
+  "expected_readiness": "not ready yet",
+  "notes": "Confusion stems from explanation shape and terminology, not only from incorrect facts.",
+  "expected_gap_present": true
+}

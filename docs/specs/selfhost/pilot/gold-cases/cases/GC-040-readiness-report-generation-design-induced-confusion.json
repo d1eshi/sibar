@@ -1,0 +1,36 @@
+{
+  "id": "GC-040",
+  "mastery_check_id": "SC-005-readiness-report-generation",
+  "concept_id": "readiness_report_generation",
+  "operation": "transfer",
+  "answer_class": "design_induced_confusion",
+  "simulated_user_answer": "The many report sections and confidence labels are overwhelming, so I skipped exact section mapping and gave a generic blocked-vs-ready statement.",
+  "declared_confidence": "medium",
+  "expected_gap_type": "design_induced_gap",
+  "expected_layer": 4,
+  "expected_severity": "important",
+  "expected_confidence": "medium",
+  "required_repo_evidence": [
+    {
+      "path": "src/runtime-readiness.ts",
+      "rationale": "Defines all report sections and section-specific readiness."
+    },
+    {
+      "path": "src/runtime-memory.ts",
+      "rationale": "Defines confidence and level transitions used in section output."
+    },
+    {
+      "path": "Tests/readiness-report.test.ts",
+      "rationale": "Shows section-by-section expectations for deterministic report output."
+    }
+  ],
+  "forbidden_claims": [
+    "Replacing multi-section report explanation with a generic readiness statement.",
+    "Ignoring evidence index linkage across sections."
+  ],
+  "acceptable_repair_task": "Create a design-oriented repair prompt to simplify section-by-section transfer with examples.",
+  "acceptable_issue_candidate_type": "DesignIssue",
+  "expected_readiness": "not ready yet",
+  "notes": "Design confusion should be captured as a design issue, then re-test with section-level mapping.",
+  "expected_gap_present": true
+}

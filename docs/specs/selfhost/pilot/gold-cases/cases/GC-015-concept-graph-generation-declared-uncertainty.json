@@ -1,0 +1,36 @@
+{
+  "id": "GC-015",
+  "mastery_check_id": "SC-002-concept-graph-generation",
+  "concept_id": "concept_graph_generation",
+  "operation": "explain",
+  "answer_class": "declared_uncertainty",
+  "simulated_user_answer": "I cannot confidently explain the middle stage between inventory and persisted edge relations without checking the implementation first.",
+  "declared_confidence": "low",
+  "expected_gap_type": "surface_gap",
+  "expected_layer": 4,
+  "expected_severity": "important",
+  "expected_confidence": "medium",
+  "required_repo_evidence": [
+    {
+      "path": "src/runtime-concept-graph.ts",
+      "rationale": "Contains the missing middle stage between extracted nodes and persisted edges."
+    },
+    {
+      "path": "src/runtime-support.ts",
+      "rationale": "Contains the edge relation schema that validates each stage."
+    },
+    {
+      "path": "Tests/concept-graph.test.ts",
+      "rationale": "Test fixture can verify the middle stage once referenced concretely."
+    }
+  ],
+  "forbidden_claims": [
+    "Marking uncertainty as a complete answer.",
+    "Skipping re-check of evidence source for middle stage."
+  ],
+  "acceptable_repair_task": "Require a re-run trace from node extraction to persisted edges with one evidence line per stage.",
+  "acceptable_issue_candidate_type": "LearningGap",
+  "expected_readiness": "not ready yet",
+  "notes": "Uncertainty targets missing confidence in the intermediate transformation.",
+  "expected_gap_present": true
+}

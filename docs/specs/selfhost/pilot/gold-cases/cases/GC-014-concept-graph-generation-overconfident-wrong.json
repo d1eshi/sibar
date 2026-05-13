@@ -1,0 +1,36 @@
+{
+  "id": "GC-014",
+  "mastery_check_id": "SC-002-concept-graph-generation",
+  "concept_id": "concept_graph_generation",
+  "operation": "explain",
+  "answer_class": "overconfident_wrong",
+  "simulated_user_answer": "I am sure concept graph is built only by tests and any source file can be cited since tests prove everything.",
+  "declared_confidence": "high",
+  "expected_gap_type": "false_confidence_gap",
+  "expected_layer": 4,
+  "expected_severity": "critical",
+  "expected_confidence": "high",
+  "required_repo_evidence": [
+    {
+      "path": "src/runtime-concept-graph.ts",
+      "rationale": "Primary graph creation implementation proves tests alone are not sufficient."
+    },
+    {
+      "path": "src/runtime-support.ts",
+      "rationale": "Provides source data schema required before test-level confirmation."
+    },
+    {
+      "path": "Tests/concept-graph.test.ts",
+      "rationale": "Confirms test expectations but not replacement for source behavior."
+    }
+  ],
+  "forbidden_claims": [
+    "Asserting source files are unnecessary once tests exist.",
+    "Maintaining certainty while attributing incorrect graph responsibility."
+  ],
+  "acceptable_repair_task": "Insert explicit uncertainty and require code-level explanation of source-based edge and node generation.",
+  "acceptable_issue_candidate_type": "LearningGap",
+  "expected_readiness": "not ready yet",
+  "notes": "Overconfident incorrect claim should trigger a false confidence gap.",
+  "expected_gap_present": true
+}

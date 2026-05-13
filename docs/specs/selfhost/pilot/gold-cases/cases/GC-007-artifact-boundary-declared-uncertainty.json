@@ -1,0 +1,36 @@
+{
+  "id": "GC-007",
+  "concept_id": "artifact_boundary",
+  "mastery_check_id": "SC-001-artifact-boundary",
+  "operation": "trace",
+  "answer_class": "declared_uncertainty",
+  "simulated_user_answer": "I am not fully sure how manifest includes and excludes combine before graph construction, so I cannot give a full boundary walk yet.",
+  "declared_confidence": "low",
+  "expected_gap_type": "surface_gap",
+  "expected_layer": 4,
+  "expected_severity": "important",
+  "expected_confidence": "medium",
+  "required_repo_evidence": [
+    {
+      "path": "src/runtime-concept-graph.ts",
+      "rationale": "Defines the concrete steps that resolve boundary uncertainty."
+    },
+    {
+      "path": "src/runtime-support.ts",
+      "rationale": "Defines evidence basis and session fields used by boundary walking."
+    },
+    {
+      "path": "Tests/concept-graph.test.ts",
+      "rationale": "Evidence for expected boundary behavior when paths are included or excluded."
+    }
+  ],
+  "forbidden_claims": [
+    "Skipping repair while claiming uncertainty is final.",
+    "Treating uncertainty as no issue for a first-slice mastery check."
+  ],
+  "acceptable_repair_task": "Ask the user to restate the include/exclude walk with two explicit file path examples.",
+  "acceptable_issue_candidate_type": "LearningGap",
+  "expected_readiness": "not ready yet",
+  "notes": "Declared uncertainty should not be accepted as mastery; ask for a concrete cited walk.",
+  "expected_gap_present": true
+}

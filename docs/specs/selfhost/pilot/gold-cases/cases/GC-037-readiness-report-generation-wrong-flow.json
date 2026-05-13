@@ -1,0 +1,36 @@
+{
+  "id": "GC-037",
+  "mastery_check_id": "SC-005-readiness-report-generation",
+  "concept_id": "readiness_report_generation",
+  "operation": "transfer",
+  "answer_class": "wrong_flow",
+  "simulated_user_answer": "I would summarize all concepts as ready first, then decide if open gaps exist, which is opposite to runtime evaluation order.",
+  "declared_confidence": "medium",
+  "expected_gap_type": "flow_gap",
+  "expected_layer": 4,
+  "expected_severity": "important",
+  "expected_confidence": "medium",
+  "required_repo_evidence": [
+    {
+      "path": "src/runtime-readiness.ts",
+      "rationale": "Defines open_gaps and readiness priority before final summary."
+    },
+    {
+      "path": "src/runtime-memory.ts",
+      "rationale": "Builds ordered concept and gap structures consumed by report."
+    },
+    {
+      "path": "Tests/readiness-report.test.ts",
+      "rationale": "Validates order-sensitive readiness gating."
+    }
+  ],
+  "forbidden_claims": [
+    "Asserting confirmed concepts imply readiness regardless of open gaps.",
+    "Reversing open-gaps-first behavior."
+  ],
+  "acceptable_repair_task": "Repair by writing the readiness flow in runtime order and evidence precedence.",
+  "acceptable_issue_candidate_type": "LearningGap",
+  "expected_readiness": "not ready yet",
+  "notes": "Flow issue should force ordered explanation of blocking open gaps.",
+  "expected_gap_present": true
+}
