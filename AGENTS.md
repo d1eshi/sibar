@@ -67,6 +67,28 @@ Examples:
 
 If a change fits more than one type, split it when reasonable.
 
+## Changelog Bridge
+
+Atomic commits are the audit trail. `CHANGELOG.md` is the human product story.
+
+For each completed commit, decide whether it is changelog-worthy:
+
+- Update `CHANGELOG.md` in the same commit when the change affects user-visible
+  behavior, a demo flow, a documented command, a product spec, release
+  readiness, or the public product narrative.
+- Do not update `CHANGELOG.md` for purely mechanical `test`, `refactor`, or
+  `chore` commits unless they change release confidence or explain product
+  progress.
+- Map commit intent to changelog groups:
+  - `feat` -> `Added` or `Changed`
+  - `fix` -> `Fixed`
+  - `docs` -> `Docs`
+  - release-relevant `test`, `refactor`, or `chore` -> `Internal`
+- If one implementation needs both behavior and changelog updates, keep them in
+  the same commit when they describe the same intent.
+- If a change is too large to describe in one changelog bullet, split the work
+  into smaller commits or attach it to a spec/iteration before committing.
+
 ## Before Finishing
 
 - Run `git status --short` again.

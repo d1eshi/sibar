@@ -11,6 +11,11 @@ accepted specs and iterations, not by raw commit count.
 Use this section for changes that have landed but are not part of a tagged
 release yet.
 
+Each changelog-worthy change should be updated in the same commit as the work it
+describes. Skip this file only when the commit is purely mechanical and does not
+change product behavior, product docs, release readiness, or the public product
+story.
+
 ### Added
 
 - Spec-based versioning policy for deciding when Sibi moves between pre-1.0
@@ -29,6 +34,8 @@ release yet.
 
 - Added release readiness rules tied to completed specs, verified acceptance
   criteria, and explicit version bump decisions.
+- Added the atomic commit to changelog bridge so agents know when a commit must
+  update `CHANGELOG.md`.
 
 ### Internal
 
