@@ -18,8 +18,19 @@ const ALLOWED_SIGNAL_TYPES = new Set([
   "practice_candidate",
 ]);
 
-const READINESS_DECISION_PATTERN =
-  /\b(ready to|not ready|readiness|mastery|mastered|owns? .*end to end|final grade|truth is|proven true)\b/i;
+const READINESS_DECISION_PATTERNS = [
+  /\breadiness_claim\b/i,
+  /\bnot\s+ready\b/i,
+  /\bready\s+to\b/i,
+  /\b(?:learner|student|user|candidate|they|he|she)\s+(?:is|are|seems|looks|appears|feels)?\s*(?:ready|not\s+ready)\b/i,
+  /\bmastered\b/i,
+  /\b(?:has|shows|demonstrates|achieved)\s+mastery\b/i,
+  /\bmastery\s+(?:achieved|proven|confirmed)\b/i,
+  /\bowns?\b.{0,80}\bend\s+to\s+end\b/i,
+  /\bfinal\s+grade\b/i,
+  /\btruth\s+is\b/i,
+  /\bproven\s+true\b/i,
+];
 
 export type ModelSignalValidationResult = {
   acceptedSignals: ModelSignalCandidate[];
@@ -86,7 +97,8 @@ export function normalizeCitation(rawCitation: unknown, artifactSession: Artifac
 }
 
 function validatesReadinessDecision(candidate: ModelSignalCandidate): boolean {
-  return READINESS_DECISION_PATTERN.test(`${candidate.signal_type} ${candidate.claim} ${candidate.rationale}`);
+  const text = `${candidate.signal_type} ${candidate.claim} ${candidate.rationale}`;
+  return READINESS_DECISION_PATTERNS.some((pattern) => pattern.test(text));
 }
 
 export function validateModelSignalCandidates(

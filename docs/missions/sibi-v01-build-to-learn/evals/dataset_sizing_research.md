@@ -59,6 +59,11 @@ model-comparison claims about:
 The initial E01 pilot is a contract smoke set. It proves case shape and coverage,
 but it is not benchmark quality.
 
+E03 uses the same 7-case contract seed for fixture-based LLM+runtime trace
+comparison only. Its report may compare accepted/rejected candidate signals for
+Codex `gpt-5.2 medium` and Codex `gpt-5.5 low`, but that comparison is a
+development trace check, not a benchmark-quality model ranking.
+
 ## pilot_dataset_size
 
 Use a 35-case pilot before E02 is considered mature:

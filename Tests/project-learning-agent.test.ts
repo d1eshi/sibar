@@ -108,6 +108,39 @@ test("run_project_learning_agent records a fixture trace with accepted model can
   assert.equal(reloaded.data.artifact_session.pedagogy_traces?.[0].trace_id, result.data.trace.trace_id);
 });
 
+test("run_project_learning_agent accepts bounded readiness concept mentions without model decisions", () => {
+  withTempHome();
+  const fixture = createAgentFixture();
+  const artifactSessionID = createArtifactSession(fixture.root);
+  const result = expectSuccess<{
+    status: "completed";
+    trace: PedagogyTrace;
+  }>(handleRequest({
+    command: "run_project_learning_agent",
+    payload: {
+      artifact_session_id: artifactSessionID,
+      eval_case_id: "F09-READINESS-CONCEPT",
+      fixture_model_response: {
+        model: "fixture-model",
+        reasoning_effort: "fixture",
+        files_read: ["src/runtime.ts"],
+        candidate_signals: [{
+          signal_type: "concept",
+          claim: "Readiness evidence collection is a concept bounded by runtime command routing.",
+          confidence: "medium",
+          citations: [{ path: "src/runtime.ts", range: "1-3" }],
+          rationale: "The claim mentions readiness as the learning goal topic without deciding learner status.",
+          proposed_layer: 3,
+        }],
+      },
+    },
+  }));
+
+  assert.equal(result.data.trace.eval_case_id, "F09-READINESS-CONCEPT");
+  assert.equal(result.data.trace.accepted_signals.length, 1);
+  assert.equal(result.data.trace.rejected_signals.length, 0);
+});
+
 test("run_project_learning_agent rejects uncited and out-of-bound model candidate signals", () => {
   withTempHome();
   const fixture = createAgentFixture();

@@ -238,6 +238,7 @@ export type RejectedModelSignal = ModelSignalCandidate & {
 export type PedagogyTrace = {
   trace_id: string;
   artifact_session_id: string;
+  eval_case_id?: string;
   model_runner: string;
   model_name: string;
   reasoning_effort: string;

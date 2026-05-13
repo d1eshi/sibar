@@ -75,6 +75,9 @@ export function runProjectLearningAgentCommand(payload: Record<string, unknown>)
   const trace: PedagogyTrace = {
     trace_id: randomUUID(),
     artifact_session_id: artifactSession.artifact_session_id,
+    ...(typeof payload.eval_case_id === "string" && payload.eval_case_id.trim()
+      ? { eval_case_id: payload.eval_case_id.trim() }
+      : {}),
     model_runner: runnerOutput.modelRunner,
     model_name: runnerOutput.modelName,
     reasoning_effort: runnerOutput.reasoningEffort,
