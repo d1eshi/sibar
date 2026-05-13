@@ -72,7 +72,9 @@ If a change fits more than one type, split it when reasonable.
 - Run `git status --short` again.
 - Confirm your final diff contains only files relevant to the requested task.
 - Report any pre-existing changes that remain untouched.
-- Do not commit, push, rebase, squash, or amend unless the user explicitly asks.
+- If you changed files and the user has asked for implementation, either commit
+  the completed change or clearly state why it is intentionally left uncommitted.
+- Do not push, rebase, squash, or amend unless the user explicitly asks.
 - Do not create hooks, automation, or repo policy files unless requested.
 
 ## Current Repo Note
