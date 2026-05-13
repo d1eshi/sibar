@@ -128,6 +128,53 @@ test("runSelfhostPilotEval writes report when reportPath is provided", () => {
   }
 });
 
+test("CLI accepts space-separated report flag and writes report file", () => {
+  const tempDir = mkdtempSync(join(tmpdir(), "sibar-selfhost-pilot-cli-report-"));
+  const reportPath = join(tempDir, "cli-report.json");
+
+  try {
+    const result = spawnSync(process.execPath, [
+      "--experimental-strip-types",
+      resolve("src/evals/selfhost-pilot.ts"),
+      "--report",
+      reportPath,
+    ], {
+      encoding: "utf8",
+    });
+
+    assert.equal(result.status, 0);
+    const aggregate = JSON.parse(result.stdout || "{}") as { total_mismatches: number };
+    assert.equal(aggregate.total_mismatches, 0);
+    const report = JSON.parse(readFileSync(reportPath, "utf8")) as { aggregate: { total_mismatches: number } };
+    assert.equal(report.aggregate.total_mismatches, 0);
+  } finally {
+    rmSync(tempDir, { recursive: true, force: true });
+  }
+});
+
+test("CLI accepts space-separated index flag and honors provided index path", () => {
+  const tempDir = mkdtempSync(join(tmpdir(), "sibar-selfhost-pilot-cli-index-"));
+  const missingIndexPath = join(tempDir, "missing-index.json");
+
+  try {
+    const result = spawnSync(process.execPath, [
+      "--experimental-strip-types",
+      resolve("src/evals/selfhost-pilot.ts"),
+      "--index",
+      missingIndexPath,
+    ], {
+      encoding: "utf8",
+    });
+
+    assert.equal(result.status, 1);
+    const aggregate = JSON.parse(result.stdout || "{}") as { total_mismatches: number };
+    assert.equal(typeof aggregate.total_mismatches, "number");
+    assert.equal(aggregate.total_mismatches > 0, true);
+  } finally {
+    rmSync(tempDir, { recursive: true, force: true });
+  }
+});
+
 test("CLI accepts space-separated manifest flag and exits nonzero for missing manifest", () => {
   const result = spawnSync(process.execPath, [
     "--experimental-strip-types",
