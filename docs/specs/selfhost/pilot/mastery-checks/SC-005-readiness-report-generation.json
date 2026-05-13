@@ -1,0 +1,56 @@
+{
+  "id": "SC-005-readiness-report-generation",
+  "concept_id": "readiness_report_generation",
+  "concept_label": "Readiness report generation",
+  "operation": "transfer",
+  "prompt": "Transfer the concept of readiness scoring into a comparable artifact: explain how `readiness_report` changes when one gap is open and one concept is confirmed. Include which claims are blocked if evidence is missing.",
+  "expected_answer_shape": {
+    "format": "table_rows",
+    "required_fields": [
+      "summary_readiness",
+      "ready_areas_evidence",
+      "risky_areas_evidence",
+      "open_gaps_mapping",
+      "practice_queue_dependency"
+    ],
+    "validation_rule": "Answer must describe concrete report sections and evidence-index behavior."
+  },
+  "required_repo_evidence": [
+    {
+      "path": "src/runtime-readiness.ts",
+      "rationale": "Primary generator for readiness scoring, claim levels, evidence indexing, and summary/risk/report composition."
+    },
+    {
+      "path": "src/runtime-memory.ts",
+      "rationale": "Constructs understanding memory state that readiness_report consumes for concept/gap/challenge context."
+    },
+    {
+      "path": "Tests/readiness-report.test.ts",
+      "rationale": "Demonstrates supported/unsupported report claims and evidence indexing behavior."
+    }
+  ],
+  "forbidden_claims": [
+    "Claiming one confirmed answer implies whole-repo ownership.",
+    "Claiming evidence from paths outside the manifest boundary can support readiness.",
+    "Claiming all claims can be emitted without evidence IDs."
+  ],
+  "minimum_readiness": "ready to explain",
+  "repair_when_failed": {
+    "issue_type": "LearningGap",
+    "required_action": "Require a revised report output that explicitly marks unsupported claims and blocks readiness advancement.",
+    "guardrails": [
+      "If open gaps remain, summary must not be 'ready to own'.",
+      "Every supported claim must include an evidence ID."
+    ],
+    "must_repair_issue_candidate_types": [
+      "LearningGap",
+      "DocsIssue"
+    ]
+  },
+  "reevaluation_prompt": "Transfer this readiness interpretation to a different slice: with the same confirmed concept but no remaining open gap, compare summary readiness and recommended_next_action.",
+  "acceptable_issue_candidate_types": [
+    "LearningGap",
+    "DocsIssue",
+    "ProductIssue"
+  ]
+}

@@ -1,0 +1,56 @@
+{
+  "id": "SC-003-gap-detection",
+  "concept_id": "gap_detection",
+  "concept_label": "Gap detection",
+  "operation": "debug",
+  "prompt": "Debug a realistic incorrect answer path: how does the runtime derive a learning gap (and severity/confidence) from user answer, artifact evidence, and quality? Point to the branch and the exact evidence it would attach.",
+  "expected_answer_shape": {
+    "format": "object",
+    "required_fields": [
+      "answer_quality_branch",
+      "artifact_evidence_source",
+      "observed_layer",
+      "severity",
+      "repair_action"
+    ],
+    "validation_rule": "Answer must identify concrete code symbols/branches that produce gap state versus confirmed state."
+  },
+  "required_repo_evidence": [
+    {
+      "path": "src/runtime-gap-detection.ts",
+      "rationale": "Contains detectLearningGapFromAnswer and persistGapDetectionResult logic for branch-specific gap/confirmed behavior."
+    },
+    {
+      "path": "src/runtime-support.ts",
+      "rationale": "Contains LearningGap and answer quality contract used by gap derivation and confidence/severity fields."
+    },
+    {
+      "path": "Tests/gap-detection.test.ts",
+      "rationale": "Shows expected branch behavior for partial, verified, uncertainty, and contradiction answer classes."
+    }
+  ],
+  "forbidden_claims": [
+    "Classifying a wrong answer as verified because it is confident.",
+    "Classifying a correct answer as a gap without considering artifact evidence.",
+    "Asserting gap detection is independent of question required_layer."
+  ],
+  "minimum_readiness": "not ready yet",
+  "repair_when_failed": {
+    "issue_type": "LearningGap",
+    "required_action": "Generate a repair prompt that ties the mismatch to bounded evidence and asks for the same concept with corrected tracing.",
+    "guardrails": [
+      "Repair must include a concrete missed-reasoning step.",
+      "Repair must include citation-backed evidence evidence paths."
+    ],
+    "must_repair_issue_candidate_types": [
+      "LearningGap",
+      "ProductIssue"
+    ]
+  },
+  "reevaluation_prompt": "Debug the same concept with `answer_quality='gap_confirmed'` using the same user wording and compare expected gap severity and confidence to the original branch.",
+  "acceptable_issue_candidate_types": [
+    "LearningGap",
+    "ProductIssue",
+    "TestIssue"
+  ]
+}

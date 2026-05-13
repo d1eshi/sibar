@@ -1,0 +1,37 @@
+{
+  "dataset_id": "selfhost-pilot-manifest-first-slice",
+  "version": "0.1.0",
+  "artifact": "sibar.selfhost.manifest.json",
+  "checks": [
+    {
+      "id": "SC-001-artifact-boundary",
+      "concept_id": "artifact_boundary",
+      "file": "mastery-checks/SC-001-artifact-boundary.json",
+      "operation": "trace"
+    },
+    {
+      "id": "SC-002-concept-graph-generation",
+      "concept_id": "concept_graph_generation",
+      "file": "mastery-checks/SC-002-concept-graph-generation.json",
+      "operation": "explain"
+    },
+    {
+      "id": "SC-003-gap-detection",
+      "concept_id": "gap_detection",
+      "file": "mastery-checks/SC-003-gap-detection.json",
+      "operation": "debug"
+    },
+    {
+      "id": "SC-004-repair-practice-generation",
+      "concept_id": "repair_practice_generation",
+      "file": "mastery-checks/SC-004-repair-practice-generation.json",
+      "operation": "modify"
+    },
+    {
+      "id": "SC-005-readiness-report-generation",
+      "concept_id": "readiness_report_generation",
+      "file": "mastery-checks/SC-005-readiness-report-generation.json",
+      "operation": "transfer"
+    }
+  ]
+}
