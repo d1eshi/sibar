@@ -127,7 +127,7 @@ function claimWithEvidence<T extends ReadinessClaim>(claim: T): T | undefined {
   return claim.evidence_ids.length > 0 ? claim : undefined;
 }
 
-function buildReadinessReport(artifactSession: ArtifactSession, referenceTime: string): ReadinessReport {
+export function buildReadinessReport(artifactSession: ArtifactSession, referenceTime: string): ReadinessReport {
   const memory = buildUnderstandingMemory(artifactSession, referenceTime);
   const evidence = createEvidenceIndexer();
   const gapByID = new Map(memory.gaps.map((gap) => [gap.id, gap]));

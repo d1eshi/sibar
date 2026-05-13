@@ -177,6 +177,10 @@ public final class RuntimeClient: Sendable {
         try send(command: "get_session_summary", payload: payload)
     }
 
+    public func getStudyPanelState(_ payload: StudyPanelStatePayload = .init()) throws -> StudyPanelSnapshot {
+        try send(command: "get_study_panel_state", payload: payload)
+    }
+
     func send<Response: Decodable, Payload: Encodable>(command: String, payload: Payload) throws -> Response {
         let encoder = JSONEncoder()
         encoder.outputFormatting = [.sortedKeys]

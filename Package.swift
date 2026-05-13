@@ -14,6 +14,8 @@ let package = Package(
             sources: [
                 "RuntimeModels.swift",
                 "RuntimeClient.swift",
+                "StudyPanelModels.swift",
+                "StudyPanelView.swift",
             ]
         ),
         .testTarget(
@@ -22,6 +24,7 @@ let package = Package(
             path: "Tests/SibiCoreTests",
             sources: [
                 "RuntimeClientTests.swift",
+                "StudyPanelTests.swift",
             ]
         ),
     ]

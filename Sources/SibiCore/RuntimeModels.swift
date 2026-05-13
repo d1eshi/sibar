@@ -189,6 +189,16 @@ public struct SessionSummaryPayload: Codable, Sendable {
     }
 }
 
+public struct StudyPanelStatePayload: Codable, Sendable {
+    public let artifact_session_id: String?
+    public let reference_time: String?
+
+    public init(artifact_session_id: String? = nil, reference_time: String? = nil) {
+        self.artifact_session_id = artifact_session_id
+        self.reference_time = reference_time
+    }
+}
+
 public struct DeclareIntentResult: Codable, Sendable {
     public let session_id: String
     public let declared_intent: RuntimeDeclaredIntent

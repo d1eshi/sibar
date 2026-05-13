@@ -15,6 +15,7 @@ export type RuntimeCommand =
   | "prepare_autopsy_step"
   | "get_understanding_memory"
   | "readiness_report"
+  | "get_study_panel_state"
   | "generate_practice_challenges"
   | "run_project_learning_agent"
   | "declare_intent"
