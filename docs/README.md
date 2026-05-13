@@ -22,13 +22,18 @@ The primary source inputs for this cleanup were:
 3. `product/02_v01_scope.md`
 4. `specs/README.md`
 5. the individual foundation specs under `specs/`
-6. `iterations/README.md`
-7. `triage/source-triage.md`
-8. `triage/iteration-spec-adaptation.md`
+6. `missions/sibi-v01-build-to-learn/mission.md`
+7. `missions/sibi-v01-build-to-learn/validation-contract.md`
+8. `missions/sibi-v01-build-to-learn/library/orchestration.md`
+9. `missions/sibi-v01-build-to-learn/features.json`
+10. `missions/sibi-v01-build-to-learn/execute_prompt.md`
+11. `iterations/README.md`
+12. `triage/source-triage.md`
+13. `triage/iteration-spec-adaptation.md`
 
 ## Foundation Decision
 
-There are 8 foundation specs for v0.1:
+There are 10 foundation specs for v0.1:
 
 1. Artifact Intake
 2. Concept Graph
@@ -38,9 +43,15 @@ There are 8 foundation specs for v0.1:
 6. Practice Challenges
 7. Understanding Memory
 8. Readiness And Export
+9. Project Learning Agent
+10. Study Panel UI
 
-Everything else is either supporting research, later surface work, or old implementation context.
+The active implementation contract is the mission pack under
+`missions/sibi-v01-build-to-learn/`. Everything else is either supporting
+research, later surface work, or old implementation context.
 
 ## Rule
 
-Until v0.1 is reproducible, new work should attach to one of the 8 foundation specs. If a proposed feature does not strengthen the Build-to-Learn loop, it goes to later.
+Until v0.1 is reproducible, new work should attach to one of the 10 foundation
+specs or the active mission pack. If a proposed feature does not strengthen the
+Build-to-Learn loop, evals, or study panel, it goes to later.

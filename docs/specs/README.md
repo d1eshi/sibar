@@ -1,6 +1,8 @@
 # Foundation Specs
 
-v0.1 has 8 foundation specs. Treat these as the only specs that govern the launch track.
+v0.1 has 10 foundation specs. Specs 01-08 define the Build-to-Learn loop.
+Specs 09-10 add the bounded project-learning agent and the reusable study UI.
+Treat these as the specs that govern the launch track.
 
 | # | Spec | Purpose |
 |---|------|---------|
@@ -12,6 +14,8 @@ v0.1 has 8 foundation specs. Treat these as the only specs that govern the launc
 | 6 | `06_practice_challenges.md` | Turn gaps into modification, recall, and transfer tasks. |
 | 7 | `07_understanding_memory.md` | Persist concept state, answers, evidence, decay, and repair history. |
 | 8 | `08_readiness_export.md` | Produce reviewable readiness output and future ingestion packages. |
+| 9 | `09_project_learning_agent.md` | Use a bounded LLM/model runner to propose candidate learning signals under deterministic pedagogy rules. |
+| 10 | `10_study_panel_ui.md` | Render the Build-to-Learn session in a reusable Swift study panel. |
 
 ## Build Order
 
@@ -26,10 +30,12 @@ Artifact Intake
   -> Practice Challenges
   -> Understanding Memory
   -> Readiness Export
+  -> Project Learning Agent
+  -> Study Panel UI
 ```
 
 ## Rule
 
-New feature ideas can be accepted only if they strengthen one of these specs for v0.1.
+New feature ideas can be accepted only if they strengthen one of these specs for v0.1
+or the active mission pack under `docs/missions/sibi-v01-build-to-learn/`.
 Otherwise they go to later.
-

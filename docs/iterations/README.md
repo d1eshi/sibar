@@ -1,6 +1,12 @@
 # v0.1 Iteration Queue
 
-This queue turns the 8 foundation specs into a launchable v0.1.
+The active implementation contract now lives in
+`docs/missions/sibi-v01-build-to-learn/`. This file remains historical context
+for the cleanup and early runtime/Swift bridge slices.
+
+This queue originally turned the first 8 foundation specs into a launchable
+v0.1. The mission pack extends that queue with evals, a bounded project-learning
+agent, and the Swift study panel.
 
 The queue is intentionally small. Do not add surface integrations before the Build-to-Learn loop works.
 

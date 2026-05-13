@@ -40,6 +40,10 @@ story.
   update `CHANGELOG.md`.
 - Added the Swift bridge candidate audit, narrowing the future native bridge to
   the five foundation runtime commands and keeping TypeScript as state owner.
+- Mission docs: added the v0.1 Build-to-Learn mission pack covering specs 01-10, internal
+  pedagogy evals, bounded LLM signal generation, and the Swift study panel UI.
+- Mission docs: added mission orchestration rules for implementation/verifier agents, Codex
+  model comparison evals, and dataset sizing research gates.
 
 ### Internal
 
