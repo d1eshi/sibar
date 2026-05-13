@@ -16,6 +16,7 @@ public struct StudyPanelRenderModel: Equatable, Sendable {
                 id: "artifact-boundary",
                 title: "Artifact",
                 rows: [
+                    "Artifact session: \(artifact.artifact_session_id)",
                     artifact.label,
                     artifact.learning_goal,
                     "Root: \(artifact.root_path)",
@@ -141,6 +142,8 @@ private func autopsyRows(_ step: StudyPanelAutopsyStep?, questions: [RuntimeQues
     }
     let question = questions.first
     return [
+        "Runtime session: \(step.session_id)",
+        "Question: \(step.question_id)",
         step.prompt,
         "Next action: \(step.next_action)",
         "Answer style: \(question?.answer_style ?? "runtime-defined")",

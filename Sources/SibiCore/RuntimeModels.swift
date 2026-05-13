@@ -62,6 +62,7 @@ public struct RuntimeQuestion: Codable, Sendable, Identifiable {
     public let answer_style: String
     public let detected_layer: Int
     public let required_layer: Int
+    public let max_followups: Int?
     public let answer: String?
     public let answer_quality: String?
 }

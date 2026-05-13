@@ -198,6 +198,21 @@ Queue, memory, readiness, scheduling, artifact maps, concept extraction, and sys
 
 `RuntimeClient` can remain a process bridge. It should be smaller, not smarter.
 
+## Standalone App Follow-Up
+
+After the first study panel runtime projection landed, the useful Swift surface
+expanded from the five foundation commands to the visible Build-to-Learn loop.
+The standalone app slice is captured in `docs/triage/standalone-swift-app-audit.md`.
+
+The bridge decision still holds:
+
+1. Swift owns the window, controls, transient loading/error state, and process calls.
+2. TypeScript owns artifact sessions, question/evidence state, gaps, practice,
+   memory, readiness, and study panel projection.
+3. `SibiStudyApp` may call `get_study_panel_state` and `answer_question`.
+4. `SibiShell`, overlay, spotlight, OCR, screen capture, and AppKit permission
+   flows remain excluded until a separate shell/observer audit exists.
+
 The bridge implementation slice is now complete for `SibiCore`. The next Swift slice, if chosen, should:
 
 1. create a narrow shell/panel spec before code

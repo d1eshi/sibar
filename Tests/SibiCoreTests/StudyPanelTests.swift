@@ -42,9 +42,107 @@ final class StudyPanelTests: XCTestCase {
             "memory-readiness",
         ])
         XCTAssertTrue(model.rows(for: "artifact-boundary").contains("Learn runtime state"))
+        XCTAssertTrue(model.rows(for: "artifact-boundary").contains("Artifact session: a1"))
         XCTAssertTrue(model.rows(for: "autopsy").contains { $0.contains("Before any explanation") })
+        XCTAssertTrue(model.rows(for: "autopsy").contains("Runtime session: s1"))
         XCTAssertTrue(model.rows(for: "gaps-practice").contains { $0.contains("Trace the runtime state path") })
         XCTAssertTrue(model.rows(for: "memory-readiness").contains { $0.contains("Readiness: not ready yet") })
+    }
+
+    @MainActor
+    func testLiveModelRefreshLoadsCurrentRuntimeSnapshot() async throws {
+        let snapshot = try decodeStudyPanelSnapshot()
+        let recorder = StudyPanelActionRecorder()
+        let model = StudyPanelLiveModel(
+            artifactSessionID: "  a1  ",
+            actions: .init(
+                loadSnapshot: { payload in
+                    recorder.recordSnapshotPayload(payload)
+                    return snapshot
+                },
+                answerQuestion: { _ in
+                    throw RuntimeClientError.processFailure("unexpected answer")
+                }
+            )
+        )
+
+        await model.refreshNow()
+
+        XCTAssertEqual(recorder.snapshotPayload?.artifact_session_id, "a1")
+        XCTAssertEqual(model.snapshot?.artifact_session.artifact_session_id, "a1")
+        XCTAssertEqual(model.statusText, "Study panel snapshot projected from runtime-owned state.")
+        XCTAssertEqual(model.lastError, "")
+    }
+
+    @MainActor
+    func testLiveModelSubmitAnswerCallsRuntimeAndRefreshesSnapshot() async throws {
+        let snapshot = try decodeStudyPanelSnapshot()
+        let question = try XCTUnwrap(snapshot.current_questions.first)
+        let recorder = StudyPanelActionRecorder()
+        let model = StudyPanelLiveModel(
+            actions: .init(
+                loadSnapshot: { _ in
+                    recorder.incrementRefreshCount()
+                    return snapshot
+                },
+                answerQuestion: { payload in
+                    recorder.recordAnswerPayload(payload)
+                    return try decodeAnswerQuestionResult()
+                }
+            )
+        )
+
+        await model.submitAnswer(question: question, answer: "  Swift renders runtime state only.  ")
+
+        XCTAssertEqual(recorder.answerPayload?.session_id, "s1")
+        XCTAssertEqual(recorder.answerPayload?.question_id, "q1")
+        XCTAssertEqual(recorder.answerPayload?.answer, "Swift renders runtime state only.")
+        XCTAssertEqual(recorder.refreshCount, 1)
+        XCTAssertEqual(model.snapshot?.artifact_session.artifact_session_id, "a1")
+        XCTAssertEqual(model.lastError, "")
+    }
+}
+
+private final class StudyPanelActionRecorder: @unchecked Sendable {
+    private let lock = NSLock()
+    private var storedSnapshotPayload: StudyPanelStatePayload?
+    private var storedAnswerPayload: AnswerQuestionPayload?
+    private var storedRefreshCount = 0
+
+    var snapshotPayload: StudyPanelStatePayload? {
+        withLock { storedSnapshotPayload }
+    }
+
+    var answerPayload: AnswerQuestionPayload? {
+        withLock { storedAnswerPayload }
+    }
+
+    var refreshCount: Int {
+        withLock { storedRefreshCount }
+    }
+
+    func recordSnapshotPayload(_ payload: StudyPanelStatePayload) {
+        withLock {
+            storedSnapshotPayload = payload
+        }
+    }
+
+    func recordAnswerPayload(_ payload: AnswerQuestionPayload) {
+        withLock {
+            storedAnswerPayload = payload
+        }
+    }
+
+    func incrementRefreshCount() {
+        withLock {
+            storedRefreshCount += 1
+        }
+    }
+
+    private func withLock<T>(_ body: () -> T) -> T {
+        lock.lock()
+        defer { lock.unlock() }
+        return body()
     }
 }
 
@@ -60,6 +158,22 @@ private final class StudyPanelStubRunner: ProcessRunning, @unchecked Sendable {
         self.standardInput = standardInput
         return result
     }
+}
+
+private func decodeStudyPanelSnapshot() throws -> StudyPanelSnapshot {
+    let envelope = try JSONDecoder().decode(
+        RuntimeEnvelope<StudyPanelSnapshot>.self,
+        from: Data(studyPanelEnvelopeJSON.utf8)
+    )
+    return try XCTUnwrap(envelope.data)
+}
+
+private func decodeAnswerQuestionResult() throws -> AnswerQuestionResult {
+    let envelope = try JSONDecoder().decode(
+        RuntimeEnvelope<AnswerQuestionResult>.self,
+        from: Data(answerQuestionEnvelopeJSON.utf8)
+    )
+    return try XCTUnwrap(envelope.data)
 }
 
 private let studyPanelEnvelopeJSON = #"""
@@ -281,6 +395,59 @@ private let studyPanelEnvelopeJSON = #"""
     }],
     "operation_state": {
       "message": "Study panel snapshot projected from runtime-owned state."
+    }
+  }
+}
+"""#
+
+private let answerQuestionEnvelopeJSON = #"""
+{
+  "ok": true,
+  "data": {
+    "session_id": "s1",
+    "question": {
+      "question_id": "q1",
+      "created_at": "t2",
+      "session_id": "s1",
+      "prompt": "Before any explanation, predict the command boundary.",
+      "target_area": "Runtime boundary",
+      "why_it_matters": "It reveals the current model.",
+      "evidence_basis": ["runtime.ts:1-2 handleRequest"],
+      "answer_style": "short_explanation",
+      "detected_layer": 2,
+      "required_layer": 4,
+      "max_followups": 1,
+      "answer": "Swift renders runtime state only.",
+      "answer_quality": "partial"
+    },
+    "session_summary": {
+      "session_id": "s1",
+      "project_label": "Sibi fixture",
+      "started_at": "t1",
+      "ended_at": "t3",
+      "declared_intent": null,
+      "observed_tools": ["typescript-runtime"],
+      "learning_signals": [],
+      "ownership_questions": [{
+        "question_id": "q1",
+        "created_at": "t2",
+        "session_id": "s1",
+        "prompt": "Before any explanation, predict the command boundary.",
+        "target_area": "Runtime boundary",
+        "why_it_matters": "It reveals the current model.",
+        "evidence_basis": ["runtime.ts:1-2 handleRequest"],
+        "answer_style": "short_explanation",
+        "detected_layer": 2,
+        "required_layer": 4,
+        "max_followups": 1,
+        "answer": "Swift renders runtime state only.",
+        "answer_quality": "partial"
+      }],
+      "export_state": "ready_for_review",
+      "code_selection": null
+    },
+    "operation_state": {
+      "message": "Saved."
     }
   }
 }

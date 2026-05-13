@@ -3,7 +3,7 @@
 ## Goal
 
 Give the user a reusable Swift panel that makes the Build-to-Learn session
-visible.
+visible, then host that panel in a standalone macOS app.
 
 The panel should show what the user is studying, why Sibi is asking a question,
 which evidence is being used, what gap was detected, what practice comes next,
@@ -27,6 +27,9 @@ StudyPanelSnapshot
 
 Swift renders `StudyPanelSnapshot`. TypeScript owns the state.
 
+The standalone host may refresh or poll the runtime, but the snapshot remains a
+runtime projection.
+
 ## Required Behavior
 
 1. The panel shows the artifact boundary and learning goal.
@@ -36,6 +39,9 @@ Swift renders `StudyPanelSnapshot`. TypeScript owns the state.
 5. The panel shows evidence, gaps, repair challenges, memory, and readiness.
 6. The panel can render fixture snapshots before live runtime wiring.
 7. Swift never implements pedagogy, memory, evals, or readiness logic.
+8. The standalone app can load the current or selected artifact session.
+9. The standalone app submits answers through `answer_question`, then reloads
+   visible state through `get_study_panel_state`.
 
 ## First Panel Regions
 
@@ -56,6 +62,7 @@ Swift renders `StudyPanelSnapshot`. TypeScript owns the state.
 5. no background watcher
 6. no Swift-side persistence
 7. no Swift-side concept extraction or gap detection
+8. no Swift-owned queues, memory, readiness, or practice scheduling
 
 ## Verification
 
@@ -66,4 +73,4 @@ The first UI acceptance should prove:
 3. mutations call runtime commands
 4. Swift tests pass for bridge models
 5. code review confirms no Swift-owned pedagogy engine
-
+6. the standalone app target builds
