@@ -36,6 +36,8 @@ story.
   criteria, and explicit version bump decisions.
 - Added the atomic commit to changelog bridge so agents know when a commit must
   update `CHANGELOG.md`.
+- Added the Swift bridge candidate audit, narrowing the future native bridge to
+  the five foundation runtime commands and keeping TypeScript as state owner.
 
 ### Internal
 
