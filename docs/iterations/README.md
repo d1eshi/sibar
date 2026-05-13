@@ -1,12 +1,15 @@
 # v0.1 Iteration Queue
 
-The active implementation contract now lives in
-`docs/missions/sibi-v01-build-to-learn/`. This file remains historical context
-for the cleanup and early runtime/Swift bridge slices.
+The active implementation contract now lives under `docs/specs/selfhost/` for self-hosted
+MVP execution.
+
+This file remains historical context for the cleanup and early runtime/Swift
+bridge slices.
 
 This queue originally turned the first 8 foundation specs into a launchable
-v0.1. The mission pack extends that queue with evals, a bounded project-learning
-agent, and the Swift study panel.
+v0.1. The mission pack extends that queue with evals, a bounded
+project-learning agent, and the Swift study panel. Active self-hosted MVP
+execution now routes to `docs/specs/selfhost/` and `docs/specs/selfhost/pilot/`.
 
 The queue is intentionally small. Do not add surface integrations before the Build-to-Learn loop works.
 
