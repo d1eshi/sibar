@@ -1,0 +1,86 @@
+#!/usr/bin/env node
+import { spawnSync } from "node:child_process";
+import { existsSync, readFileSync } from "node:fs";
+import { dirname, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
+
+const scriptDir = dirname(fileURLToPath(import.meta.url));
+const repoRoot = resolve(scriptDir, "..");
+const runtimePath = resolve(repoRoot, "src/runtime.ts");
+
+function usage() {
+  console.error("Usage: sibi-code-question '{\"project_label\":\"demo\",\"file_path\":\"/tmp/a.ts\",\"start_line\":1}'");
+  console.error("   or: sibi-code-question --json-file payload.json");
+}
+
+function readPayload() {
+  const [first, second] = process.argv.slice(2);
+  if (first === "--json-file" && second) {
+    return readFileSync(second, "utf8");
+  }
+  if (first) {
+    return first;
+  }
+  usage();
+  process.exit(2);
+}
+
+const rawPayload = readPayload();
+let payload;
+try {
+  payload = JSON.parse(rawPayload);
+} catch (error) {
+  console.error(`Invalid JSON payload: ${error instanceof Error ? error.message : "unknown parse error"}`);
+  process.exit(2);
+}
+
+const request = JSON.stringify({ command: "prepare_code_question", payload });
+const result = spawnSync(process.execPath, ["--no-warnings", "--experimental-strip-types", runtimePath], {
+  cwd: repoRoot,
+  input: request,
+  encoding: "utf8",
+});
+
+if (result.error) {
+  console.error(result.error.message);
+  process.exit(1);
+}
+
+const stdout = result.stdout.trim();
+
+try {
+  const response = JSON.parse(stdout);
+  if (!response.ok) {
+    const code = response.error?.code ? ` [${response.error.code}]` : "";
+    const message = response.error?.message || "runtime rejected the code question payload";
+    console.error(`Sibi runtime error${code}: ${message}`);
+    process.exit(1);
+  }
+  process.stdout.write(`${stdout}\n`);
+} catch {
+  if (stdout) {
+    process.stdout.write(`${stdout}\n`);
+  }
+  if (result.stderr.trim()) {
+    process.stderr.write(result.stderr);
+  }
+  process.exit(result.status === 0 ? 1 : result.status ?? 1);
+}
+
+if (process.env.SIBI_SKIP_OPEN === "1") {
+  process.exit(0);
+}
+
+const openTarget = process.env.SIBI_OPEN_TARGET_PATH;
+if (!openTarget) {
+  process.exit(0);
+}
+if (!existsSync(openTarget)) {
+  console.error(`Sibi open target not found: ${openTarget}`);
+  process.exit(0);
+}
+const openResult = spawnSync("open", [openTarget], { stdio: "ignore" });
+if (openResult.error || openResult.status !== 0) {
+  const reason = openResult.error?.message || `open exited with status ${openResult.status}`;
+  console.error(`Could not open Sibi target at ${openTarget}: ${reason}`);
+}
