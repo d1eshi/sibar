@@ -5,6 +5,7 @@ let package = Package(
     name: "sibi",
     platforms: [.macOS(.v14)],
     products: [
+        .executable(name: "SibiStudyApp", targets: ["SibiStudyApp"]),
         .library(name: "SibiCore", targets: ["SibiCore"]),
     ],
     targets: [
@@ -15,7 +16,16 @@ let package = Package(
                 "RuntimeModels.swift",
                 "RuntimeClient.swift",
                 "StudyPanelModels.swift",
+                "StudyPanelLiveModel.swift",
                 "StudyPanelView.swift",
+            ]
+        ),
+        .executableTarget(
+            name: "SibiStudyApp",
+            dependencies: ["SibiCore"],
+            path: "Sources/SibiStudyApp",
+            sources: [
+                "SibiStudyApp.swift",
             ]
         ),
         .testTarget(

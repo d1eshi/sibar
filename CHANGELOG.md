@@ -27,6 +27,8 @@ story.
   gaps into evidence-backed repair practice with revisit timing.
 - F08 runtime `readiness_report` command that exports evidence-backed readiness
   reports as JSON and Markdown.
+- Standalone SwiftUI `SibiStudyApp` host for live runtime-owned study panel
+  snapshots and answer submission.
 
 ### Changed
 
@@ -48,6 +50,8 @@ story.
   pedagogy evals, bounded LLM signal generation, and the Swift study panel UI.
 - Mission docs: added mission orchestration rules for implementation/verifier agents, Codex
   model comparison evals, and dataset sizing research gates.
+- Mission docs: added the standalone Swift app audit, iteration, and validation
+  contract for the live study panel host.
 
 ### Internal
 
