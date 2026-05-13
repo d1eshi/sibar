@@ -11,6 +11,7 @@
     "eval:pedagogy": "node --experimental-strip-types src/evals/deterministic-pedagogy.ts",
     "eval:llm-runtime-trace": "node --experimental-strip-types src/evals/llm-runtime-trace.ts",
     "eval:selfhost-pilot": "node --experimental-strip-types src/evals/selfhost-pilot.ts",
+    "eval:selfhost-benchmark": "node --experimental-strip-types src/evals/selfhost-benchmark.ts",
     "test": "node --test --experimental-strip-types Tests/**/*.test.ts",
     "typecheck": "npx tsc -p tsconfig.json --noEmit"
   },
