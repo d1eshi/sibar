@@ -36,6 +36,23 @@ Artifact Intake
 
 ## Rule
 
-New feature ideas can be accepted only if they strengthen one of these specs for v0.1
-or the active mission pack under `docs/missions/sibi-v01-build-to-learn/`.
-Otherwise they go to later.
+For this MVP execution layer, active routing is explicit:
+
+1. Self-hosted MVP artifacts must live under `docs/specs/selfhost/` and
+   `docs/specs/selfhost/pilot/`.
+2. Only an explicit later worker brief may revise this route.
+
+Historical references to mission packs may remain in the repository, but they do
+not define current artifact destinations for this layer.
+
+New feature ideas can be accepted only if they strengthen one of these specs for
+v0.1 or the current self-hosted execution layer target.
+
+For the self-hosted MVP, new work must produce at least one of:
+
+1. manifest
+2. mastery check
+3. dataset
+4. evaluator
+5. benchmark report
+6. readiness evidence
