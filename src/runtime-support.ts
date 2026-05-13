@@ -7,21 +7,13 @@ import type {
   TaskType,
 } from "./pedagogy/index.ts";
 import type { RuntimeCodeSelection } from "./code-selection.ts";
-import type { RuntimeReadingSelection } from "./reading-selection.ts";
 
 export type RuntimeCommand =
-  | "capture_resource"
   | "declare_intent"
+  | "prepare_code_question"
   | "generate_questions"
   | "answer_question"
-  | "prepare_code_question"
-  | "prepare_code_review"
-  | "prepare_reading_question"
-  | "get_session_summary"
-  | "start_note"
-  | "append_note"
-  | "get_active_note"
-  | "list_notes";
+  | "get_session_summary";
 
 export type RuntimeRequest = {
   command: RuntimeCommand;
@@ -39,29 +31,6 @@ export type RuntimeQuestion = OwnershipQuestion & {
   answer_quality?: AnswerQuality;
 };
 
-export type ReviewedFile = {
-  file_path: string;
-  project_path: string;
-  language: string;
-  relevance: "primary" | "supporting";
-  rationale: string;
-};
-
-export type RuntimeReviewPlan = {
-  project_label: string;
-  project_path: string;
-  objective: string;
-  reviewed_files: ReviewedFile[];
-  active_file: ReviewedFile;
-  highlighted_range: {
-    start_line: number;
-    end_line: number;
-  };
-  selection: RuntimeCodeSelection;
-  excerpt: string;
-  rationale: string;
-};
-
 export type RuntimeSession = {
   session_id: string;
   project_label: string;
@@ -73,10 +42,7 @@ export type RuntimeSession = {
   ownership_questions: RuntimeQuestion[];
   export_state: AgentWorkSessionSummary["export_state"];
   task_type: TaskType;
-  resource_ids: number[];
   code_selection?: RuntimeCodeSelection;
-  reading_selection?: RuntimeReadingSelection;
-  review_plan?: RuntimeReviewPlan;
 };
 
 export type RuntimeState = {
@@ -86,8 +52,6 @@ export type RuntimeState = {
 
 export type RuntimeSessionSummary = AgentWorkSessionSummary & {
   code_selection?: RuntimeCodeSelection;
-  reading_selection?: RuntimeReadingSelection;
-  review_plan?: RuntimeReviewPlan;
 };
 
 export class RuntimeError extends Error {

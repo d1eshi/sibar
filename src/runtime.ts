@@ -13,21 +13,9 @@ import {
   type LearningSignal,
   type TaskType,
 } from "./pedagogy/index.ts";
-import {
-  appendNoteEvent,
-  getActiveNote,
-  getConceptMap,
-  listNotes,
-  recordSignal,
-  saveResource,
-  writeActiveNoteID,
-  type Resource,
-} from "./store.ts";
-import { applyAppend, createNote, type AppendNoteInput, type Note, type NoteContext, type StartNoteInput } from "./notes.ts";
+import { getConceptMap, recordSignal } from "./store.ts";
 import { CodeSelectionError, readCodeSelection, type RuntimeCodeSelection } from "./code-selection.ts";
-import { ReadingSelectionError, normalizeReadingSelection, type RuntimeReadingSelection } from "./reading-selection.ts";
 import { createPreparedQuestionSession } from "./runtime-prepared-question.ts";
-import { prepareCodeReviewCommand } from "./runtime-review-plan.ts";
 import { getSession, readState, toSummary, writeState } from "./runtime-state.ts";
 import {
   RuntimeError,
@@ -152,7 +140,6 @@ function declareIntent(payload: Record<string, unknown>): RuntimeSuccess<{
     ownership_questions: [],
     export_state: "not_exported",
     task_type: inferTaskType(intent.desired_help),
-    resource_ids: [],
   };
   state.current_session_id = sessionID;
   writeState(state);
@@ -217,100 +204,6 @@ function prepareCodeQuestionCommand(payload: Record<string, unknown>): RuntimeSu
       selection,
       question,
       operation_state: toOperationState("Code question prepared."),
-    },
-  };
-}
-
-function prepareReadingQuestionCommand(payload: Record<string, unknown>): RuntimeSuccess<{
-  session_id: string;
-  selection: RuntimeReadingSelection;
-  question: RuntimeQuestion;
-  operation_state: { message: string };
-}> {
-  const projectLabel = String(payload.project_label || "").trim() || "reading";
-  const originalSelectedText = String(payload.selected_text || "");
-  const selection = normalizeReadingSelection({
-    source_title: typeof payload.source_title === "string" ? payload.source_title : null,
-    source_url: typeof payload.source_url === "string" ? payload.source_url : null,
-    document_path: typeof payload.document_path === "string" ? payload.document_path : null,
-    selected_text: originalSelectedText,
-    user_note: typeof payload.user_note === "string" ? payload.user_note : null,
-  });
-  const sourceLabel = selection.source_title || selection.document_path || selection.source_url || "selected reading";
-  const targetArea = selection.source_title || excerptPrefix(selection.selected_text, 48);
-  const evidence = [
-    `source=${sourceLabel}`,
-    ...(selection.source_title ? [`source_title=${selection.source_title}`] : []),
-    ...(selection.source_url ? [`source_url=${selection.source_url}`] : []),
-    ...(selection.document_path ? [`document_path=${selection.document_path}`] : []),
-    `excerpt=${excerptPrefix(selection.selected_text)}`,
-    `original_selected_text=${originalSelectedText}`,
-    ...(selection.user_note ? [`user_note=${selection.user_note}`] : []),
-  ];
-  const { session, question } = createPreparedQuestionSession({
-    projectLabel,
-    projectPath: null,
-    observedTools: ["typescript-runtime", "reading-selection"],
-    intentStatement: `Understand selected reading from ${sourceLabel}.`,
-    intentUncertainty: "User is reconstructing the claim in the selected fragment before receiving an explanation.",
-    expectedWorkArea: targetArea,
-    question: {
-      prompt: "Before I explain it: in your own words, what claim is this fragment making, and which term or step feels least clear?",
-      target_area: targetArea,
-      why_it_matters: "Active understanding starts with the reader naming the claim and the unclear term before Sibi explains it.",
-      evidence_basis: evidence,
-      answer_style: "study_request",
-    },
-    signalReason: "Runtime prepared a Socratic ownership question for a bounded reading selection.",
-    signalEvidence: evidence,
-    readingSelection: selection,
-  });
-
-  return {
-    ok: true,
-    data: {
-      session_id: session.session_id,
-      selection,
-      question,
-      operation_state: toOperationState("Reading question prepared."),
-    },
-  };
-}
-
-function captureResource(payload: Record<string, unknown>): RuntimeSuccess<{
-  session_id?: string;
-  resource: Resource & { id: number };
-  operation_state: { message: string };
-}> {
-  const projectLabel = String(payload.project_label || "demo-project").trim();
-  const url = String(payload.url || "").trim();
-  if (!url) {
-    fail("invalid_payload", "capture_resource requires url.");
-  }
-
-  const resource: Resource = {
-    url,
-    title: typeof payload.title === "string" ? payload.title : undefined,
-    notes: String(payload.notes || ""),
-    project_label: projectLabel,
-    resource_type: typeof payload.resource_type === "string" ? payload.resource_type : "url",
-    captured_at: now(),
-  };
-
-  const resourceID = saveResource(resource);
-  const state = readState();
-  const session = state.current_session_id ? state.sessions[state.current_session_id] : undefined;
-  if (session) {
-    session.resource_ids.push(resourceID);
-    writeState(state);
-  }
-
-  return {
-    ok: true,
-    data: {
-      session_id: session?.session_id,
-      resource: { ...resource, id: resourceID },
-      operation_state: toOperationState("Resource captured by TypeScript runtime."),
     },
   };
 }
@@ -393,7 +286,11 @@ function generateQuestionsCommand(payload: Record<string, unknown>): RuntimeSucc
       session_id: session.session_id,
       questions: session.ownership_questions,
       learning_signals: session.learning_signals,
-      operation_state: toOperationState(generated.length > 0 ? "Questions generated in TypeScript runtime." : "No gap detected for the current session."),
+      operation_state: toOperationState(
+        generated.length > 0
+          ? "Questions generated in TypeScript runtime."
+          : "No gap detected for the current session.",
+      ),
     },
   };
 }
@@ -480,144 +377,34 @@ function getSessionSummaryCommand(payload: Record<string, unknown>): RuntimeSucc
   };
 }
 
-function noteContextFromPayload(payload: Record<string, unknown>): NoteContext | undefined {
-  const context = payload.context && typeof payload.context === "object" ? payload.context as Record<string, unknown> : payload;
-  return {
-    url: typeof context.url === "string" ? context.url : undefined,
-    source_title: typeof context.source_title === "string" ? context.source_title : undefined,
-    source_type: typeof context.source_type === "string" ? context.source_type as NoteContext["source_type"] : undefined,
-    app_hint: typeof context.app_hint === "string" ? context.app_hint : undefined,
-  };
-}
-
-function startNoteInput(payload: Record<string, unknown>): StartNoteInput {
-  return {
-    title: typeof payload.title === "string" ? payload.title : undefined,
-    instruction: typeof payload.instruction === "string" ? payload.instruction : undefined,
-    context: noteContextFromPayload(payload),
-  };
-}
-
-function startNoteCommand(payload: Record<string, unknown>): RuntimeSuccess<{
-  note: Note;
-  operation_state: { message: string };
-}> {
-  const note = createNote(startNoteInput(payload));
-  appendNoteEvent({ event_type: "note_started", note });
-  writeActiveNoteID(note.note_id);
-  return {
-    ok: true,
-    data: {
-      note,
-      operation_state: toOperationState("New active note started."),
-    },
-  };
-}
-
-function appendNoteCommand(payload: Record<string, unknown>): RuntimeSuccess<{
-  note: Note;
-  operation_state: { message: string };
-}> {
-  const text = String(payload.text || "").trim();
-  if (!text) {
-    fail("invalid_payload", "append_note requires text.");
-  }
-
-  const input: AppendNoteInput = { ...startNoteInput(payload), text };
-  let note = getActiveNote();
-  if (!note) {
-    note = createNote(input);
-    appendNoteEvent({ event_type: "note_started", note });
-    writeActiveNoteID(note.note_id);
-  }
-
-  const result = applyAppend(note, input);
-  appendNoteEvent({
-    event_type: "note_appended",
-    note_id: result.note.note_id,
-    entry: result.entry,
-    updated_at: result.note.updated_at,
-    instruction: result.note.instruction,
-    context: result.note.context,
-    title: result.note.title,
-    detected_topics: result.note.detected_topics,
-  });
-  writeActiveNoteID(result.note.note_id);
-
-  return {
-    ok: true,
-    data: {
-      note: result.note,
-      operation_state: toOperationState("Note appended to active note."),
-    },
-  };
-}
-
-function getActiveNoteCommand(): RuntimeSuccess<{
-  note: Note | null;
-  operation_state: { message: string };
-}> {
-  const note = getActiveNote();
-  return {
-    ok: true,
-    data: {
-      note,
-      operation_state: toOperationState(note ? "Active note loaded." : "No active note."),
-    },
-  };
-}
-
-function listNotesCommand(payload: Record<string, unknown>): RuntimeSuccess<{
-  notes: Note[];
-  operation_state: { message: string };
-}> {
-  const limit = typeof payload.limit === "number" ? payload.limit : 20;
-  const notes = listNotes(limit);
-  return {
-    ok: true,
-    data: {
-      notes,
-      operation_state: toOperationState(`Loaded ${notes.length} recent note(s).`),
-    },
-  };
-}
-
 export function handleRequest(request: RuntimeRequest): RuntimeResponse<unknown> {
   try {
     switch (request.command) {
       case "declare_intent":
         return declareIntent(request.payload);
-      case "capture_resource":
-        return captureResource(request.payload);
       case "generate_questions":
         return generateQuestionsCommand(request.payload);
       case "answer_question":
         return answerQuestionCommand(request.payload);
       case "prepare_code_question":
         return prepareCodeQuestionCommand(request.payload);
-      case "prepare_code_review":
-        return prepareCodeReviewCommand(request.payload);
-      case "prepare_reading_question":
-        return prepareReadingQuestionCommand(request.payload);
       case "get_session_summary":
         return getSessionSummaryCommand(request.payload);
-      case "start_note":
-        return startNoteCommand(request.payload);
-      case "append_note":
-        return appendNoteCommand(request.payload);
-      case "get_active_note":
-        return getActiveNoteCommand();
-      case "list_notes":
-        return listNotesCommand(request.payload);
     }
   } catch (error) {
-    if (error instanceof CodeSelectionError || error instanceof ReadingSelectionError) {
+    if (error instanceof CodeSelectionError) {
       return { ok: false, error: { code: error.code, message: error.message } };
     }
     if (error instanceof RuntimeError) {
       return { ok: false, error: { code: error.code, message: error.message } };
     }
-    return { ok: false, error: { code: "runtime_error", message: error instanceof Error ? error.message : "Unknown runtime error" } };
+    return {
+      ok: false,
+      error: {
+        code: "runtime_error",
+        message: error instanceof Error ? error.message : "Unknown runtime error",
+      },
+    };
   }
 }
 
