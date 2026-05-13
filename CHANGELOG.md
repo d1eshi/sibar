@@ -21,6 +21,8 @@ story.
 - Spec-based versioning policy for deciding when Sibi moves between pre-1.0
   versions.
 - Changelog source of truth for future web-facing product progress updates.
+- Swift `SibiCore` process bridge for the five foundation TypeScript runtime
+  commands, with tests and no shell/UI state ownership.
 
 ### Changed
 
