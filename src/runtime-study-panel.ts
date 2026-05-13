@@ -1,6 +1,7 @@
 import { buildUnderstandingMemory } from "./runtime-memory.ts";
 import { buildReadinessReport, type ReadinessReport } from "./runtime-readiness.ts";
 import { getArtifactSession, readState } from "./runtime-state.ts";
+import type { RuntimeCodeSelection } from "./code-selection.ts";
 import {
   now,
   toOperationState,
@@ -30,6 +31,7 @@ export type StudyPanelSnapshot = {
   artifact_session: ArtifactSession;
   concept_graph: ConceptGraph | null;
   active_autopsy_step: AutopsyStep | null;
+  active_code_selection: RuntimeCodeSelection | null;
   current_questions: RuntimeQuestion[];
   learning_gaps: LearningGap[];
   practice_challenges: PracticeChallenge[];
@@ -45,6 +47,12 @@ function activeQuestions(state: RuntimeState, artifactSession: ArtifactSession):
   return state.sessions[step.session_id]?.ownership_questions
     .filter((question) => question.question_id === step.question_id)
     ?? [];
+}
+
+function activeCodeSelection(state: RuntimeState, artifactSession: ArtifactSession): RuntimeCodeSelection | null {
+  const step = artifactSession.active_autopsy_step;
+  if (!step) return null;
+  return state.sessions[step.session_id]?.code_selection ?? null;
 }
 
 function citationKey(citation: EvidenceCitation): string {
@@ -100,6 +108,7 @@ export function getStudyPanelStateCommand(payload: Record<string, unknown>): Run
       artifact_session: artifactSession,
       concept_graph: conceptGraph,
       active_autopsy_step: artifactSession.active_autopsy_step ?? null,
+      active_code_selection: activeCodeSelection(state, artifactSession),
       current_questions: activeQuestions(state, artifactSession),
       learning_gaps: learningGaps,
       practice_challenges: practiceChallenges,

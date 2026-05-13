@@ -29,6 +29,8 @@ story.
   reports as JSON and Markdown.
 - Standalone SwiftUI `SibiStudyApp` host for live runtime-owned study panel
   snapshots and answer submission.
+- Floating `NSPanel` study surface with collapsible mode and Graph + Code canvas
+  rendered from runtime-owned snapshots.
 
 ### Changed
 
@@ -52,6 +54,8 @@ story.
   model comparison evals, and dataset sizing research gates.
 - Mission docs: added the standalone Swift app audit, iteration, and validation
   contract for the live study panel host.
+- Mission docs: updated Study Panel UI to require an accessory `NSPanel` host
+  and explicit Graph + Code canvas behavior.
 
 ### Internal
 

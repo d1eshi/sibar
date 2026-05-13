@@ -7,6 +7,7 @@ let package = Package(
     products: [
         .executable(name: "SibiStudyApp", targets: ["SibiStudyApp"]),
         .library(name: "SibiCore", targets: ["SibiCore"]),
+        .library(name: "SibiStudyShellKit", targets: ["SibiStudyShellKit"]),
     ],
     targets: [
         .target(
@@ -22,10 +23,21 @@ let package = Package(
         ),
         .executableTarget(
             name: "SibiStudyApp",
-            dependencies: ["SibiCore"],
+            dependencies: ["SibiStudyShellKit"],
             path: "Sources/SibiStudyApp",
             sources: [
                 "SibiStudyApp.swift",
+            ]
+        ),
+        .target(
+            name: "SibiStudyShellKit",
+            dependencies: ["SibiCore"],
+            path: "Sources/SibiStudyShellKit",
+            sources: [
+                "SibiStudyAppDelegate.swift",
+                "StudyGraphCodeCanvasView.swift",
+                "StudyPanelController.swift",
+                "StudyPanelRootView.swift",
             ]
         ),
         .testTarget(
@@ -35,6 +47,15 @@ let package = Package(
             sources: [
                 "RuntimeClientTests.swift",
                 "StudyPanelTests.swift",
+            ]
+        ),
+        .testTarget(
+            name: "SibiStudyShellKitTests",
+            dependencies: ["SibiStudyShellKit", "SibiCore"],
+            path: "Tests/SibiStudyShellKitTests",
+            sources: [
+                "StudyGraphCodeCanvasTests.swift",
+                "StudyPanelControllerTests.swift",
             ]
         ),
     ]
