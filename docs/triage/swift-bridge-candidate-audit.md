@@ -210,15 +210,14 @@ The bridge decision still holds:
 2. TypeScript owns artifact sessions, question/evidence state, gaps, practice,
    memory, readiness, and study panel projection.
 3. `SibiStudyApp` may call `get_study_panel_state` and `answer_question`.
-4. `SibiShell`, overlay, spotlight, OCR, screen capture, and AppKit permission
-   flows remain excluded until a separate shell/observer audit exists.
+4. F12 adapts only AppKit panel mechanics; `SibiShell`, spotlight, OCR, screen
+   capture, and AppKit permission flows remain excluded.
 
 The bridge implementation slice is now complete for `SibiCore`. The next Swift slice, if chosen, should:
 
-1. create a narrow shell/panel spec before code
-2. copy/adapt only panel mechanics and code-question UI
-3. exclude notes, reading, code-review-plan, OCR spotlight, and AppKit permission flows until separately audited
-4. keep TypeScript as the state owner
-5. run Swift tests without launching UI
+1. keep F12 panel mechanics tied to `StudyPanelSnapshot`
+2. exclude notes, reading, code-review-plan, OCR spotlight, and AppKit permission flows until separately audited
+3. keep TypeScript as the state owner
+4. run Swift tests without launching UI
 
 The alternative next product slice remains `Foundation memory + readiness skeleton`, as recommended by the runtime moat audit. Choose the Swift bridge implementation only if a native surface is needed immediately.

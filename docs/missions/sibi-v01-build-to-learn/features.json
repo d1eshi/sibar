@@ -195,6 +195,20 @@
       "workerSessionIds": [],
       "currentWorkerSessionId": null,
       "completedWorkerSessionId": null
+    },
+    {
+      "id": "F12",
+      "description": "Replace the study app window with an NSPanel surface and Graph + Code canvas.",
+      "milestone": "ui",
+      "status": "completed",
+      "skillName": "mission-spec-orchestrator",
+      "preconditions": ["F11 standalone app exists.", "StudyPanelSnapshot runtime command exists."],
+      "expectedBehavior": ["Swift app launches as an accessory floating panel, can collapse, and opens a runtime-owned Graph + Code canvas."],
+      "verificationSteps": ["Run swift build.", "Run swift test.", "Run npm test.", "Run npm run typecheck."],
+      "fulfills": ["VAL-UI-001", "VAL-UI-002", "VAL-UI-003", "VAL-UI-004"],
+      "workerSessionIds": [],
+      "currentWorkerSessionId": null,
+      "completedWorkerSessionId": null
     }
   ]
 }

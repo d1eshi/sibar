@@ -126,3 +126,9 @@ written from the user's and system validator's point of view.
 - **Behavioral description:** A standalone Swift app can load the current or selected artifact session, refresh `StudyPanelSnapshot` data, and submit answers back to the TypeScript runtime.
 - **Tool:** Swift build, Swift tests, and runtime regression tests.
 - **Evidence:** `SibiStudyApp` executable target, `StudyPanelLiveModel` tests, and passing TypeScript runtime tests.
+
+### `VAL-UI-004` - Study app is a floating panel with graph/code canvas
+
+- **Behavioral description:** The product app opens as an accessory floating `NSPanel`, supports collapse/restore, and opens a separate Graph + Code canvas rendered from runtime snapshot data.
+- **Tool:** Swift panel/controller tests, Swift build, and runtime snapshot tests.
+- **Evidence:** `SibiStudyShellKit` panel tests plus `StudyPanelSnapshot.active_code_selection` coverage.

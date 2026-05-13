@@ -53,9 +53,10 @@ without reimplementing any of it.
 | `SibiCore/RuntimeModels.swift` | Adapt | Models must track the current runtime payloads, including `RuntimeQuestion.max_followups`. |
 | `SibiCore/StudyPanelModels.swift` | Keep | Codable snapshot models are the UI contract for the current moat. |
 | `SibiCore/StudyPanelView.swift` | Adapt | The reusable panel is correct, but the standalone app needs visible artifact/session/question identity. |
-| `StudyPanelLiveModel.swift` | Add | This is the smallest bridge between the runtime process and a live SwiftUI window. |
-| `SibiStudyApp` | Add | The app host is necessary to move from test/render model evidence to an actual user surface. |
-| `SibiShell`, `SibiShellKit`, overlay, spotlight, AppKit shell | Later | Useful native mechanics, but they add observer and permission scope before the study loop is stable. |
+| `StudyPanelLiveModel.swift` | Add | This is the smallest bridge between the runtime process and a live Swift surface. |
+| `SibiStudyApp` | Adapt | The app host is necessary to move from test/render model evidence to an actual user surface. |
+| AppKit panel mechanics | Adapt in F12 | Floating/collapsible `NSPanel` behavior is product surface, not runtime state. |
+| Spotlight, OCR, screen capture, overlay permissions | Later | These add observer and permission scope before the study loop is stable. |
 
 ## Copy / Adapt Decision
 
@@ -75,12 +76,17 @@ Adapted now:
 Not copied now:
 
 1. `SibiShell`
-2. `SibiShellKit`
-3. overlay controllers
-4. spotlight controllers
-5. OCR or screen capture code
-6. AppKit accessory app behavior
-7. old notes, reading, review-plan, or shell-specific workflows
+2. spotlight controllers
+3. OCR or screen capture code
+4. old notes, reading, review-plan, or shell-specific workflows
+
+Adapted in F12:
+
+1. accessory AppKit host behavior
+2. floating nonactivating `NSPanel`
+3. collapsed pill mechanics
+4. separate Graph + Code canvas panel keyed to `StudyPanelSnapshot`, not
+   `RuntimeReviewPlan`
 
 ## Boundary Rule
 

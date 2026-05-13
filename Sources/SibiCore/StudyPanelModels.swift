@@ -4,6 +4,7 @@ public struct StudyPanelSnapshot: Codable, Sendable {
     public let artifact_session: StudyPanelArtifactSession
     public let concept_graph: StudyPanelConceptGraph?
     public let active_autopsy_step: StudyPanelAutopsyStep?
+    public let active_code_selection: RuntimeCodeSelection?
     public let current_questions: [RuntimeQuestion]
     public let learning_gaps: [StudyPanelLearningGap]
     public let practice_challenges: [StudyPanelPracticeChallenge]

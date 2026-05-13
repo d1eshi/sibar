@@ -33,8 +33,12 @@ The first standalone host is `SibiStudyApp`. It wraps the reusable
 - manual refresh and polling reload returned snapshots
 - Swift keeps only transient loading, error, and input state
 
-This host is still not the observer. It does not copy `SibiShell`, overlay,
-spotlight, OCR, screen capture, or AppKit permission flows.
+The product host is an accessory app with a floating nonactivating `NSPanel`,
+not a primary SwiftUI `WindowGroup`. It may collapse into a small pill and open a
+separate Graph + Code canvas from an explicit control.
+
+This host is still not the observer. It does not copy spotlight, OCR, screen
+capture, or AppKit permission flows.
 
 ## Required Panel Regions
 
@@ -60,8 +64,18 @@ StudyPanelSnapshot
   memory_summary
   readiness_report
   evidence_index
+  active_code_selection?
   operation_state
 ```
+
+## Graph + Code Canvas
+
+- Canvas renders `concept_graph` nodes/edges and bounded code/evidence from the
+  same snapshot.
+- Concept/edge selection only filters already-decoded snapshot evidence.
+- `active_code_selection` is optional and runtime-owned.
+- Swift must not read files directly to fill the canvas.
+- The old `RuntimeReviewPlan` canvas is excluded.
 
 ## Reuse Rules
 
@@ -71,3 +85,4 @@ StudyPanelSnapshot
 - Panel state must be testable with fixtures before live runtime wiring.
 - The standalone app may poll the runtime, but queues, memory, readiness, and
   practice scheduling remain runtime-owned.
+- Window behavior may live in Swift; product truth and learning state may not.

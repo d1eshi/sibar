@@ -5,6 +5,8 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 
 import { handleRequest } from "../src/runtime.ts";
+import type { RuntimeCodeSelection } from "../src/code-selection.ts";
+import { readState, writeState } from "../src/runtime-state.ts";
 import type {
   AutopsyStep,
   ConceptGraph,
@@ -105,6 +107,19 @@ function prepareFixtureSession(): {
 
 test("get_study_panel_state returns a complete runtime-owned Build-to-Learn snapshot", () => {
   const fixture = prepareFixtureSession();
+  const codeSelection: RuntimeCodeSelection = {
+    file_path: fixture.graph.nodes[0].evidence[0].file_path,
+    project_path: null,
+    language: "typescript",
+    start_line: 1,
+    end_line: 3,
+    selected_text: "export function handleRequest(request: { command: string }) {",
+    surrounding_text: "export function handleRequest(request: { command: string }) {\n  if (request.command === 'answer_question') return writeState(readState());\n}",
+  };
+  const state = readState();
+  state.sessions[fixture.autopsyStep.session_id].code_selection = codeSelection;
+  writeState(state);
+
   const snapshot = expectSuccess<StudyPanelSnapshot>(handleRequest({
     command: "get_study_panel_state",
     payload: { artifact_session_id: fixture.artifactSessionID },
@@ -113,6 +128,8 @@ test("get_study_panel_state returns a complete runtime-owned Build-to-Learn snap
   assert.equal(snapshot.artifact_session.artifact_session_id, fixture.artifactSessionID);
   assert.equal(snapshot.concept_graph?.artifact_session_id, fixture.artifactSessionID);
   assert.equal(snapshot.active_autopsy_step?.autopsy_step_id, fixture.autopsyStep.autopsy_step_id);
+  assert.equal(snapshot.active_code_selection?.file_path, codeSelection.file_path);
+  assert.equal(snapshot.active_code_selection?.selected_text, codeSelection.selected_text);
   assert.equal(snapshot.current_questions[0]?.question_id, fixture.autopsyStep.question_id);
   assert.ok(snapshot.current_questions[0]?.prompt.includes("Before any explanation"));
   assert.ok(snapshot.learning_gaps.some((gap) => gap.id === fixture.gap.id));
@@ -146,6 +163,7 @@ test("get_study_panel_state renders explicit empty panel regions before learning
 
   assert.equal(snapshot.concept_graph, null);
   assert.equal(snapshot.active_autopsy_step, null);
+  assert.equal(snapshot.active_code_selection, null);
   assert.deepEqual(snapshot.current_questions, []);
   assert.deepEqual(snapshot.learning_gaps, []);
   assert.deepEqual(snapshot.practice_challenges, []);

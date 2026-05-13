@@ -16,6 +16,7 @@ final class StudyPanelTests: XCTestCase {
         XCTAssertEqual(snapshot.artifact_session.artifact_session_id, "a1")
         XCTAssertEqual(snapshot.concept_graph?.nodes.first?.label, "Runtime boundary")
         XCTAssertEqual(snapshot.active_autopsy_step?.next_action, "collect_user_attempt")
+        XCTAssertEqual(snapshot.active_code_selection?.selected_text, "handleRequest")
         XCTAssertEqual(snapshot.current_questions.first?.question_id, "q1")
         XCTAssertEqual(snapshot.learning_gaps.first?.repair_action, "Trace the runtime state path.")
         XCTAssertEqual(snapshot.practice_challenges.first?.gap_id, "g1")
@@ -246,6 +247,15 @@ private let studyPanelEnvelopeJSON = #"""
       "evidence_basis": ["runtime.ts:1-2 handleRequest"],
       "next_action": "collect_user_attempt",
       "created_at": "t2"
+    },
+    "active_code_selection": {
+      "file_path": "/tmp/sibi/src/runtime.ts",
+      "project_path": "/tmp/sibi",
+      "language": "typescript",
+      "start_line": 1,
+      "end_line": 2,
+      "selected_text": "handleRequest",
+      "surrounding_text": "export function handleRequest(request) {\n  return request.command;\n}"
     },
     "current_questions": [{
       "question_id": "q1",

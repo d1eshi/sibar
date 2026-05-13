@@ -5,13 +5,13 @@
 This mission turns the v0.1 foundation specs into an implementation-ready queue.
 Sibi v0.1 must run one reproducible Build-to-Learn session over one bounded
 software artifact, measure its own pedagogy/runtime behavior through evals, and
-show the user what they are studying through a reusable Swift panel and a
-standalone Swift app host.
+show the user what they are studying through a reusable Swift panel, a floating
+standalone `NSPanel` host, and a Graph + Code canvas.
 
 The mission extends the existing eight specs with:
 
 1. `Spec 09: Project Learning Agent` - a bounded LLM/Codex adapter that proposes candidate signals only.
-2. `Spec 10: Study Panel UI` - a Swift panel and app host that render runtime-owned study state.
+2. `Spec 10: Study Panel UI` - a Swift panel, app host, and canvas that render runtime-owned study state.
 3. Internal eval specs for datasets, deterministic pedagogy checks, and LLM+runtime trace checks.
 
 ## Expected Functionality
@@ -34,7 +34,9 @@ The mission extends the existing eight specs with:
 - Validate model output through deterministic boundaries, evidence checks, and pedagogy rules before using it.
 - Render the session in a Swift study panel through `SibiCore`, without Swift owning memory, queues, evals, or readiness decisions.
 - Host the study panel in `SibiStudyApp` so the user can refresh live artifact
-  and session state without adopting observer, OCR, or shell scope yet.
+  and session state from an accessory floating `NSPanel`.
+- Open a Graph + Code canvas from the same runtime snapshot without adopting
+  observer, OCR, spotlight, screen capture, or permission scope yet.
 
 ## Boundaries
 
@@ -46,7 +48,8 @@ In scope:
 - Runtime tests under `Tests/runtime.test.ts`
 - Swift bridge models/client in `Sources/SibiCore/` only after TypeScript command contracts stabilize
 - Mission eval datasets and eval harness contracts
-- Manual Swift study panel contract, standalone app host, and future implementation slices
+- Manual Swift study panel contract, standalone `NSPanel` app host, Graph + Code
+  canvas, and future implementation slices
 - Worker/verifier orchestration rules in `library/orchestration.md`
 
 Out of scope for this mission:
