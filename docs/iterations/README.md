@@ -1,0 +1,155 @@
+# v0.1 Iteration Queue
+
+This queue turns the 8 foundation specs into a launchable v0.1.
+
+The queue is intentionally small. Do not add surface integrations before the Build-to-Learn loop works.
+
+## Iteration 0: Clean Foundation
+
+Status: complete in this cleanup pass.
+
+Output:
+
+1. product foundation
+2. moat statement
+3. v0.1 scope
+4. 8 foundation specs
+5. source triage
+
+## Iteration 1: TypeScript Runtime Port
+
+Status: complete.
+
+Specs: 01, 03, 04, 05, 07
+
+Port the working TypeScript runtime from `sibar-agent/src` as a runnable, tested seed before changing behavior.
+
+Spec:
+
+`01_typescript_runtime_port.md`
+
+Verification:
+
+1. `npm test` passes
+2. `npm run typecheck` passes
+3. runtime stdin command works for `declare_intent`
+4. temporary-file `prepare_code_question` works
+
+## Iteration 2: Runtime Moat Audit
+
+Specs: 01, 03, 04, 05, 07, 08
+
+Review the copied TypeScript runtime against the moat before adding new behavior.
+
+Spec:
+
+`02_runtime_moat_audit.md`
+
+Verification:
+
+1. every copied command is classified as `foundation`, `supporting`, `later`, or `drop`
+2. every copied module is classified
+3. `npm test` passes
+4. `npm run typecheck` passes
+
+## Iteration 3: Swift Bridge Candidate Audit
+
+Specs: 03, 04, 07
+
+Evaluate only the minimum Swift bridge candidate after the TS runtime audit. Do not copy Swift code yet.
+
+Spec:
+
+`03_swift_bridge_candidate_audit.md`
+
+Verification:
+
+1. exact bridge files are named
+2. exact runtime commands are named
+3. shell/UI/AppKit are explicitly excluded
+
+## Iteration 4: Artifact Session Prototype
+
+Status: blocked until Iteration 2 finishes.
+
+Specs: 01
+
+Build the minimum flow to create an artifact session with a label, goal, root path, included paths, and excluded paths.
+
+Verification:
+
+1. create one session
+2. inspect stored session
+3. confirm path boundary is respected
+
+## Iteration 5: Concept Graph Seed
+
+Specs: 02
+
+Create a small human-readable concept graph from the chosen artifact.
+
+Verification:
+
+1. at least 5 concept nodes
+2. at least 1 important flow
+3. every node cites source evidence
+
+## Iteration 6: Autopsy Step
+
+Specs: 03, 04
+
+Run one guided reverse-engineering step where the user predicts before Sibi explains.
+
+Verification:
+
+1. show bounded evidence
+2. ask one ownership question
+3. store answer
+4. produce next action
+
+## Iteration 7: Gap Detection
+
+Specs: 05
+
+Compare the user's answer to artifact evidence and produce one learning gap or confirmed concept state.
+
+Verification:
+
+1. detected gap includes concept, severity, confidence, evidence, and repair action
+2. "I don't know" becomes uncertainty evidence, not failure
+
+## Iteration 8: Challenge And Memory
+
+Specs: 06, 07
+
+Create one practice challenge and persist understanding memory across session resume.
+
+Verification:
+
+1. challenge is tied to a gap
+2. memory shows answer history and next review
+3. resumed session can continue from prior state
+
+## Iteration 9: Readiness Report
+
+Specs: 08
+
+Generate a local readiness report with evidence-backed claims.
+
+Verification:
+
+1. report lists ready areas and risky areas
+2. every claim cites evidence
+3. report exports to Markdown or JSON
+
+## Later Queue
+
+Only after Iteration 9:
+
+1. macOS observer shell
+2. code range selection UI
+3. reading fragment mode
+4. editor bridge
+5. voice capture
+6. team onboarding
+7. workspace/API sync
