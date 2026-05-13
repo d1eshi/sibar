@@ -84,6 +84,21 @@ type ValidationState = {
   casesChecked: number;
 };
 
+function getFlagValue(argv: string[], flag: string): string | undefined {
+  const equalsPrefix = `--${flag}=`;
+  const equalsValue = argv.find((entry) => entry.startsWith(equalsPrefix));
+  if (equalsValue !== undefined) {
+    return equalsValue.slice(equalsPrefix.length);
+  }
+
+  const spacedIndex = argv.findIndex((entry) => entry === `--${flag}`);
+  if (spacedIndex !== -1 && spacedIndex + 1 < argv.length) {
+    return argv[spacedIndex + 1];
+  }
+
+  return undefined;
+}
+
 type RawManifest = {
   included_paths?: unknown;
   concepts?: unknown;
@@ -713,8 +728,7 @@ export function runSelfhostPilotEval(options: SelfhostPilotOptions = {}): Selfho
     answer_class_distribution: state.answerClassDistribution,
     out_of_scope_required_evidence_paths: state.outOfScopeEvidencePaths,
   };
-
-  return {
+  const report: SelfhostPilotEvalReport = {
     generated_at: new Date().toISOString(),
     validation: SELFHOST_VALIDATION_ID,
     manifest_path: manifestPath,
@@ -723,12 +737,20 @@ export function runSelfhostPilotEval(options: SelfhostPilotOptions = {}): Selfho
     aggregate,
     mismatches: state.mismatches,
   };
+
+  if (options.reportPath) {
+    const outputPath = resolve(options.reportPath);
+    mkdirSync(dirname(outputPath), { recursive: true });
+    writeFileSync(outputPath, `${JSON.stringify(report, null, 2)}\n`, "utf8");
+  }
+
+  return report;
 }
 
 if (import.meta.url === `file://${process.argv[1]}`) {
-  const manifestArg = process.argv.find((entry) => entry.startsWith("--manifest="))?.slice("--manifest=".length);
-  const indexArg = process.argv.find((entry) => entry.startsWith("--index="))?.slice("--index=".length);
-  const reportArg = process.argv.find((entry) => entry.startsWith("--report="))?.slice("--report=".length);
+  const manifestArg = getFlagValue(process.argv, "manifest");
+  const indexArg = getFlagValue(process.argv, "index");
+  const reportArg = getFlagValue(process.argv, "report");
 
   const report = runSelfhostPilotEval({
     manifestPath: manifestArg,
@@ -737,12 +759,6 @@ if (import.meta.url === `file://${process.argv[1]}`) {
   });
 
   process.stdout.write(`${JSON.stringify(report.aggregate, null, 2)}\n`);
-
-  if (reportArg) {
-    const outputPath = resolve(reportArg);
-    mkdirSync(dirname(outputPath), { recursive: true });
-    writeFileSync(outputPath, `${JSON.stringify(report, null, 2)}\n`, "utf8");
-  }
 
   if (report.aggregate.total_mismatches > 0) {
     process.exitCode = 1;
