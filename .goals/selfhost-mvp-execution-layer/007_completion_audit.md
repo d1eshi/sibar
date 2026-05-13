@@ -2,12 +2,14 @@
 
 ## Objective Restated
 
-Complete the Self-Hosted MVP Execution Layer for SIBI/SIBAR step by step from
+Complete the Self-Hosted MVP Execution Layer for SIBI/SIBAR first-slice artifacts from
 `docs/specs/README.md`, with the main assistant acting only as orchestrator.
 
 Protocol normalization note (2026-05-13): the orchestrator now has no direct file
 write authority. All writes are worker-owned and must be followed by verifier
 review before this log marks them as accepted.
+Historical direct edits done before the correction are retained as context in
+`D008`.
 
 Concrete success criteria:
 
@@ -37,70 +39,65 @@ manifest
 |---|---|---|
 | Keep a bitácora in `.goals/selfhost-mvp-execution-layer/` | `.goals/selfhost-mvp-execution-layer/README.md` exists | satisfied |
 | Record current self-hosted audit | `001_selfhost_spec_audit.md` exists | satisfied |
-| Discuss incongruences before decision | `002_decision_fifth_concept.md` and `006_confirmation_packet.md` mark fifth concept as pending | satisfied |
-| Worker model protocol | `README.md` and `worker_brief_template.md` specify `gpt-5.3-codex-spark` worker | satisfied |
-| Verifier model protocol | `README.md` and `verifier_brief_template.md` specify `gpt-5.2` high verifier | satisfied |
-| Orchestrator-only rule | `README.md` states orchestrator must not create product code directly | satisfied |
-| Orchestrator write authority | `README.md` includes `D008` restricting direct writes by orchestrator | satisfied |
-| Active source of truth from README/specs | `README.md` lists `docs/specs/README.md` and selfhost specs | satisfied |
-| Manifest decision | `003_decision_manifest_location.md` prepared | pending user confirmation |
-| First worker slice decision | `004_decision_first_worker_slice.md` prepared | pending user confirmation |
-| Dataset location decision | `005_decision_dataset_location.md` prepared | pending user confirmation |
-| Fifth concept/boundary decision | `002_decision_fifth_concept.md` prepared | pending user confirmation |
-| Concrete manifest artifact | `sibar.selfhost.manifest.json` exists and Verifier 2 accepted it | satisfied |
-| Mastery-check fixtures | five checks under `docs/specs/selfhost/pilot/mastery-checks/` and Verifier 2 accepted them | satisfied |
-| 40-case pilot dataset | none yet | not achieved |
-| Worker delegation | no worker spawned or assigned yet | not achieved |
-| Verifier review | no verifier spawned or assigned yet | not achieved |
-| Product code avoided | `git status --short` shows docs/goal artifacts only; no `src/`, `Tests/`, or `Sources/` changes | satisfied so far |
+| Resolve incongruences before decision | `002_decision_fifth_concept.md`, `004_decision_first_worker_slice.md`, and `006_confirmation_packet.md` | satisfied |
+| Worker protocol is defined | `README.md` + `worker_brief_template.md` | satisfied |
+| Verifier protocol is defined | `README.md` + `verifier_brief_template.md` | satisfied |
+| Orchestrator-only rule | `README.md` + `D008` | satisfied |
+| Active source of truth is used | `README.md` lists `docs/specs/README.md` and self-hosted specs | satisfied |
+| Manifest decision | `003_decision_manifest_location.md` + `sibar.selfhost.manifest.json` | satisfied |
+| Mastery-check decision | `004_decision_first_worker_slice.md` + `D005` | satisfied |
+| Dataset location decision | `005_decision_dataset_location.md` + artifacts in `docs/specs/selfhost/pilot/` | satisfied |
+| Fifth concept decision | `002_decision_fifth_concept.md` | satisfied |
+| Concrete manifest artifact | `sibar.selfhost.manifest.json` exists and is part of accepted commit `883ff0e` | satisfied |
+| Mastery-check fixtures | `docs/specs/selfhost/pilot/mastery-checks/` exists with five checks accepted in `010_verifier_result_manifest_mastery_fixtures.md` | satisfied |
+| 40-case pilot dataset | `docs/specs/selfhost/pilot/gold-cases/index.json` (`40` entries) and 40 files under `cases/` + accepted commit `4e387c9` | satisfied |
+| Evaluator implementation | `src/evals/selfhost-pilot.ts` + commit `3a510fd`; spacing support in `b4c68ec`, tests in `a922022` | satisfied |
+| Benchmark runner implementation | `src/evals/selfhost-benchmark.ts` + commit `8076044` + split-mismatch fix `0e364d3` | satisfied |
+| Benchmark report artifact | `docs/specs/selfhost/pilot/reports/VAL-EVAL-006-selfhost-benchmark.json` exists and committed `f4dc5e0` | satisfied |
+| Readiness evidence | same report contains `observed_readiness` in all 40 cases (`jq` check passed) | satisfied |
+| Source-control history integrity | all accepted commits present in `git log --oneline -n 12` | satisfied |
+| Working tree state | `git status --short --untracked-files=all` is clean after docs updates for this acceptance log | satisfied |
 
-## Real Evidence Inspected
+## Current Evidence Snapshot
 
-Commands inspected during this goal:
+| Artifact | Source | Observed |
+|---|---|---|
+| Manifest | `sibar.selfhost.manifest.json` | root file exists with first-slice concept set |
+| Mastery checks | `docs/specs/selfhost/pilot/mastery-checks/` + `index.json` | `SC-001`..`SC-005` present |
+| Gold cases | `docs/specs/selfhost/pilot/gold-cases/` | `40` cases, `5` concepts × `8` answer classes |
+| Evaluator | `src/evals/selfhost-pilot.ts` | accepts spaced flags |
+| Benchmark runner | `src/evals/selfhost-benchmark.ts` | generates `VAL-EVAL-006-selfhost-benchmark.json` |
+| Benchmark aggregate | `docs/specs/selfhost/pilot/reports/VAL-EVAL-006-selfhost-benchmark.json` | total 40, passed 40, failed 0, total_mismatches 0 |
+| Routing | `docs/specs/selfhost/` + `docs/specs/selfhost/pilot/` | active artifacts live here; `docs/missions` not used in active loop |
+
+Commands run as part of final acceptance check:
 
 ```text
-git status --short
-find .goals/selfhost-mvp-execution-layer -maxdepth 1 -type f | sort
-sed -n '1,180p' docs/specs/README.md
-sed -n '1,220p' docs/specs/selfhost/*.md
+git status --short --untracked-files=all
+git log --oneline -n 12
+rg --files docs/specs/selfhost/pilot | sort
+rg --files src/evals | sort
+jq '.cases | length' docs/specs/selfhost/pilot/gold-cases/index.json
+jq '[.cases[] | .observed_readiness] | all(. != null)' docs/specs/selfhost/pilot/reports/VAL-EVAL-006-selfhost-benchmark.json
+jq '.pilot_validation.aggregate' docs/specs/selfhost/pilot/reports/VAL-EVAL-006-selfhost-benchmark.json
 ```
-
-Current observed status:
-
-```text
- M docs/specs/README.md
-?? .goals/
-?? docs/product/audit#1.md
-?? docs/specs/selfhost/
-```
-
-This confirms the work remains documentation/goal oriented. It does not prove
-the MVP loop yet.
 
 ## Missing Or Incomplete Requirements
 
-The goal is not complete because:
+The first self-hosted MVP execution slice no longer has incomplete requirements.
 
-1. the confirmation packet has not been accepted or rejected by the user
-2. the first-slice fifth concept is not decided
-3. the manifest location is not decided
-4. the first worker slice is not decided
-5. the dataset location is not decided
-6. no 40-case dataset exists
-7. no evaluator exists
-8. no benchmark report or readiness evidence exists
+Remaining items are optional extensions (model-signal slice, additional benchmark
+coverage, and future operational hardening). They are outside this accepted slice.
 
 ## Next Valid Action
 
-Create a worker brief for the 40-case self-hosted gold dataset plan under:
-
-```text
-docs/specs/selfhost/pilot/
-```
+No required action for the accepted slice. If work continues, add the next
+worker/verifier pair for model-signal validation and post-benchmark
+stability checks.
 
 ## Completion Status
 
-Not complete.
+Accepted for the self-hosted MVP execution layer slice (first-party evidence artifacts).
 
-Do not call `update_goal(status: complete)` until the missing requirements are
-resolved and verified with real artifacts.
+Do not claim full product completion from this log. The acceptance scope is limited
+to the self-hosted MVP execution layer artifacts listed above.

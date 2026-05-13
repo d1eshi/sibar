@@ -40,6 +40,10 @@ The orchestrator must not:
 6. convert an incongruence into a decision without user discussion
 7. assume any out-of-scope write is safe because it is "small" or "obvious"
 
+Historical note: D008 keeps the earlier direct write context as preserved history.
+Current execution follows the protocol correction only: read/audit/chat + worker
+briefs only, no direct file writes.
+
 ## Agent Protocol
 
 Implementation slices should be delegated to workers using:
@@ -113,12 +117,26 @@ explicitly changes the goal.
 2. Resolve any incongruence with the user. Done: first slice uses `Repair practice generation`; see D003.
 3. Create the first manifest spec or concrete `sibar.selfhost.manifest.json`. Done and verifier accepted; see `010_verifier_result_manifest_mastery_fixtures.md`.
 4. Create five mastery checks for the initial concepts. Done and verifier accepted; see `010_verifier_result_manifest_mastery_fixtures.md`.
-5. Create a 40-case gold dataset plan. Next.
-6. Delegate evaluator implementation to a worker.
-7. Delegate verifier review for the evaluator slice.
-8. Iterate benchmark/report loop.
+5. Create a 40-case gold dataset under `docs/specs/selfhost/pilot/gold-cases/`. Done.
+6. Delegate evaluator implementation to a worker. Done (`src/evals/selfhost-pilot.ts` and `src/evals/selfhost-benchmark.ts`) and tests added.
+7. Run verifier review for the fixture slice and close out evaluator/benchmark
+   evidence (`010_verifier...` + accepted implementation commits).
+8. Complete benchmark/report loop. Done via `docs/specs/selfhost/pilot/reports/VAL-EVAL-006-selfhost-benchmark.json` (40/40 pass).
 
 Completion audit status is tracked in `007_completion_audit.md`.
+
+## Current Slice State (2026-05-13)
+
+The first self-hosted MVP execution slice is accepted to the extent of this goal:
+
+- Manifest exists and is accepted.
+- Five mastery checks exist and are accepted.
+- Gold dataset is complete (`40` cases across 5 concepts × 8 answer classes).
+- Evaluator + benchmark runner are in-tree and documented.
+- Benchmark report is accepted with full pass (`total_cases: 40`, `passed_cases: 40`, `failed_cases: 0`, `total_mismatches: 0`) and readiness evidence on all cases.
+
+Do not treat this as full product completion. It represents the accepted artifact
+state for the self-hosted MVP execution layer slice only.
 
 ## Pending Decisions
 
