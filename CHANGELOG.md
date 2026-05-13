@@ -23,6 +23,10 @@ story.
 - Changelog source of truth for future web-facing product progress updates.
 - Swift `SibiCore` process bridge for the five foundation TypeScript runtime
   commands, with tests and no shell/UI state ownership.
+- F06 runtime `generate_practice_challenges` command that turns detected learning
+  gaps into evidence-backed repair practice with revisit timing.
+- F08 runtime `readiness_report` command that exports evidence-backed readiness
+  reports as JSON and Markdown.
 
 ### Changed
 
