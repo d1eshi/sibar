@@ -1,0 +1,90 @@
+{
+  "id": "E01-UNCERTAIN-L1-DECLARED",
+  "title": "Declared uncertainty is preserved as evidence instead of treated as failure",
+  "case_class": "declared_uncertainty",
+  "artifact_fixture": "fixtures/sibi-runtime-mini",
+  "artifact_boundary": {
+    "root": "fixtures/sibi-runtime-mini",
+    "included_paths": [
+      "src/runtime.ts",
+      "src/runtime-gap-detection.ts",
+      "src/runtime-memory.ts"
+    ],
+    "excluded_paths": []
+  },
+  "learning_goal": "Identify how Sibi records uncertainty during an autopsy answer.",
+  "concept_under_test": {
+    "id": "uncertainty-as-evidence",
+    "label": "Declared uncertainty as learning evidence",
+    "layer_target": 3
+  },
+  "user_answer": {
+    "kind": "declared_uncertainty",
+    "text": "I don't know where this is stored yet.",
+    "declared_confidence": "low"
+  },
+  "llm_fixture_response": null,
+  "expected_layer": {
+    "level": 1,
+    "label": "Surface Recognition",
+    "rationale": "The user recognizes the topic but explicitly cannot explain the storage path."
+  },
+  "expected_gap": {
+    "should_create": true,
+    "severity": "important",
+    "confidence": "medium",
+    "observed_layer": 1,
+    "reason": "Declared uncertainty is valid answer evidence for a repairable gap."
+  },
+  "expected_misconception": {
+    "should_create": false,
+    "label": null,
+    "reason": "The user did not assert a wrong model."
+  },
+  "expected_challenge": {
+    "should_create": true,
+    "challenge_type": "explain_the_flow_without_looking",
+    "expected_evidence": [
+      "declared uncertainty text",
+      "artifact citation for storage path"
+    ]
+  },
+  "expected_readiness": {
+    "claim": "not ready yet",
+    "confidence": "medium",
+    "must_cite_evidence": true
+  },
+  "required_evidence": [
+    {
+      "path": "src/runtime-gap-detection.ts",
+      "range": "uncertainty answer classification",
+      "expectation": "Accepted evidence must show uncertainty creates a gap with answer evidence."
+    },
+    {
+      "path": "src/runtime-memory.ts",
+      "range": "answer history projection",
+      "expectation": "Accepted evidence should show the uncertainty remains inspectable later."
+    }
+  ],
+  "forbidden_evidence": [],
+  "boundary_expectations": {
+    "accepted_evidence_must_be_inside_boundary": true,
+    "reject_forbidden_evidence": false,
+    "expected_rejection_reason": null
+  },
+  "gap_readiness_expectations": {
+    "create_gap": true,
+    "create_challenge": true,
+    "persist_declared_uncertainty": true,
+    "allowed_readiness_claims": [
+      "not ready yet"
+    ],
+    "disallowed_readiness_claims": [
+      "ready to explain",
+      "ready to own"
+    ]
+  },
+  "validation_notes": [
+    "Covers the Sibi rule that uncertainty is learning evidence, not a punitive failure."
+  ]
+}

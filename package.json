@@ -8,6 +8,7 @@
   "scripts": {
     "runtime": "node --experimental-strip-types src/runtime.ts",
     "cli": "node --experimental-strip-types src/sibi.ts",
+    "eval:pedagogy": "node --experimental-strip-types src/evals/deterministic-pedagogy.ts",
     "test": "node --test --experimental-strip-types Tests/**/*.test.ts",
     "typecheck": "npx tsc -p tsconfig.json --noEmit"
   },
