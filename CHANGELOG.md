@@ -42,6 +42,9 @@ story.
 
 ### Docs
 
+- Added the self-hosted SDD loop, clarifying foundation specs, executable MVP
+  specs, harness artifacts, living-spec sections, and the first freeform answer
+  evaluator iteration target.
 - Added release readiness rules tied to completed specs, verified acceptance
   criteria, and explicit version bump decisions.
 - Added the atomic commit to changelog bridge so agents know when a commit must
