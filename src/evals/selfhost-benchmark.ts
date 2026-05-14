@@ -1,8 +1,17 @@
-import { dirname, resolve } from "node:path";
+import { dirname, relative, resolve } from "node:path";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 
 import { runSelfhostPilotEval, type SelfhostPilotEvalReport } from "./selfhost-pilot.ts";
 import { runSelfhostFreeformEval, type SelfhostFreeformCaseResult, type SelfhostFreeformReport } from "./selfhost-freeform.ts";
+
+/**
+ * Convert a path to repo-relative form, normalizing absolute paths
+ * so generated reports are location-independent across checkouts.
+ */
+function toRepoRelative(filePath: string): string {
+  const rel = relative(process.cwd(), resolve(filePath));
+  return rel || ".";
+}
 
 const DEFAULT_MANIFEST_PATH = "sibar.selfhost.manifest.json";
 const DEFAULT_GOLD_CASE_INDEX = "docs/specs/selfhost/pilot/gold-cases/index.json";
@@ -971,8 +980,8 @@ export function runSelfhostBenchmark(options: SelfhostBenchmarkOptions = {}): Se
   const report: SelfhostBenchmarkReport = {
     generated_at: new Date().toISOString(),
     validation: BENCHMARK_VALIDATION_ID,
-    manifest_path: manifestPath,
-    gold_case_index_path: goldCaseIndexPath,
+    manifest_path: toRepoRelative(manifestPath),
+    gold_case_index_path: toRepoRelative(goldCaseIndexPath),
     pilot_validation: pilotReport,
     confidence_sections: {
       deterministic_fixture: "Deterministic fixture checks compare gold metadata to stable benchmark observations.",

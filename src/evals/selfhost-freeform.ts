@@ -1,6 +1,15 @@
 import { dirname, isAbsolute, relative, resolve, sep } from "node:path";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 
+/**
+ * Convert a path to repo-relative form, normalizing absolute paths
+ * so generated reports are location-independent across checkouts.
+ */
+function toRepoRelative(filePath: string): string {
+  const rel = relative(process.cwd(), resolve(filePath));
+  return rel || ".";
+}
+
 const DEFAULT_GOLD_CASE_INDEX = "docs/specs/selfhost/pilot/gold-cases/index.json";
 const DEFAULT_MASTERY_CHECK_DIR = "docs/specs/selfhost/pilot/mastery-checks";
 const FREEFORM_VALIDATION_ID = "VAL-EVAL-008-selfhost-freeform";
@@ -455,14 +464,14 @@ function loadRepoEvidence(
     }
 
     if (exists && manifest === undefined) {
-      return { ...entry, path: absolutePath, excerpt, exists };
+      return { ...entry, path: toRepoRelative(entry.path), excerpt, exists };
     }
 
     if (!exists) {
       throw new Error(`repo_evidence_missing:${absolutePath}`);
     }
 
-    return { ...entry, path: absolutePath, excerpt, exists };
+    return { ...entry, path: toRepoRelative(entry.path), excerpt, exists };
   });
 }
 
@@ -1275,8 +1284,8 @@ function makeEmptyReport(
   const report: SelfhostFreeformReport = {
     generated_at: new Date().toISOString(),
     validation: FREEFORM_VALIDATION_ID,
-    gold_case_index_path: resolve(options.indexPath ?? DEFAULT_GOLD_CASE_INDEX),
-    manifest_path: resolve(options.manifestPath ?? manifestPath),
+    gold_case_index_path: toRepoRelative(options.indexPath ?? DEFAULT_GOLD_CASE_INDEX),
+    manifest_path: toRepoRelative(manifestPath),
     mismatches,
     cases: [],
     gap_label_coverage: ALL_GAP_LABELS.map((label) => ({
@@ -1685,8 +1694,8 @@ export function runSelfhostFreeformEval(options: SelfhostFreeformOptions = {}): 
   const report: SelfhostFreeformReport = {
     generated_at: new Date().toISOString(),
     validation: FREEFORM_VALIDATION_ID,
-    gold_case_index_path: goldCaseIndexPath,
-    manifest_path: manifestPath,
+    gold_case_index_path: toRepoRelative(goldCaseIndexPath),
+    manifest_path: toRepoRelative(manifestPath),
     mismatches,
     cases,
     gap_label_coverage: gapLabelCoverage,

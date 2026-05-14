@@ -1,5 +1,14 @@
 import { existsSync, mkdirSync, readFileSync, realpathSync, writeFileSync } from "node:fs";
-import { dirname, isAbsolute, resolve, sep } from "node:path";
+import { dirname, isAbsolute, relative, resolve, sep } from "node:path";
+
+/**
+ * Convert a path to repo-relative form, normalizing absolute paths
+ * so generated reports are location-independent across checkouts.
+ */
+function toRepoRelative(filePath: string): string {
+  const rel = relative(process.cwd(), resolve(filePath));
+  return rel || ".";
+}
 
 const DEFAULT_MANIFEST_PATH = "sibar.selfhost.manifest.json";
 const DEFAULT_GOLD_CASE_INDEX = "docs/specs/selfhost/pilot/gold-cases/index.json";
@@ -731,9 +740,9 @@ export function runSelfhostPilotEval(options: SelfhostPilotOptions = {}): Selfho
   const report: SelfhostPilotEvalReport = {
     generated_at: new Date().toISOString(),
     validation: SELFHOST_VALIDATION_ID,
-    manifest_path: manifestPath,
-    gold_case_index_path: goldCaseIndexPath,
-    mastery_check_index_path: masteryCheckIndexPath,
+    manifest_path: toRepoRelative(manifestPath),
+    gold_case_index_path: toRepoRelative(goldCaseIndexPath),
+    mastery_check_index_path: toRepoRelative(masteryCheckIndexPath),
     aggregate,
     mismatches: state.mismatches,
   };
