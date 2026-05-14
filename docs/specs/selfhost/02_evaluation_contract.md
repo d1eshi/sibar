@@ -188,6 +188,7 @@ Manual testers should record:
 6. repo evidence citation
 7. repair or readiness result
 
+
 ## Eval Coverage
 
 Current coverage:
@@ -197,16 +198,21 @@ Current coverage:
 2. `npm run eval:selfhost-benchmark` reports deterministic precision, recall,
    gap type accuracy, evidence quality, false-confidence detection, and
    design-issue detection over 40 gold cases.
-3. `Tests/selfhost-pilot-evals.test.ts` and `Tests/selfhost-benchmark.test.ts`
-   protect validator and benchmark regressions.
+3. `npm run eval:selfhost-freeform` runs the first freeform evaluator slice over
+   five artifact-boundary answers: grounded, uncited, partial, overconfident
+   wrong, and design-induced confusion. It reports the observed finding type and
+   whether user plus repo evidence were attached.
+4. `Tests/selfhost-pilot-evals.test.ts`, `Tests/selfhost-benchmark.test.ts`, and
+   `Tests/selfhost-freeform.test.ts` protect validator, benchmark, and first
+   freeform-slice regressions.
 
 Missing coverage:
 
-1. a freeform evaluator that infers outcomes from `user_answer` instead of
-   trusting `answer_class`
-2. regression tests for freeform grounded, uncited, partial, overconfident
-   wrong, and design-induced answers
-3. exact user-evidence excerpts and repo-evidence excerpts in observed findings
+1. broad freeform evaluation across all 40 gold cases instead of the first five
+   artifact-boundary cases
+2. richer repo-evidence extraction than first matching bounded source excerpts
+3. model-signal validation for natural answers outside the deterministic first
+   slice
 
 ## Iteration Log
 
@@ -251,6 +257,76 @@ Decision:
 - Implement freeform answer evaluation here before adding model-signal
   validation, UI, full RAG, or new spec directories.
 
+### 2026-05-14: First freeform evaluator slice implementation
+
+Input used:
+
+- `SC-001-artifact-boundary`
+- five artifact-boundary gold answers: `GC-001`, `GC-002`, `GC-003`, `GC-006`,
+  and `GC-008`
+- bounded repo evidence loaded from the mastery check's `required_repo_evidence`
+
+Expected outcome:
+
+- Build the first executable slice inside the existing eval/runtime surface.
+- Infer outcomes from `simulated_user_answer` plus bounded repo evidence instead
+  of trusting `answer_class` as evaluator authority.
+- Report observed finding type and whether user plus repo evidence were attached.
+
+Actual outcome:
+
+- Added `src/evals/selfhost-freeform.ts` and `npm run eval:selfhost-freeform`.
+- Added `Tests/selfhost-freeform.test.ts` for grounded, uncited, partial,
+  overconfident wrong, and design-induced answers.
+- Wrote the first-slice report to
+  `docs/specs/selfhost/pilot/reports/VAL-EVAL-008-selfhost-freeform-first-slice.json`.
+
+Observed results:
+
+| Case | Expected | Observed | User evidence | Repo evidence |
+|---|---|---|---|---|
+| `GC-001` | readiness | readiness | attached | attached |
+| `GC-002` | `evidence_gap` | `evidence_gap` | attached | attached |
+| `GC-003` | `flow_gap` | `flow_gap` | attached | attached |
+| `GC-006` | `false_confidence_gap` | `false_confidence_gap` | attached | attached |
+| `GC-008` | `design_induced_gap` | `design_induced_gap` | attached | attached |
+
+What worked:
+
+- The evaluator consumes `MasteryCheck + user_answer + bounded repo evidence`.
+- The first slice separates readiness, evidence gaps, flow gaps, false
+  confidence, and design-induced confusion without using `answer_class` to make
+  the observation.
+- Every observed finding includes a user evidence excerpt and bounded repo
+  evidence citations.
+- A verifier run with `pi --provider openai-codex --model gpt-5.2 --thinking high`
+  found the slice congruent with the first-slice scope and confirmed that
+  `answer_class` is not used as evaluator authority.
+
+What failed or remains weak:
+
+- Classification is deterministic and narrow to the artifact-boundary first
+  slice.
+- Repo excerpts are exact bounded excerpts, but still shallow line selection.
+- Negative generic-output checks are not broad enough to prove robustness across
+  all concepts.
+- The verifier flagged two follow-ups: hard-enforce the no-gap-without-evidence
+  rule and clarify future readiness derivation. The implementation now rejects
+  gap/readiness findings when user or repo evidence is missing; readiness remains
+  a fixed first-slice output pending the next breadth iteration.
+
+Coverage added or missing:
+
+- Added CLI, report, and regression tests for the first five freeform cases.
+- Added a negative regression that rejects findings without user or repo
+  evidence.
+- Missing full 40-case freeform coverage and model-signal validation.
+
+Decision:
+
+- Treat this as the completed first freeform evaluator slice and expand breadth
+  in the next iteration before adding UI or full RAG behavior.
+
 ## Acceptance Gate
 
 This feature is MVP-ready when:
@@ -266,8 +342,15 @@ This feature is MVP-ready when:
 8. plausible product-caused confusion can produce a design issue
 9. tests fail when output is generic, uncited, or overconfident
 
+First-slice status: items 1-8 are covered for the artifact-boundary five-case
+manual harness by `src/evals/selfhost-freeform.ts` and
+`Tests/selfhost-freeform.test.ts`. Item 9 is partially covered by regression
+assertions for uncited and overconfident classifications, but still needs richer
+negative cases for generic outputs across all concepts.
+
 ## Next Iteration
 
-Build the first freeform evaluator slice inside the existing eval/runtime
-surface. Start with five cases, one per manual answer shape above, and report
-both observed finding type and whether user plus repo evidence were attached.
+Expand the freeform evaluator from the first five artifact-boundary cases to the
+full 40-case pilot set. Keep `answer_class` available only as expected fixture
+metadata, not as evaluator authority, and add negative tests for generic answers
+that attach no usable user excerpt or repo citation.
