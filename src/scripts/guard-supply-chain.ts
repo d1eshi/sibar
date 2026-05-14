@@ -38,6 +38,14 @@ const SCAN_FILES = [
   "docs/specs/selfhost/03_product_improvement_loop.md",
   "docs/specs/selfhost/04_selfhost_gap_detection_benchmark.md",
   "docs/specs/selfhost/05_public_demo_prototype.md",
+  "docs/iterations/01_typescript_runtime_port.md",
+  "docs/iterations/02_runtime_moat_audit.md",
+  "docs/iterations/03_swift_bridge_candidate_audit.md",
+  "docs/iterations/README.md",
+  "docs/triage/iteration-spec-adaptation.md",
+  "docs/triage/source-triage.md",
+  "docs/triage/standalone-swift-app-audit.md",
+  "docs/triage/swift-bridge-candidate-audit.md",
 ];
 
 /** Directories to scan recursively for .html and .ts files. */
@@ -49,9 +57,13 @@ const SCAN_DIRS = [
 // Patterns that must NOT appear in mission-owned files.
 // Each pattern is tested against every line of scanned files.
 const FORBIDDEN_PATTERNS: Array<{ label: string; re: RegExp }> = [
-  { label: "npm command", re: /\bnpm\s+(?:install|run|test|exec|start|build)\b/ },
+  {
+    label: "npm command",
+    re: /\bnpm\s+(?:ci|install|run|test|exec|start|build|i|add|uninstall|remove|upgrade|update)\b/,
+  },
   { label: "npx command", re: /\bnpx\s+/ },
   { label: "package-lock reliance", re: /\bpackage-lock(?:\.json)?\b/ },
+  { label: "destructive rm", re: /\brm\b(?!\s+-[rf])/ },
   { label: "destructive rm -rf", re: /\brm\s+-rf\b/ },
   { label: "destructive rm -r", re: /\brm\s+-r\b/ },
   { label: "destructive rmdir", re: /\brmdir\b/ },
@@ -134,7 +146,7 @@ function checkPackageJsonScripts(): Violation[] {
           excerpt: cmd,
         });
       }
-      if (/\bnpm\s+(?:install|run|test|exec|start|build)\b/.test(cmd)) {
+      if (/\bnpm\s+(?:ci|install|run|test|exec|start|build|i|add|uninstall|remove|upgrade|update)\b/.test(cmd)) {
         violations.push({
           file: rel(pkgPath),
           pattern: `npm command in script "${name}"`,
