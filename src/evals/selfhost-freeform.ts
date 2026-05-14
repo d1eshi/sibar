@@ -30,6 +30,41 @@ type FreeformFindingType = "readiness" | (typeof ALL_GAP_LABELS)[number];
 type ReadinessLabel = (typeof ALLOWED_READINESS_LABELS)[number];
 type IssueCandidateType = "none" | "LearningGap" | "DesignIssue" | "ProductIssue" | "DocsIssue" | "TestIssue";
 
+export type IssueCandidate = {
+  id: string;
+  type: IssueCandidateType;
+  title: string;
+  evidence: string[];
+  why_it_matters: string;
+  proposed_action: string;
+  readiness_blocking: boolean;
+  linked_to_gap: string | null;
+};
+
+export type RepairTaskInfo = {
+  description: string;
+  required_evidence: string[];
+  evidence_producing: boolean;
+  generic: boolean;
+};
+
+export type ReevaluationInfo = {
+  prompt: string;
+  preserves_operation: boolean;
+  uses_required_evidence: boolean;
+  is_repeat_of_original: boolean;
+};
+
+type LoopStatus = "not_applicable" | "gap_detected" | "issue_candidate_created" | "repair_task_provided" | "reevaluation_prompted" | "incomplete_loop";
+
+export type LoopSummary = {
+  gaps_with_full_loop: number;
+  gaps_with_partial_loop: number;
+  gaps_failed_closed: number;
+  readiness_answers_with_no_candidates: number;
+  loop_incomplete_cases: string[];
+};
+
 type RawCaseIndex = {
   cases?: unknown;
   concepts?: unknown;
@@ -107,6 +142,7 @@ export type FreeformEvaluationFinding = {
   operation: string;
   readiness: ReadinessLabel;
   issue_candidate_type: IssueCandidateType;
+  issue_candidate: IssueCandidate | null;
   user_evidence_excerpt: string;
   repo_evidence_citations: FreeformRepoEvidence[];
   user_evidence_attached: boolean;
@@ -114,10 +150,14 @@ export type FreeformEvaluationFinding = {
   contradiction_or_insufficiency: string;
   missing_reasoning_step: string;
   repair_task: string | null;
+  repair_task_info: RepairTaskInfo | null;
   reevaluation_prompt: string | null;
+  reevaluation_info: ReevaluationInfo | null;
   forbidden_claim_triggered: boolean;
   generic_answer_detected: boolean;
   gap_label: string | null;
+  loop_status: LoopStatus;
+  loop_error: string | null;
 };
 
 export type GapLabelCoverage = {
@@ -136,6 +176,7 @@ export type SelfhostFreeformCaseResult = {
   observed_finding_type: FreeformFindingType;
   expected_issue_candidate_type: IssueCandidateType;
   observed_issue_candidate_type: IssueCandidateType;
+  issue_candidate_id: string | null;
   user_evidence_attached: boolean;
   repo_evidence_attached: boolean;
   forbidden_claim_triggered: boolean;
@@ -143,6 +184,8 @@ export type SelfhostFreeformCaseResult = {
   passed: boolean;
   error?: string;
   finding: FreeformEvaluationFinding;
+  loop_status: LoopStatus;
+  loop_error: string | null;
 };
 
 export type SelfhostFreeformReport = {
@@ -151,6 +194,7 @@ export type SelfhostFreeformReport = {
   gold_case_index_path: string;
   cases: SelfhostFreeformCaseResult[];
   gap_label_coverage: GapLabelCoverage[];
+  loop_summary: LoopSummary;
   aggregate: {
     total_cases: number;
     passed_cases: number;
@@ -162,6 +206,9 @@ export type SelfhostFreeformReport = {
     generic_answer_cases: number;
     readiness_cases: number;
     gap_cases: number;
+    issue_candidate_cases: number;
+    full_loop_cases: number;
+    incomplete_loop_cases: number;
   };
 };
 
@@ -466,6 +513,293 @@ function issueCandidateTypeFor(findingType: FreeformFindingType): IssueCandidate
   }
 }
 
+let issueCandidateCounter = 0;
+
+function buildIssueCandidate(
+  findingType: FreeformFindingType,
+  conceptId: string,
+  evidence: FreeformRepoEvidence[],
+  gapLabel: string | null,
+): IssueCandidate | null {
+  if (findingType === "readiness") return null;
+  issueCandidateCounter += 1;
+  const candidateType = issueCandidateTypeFor(findingType);
+  const titleMap: Record<string, string> = {
+    surface_gap: `${conceptId}: surface-level answer needs deeper evidence`,
+    evidence_gap: `${conceptId}: answer lacks concrete file citations`,
+    flow_gap: `${conceptId}: answer flow order does not match implementation`,
+    boundary_gap: `${conceptId}: answer crosses artifact boundary into excluded scope`,
+    responsibility_gap: `${conceptId}: wrong module assigned responsibility`,
+    causal_gap: `${conceptId}: missing cause-and-effect reasoning`,
+    false_confidence_gap: `${conceptId}: high-confidence claim contradicts evidence`,
+    design_induced_gap: `${conceptId}: product terminology makes enforcement unclear`,
+    test_oracle_gap: `${conceptId}: answer lacks concrete test assertions`,
+    product_gap: `${conceptId}: product affordance gap between docs and code`,
+  };
+
+  const whyMap: Record<string, string> = {
+    surface_gap: "Surface-level answers without specific evidence citations cannot demonstrate ownership of the codebase behavior.",
+    evidence_gap: "Answers without concrete file path citations cannot be verified against the implementation, making claims unsupported.",
+    flow_gap: "When the answer sequence does not match the actual implementation order, the mental model will break during modification or debugging.",
+    boundary_gap: "Claims that rely on out-of-boundary evidence create false confidence and violate the artifact scope contract.",
+    responsibility_gap: "Assigning a behavior to the wrong module causes downstream errors when modifying or extending the system.",
+    causal_gap: "Without cause-and-effect reasoning, the answer cannot predict behavior under change or explain why outcomes occur.",
+    false_confidence_gap: "High-confidence claims that contradict evidence create dangerous false certainty about codebase behavior.",
+    design_induced_gap: "When product terminology obscures executable enforcement, users treat optional conventions as binding rules.",
+    test_oracle_gap: "Without concrete test assertions, answer correctness cannot be objectively verified, leaving claims unvalidated.",
+    product_gap: "Product affordance gaps between documentation and code behavior create discoverability failures that block understanding.",
+  };
+
+  const actionMap: Record<string, string> = {
+    surface_gap: "Provide specific file paths and evidence citations that ground the conceptual explanation in the codebase.",
+    evidence_gap: "Restate the answer with explicit in-boundary file citations and one allowed/blocked path example from the manifest.",
+    flow_gap: "Trace the boundary sequence end-to-end using source file paths and connect each phase to repository evidence.",
+    boundary_gap: "Re-ground the answer using only manifest included_paths evidence; exclude paths outside the artifact boundary.",
+    responsibility_gap: "Trace the actual implementation to identify which module truly owns the described behavior, citing specific source files.",
+    causal_gap: "Explain the cause-and-effect chain: why the observed behavior follows from the cited evidence, not just what happens.",
+    false_confidence_gap: "Compare the confidence claim against manifest include/exclude evidence before asserting scope or correctness.",
+    design_induced_gap: "Separate product wording confusion from the executable enforcement behavior in the code; clarify which rules are enforced.",
+    test_oracle_gap: "Map each expected behavior to a concrete test assertion and explain why that test constrains the implementation.",
+    product_gap: "Identify the product affordance gap: what the UI/docs should show versus what the code actually enforces.",
+  };
+
+  return {
+    id: `IC-${issueCandidateCounter.toString().padStart(3, "0")}`,
+    type: candidateType,
+    title: titleMap[findingType] ?? `${conceptId}: detected ${findingType}`,
+    evidence: evidence.map((ev) => `${ev.path}: ${ev.rationale}`),
+    why_it_matters: whyMap[findingType] ?? "This gap blocks readiness because the answer does not demonstrate evidence-backed ownership.",
+    proposed_action: actionMap[findingType] ?? "Re-ground the answer with specific evidence citations and bounded reasoning.",
+    readiness_blocking: true,
+    linked_to_gap: gapLabel,
+  };
+}
+
+function buildRepairTaskInfo(
+  findingType: FreeformFindingType,
+  existingRepairTask: string | null,
+  requiredEvidencePaths: string[],
+): RepairTaskInfo | null {
+  if (findingType === "readiness" || existingRepairTask === null) return null;
+  
+  // Generic repair detection: repair tasks that are too vague
+  const genericPatterns = [
+    /^review docs$/i,
+    /^read (?:the )?(?:documentation|docs|code)$/i,
+    /^think (?:about|more about) it$/i,
+    /^try again$/i,
+    /^do better$/i,
+    /^just review (?:the )?(?:material|content|concept|code)$/i,
+  ];
+  const isGeneric = genericPatterns.some((pattern) => pattern.test(existingRepairTask.trim()))
+    || existingRepairTask.trim().length < 20;
+
+  const evidencePaths = requiredEvidencePaths.length > 0
+    ? requiredEvidencePaths
+    : ["artifact_boundary_evidence"];
+
+  return {
+    description: existingRepairTask,
+    required_evidence: evidencePaths,
+    evidence_producing: !isGeneric && evidencePaths.length > 0,
+    generic: isGeneric,
+  };
+}
+
+function buildReevaluationInfo(
+  findingType: FreeformFindingType,
+  reevaluationPrompt: string | null,
+  originalPrompt: string,
+  operation: string,
+): ReevaluationInfo | null {
+  if (findingType === "readiness" || reevaluationPrompt === null || reevaluationPrompt.trim().length === 0) return null;
+
+  const trimmedOriginal = originalPrompt.trim();
+  const trimmedReeval = reevaluationPrompt.trim();
+
+  // Check if re-evaluation preserves the same operation
+  const preservesOperation = trimmedReeval.toLowerCase().includes(operation.toLowerCase());
+
+  // Check if re-evaluation uses required evidence (mentions paths, evidence, or citations)
+  const usesRequiredEvidence = /(?:evidence|path|file|citation|manifest|include|exclude|boundary|src\/|Tests\/)/i.test(trimmedReeval);
+
+  // Check if re-evaluation is a verbatim repeat
+  const isRepeat = trimmedReeval === trimmedOriginal
+    || (trimmedReeval.length > 0 && trimmedOriginal.length > 0
+        && trimmedReeval.replace(/\s+/g, " ").trim() === trimmedOriginal.replace(/\s+/g, " ").trim());
+
+  return {
+    prompt: reevaluationPrompt,
+    preserves_operation: preservesOperation,
+    uses_required_evidence: usesRequiredEvidence,
+    is_repeat_of_original: isRepeat,
+  };
+}
+
+function determineLoopStatus(
+  findingType: FreeformFindingType,
+  issueCandidate: IssueCandidate | null,
+  repairTaskInfo: RepairTaskInfo | null,
+  reevaluationInfo: ReevaluationInfo | null,
+): { loop_status: LoopStatus; loop_error: string | null } {
+  if (findingType === "readiness") {
+    return { loop_status: "not_applicable", loop_error: null };
+  }
+
+  // Gap detected but loop artifacts may be incomplete
+  const missing: string[] = [];
+  if (!issueCandidate) missing.push("issue_candidate");
+  if (!repairTaskInfo) missing.push("repair_task");
+  if (!reevaluationInfo) missing.push("reevaluation_prompt");
+
+  if (missing.length > 0) {
+    return {
+      loop_status: "incomplete_loop",
+      loop_error: `Incomplete loop: missing ${missing.join(", ")}`,
+    };
+  }
+
+  // After the check above, repairTaskInfo and reevaluationInfo are non-null
+  const repair = repairTaskInfo as RepairTaskInfo;
+  const reEval = reevaluationInfo as ReevaluationInfo;
+
+  // Check for generic repair
+  if (repair.generic) {
+    return {
+      loop_status: "incomplete_loop",
+      loop_error: "Incomplete loop: repair task is generic and not evidence-producing",
+    };
+  }
+
+  // Check for repeated re-evaluation
+  if (reEval.is_repeat_of_original) {
+    return {
+      loop_status: "incomplete_loop",
+      loop_error: "Incomplete loop: re-evaluation prompt repeats the original prompt verbatim",
+    };
+  }
+
+  // Full loop is present
+  return {
+    loop_status: "reevaluation_prompted",
+    loop_error: null,
+  };
+}
+
+/**
+ * Detect whether a re-evaluation answer is substantially the same as the original failed answer.
+ * Uses Jaccard-like word overlap and checks if the same core claims are present.
+ */
+export function isRepeatedAnswer(originalAnswer: string, newAnswer: string): boolean {
+  if (originalAnswer.trim().length === 0 || newAnswer.trim().length === 0) return false;
+  if (originalAnswer.trim() === newAnswer.trim()) return true;
+
+  const normalize = (text: string): Set<string> => {
+    const words = text.toLowerCase()
+      .replace(/[.,;:!?()'"`\-]/g, " ")
+      .split(/\s+/)
+      .filter((w) => w.length > 3);
+    return new Set(words);
+  };
+
+  const origWords = normalize(originalAnswer);
+  const newWords = normalize(newAnswer);
+
+  if (origWords.size === 0) return false;
+
+  // Count overlap
+  let overlap = 0;
+  for (const word of newWords) {
+    if (origWords.has(word)) overlap += 1;
+  }
+
+  const overlapRatio = overlap / origWords.size;
+  // If >70% of original significant words appear in new answer, it's a repeat
+  return overlapRatio > 0.7;
+}
+
+/**
+ * Simulate re-evaluation: given the original gap finding and a new user answer,
+ * determine whether the gap is repaired and readiness can advance.
+ * Returns updated readiness and whether the re-evaluation succeeded.
+ */
+export type ReevaluationResult = {
+  gap_repaired: boolean;
+  updated_readiness: ReadinessLabel;
+  repeated_answer: boolean;
+  repair_evidence_cited: boolean;
+  loop_error: string | null;
+};
+
+export function simulateReevaluation(
+  originalFinding: FreeformEvaluationFinding,
+  newAnswer: string,
+  newConfidence: string | undefined,
+): ReevaluationResult {
+  if (originalFinding.gap_present === false || originalFinding.finding_type === "readiness") {
+    return {
+      gap_repaired: true,
+      updated_readiness: originalFinding.readiness,
+      repeated_answer: false,
+      repair_evidence_cited: true,
+      loop_error: null,
+    };
+  }
+
+  // Check if the answer is a repeat
+  const isRepeat = isRepeatedAnswer(originalFinding.user_evidence_excerpt, newAnswer);
+
+  if (isRepeat) {
+    return {
+      gap_repaired: false,
+      updated_readiness: "not ready yet",
+      repeated_answer: true,
+      repair_evidence_cited: false,
+      loop_error: "Re-evaluation failed: answer repeats the original failed answer without new evidence.",
+    };
+  }
+
+  // Check if the new answer cites evidence (paths, references)
+  const hasEvidenceCitation = /(?:src\/|Tests\/|docs\/|[`\"'][^`\"']*\.[^`\"']{1,6}[`\"'])/.test(newAnswer)
+    || newAnswer.length > 100;
+
+  if (!hasEvidenceCitation) {
+    return {
+      gap_repaired: false,
+      updated_readiness: "not ready yet",
+      repeated_answer: false,
+      repair_evidence_cited: false,
+      loop_error: "Re-evaluation failed: new answer does not cite in-boundary evidence.",
+    };
+  }
+
+  // Check for uncertainty declarations
+  const hasUncertainty = /(?:i am not (?:fully |yet |really |quite )?sure|i cannot (?:confidently|fully|give|map|confirm)|i am unsure|i don.t know|uncertain|not certain|not confident)/i.test(newAnswer);
+
+  if (hasUncertainty) {
+    return {
+      gap_repaired: false,
+      updated_readiness: "not ready yet",
+      repeated_answer: false,
+      repair_evidence_cited: true,
+      loop_error: "Re-evaluation failed: answer declares uncertainty rather than demonstrating understanding.",
+    };
+  }
+
+  // Successful re-evaluation: advance readiness (bounded)
+  const boundedReadiness = originalFinding.issue_candidate
+    ? "ready to explain"
+    : "ready to inspect";
+
+  return {
+    gap_repaired: true,
+    updated_readiness: boundedReadiness,
+    repeated_answer: false,
+    repair_evidence_cited: true,
+    loop_error: null,
+  };
+}
+
 export function evaluateFreeformOwnershipAnswer(input: FreeformEvaluationInput): FreeformEvaluationFinding {
   const answer = input.user_answer.trim();
   const lower = answer.toLowerCase();
@@ -555,6 +889,12 @@ export function evaluateFreeformOwnershipAnswer(input: FreeformEvaluationInput):
   }
 
   const issueCandidateType = issueCandidateTypeFor(findingType);
+  const issueCandidate = buildIssueCandidate(findingType, input.masteryCheck.concept_id, repoEvidence, gapPresent ? findingType : null);
+  const repairTask = repairTaskFor(findingType);
+  const repairTaskInfo = buildRepairTaskInfo(findingType, repairTask, input.masteryCheck.required_repo_evidence.map((ev) => ev.path));
+  const reevalPromptString = gapPresent ? input.masteryCheck.reevaluation_prompt : null;
+  const reevaluationInfo = buildReevaluationInfo(findingType, reevalPromptString, input.masteryCheck.prompt, input.masteryCheck.operation);
+  const loopResult = determineLoopStatus(findingType, issueCandidate, repairTaskInfo, reevaluationInfo);
 
   return {
     finding_type: findingType,
@@ -563,17 +903,22 @@ export function evaluateFreeformOwnershipAnswer(input: FreeformEvaluationInput):
     operation: input.masteryCheck.operation,
     readiness: readinessFor(findingType, input),
     issue_candidate_type: issueCandidateType,
+    issue_candidate: issueCandidate,
     user_evidence_excerpt: firstSentence(answer),
     repo_evidence_citations: repoEvidence,
     user_evidence_attached: hasUserEvidence,
     repo_evidence_attached: hasRepoEvidence,
     contradiction_or_insufficiency: insufficiencyFor(findingType),
     missing_reasoning_step: missingStepFor(findingType),
-    repair_task: repairTaskFor(findingType),
-    reevaluation_prompt: gapPresent ? input.masteryCheck.reevaluation_prompt : null,
+    repair_task: repairTask,
+    repair_task_info: repairTaskInfo,
+    reevaluation_prompt: reevalPromptString,
+    reevaluation_info: reevaluationInfo,
     forbidden_claim_triggered: forbiddenClaim !== null,
     generic_answer_detected: isGeneric,
     gap_label: gapPresent ? findingType : null,
+    loop_status: loopResult.loop_status,
+    loop_error: loopResult.loop_error,
   };
 }
 
@@ -668,12 +1013,15 @@ export function runSelfhostFreeformEval(options: SelfhostFreeformOptions = {}): 
         observed_finding_type: finding.finding_type,
         expected_issue_candidate_type: expectedType === "readiness" ? "none" : expectedIssueType,
         observed_issue_candidate_type: finding.issue_candidate_type,
+        issue_candidate_id: finding.issue_candidate?.id ?? null,
         user_evidence_attached: finding.user_evidence_attached,
         repo_evidence_attached: finding.repo_evidence_attached,
         forbidden_claim_triggered: finding.forbidden_claim_triggered,
         generic_answer_detected: finding.generic_answer_detected,
         passed,
         finding,
+        loop_status: finding.loop_status,
+        loop_error: finding.loop_error,
       });
     } catch (err) {
       erroredCases += 1;
@@ -686,6 +1034,7 @@ export function runSelfhostFreeformEval(options: SelfhostFreeformOptions = {}): 
         observed_finding_type: "evidence_gap",
         expected_issue_candidate_type: "none",
         observed_issue_candidate_type: "LearningGap",
+        issue_candidate_id: null,
         user_evidence_attached: false,
         repo_evidence_attached: false,
         forbidden_claim_triggered: false,
@@ -699,6 +1048,7 @@ export function runSelfhostFreeformEval(options: SelfhostFreeformOptions = {}): 
           operation: "",
           readiness: "not ready yet",
           issue_candidate_type: "LearningGap",
+          issue_candidate: null,
           user_evidence_excerpt: "",
           repo_evidence_citations: [],
           user_evidence_attached: false,
@@ -706,11 +1056,17 @@ export function runSelfhostFreeformEval(options: SelfhostFreeformOptions = {}): 
           contradiction_or_insufficiency: "Evaluation error prevented classification.",
           missing_reasoning_step: "Fix the error condition and re-run.",
           repair_task: null,
+          repair_task_info: null,
           reevaluation_prompt: null,
+          reevaluation_info: null,
           forbidden_claim_triggered: false,
           generic_answer_detected: false,
           gap_label: null,
+          loop_status: "incomplete_loop",
+          loop_error: "Evaluation error prevented loop artifacts.",
         },
+        loop_status: "incomplete_loop",
+        loop_error: "Evaluation error prevented loop artifacts.",
       });
     }
   }
@@ -723,6 +1079,13 @@ export function runSelfhostFreeformEval(options: SelfhostFreeformOptions = {}): 
       gold_case_index_path: goldCaseIndexPath,
       cases: [],
       gap_label_coverage: [],
+      loop_summary: {
+        gaps_with_full_loop: 0,
+        gaps_with_partial_loop: 0,
+        gaps_failed_closed: 0,
+        readiness_answers_with_no_candidates: 0,
+        loop_incomplete_cases: [],
+      },
       aggregate: {
         total_cases: 0,
         passed_cases: 0,
@@ -734,6 +1097,9 @@ export function runSelfhostFreeformEval(options: SelfhostFreeformOptions = {}): 
         generic_answer_cases: 0,
         readiness_cases: 0,
         gap_cases: 0,
+        issue_candidate_cases: 0,
+        full_loop_cases: 0,
+        incomplete_loop_cases: 0,
       },
     };
     if (options.reportPath) {
@@ -756,12 +1122,21 @@ export function runSelfhostFreeformEval(options: SelfhostFreeformOptions = {}): 
     };
   });
 
+  const loopSummary: LoopSummary = {
+    gaps_with_full_loop: cases.filter((c) => c.loop_status === "reevaluation_prompted").length,
+    gaps_with_partial_loop: cases.filter((c) => c.loop_status === "gap_detected" || c.loop_status === "issue_candidate_created" || c.loop_status === "repair_task_provided").length,
+    gaps_failed_closed: cases.filter((c) => c.loop_status === "incomplete_loop").length,
+    readiness_answers_with_no_candidates: cases.filter((c) => c.observed_finding_type === "readiness" && c.issue_candidate_id === null).length,
+    loop_incomplete_cases: cases.filter((c) => c.loop_status === "incomplete_loop").map((c) => c.case_id),
+  };
+
   const report: SelfhostFreeformReport = {
     generated_at: new Date().toISOString(),
     validation: FREEFORM_VALIDATION_ID,
     gold_case_index_path: goldCaseIndexPath,
     cases,
     gap_label_coverage: gapLabelCoverage,
+    loop_summary: loopSummary,
     aggregate: {
       total_cases: totalCases,
       passed_cases: cases.filter((entry) => entry.passed).length,
@@ -773,6 +1148,9 @@ export function runSelfhostFreeformEval(options: SelfhostFreeformOptions = {}): 
       generic_answer_cases: cases.filter((entry) => entry.generic_answer_detected).length,
       readiness_cases: cases.filter((entry) => entry.observed_finding_type === "readiness").length,
       gap_cases: cases.filter((entry) => entry.observed_finding_type !== "readiness").length,
+      issue_candidate_cases: cases.filter((entry) => entry.issue_candidate_id !== null).length,
+      full_loop_cases: cases.filter((entry) => entry.loop_status === "reevaluation_prompted").length,
+      incomplete_loop_cases: cases.filter((entry) => entry.loop_status === "incomplete_loop").length,
     },
   };
 
@@ -792,7 +1170,7 @@ if (import.meta.url === `file://${process.argv[1]}`) {
 
   process.stdout.write(`${JSON.stringify(report.aggregate, null, 2)}\n`);
 
-  // Fail closed: exit nonzero for incomplete runs, zero cases, or errors
+  // Fail closed: exit nonzero for incomplete runs, zero cases, errors, or incomplete loops
   // (Mismatches between expected and observed findings are informational, not failures)
   if (report.aggregate.total_cases < 40) {
     process.stderr.write(`freeform eval: incomplete run — only ${report.aggregate.total_cases} of 40 cases processed\n`);
@@ -802,6 +1180,9 @@ if (import.meta.url === `file://${process.argv[1]}`) {
     process.exitCode = 1;
   } else if (report.aggregate.total_cases === 0) {
     process.stderr.write("freeform eval: zero cases processed\n");
+    process.exitCode = 1;
+  } else if (report.aggregate.incomplete_loop_cases > 0) {
+    process.stderr.write(`freeform eval: ${report.aggregate.incomplete_loop_cases} cases with incomplete repair loops\n`);
     process.exitCode = 1;
   }
 }
