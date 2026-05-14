@@ -63,7 +63,7 @@ const FORBIDDEN_PATTERNS: Array<{ label: string; re: RegExp }> = [
   },
   { label: "npx command", re: /\bnpx\s+/ },
   { label: "package-lock reliance", re: /\bpackage-lock(?:\.json)?\b/ },
-  { label: "destructive rm", re: /\brm\b(?!\s+-[rf])/ },
+  { label: "destructive rm", re: /\brm\b/ },
   { label: "destructive rm -rf", re: /\brm\s+-rf\b/ },
   { label: "destructive rm -r", re: /\brm\s+-r\b/ },
   { label: "destructive rmdir", re: /\brmdir\b/ },
