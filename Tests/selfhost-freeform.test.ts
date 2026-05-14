@@ -6,7 +6,13 @@ import test from "node:test";
 import assert from "node:assert/strict";
 
 import { evaluateFreeformOwnershipAnswer, runSelfhostFreeformEval, isRepeatedAnswer, simulateReevaluation } from "../src/evals/selfhost-freeform.ts";
-import type { FreeformEvaluationFinding, IssueCandidate, RepairTaskInfo, ReevaluationInfo } from "../src/evals/selfhost-freeform.ts";
+import type {
+  FreeformEvaluationFinding,
+  IssueCandidate,
+  RepairTaskInfo,
+  ReevaluationInfo,
+  SelfhostFreeformReport,
+} from "../src/evals/selfhost-freeform.ts";
 
 function masteryCheckFixture(overrides: Partial<{
   id: string;
@@ -318,7 +324,8 @@ test("eval:selfhost-freeform CLI processes 40 cases and writes report", () => {
     const report = JSON.parse(readFileSync(reportPath, "utf8")) as {
       cases: unknown[];
       gap_label_coverage: unknown[];
-      aggregate: { total_cases: number };
+      mismatches: unknown[];
+      aggregate: { total_cases: number; mismatch_count?: number };
     };
     assert.equal(report.cases.length, 40);
     assert.equal(report.aggregate.total_cases, 40);
@@ -343,6 +350,156 @@ test("eval:selfhost-freeform CLI fails closed on incomplete runs (VAL-EVAL-008)"
 
     assert.notEqual(result.status, 0, "CLI must exit nonzero for zero cases");
     assert.match(result.stderr || "", /zero cases|incomplete/);
+  } finally {
+    rmSync(tempDir, { recursive: true, force: true });
+  }
+});
+
+test("freeform evaluator detects duplicate/partial case coverage and fails with mismatch report (VAL-EVAL-008)", () => {
+  const tempDir = mkdtempSync(join(tmpdir(), "sibar-selfhost-freeform-coverage-"));
+  const indexPath = join(tempDir, "coverage-index.json");
+  const manifestPath = join(tempDir, "manifest.json");
+
+  const duplicateCasePath = resolve("docs/specs/selfhost/pilot/gold-cases/cases/GC-001-artifact-boundary-correct-grounded.json");
+
+  const indexPayload = {
+    cases: [
+      {
+        id: "GC-001",
+        path: duplicateCasePath,
+        concept_id: "artifact_boundary",
+        answer_class: "correct_grounded",
+        mastery_check_id: "SC-001-artifact-boundary",
+      },
+      {
+        id: "GC-001",
+        path: duplicateCasePath,
+        concept_id: "artifact_boundary",
+        answer_class: "correct_grounded",
+        mastery_check_id: "SC-001-artifact-boundary",
+      },
+    ],
+  };
+
+  const manifestPayload = {
+    included_paths: ["src/"],
+    excluded_paths: [],
+    artifact_id: "sibar.selfhost.coverage",
+  };
+
+  writeFileSync(indexPath, JSON.stringify(indexPayload, null, 2), "utf8");
+  writeFileSync(manifestPath, JSON.stringify(manifestPayload, null, 2), "utf8");
+
+  try {
+    const report = runSelfhostFreeformEval({
+      indexPath,
+      manifestPath,
+    });
+
+    assert.equal(report.aggregate.mismatch_count > 0, true);
+    assert.equal(report.aggregate.total_cases, 1);
+    assert.equal(
+      hasMismatchWithCode(report, "duplicate_case_id"),
+      true,
+    );
+  } finally {
+    rmSync(tempDir, { recursive: true, force: true });
+  }
+
+  function hasMismatchWithCode(value: SelfhostFreeformReport, code: string): boolean {
+    return value.mismatches.some((entry) => entry.code === code);
+  }
+});
+
+test("freeform evaluator enforces manifest boundaries for required repo evidence (VAL-EVAL-001)", () => {
+  const tempDir = mkdtempSync(join(tmpdir(), "sibar-selfhost-freeform-manifest-"));
+  const indexPath = join(tempDir, "index.json");
+  const manifestPath = join(tempDir, "manifest.json");
+
+  const casePath = resolve("docs/specs/selfhost/pilot/gold-cases/cases/GC-001-artifact-boundary-correct-grounded.json");
+  const indexPayload = {
+    cases: [
+      {
+        id: "GC-001",
+        path: casePath,
+        concept_id: "artifact_boundary",
+        answer_class: "correct_grounded",
+        mastery_check_id: "SC-001-artifact-boundary",
+      },
+    ],
+  };
+
+  const manifestPayload = {
+    included_paths: ["Tests/"],
+    excluded_paths: ["node_modules/"],
+    artifact_id: "sibar.selfhost.boundary",
+  };
+
+  writeFileSync(indexPath, JSON.stringify(indexPayload, null, 2), "utf8");
+  writeFileSync(manifestPath, JSON.stringify(manifestPayload, null, 2), "utf8");
+
+  try {
+    const report = runSelfhostFreeformEval({
+      indexPath,
+      manifestPath,
+    });
+
+    assert.equal(report.aggregate.mismatch_count > 0, true);
+    assert.ok(report.mismatches.some((entry) => entry.code === "repo_evidence_outside_included_paths"));
+  } finally {
+    rmSync(tempDir, { recursive: true, force: true });
+  }
+});
+
+test("eval:selfhost-freeform CLI exits nonzero for observed-vs-expected mismatches (VAL-EVAL-008)", () => {
+  const tempDir = mkdtempSync(join(tmpdir(), "sibar-selfhost-freeform-mismatch-"));
+  const reportPath = join(tempDir, "report.json");
+  const casePath = join(tempDir, "GC-001-mutated.json");
+  const indexPath = join(tempDir, "index.json");
+  const originalCase = JSON.parse(readFileSync(resolve("docs/specs/selfhost/pilot/gold-cases/cases/GC-001-artifact-boundary-correct-grounded.json"), "utf8")) as Record<string, unknown>;
+
+  originalCase.expected_gap_present = true;
+  originalCase.expected_gap_type = "evidence_gap";
+  originalCase.expected_readiness = "not ready yet";
+  originalCase.acceptable_issue_candidate_type = "LearningGap";
+  writeFileSync(casePath, JSON.stringify(originalCase, null, 2), "utf8");
+  writeFileSync(indexPath, JSON.stringify({ cases: [{ id: "GC-001", path: casePath, concept_id: "artifact_boundary", answer_class: "correct_grounded", mastery_check_id: "SC-001-artifact-boundary" }] }, null, 2), "utf8");
+
+  try {
+    const result = spawnSync(process.execPath, [
+      "--experimental-strip-types",
+      resolve("src/evals/selfhost-freeform.ts"),
+      "--index",
+      indexPath,
+      "--report",
+      reportPath,
+    ], { encoding: "utf8" });
+
+    assert.notEqual(result.status, 0, "CLI must fail closed for mismatched observed vs expected metadata");
+    assert.match(result.stderr || "", /mismatches detected|incomplete/);
+    const report = JSON.parse(readFileSync(reportPath, "utf8")) as SelfhostFreeformReport;
+    assert.ok(report.mismatches.some((entry) => entry.code === "finding_type_mismatch"));
+  } finally {
+    rmSync(tempDir, { recursive: true, force: true });
+  }
+});
+
+test("freeform evaluator rejects invalid expected metadata instead of defaulting (VAL-EVAL-008)", () => {
+  const tempDir = mkdtempSync(join(tmpdir(), "sibar-selfhost-freeform-invalid-meta-"));
+  const casePath = join(tempDir, "GC-001-invalid-meta.json");
+  const indexPath = join(tempDir, "index.json");
+  const originalCase = JSON.parse(readFileSync(resolve("docs/specs/selfhost/pilot/gold-cases/cases/GC-001-artifact-boundary-correct-grounded.json"), "utf8")) as Record<string, unknown>;
+
+  originalCase.expected_gap_present = true;
+  originalCase.expected_gap_type = "not_a_contract_gap";
+  writeFileSync(casePath, JSON.stringify(originalCase, null, 2), "utf8");
+  writeFileSync(indexPath, JSON.stringify({ cases: [{ id: "GC-001", path: casePath, concept_id: "artifact_boundary", answer_class: "correct_grounded", mastery_check_id: "SC-001-artifact-boundary" }] }, null, 2), "utf8");
+
+  try {
+    const report = runSelfhostFreeformEval({ indexPath });
+
+    assert.equal(report.aggregate.mismatch_count > 0, true);
+    assert.ok(report.mismatches.some((entry) => entry.message.includes("invalid_case_expected_gap_type")));
   } finally {
     rmSync(tempDir, { recursive: true, force: true });
   }
