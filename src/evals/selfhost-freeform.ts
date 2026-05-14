@@ -170,6 +170,7 @@ export type FreeformEvaluationFinding = {
   readiness: ReadinessLabel;
   issue_candidate_type: IssueCandidateType;
   issue_candidate: IssueCandidate | null;
+  issue_candidates: IssueCandidate[];
   user_evidence_excerpt: string;
   repo_evidence_citations: FreeformRepoEvidence[];
   user_evidence_attached: boolean;
@@ -717,15 +718,35 @@ function issueCandidateTypeFor(findingType: FreeformFindingType): IssueCandidate
 
 let issueCandidateCounter = 0;
 
+function issueCandidateTypesFor(findingType: FreeformFindingType, answer: string): IssueCandidateType[] {
+  const primary = issueCandidateTypeFor(findingType);
+  if (primary === "none") return [];
+
+  const types = new Set<IssueCandidateType>([primary]);
+  const lower = answer.toLowerCase();
+  const hasLearningEvidence = /(?:i|me|my|user|answer|missed|skipped|forgot|confused|assumed|treated|didn.t|did not|lacked|uncited|no citation)/i.test(lower);
+  const hasDocsEvidence = /(?:docs?|documentation|readme|spec|guide|instructions?).*(?:missing|unclear|wrong|stale|confus|hide|doesn.t say|does not say)|(?:missing|unclear|wrong|stale|confus).*(?:docs?|documentation|readme|spec|guide|instructions?)/i.test(lower);
+  const hasProductEvidence = /(?:product|ui|ux|affordance|interface|workflow).*(?:missing|unclear|confus|hide|gap|problem)|(?:missing|unclear|confus|hidden).*(?:product|ui|ux|affordance|interface|workflow)/i.test(lower);
+  const hasTestEvidence = /(?:test|oracle|assertion|coverage).*(?:missing|unclear|wrong|gap)|(?:missing|unclear|wrong).*(?:test|oracle|assertion|coverage)/i.test(lower);
+
+  if (hasDocsEvidence) types.add("DocsIssue");
+  if (hasProductEvidence) types.add("ProductIssue");
+  if (hasTestEvidence) types.add("TestIssue");
+  if ((hasDocsEvidence || hasProductEvidence || hasTestEvidence) && hasLearningEvidence) types.add("LearningGap");
+
+  return [...types].filter((type) => type !== "none");
+}
+
 function buildIssueCandidate(
   findingType: FreeformFindingType,
   conceptId: string,
   evidence: FreeformRepoEvidence[],
   gapLabel: string | null,
+  candidateTypeOverride?: IssueCandidateType,
 ): IssueCandidate | null {
   if (findingType === "readiness") return null;
   issueCandidateCounter += 1;
-  const candidateType = issueCandidateTypeFor(findingType);
+  const candidateType = candidateTypeOverride ?? issueCandidateTypeFor(findingType);
   const titleMap: Record<string, string> = {
     surface_gap: `${conceptId}: surface-level answer needs deeper evidence`,
     evidence_gap: `${conceptId}: answer lacks concrete file citations`,
@@ -737,6 +758,10 @@ function buildIssueCandidate(
     design_induced_gap: `${conceptId}: product terminology makes enforcement unclear`,
     test_oracle_gap: `${conceptId}: answer lacks concrete test assertions`,
     product_gap: `${conceptId}: product affordance gap between docs and code`,
+    DocsIssue: `${conceptId}: documentation gap blocks evidence-backed understanding`,
+    ProductIssue: `${conceptId}: product affordance gap blocks evidence-backed understanding`,
+    TestIssue: `${conceptId}: test oracle gap blocks evidence-backed understanding`,
+    LearningGap: `${conceptId}: learner needs evidence-backed repair`,
   };
 
   const whyMap: Record<string, string> = {
@@ -750,6 +775,10 @@ function buildIssueCandidate(
     design_induced_gap: "When product terminology obscures executable enforcement, users treat optional conventions as binding rules.",
     test_oracle_gap: "Without concrete test assertions, answer correctness cannot be objectively verified, leaving claims unvalidated.",
     product_gap: "Product affordance gaps between documentation and code behavior create discoverability failures that block understanding.",
+    DocsIssue: "Documentation gaps can prevent users from finding the required repo evidence even when the code behavior exists.",
+    ProductIssue: "Product affordance gaps can make the required evidence path hard to discover or apply correctly.",
+    TestIssue: "Test oracle gaps leave the expected behavior under-specified and hard to verify.",
+    LearningGap: "The learner still needs a narrow evidence-producing repair before readiness can advance.",
   };
 
   const actionMap: Record<string, string> = {
@@ -763,15 +792,19 @@ function buildIssueCandidate(
     design_induced_gap: "Separate product wording confusion from the executable enforcement behavior in the code; clarify which rules are enforced.",
     test_oracle_gap: "Map each expected behavior to a concrete test assertion and explain why that test constrains the implementation.",
     product_gap: "Identify the product affordance gap: what the UI/docs should show versus what the code actually enforces.",
+    DocsIssue: "Clarify the documentation so it names the required evidence path and the specific operation being checked.",
+    ProductIssue: "Clarify the product affordance so the user can discover and apply the required evidence path.",
+    TestIssue: "Add or name the concrete test assertion that would verify the expected behavior.",
+    LearningGap: "Ask the learner to restate the answer with required repo evidence and the same operation.",
   };
 
   return {
     id: `IC-${issueCandidateCounter.toString().padStart(3, "0")}`,
     type: candidateType,
-    title: titleMap[findingType] ?? `${conceptId}: detected ${findingType}`,
+    title: titleMap[candidateType] ?? titleMap[findingType] ?? `${conceptId}: detected ${findingType}`,
     evidence: evidence.map((ev) => `${ev.path}: ${ev.rationale}`),
-    why_it_matters: whyMap[findingType] ?? "This gap blocks readiness because the answer does not demonstrate evidence-backed ownership.",
-    proposed_action: actionMap[findingType] ?? "Re-ground the answer with specific evidence citations and bounded reasoning.",
+    why_it_matters: whyMap[candidateType] ?? whyMap[findingType] ?? "This gap blocks readiness because the answer does not demonstrate evidence-backed ownership.",
+    proposed_action: actionMap[candidateType] ?? actionMap[findingType] ?? "Re-ground the answer with specific evidence citations and bounded reasoning.",
     readiness_blocking: true,
     linked_to_gap: gapLabel,
   };
@@ -820,10 +853,18 @@ function buildReevaluationInfo(
   const trimmedReeval = reevaluationPrompt.trim();
 
   // Check if re-evaluation preserves the same operation
-  const preservesOperation = trimmedReeval.toLowerCase().includes(operation.toLowerCase());
+  const operationPattern: Record<string, RegExp> = {
+    explain: /\b(?:explain|explanation)\b/i,
+    trace: /\b(?:trace|tracing)\b/i,
+    debug: /\b(?:debug|diagnose|compare expected)\b/i,
+    modify: /\b(?:modify|change|state the new)\b/i,
+    transfer: /\b(?:transfer|different slice|different concept)\b/i,
+    predict: /\b(?:predict|prediction|would change)\b/i,
+  };
+  const preservesOperation = (operationPattern[operation.toLowerCase()] ?? new RegExp(`\\b${operation}\\b`, "i")).test(trimmedReeval);
 
   // Check if re-evaluation uses required evidence (mentions paths, evidence, or citations)
-  const usesRequiredEvidence = /(?:evidence|path|file|citation|manifest|include|exclude|boundary|src\/|Tests\/)/i.test(trimmedReeval);
+  const usesRequiredEvidence = /(?:evidence|path|file|citation|manifest|include|exclude|boundary|src\/|Tests\/|concept graph|rule set|severity|confidence|due_after|readiness|recommended_next_action|`[^`]+`)/i.test(trimmedReeval);
 
   // Check if re-evaluation is a verbatim repeat
   const isRepeat = trimmedReeval === trimmedOriginal
@@ -878,6 +919,20 @@ function determineLoopStatus(
     return {
       loop_status: "incomplete_loop",
       loop_error: "Incomplete loop: re-evaluation prompt repeats the original prompt verbatim",
+    };
+  }
+
+  if (!reEval.preserves_operation) {
+    return {
+      loop_status: "incomplete_loop",
+      loop_error: "Incomplete loop: re-evaluation prompt does not preserve the original operation",
+    };
+  }
+
+  if (!reEval.uses_required_evidence) {
+    return {
+      loop_status: "incomplete_loop",
+      loop_error: "Incomplete loop: re-evaluation prompt does not use required repo evidence",
     };
   }
 
@@ -1094,8 +1149,12 @@ export function evaluateFreeformOwnershipAnswer(input: FreeformEvaluationInput):
     throw new Error("invalid_readiness_without_user_and_repo_evidence");
   }
 
-  const issueCandidateType = issueCandidateTypeFor(findingType);
-  const issueCandidate = buildIssueCandidate(findingType, input.masteryCheck.concept_id, repoEvidence, gapPresent ? findingType : null);
+  const issueCandidateTypes = issueCandidateTypesFor(findingType, answer);
+  const issueCandidates = issueCandidateTypes
+    .map((type) => buildIssueCandidate(findingType, input.masteryCheck.concept_id, repoEvidence, gapPresent ? findingType : null, type))
+    .filter((candidate): candidate is IssueCandidate => candidate !== null);
+  const issueCandidate = issueCandidates[0] ?? null;
+  const issueCandidateType = issueCandidate?.type ?? "none";
   const repairTask = repairTaskFor(findingType);
   const repairTaskInfo = buildRepairTaskInfo(findingType, repairTask, input.masteryCheck.required_repo_evidence.map((ev) => ev.path));
   const reevalPromptString = gapPresent ? input.masteryCheck.reevaluation_prompt : null;
@@ -1110,6 +1169,7 @@ export function evaluateFreeformOwnershipAnswer(input: FreeformEvaluationInput):
     readiness: readinessFor(findingType, input),
     issue_candidate_type: issueCandidateType,
     issue_candidate: issueCandidate,
+    issue_candidates: issueCandidates,
     user_evidence_excerpt: firstSentence(answer),
     repo_evidence_citations: repoEvidence,
     user_evidence_attached: hasUserEvidence,
@@ -1521,6 +1581,7 @@ export function runSelfhostFreeformEval(options: SelfhostFreeformOptions = {}): 
           readiness: "not ready yet",
           issue_candidate_type: "LearningGap",
           issue_candidate: null,
+          issue_candidates: [],
           user_evidence_excerpt: "",
           repo_evidence_citations: [],
           user_evidence_attached: false,

@@ -30,7 +30,7 @@ function masteryCheckFixture(overrides: Partial<{
     prompt: overrides.prompt ?? "Trace boundary behavior.",
     required_repo_evidence: [{ path: "src/runtime-concept-graph.ts", rationale: "Boundary logic." }],
     minimum_readiness: overrides.minimum_readiness ?? "ready to inspect",
-    reevaluation_prompt: overrides.reevaluation_prompt ?? "Retry with explicit citations.",
+    reevaluation_prompt: overrides.reevaluation_prompt ?? "Using the same trace operation, retry with explicit file evidence from src/runtime-concept-graph.ts.",
     forbidden_claims: overrides.forbidden_claims ?? [
       "Claiming full repo ownership from one boundary trace.",
       "Treating excluded paths as legitimate evidence in the same answer.",
@@ -618,6 +618,32 @@ test("VAL-LOOP-003: issue candidate type follows evidence", () => {
   assert.notEqual(evidenceGapFinding.issue_candidate, null);
   assert.equal(evidenceGapFinding.issue_candidate?.type, "LearningGap");
 
+  const docsFinding = evaluateFreeformOwnershipAnswer({
+    masteryCheck: masteryCheckFixture(),
+    user_answer: "I missed the citation because the documentation is unclear and does not say which file evidence to use for the trace operation.",
+    declared_confidence: "medium",
+    bounded_repo_evidence: validRepoEvidence(),
+  });
+
+  assert.notEqual(docsFinding.issue_candidate, null);
+  assert.ok(
+    docsFinding.issue_candidates.some((candidate) => candidate.type === "DocsIssue"),
+    "documentation evidence must emit a DocsIssue candidate",
+  );
+
+  const mixedFinding = evaluateFreeformOwnershipAnswer({
+    masteryCheck: masteryCheckFixture(),
+    user_answer: "I skipped citations in my answer, and the product UI plus documentation hide which repo evidence file to use for this trace.",
+    declared_confidence: "medium",
+    bounded_repo_evidence: validRepoEvidence(),
+  });
+
+  const mixedTypes = mixedFinding.issue_candidates.map((candidate) => candidate.type);
+  assert.ok(mixedTypes.includes("LearningGap"), "mixed learner evidence must emit LearningGap");
+  assert.ok(mixedTypes.includes("ProductIssue"), "mixed product evidence must emit ProductIssue");
+  assert.ok(mixedTypes.includes("DocsIssue"), "mixed docs evidence must emit DocsIssue");
+  assert.ok(mixedTypes.length >= 3, "mixed evidence must produce multiple issue candidates");
+
   // Readiness gets none
   const readinessFinding = evaluateFreeformOwnershipAnswer({
     masteryCheck: masteryCheckFixture(),
@@ -628,6 +654,40 @@ test("VAL-LOOP-003: issue candidate type follows evidence", () => {
   assert.equal(readinessFinding.finding_type, "readiness");
   assert.equal(readinessFinding.issue_candidate, null);
   assert.equal(readinessFinding.issue_candidate_type, "none");
+});
+
+test("VAL-LOOP-005: loop fails closed when re-evaluation does not preserve operation", () => {
+  const finding = evaluateFreeformOwnershipAnswer({
+    masteryCheck: masteryCheckFixture({
+      operation: "trace",
+      reevaluation_prompt: "Using repo evidence from src/runtime-concept-graph.ts, explain boundary behavior in a nearby scenario.",
+    }),
+    user_answer: "Boundary checks are based on manifest paths but I do not cite concrete files.",
+    declared_confidence: "medium",
+    bounded_repo_evidence: validRepoEvidence(),
+  });
+
+  assert.equal(finding.reevaluation_info?.preserves_operation, false);
+  assert.equal(finding.loop_status, "incomplete_loop");
+  assert.match(finding.loop_error ?? "", /does not preserve the original operation/);
+  assert.equal(finding.readiness, "not ready yet");
+});
+
+test("VAL-LOOP-005: loop fails closed when re-evaluation does not use required evidence", () => {
+  const finding = evaluateFreeformOwnershipAnswer({
+    masteryCheck: masteryCheckFixture({
+      operation: "trace",
+      reevaluation_prompt: "Using the same trace operation, retry this nearby scenario in your own words.",
+    }),
+    user_answer: "Boundary checks are based on manifest paths but I do not cite concrete files.",
+    declared_confidence: "medium",
+    bounded_repo_evidence: validRepoEvidence(),
+  });
+
+  assert.equal(finding.reevaluation_info?.uses_required_evidence, false);
+  assert.equal(finding.loop_status, "incomplete_loop");
+  assert.match(finding.loop_error ?? "", /does not use required repo evidence/);
+  assert.equal(finding.readiness, "not ready yet");
 });
 
 test("VAL-LOOP-004: repair tasks are narrow and evidence-producing", () => {
