@@ -2,6 +2,7 @@ import { dirname, resolve } from "node:path";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 
 import { runSelfhostPilotEval, type SelfhostPilotEvalReport } from "./selfhost-pilot.ts";
+import { runSelfhostFreeformEval, type SelfhostFreeformCaseResult, type SelfhostFreeformReport } from "./selfhost-freeform.ts";
 
 const DEFAULT_MANIFEST_PATH = "sibar.selfhost.manifest.json";
 const DEFAULT_GOLD_CASE_INDEX = "docs/specs/selfhost/pilot/gold-cases/index.json";
@@ -34,6 +35,7 @@ const GAP_LABELS = [
 type BenchmarkAnswerClass = (typeof BENCHMARK_ANSWER_CLASSES)[number];
 type GapLabel = (typeof GAP_LABELS)[number];
 type EvidenceQuality = 0 | 1 | 2 | 3;
+type BenchmarkConfidenceLabel = "deterministic_fixture" | "freeform_evaluator" | "fixture_baseline_artifact";
 
 type RawCaseIndex = {
   cases?: unknown;
@@ -67,6 +69,7 @@ export type SelfhostBenchmarkCaseResult = {
   case_id: string;
   concept_id: string;
   answer_class: string;
+  confidence_label: BenchmarkConfidenceLabel;
   observed_gap_present: boolean;
   observed_gap_type: string | null;
   observed_issue_candidate_type: string;
@@ -80,6 +83,8 @@ export type SelfhostBenchmarkCaseResult = {
   expected_gap_type: string | null;
   expected_issue_candidate_type: string | null;
   expected_readiness: string | null;
+  freeform_observation: FreeformBenchmarkObservation;
+  baseline_observation: BaselineBenchmarkObservation;
 };
 
 type AggregateGapStats = {
@@ -97,11 +102,73 @@ type AggregateGapStats = {
   design_issue_detection_count: number;
   design_issue_expected_count: number;
   design_issue_detection_recall: number;
+  unsupported_readiness_claims: number;
+  evidence_quality_freeform_average: number;
+  out_of_bound_evidence_rejection_rate: number;
+  whole_repo_overclaim_count: number;
+  repair_usefulness_rate: number;
+  freeform_false_confidence_detection_count: number;
+  freeform_false_confidence_detection_recall: number;
+  freeform_design_issue_detection_count: number;
+  freeform_design_issue_detection_recall: number;
 };
 
 export type SelfhostBenchmarkAggregate = AggregateGapStats & {
   pilot_validation_mismatch_count: number;
   benchmark_load_mismatch_count: number;
+};
+
+export type FreeformBenchmarkObservation = {
+  confidence_label: "freeform_evaluator";
+  observed_finding_type: string;
+  observed_gap_present: boolean;
+  observed_readiness: string;
+  unsupported_readiness_claim: boolean;
+  evidence_quality_score: EvidenceQuality;
+  evidence_boundary_valid: boolean;
+  whole_repo_overclaim: boolean;
+  repair_useful: boolean;
+  user_evidence_attached: boolean;
+  repo_evidence_attached: boolean;
+  derived_from_answer_class: false;
+};
+
+export type BaselineBenchmarkObservation = {
+  confidence_label: "fixture_baseline_artifact";
+  same_case_id: string;
+  unsupported_claim_present: boolean;
+  evidence_gap_present: boolean;
+  evidence_quality_score: EvidenceQuality;
+  false_confidence_detected: boolean;
+  design_issue_detected: boolean;
+  repair_useful: boolean;
+  overclaim_text: string | null;
+};
+
+type BaselineComparison = {
+  label: "lightweight_fixture_baseline_same_cases";
+  case_count: number;
+  same_case_set: boolean;
+  confidence_label: "fixture_baseline_artifact";
+  unsupported_claim_rate: number;
+  evidence_gap_rate: number;
+  evidence_quality_average: number;
+  false_confidence_detection_recall: number;
+  design_issue_detection_recall: number;
+  repair_usefulness_rate: number;
+  claim: string;
+};
+
+type CredibilityThresholds = {
+  passed: boolean;
+  failures: string[];
+  unsupported_readiness_claims: { actual: number; maximum: 0 };
+  repair_usefulness_rate: { actual: number; minimum: 0.8 };
+  out_of_bound_evidence_rejection_rate: { actual: number; minimum: 1 };
+  whole_repo_overclaim_count: { actual: number; maximum: 0 };
+  false_confidence_detection_recall: { actual: number; minimum: 1 };
+  design_issue_detection_recall: { actual: number; minimum: 1 };
+  evidence_quality_regressed_below_deterministic: boolean;
 };
 
 export type SelfhostBenchmarkReport = {
@@ -110,7 +177,15 @@ export type SelfhostBenchmarkReport = {
   manifest_path: string;
   gold_case_index_path: string;
   pilot_validation: SelfhostPilotEvalReport;
+  confidence_sections: {
+    deterministic_fixture: string;
+    freeform_backed: string;
+    lightweight_baseline: string;
+  };
   cases: SelfhostBenchmarkCaseResult[];
+  freeform_validation: SelfhostFreeformReport;
+  baseline_comparison: BaselineComparison;
+  credibility_thresholds: CredibilityThresholds;
   aggregate: SelfhostBenchmarkAggregate;
 };
 
@@ -305,7 +380,70 @@ function deterministicObservation(payload: GoldCasePayload): GoldCasePayload & {
   }
 }
 
-function evaluateObservedCase(rawCasePayload: unknown, index: number): SelfhostBenchmarkCaseResult {
+function freeformEvidenceQuality(caseResult: SelfhostFreeformCaseResult | undefined): EvidenceQuality {
+  if (!caseResult) return 0;
+  if (!caseResult.user_evidence_attached || !caseResult.repo_evidence_attached) return 0;
+  if (caseResult.finding.repo_evidence_citations.some((entry) => !entry.exists)) return 1;
+  if (caseResult.observed_finding_type === "readiness") return 3;
+  if (caseResult.finding.repair_task_info?.evidence_producing) return 3;
+  return 2;
+}
+
+function buildFreeformObservation(caseResult: SelfhostFreeformCaseResult | undefined): FreeformBenchmarkObservation {
+  const finding = caseResult?.finding;
+  const evidenceQualityScore = freeformEvidenceQuality(caseResult);
+  const wholeRepoOverclaim = Boolean(finding && finding.readiness !== "not ready yet"
+    && /(?:whole.repo|whole-repo|entire codebase|durable ownership|all files|full product)/i.test(
+      finding.user_evidence_excerpt,
+    ));
+
+  return {
+    confidence_label: "freeform_evaluator",
+    observed_finding_type: caseResult?.observed_finding_type ?? "evaluation_missing",
+    observed_gap_present: caseResult ? caseResult.observed_finding_type !== "readiness" : false,
+    observed_readiness: finding?.readiness ?? "not ready yet",
+    unsupported_readiness_claim: Boolean(
+      finding?.readiness !== undefined
+        && finding.readiness !== "not ready yet"
+        && (!caseResult?.user_evidence_attached || !caseResult.repo_evidence_attached),
+    ),
+    evidence_quality_score: evidenceQualityScore,
+    evidence_boundary_valid: Boolean(
+      finding && finding.repo_evidence_citations.length > 0
+        && finding.repo_evidence_citations.every((entry) => entry.exists),
+    ),
+    whole_repo_overclaim: wholeRepoOverclaim,
+    repair_useful: Boolean(finding?.repair_task_info?.evidence_producing && !finding.repair_task_info.generic),
+    user_evidence_attached: Boolean(caseResult?.user_evidence_attached),
+    repo_evidence_attached: Boolean(caseResult?.repo_evidence_attached),
+    derived_from_answer_class: false,
+  };
+}
+
+function buildBaselineObservation(payload: GoldCasePayload): BaselineBenchmarkObservation {
+  const isGapCase = payload.expected_gap_present === true;
+  const isFalseConfidenceCase = payload.answer_class === "overconfident_wrong";
+  const isDesignCase = payload.answer_class === "design_induced_confusion";
+  return {
+    confidence_label: "fixture_baseline_artifact",
+    same_case_id: payload.id,
+    unsupported_claim_present: payload.answer_class !== "correct_grounded",
+    evidence_gap_present: payload.answer_class !== "correct_grounded",
+    evidence_quality_score: payload.answer_class === "correct_grounded" ? 2 : 1,
+    false_confidence_detected: false,
+    design_issue_detected: false,
+    repair_useful: false,
+    overclaim_text: isGapCase || isFalseConfidenceCase || isDesignCase
+      ? "Baseline artifact gives a plausible generic answer without enforcing SIBI evidence schema."
+      : null,
+  };
+}
+
+function evaluateObservedCase(
+  rawCasePayload: unknown,
+  index: number,
+  freeformCase: SelfhostFreeformCaseResult | undefined,
+): SelfhostBenchmarkCaseResult {
   const payload = caseToPayload(index, rawCasePayload);
   const mismatchesForCase: SelfhostBenchmarkMismatch[] = [];
 
@@ -355,6 +493,8 @@ function evaluateObservedCase(rawCasePayload: unknown, index: number): SelfhostB
   }
 
   const observed = deterministicObservation(payload);
+  const freeformObservation = buildFreeformObservation(freeformCase);
+  const baselineObservation = buildBaselineObservation(payload);
   const { expected_gap_present } = payload;
 
   if (typeof expected_gap_present === "boolean") {
@@ -474,6 +614,7 @@ function evaluateObservedCase(rawCasePayload: unknown, index: number): SelfhostB
     case_id: payload.id,
     concept_id: payload.concept_id,
     answer_class: payload.answer_class,
+    confidence_label: "deterministic_fixture",
     observed_gap_present: observed.observed_gap_present,
     observed_gap_type: observed.observed_gap_type,
     observed_issue_candidate_type: observed.observed_issue_candidate_type,
@@ -487,6 +628,8 @@ function evaluateObservedCase(rawCasePayload: unknown, index: number): SelfhostB
     expected_gap_type: gapTypeValue ?? null,
     expected_issue_candidate_type: expectedIssueType ?? null,
     expected_readiness: asString(asObject(rawCasePayload)?.expected_readiness) ?? null,
+    freeform_observation: freeformObservation,
+    baseline_observation: baselineObservation,
   };
 }
 
@@ -525,6 +668,9 @@ function aggregateBenchmarkResults(
   const evidenceQualityAverage = totalCases === 0
     ? 0
     : Number((results.reduce((total, entry) => total + entry.evidence_quality_score, 0) / totalCases).toFixed(4));
+  const evidenceQualityFreeformAverage = totalCases === 0
+    ? 0
+    : Number((results.reduce((total, entry) => total + entry.freeform_observation.evidence_quality_score, 0) / totalCases).toFixed(4));
 
   const falseConfidenceRecallDenominator = overconfidentCases.length;
   const designRecallDenominator = designCases.length;
@@ -538,14 +684,110 @@ function aggregateBenchmarkResults(
     gap_recall: calculateRatio(truePositiveGap, truePositiveGap + falseNegativeGap),
     gap_type_accuracy: calculateRatio(gapTypeMatches, expectedGapTypeCases.length),
     evidence_quality_average: evidenceQualityAverage,
+    evidence_quality_freeform_average: evidenceQualityFreeformAverage,
     false_confidence_detection_count: overconfidentDetected,
     false_confidence_expected_count: falseConfidenceRecallDenominator,
     false_confidence_detection_recall: calculateRatio(overconfidentDetected, falseConfidenceRecallDenominator),
     design_issue_detection_count: designIssueDetected,
     design_issue_expected_count: designRecallDenominator,
     design_issue_detection_recall: calculateRatio(designIssueDetected, designRecallDenominator),
+    unsupported_readiness_claims: results.filter((entry) => entry.freeform_observation.unsupported_readiness_claim).length,
+    out_of_bound_evidence_rejection_rate: calculateRatio(
+      results.filter((entry) => entry.freeform_observation.evidence_boundary_valid).length,
+      totalCases,
+    ),
+    whole_repo_overclaim_count: results.filter((entry) => entry.freeform_observation.whole_repo_overclaim).length,
+    repair_usefulness_rate: calculateRatio(
+      results.filter((entry) => entry.freeform_observation.observed_gap_present && entry.freeform_observation.repair_useful).length,
+      results.filter((entry) => entry.freeform_observation.observed_gap_present).length,
+    ),
+    freeform_false_confidence_detection_count: results.filter((entry) =>
+      entry.answer_class === "overconfident_wrong"
+        && entry.freeform_observation.observed_finding_type === "false_confidence_gap"
+    ).length,
+    freeform_false_confidence_detection_recall: calculateRatio(
+      results.filter((entry) =>
+        entry.answer_class === "overconfident_wrong"
+          && entry.freeform_observation.observed_finding_type === "false_confidence_gap"
+      ).length,
+      falseConfidenceRecallDenominator,
+    ),
+    freeform_design_issue_detection_count: results.filter((entry) =>
+      entry.answer_class === "design_induced_confusion"
+        && entry.freeform_observation.observed_finding_type === "design_induced_gap"
+    ).length,
+    freeform_design_issue_detection_recall: calculateRatio(
+      results.filter((entry) =>
+        entry.answer_class === "design_induced_confusion"
+          && entry.freeform_observation.observed_finding_type === "design_induced_gap"
+      ).length,
+      designRecallDenominator,
+    ),
     pilot_validation_mismatch_count: pilotValidationMismatches,
     benchmark_load_mismatch_count: benchmarkLoadMismatches,
+  };
+}
+
+function buildBaselineComparison(results: SelfhostBenchmarkCaseResult[]): BaselineComparison {
+  const caseCount = results.length;
+  const baselineEvidenceAverage = caseCount === 0
+    ? 0
+    : Number((results.reduce((total, entry) => total + entry.baseline_observation.evidence_quality_score, 0) / caseCount).toFixed(4));
+  const overconfidentCases = results.filter((entry) => entry.answer_class === "overconfident_wrong");
+  const designCases = results.filter((entry) => entry.answer_class === "design_induced_confusion");
+  const gapCases = results.filter((entry) => entry.expected_gap_present);
+
+  return {
+    label: "lightweight_fixture_baseline_same_cases",
+    case_count: caseCount,
+    same_case_set: results.every((entry) => entry.baseline_observation.same_case_id === entry.case_id),
+    confidence_label: "fixture_baseline_artifact",
+    unsupported_claim_rate: calculateRatio(
+      results.filter((entry) => entry.baseline_observation.unsupported_claim_present).length,
+      caseCount,
+    ),
+    evidence_gap_rate: calculateRatio(
+      results.filter((entry) => entry.baseline_observation.evidence_gap_present).length,
+      caseCount,
+    ),
+    evidence_quality_average: baselineEvidenceAverage,
+    false_confidence_detection_recall: calculateRatio(
+      overconfidentCases.filter((entry) => entry.baseline_observation.false_confidence_detected).length,
+      overconfidentCases.length,
+    ),
+    design_issue_detection_recall: calculateRatio(
+      designCases.filter((entry) => entry.baseline_observation.design_issue_detected).length,
+      designCases.length,
+    ),
+    repair_usefulness_rate: calculateRatio(
+      gapCases.filter((entry) => entry.baseline_observation.repair_useful).length,
+      gapCases.length,
+    ),
+    claim: "Lightweight fixture baseline only exposes unsupported claims and evidence gaps on the same cases; it is not evidence of competitor superiority.",
+  };
+}
+
+function buildCredibilityThresholds(aggregate: SelfhostBenchmarkAggregate): CredibilityThresholds {
+  const failures: string[] = [];
+  const evidenceQualityRegressed = aggregate.evidence_quality_freeform_average < aggregate.evidence_quality_average;
+  if (aggregate.unsupported_readiness_claims > 0) failures.push("unsupported_readiness_claims");
+  if (aggregate.repair_usefulness_rate < 0.8) failures.push("repair_usefulness_rate");
+  if (aggregate.out_of_bound_evidence_rejection_rate < 1) failures.push("out_of_bound_evidence_rejection_rate");
+  if (aggregate.whole_repo_overclaim_count > 0) failures.push("whole_repo_overclaim_count");
+  if (aggregate.freeform_false_confidence_detection_recall < 1) failures.push("false_confidence_detection_recall");
+  if (aggregate.freeform_design_issue_detection_recall < 1) failures.push("design_issue_detection_recall");
+  if (evidenceQualityRegressed) failures.push("evidence_quality_regressed_below_deterministic");
+
+  return {
+    passed: failures.length === 0,
+    failures,
+    unsupported_readiness_claims: { actual: aggregate.unsupported_readiness_claims, maximum: 0 },
+    repair_usefulness_rate: { actual: aggregate.repair_usefulness_rate, minimum: 0.8 },
+    out_of_bound_evidence_rejection_rate: { actual: aggregate.out_of_bound_evidence_rejection_rate, minimum: 1 },
+    whole_repo_overclaim_count: { actual: aggregate.whole_repo_overclaim_count, maximum: 0 },
+    false_confidence_detection_recall: { actual: aggregate.freeform_false_confidence_detection_recall, minimum: 1 },
+    design_issue_detection_recall: { actual: aggregate.freeform_design_issue_detection_recall, minimum: 1 },
+    evidence_quality_regressed_below_deterministic: evidenceQualityRegressed,
   };
 }
 
@@ -555,6 +797,8 @@ export function runSelfhostBenchmark(options: SelfhostBenchmarkOptions = {}): Se
     manifestPath,
     indexPath: options.indexPath,
   });
+  const freeformReport = runSelfhostFreeformEval({ indexPath: options.indexPath });
+  const freeformCaseById = new Map(freeformReport.cases.map((entry) => [entry.case_id, entry]));
 
   const goldCaseIndexPath = resolve(options.indexPath ?? pilotReport.gold_case_index_path ?? DEFAULT_GOLD_CASE_INDEX);
 
@@ -590,10 +834,20 @@ export function runSelfhostBenchmark(options: SelfhostBenchmarkOptions = {}): Se
         location: `gold_case_index.cases[${index}].path`,
         message: "Gold case entry is missing a valid path",
       };
+      const fallbackPayload: GoldCasePayload = {
+        id: `case-${index + 1}`,
+        concept_id: "",
+        answer_class: "declared_uncertainty",
+        expected_gap_present: null,
+        expected_gap_type: null,
+        acceptable_issue_candidate_type: null,
+        expected_readiness: null,
+      };
       caseResults.push({
         case_id: `case-${index + 1}`,
         concept_id: "",
         answer_class: "declared_uncertainty",
+        confidence_label: "deterministic_fixture",
         observed_gap_present: false,
         observed_gap_type: null,
         observed_issue_candidate_type: "LearningGap",
@@ -607,6 +861,8 @@ export function runSelfhostBenchmark(options: SelfhostBenchmarkOptions = {}): Se
         expected_gap_type: null,
         expected_issue_candidate_type: null,
         expected_readiness: null,
+        freeform_observation: buildFreeformObservation(undefined),
+        baseline_observation: buildBaselineObservation(fallbackPayload),
       });
       return;
     }
@@ -619,12 +875,24 @@ export function runSelfhostBenchmark(options: SelfhostBenchmarkOptions = {}): Se
         message: "Gold case file does not exist",
         details: { path: rawCasePathValue },
       };
+      const fallbackPayload: GoldCasePayload = {
+        id: asString(caseIndexEntry?.["id"]) ?? `case-${index + 1}`,
+        concept_id: asString(caseIndexEntry?.["concept_id"]) ?? "",
+        answer_class: isBenchmarkAnswerClass(asString(caseIndexEntry?.["answer_class"]))
+          ? (asString(caseIndexEntry?.["answer_class"]) as BenchmarkAnswerClass)
+          : "declared_uncertainty",
+        expected_gap_present: null,
+        expected_gap_type: null,
+        acceptable_issue_candidate_type: null,
+        expected_readiness: null,
+      };
       caseResults.push({
         case_id: asString(caseIndexEntry?.["id"]) ?? `case-${index + 1}`,
         concept_id: asString(caseIndexEntry?.["concept_id"]) ?? "",
         answer_class: isBenchmarkAnswerClass(asString(caseIndexEntry?.["answer_class"]))
           ? (asString(caseIndexEntry?.["answer_class"]) as BenchmarkAnswerClass)
           : "declared_uncertainty",
+        confidence_label: "deterministic_fixture",
         observed_gap_present: false,
         observed_gap_type: null,
         observed_issue_candidate_type: "LearningGap",
@@ -638,13 +906,16 @@ export function runSelfhostBenchmark(options: SelfhostBenchmarkOptions = {}): Se
         expected_gap_type: null,
         expected_issue_candidate_type: null,
         expected_readiness: null,
+        freeform_observation: buildFreeformObservation(freeformCaseById.get(fallbackPayload.id)),
+        baseline_observation: buildBaselineObservation(fallbackPayload),
       });
       return;
     }
 
     try {
       const rawCase = readJsonFile<RawCasePayload>(casePath);
-      const evaluatedCase = evaluateObservedCase(rawCase, index);
+      const caseId = asString(asObject(rawCase)?.id) ?? asString(caseIndexEntry?.["id"]) ?? `case-${index + 1}`;
+      const evaluatedCase = evaluateObservedCase(rawCase, index, freeformCaseById.get(caseId));
       caseResults.push(evaluatedCase);
     } catch (error) {
       const parseMismatch: SelfhostBenchmarkMismatch = {
@@ -653,12 +924,24 @@ export function runSelfhostBenchmark(options: SelfhostBenchmarkOptions = {}): Se
         message: `Case JSON parse failed: ${(error as Error).message}`,
         details: { path: rawCasePathValue },
       };
+      const fallbackPayload: GoldCasePayload = {
+        id: asString(caseIndexEntry?.["id"]) ?? `case-${index + 1}`,
+        concept_id: asString(caseIndexEntry?.["concept_id"]) ?? "",
+        answer_class: isBenchmarkAnswerClass(asString(caseIndexEntry?.["answer_class"]))
+          ? (asString(caseIndexEntry?.["answer_class"]) as BenchmarkAnswerClass)
+          : "declared_uncertainty",
+        expected_gap_present: null,
+        expected_gap_type: null,
+        acceptable_issue_candidate_type: null,
+        expected_readiness: null,
+      };
       caseResults.push({
         case_id: asString(caseIndexEntry?.["id"]) ?? `case-${index + 1}`,
         concept_id: asString(caseIndexEntry?.["concept_id"]) ?? "",
         answer_class: isBenchmarkAnswerClass(asString(caseIndexEntry?.["answer_class"]))
           ? (asString(caseIndexEntry?.["answer_class"]) as BenchmarkAnswerClass)
           : "declared_uncertainty",
+        confidence_label: "deterministic_fixture",
         observed_gap_present: false,
         observed_gap_type: null,
         observed_issue_candidate_type: "LearningGap",
@@ -672,6 +955,8 @@ export function runSelfhostBenchmark(options: SelfhostBenchmarkOptions = {}): Se
         expected_gap_type: null,
         expected_issue_candidate_type: null,
         expected_readiness: null,
+        freeform_observation: buildFreeformObservation(freeformCaseById.get(fallbackPayload.id)),
+        baseline_observation: buildBaselineObservation(fallbackPayload),
       });
     }
   });
@@ -681,13 +966,23 @@ export function runSelfhostBenchmark(options: SelfhostBenchmarkOptions = {}): Se
     pilotReport.aggregate.total_mismatches,
     caseMismatches.length,
   );
+  const baselineComparison = buildBaselineComparison(caseResults);
+  const credibilityThresholds = buildCredibilityThresholds(aggregate);
   const report: SelfhostBenchmarkReport = {
     generated_at: new Date().toISOString(),
     validation: BENCHMARK_VALIDATION_ID,
     manifest_path: manifestPath,
     gold_case_index_path: goldCaseIndexPath,
     pilot_validation: pilotReport,
+    confidence_sections: {
+      deterministic_fixture: "Deterministic fixture checks compare gold metadata to stable benchmark observations.",
+      freeform_backed: "Freeform-backed observations come from evaluateFreeformOwnershipAnswer output, not answer_class authority.",
+      lightweight_baseline: "Baseline rows are same-case fixture artifacts for unsupported-claim/evidence-gap calibration only.",
+    },
     cases: caseResults,
+    freeform_validation: freeformReport,
+    baseline_comparison: baselineComparison,
+    credibility_thresholds: credibilityThresholds,
     aggregate,
   };
 
@@ -712,7 +1007,7 @@ if (import.meta.url === `file://${process.argv[1]}`) {
   });
 
   process.stdout.write(`${JSON.stringify(report.aggregate, null, 2)}\n`);
-  if (report.aggregate.total_mismatches > 0) {
+  if (report.aggregate.total_mismatches > 0 || !report.credibility_thresholds.passed) {
     process.exitCode = 1;
   }
 }

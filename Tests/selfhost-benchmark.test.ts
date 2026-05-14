@@ -63,9 +63,79 @@ test("self-hosted benchmark passes all gold cases with no mismatches", () => {
   assert.equal(report.aggregate.gap_type_accuracy, 1);
   assert.equal(report.aggregate.false_confidence_detection_count, 5);
   assert.equal(report.aggregate.design_issue_detection_count, 5);
+  assert.equal(report.aggregate.unsupported_readiness_claims, 0);
+  assert.equal(report.aggregate.out_of_bound_evidence_rejection_rate, 1);
+  assert.equal(report.aggregate.whole_repo_overclaim_count, 0);
+  assert.equal(report.aggregate.repair_usefulness_rate >= 0.8, true);
+  assert.equal(report.aggregate.freeform_false_confidence_detection_recall, 1);
+  assert.equal(report.aggregate.freeform_design_issue_detection_recall, 1);
+  assert.equal(report.credibility_thresholds.passed, true);
   assert.equal(report.pilot_validation.aggregate.total_mismatches, 0);
+  assert.equal(report.freeform_validation.aggregate.total_cases, 40);
+  assert.equal(report.baseline_comparison.same_case_set, true);
+  assert.equal(report.baseline_comparison.case_count, 40);
+  assert.equal(report.baseline_comparison.confidence_label, "fixture_baseline_artifact");
+  assert.match(report.baseline_comparison.claim, /not evidence of competitor superiority/i);
   assert.equal(report.cases.length, 40);
   assert.ok(report.cases.every((entry) => entry.passed));
+  assert.ok(report.cases.every((entry) => entry.confidence_label === "deterministic_fixture"));
+  assert.ok(report.cases.every((entry) => entry.freeform_observation.confidence_label === "freeform_evaluator"));
+  assert.ok(report.cases.every((entry) => entry.freeform_observation.derived_from_answer_class === false));
+  assert.ok(report.cases.every((entry) => entry.baseline_observation.same_case_id === entry.case_id));
+});
+
+test("freeform benchmark observations are stable across answer_class metadata mutations", () => {
+  const baseline = runSelfhostBenchmark();
+  const targetCase = baseline.cases.find((entry) => entry.answer_class === "correct_uncited");
+  assert.ok(targetCase);
+
+  const { tempPath, tempDir } = withMutatedGoldIndex(({ index, getCasePath }) => {
+    const indexEntry = index.cases.find((entry) => entry.id === targetCase.case_id);
+    assert.ok(indexEntry);
+    indexEntry.answer_class = "correct_grounded";
+    const casePath = getCasePath(indexEntry.path as string);
+    const payload = JSON.parse(readFileSync(casePath, "utf8")) as {
+      answer_class?: unknown;
+    };
+    payload.answer_class = "correct_grounded";
+    writeFileSync(casePath, `${JSON.stringify(payload, null, 2)}\n`, "utf8");
+  });
+
+  try {
+    const mutated = runSelfhostBenchmark({ manifestPath: DEFAULT_MANIFEST_PATH, indexPath: tempPath });
+    const mutatedCase = mutated.cases.find((entry) => entry.case_id === targetCase.case_id);
+    assert.ok(mutatedCase);
+    assert.equal(
+      mutatedCase.freeform_observation.observed_finding_type,
+      targetCase.freeform_observation.observed_finding_type,
+    );
+    assert.equal(mutatedCase.freeform_observation.derived_from_answer_class, false);
+  } finally {
+    rmSync(tempDir, { recursive: true, force: true });
+  }
+});
+
+test("benchmark credibility thresholds fail closed on false-confidence regression", () => {
+  const { tempPath, tempDir } = withMutatedGoldIndex(({ index, getCasePath }) => {
+    const indexEntry = index.cases.find((entry) => entry.answer_class === "overconfident_wrong");
+    assert.ok(indexEntry);
+    const casePath = getCasePath(indexEntry.path as string);
+    const payload = JSON.parse(readFileSync(casePath, "utf8")) as {
+      simulated_user_answer?: unknown;
+      declared_confidence?: unknown;
+    };
+    payload.simulated_user_answer = "I am not sure about the boundary behavior.";
+    payload.declared_confidence = "low";
+    writeFileSync(casePath, `${JSON.stringify(payload, null, 2)}\n`, "utf8");
+  });
+
+  try {
+    const report = runSelfhostBenchmark({ manifestPath: DEFAULT_MANIFEST_PATH, indexPath: tempPath });
+    assert.equal(report.credibility_thresholds.passed, false);
+    assert.ok(report.credibility_thresholds.failures.includes("false_confidence_detection_recall"));
+  } finally {
+    rmSync(tempDir, { recursive: true, force: true });
+  }
 });
 
 test("benchmark flags mismatch when a non-grounded case has an invalid expected_gap_type", () => {

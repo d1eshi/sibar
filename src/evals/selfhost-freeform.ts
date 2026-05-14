@@ -392,7 +392,7 @@ function detectOverconfidence(answer: string, confidence?: string): boolean {
   const lower = answer.toLowerCase();
   const isHigh = answerHasHighConfidence(confidence);
   if (!isHigh) return false;
-  return /(?:absolutely sure|100%|completely certain|always|every time|no doubt|never wrong|definitely correct|i am sure|i know (?:for sure|for certain)|i am confident)/i.test(lower);
+  return /(?:absolutely sure|100%|completely certain|always|every time|no doubt|never wrong|definitely correct|i am sure|i am certain|i know (?:for sure|for certain)|i am confident)/i.test(lower);
 }
 
 function detectDesignConfusion(answer: string): boolean {
