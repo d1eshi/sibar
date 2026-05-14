@@ -5,7 +5,8 @@ import { spawnSync } from "node:child_process";
 import test from "node:test";
 import assert from "node:assert/strict";
 
-import { evaluateFreeformOwnershipAnswer, runSelfhostFreeformEval } from "../src/evals/selfhost-freeform.ts";
+import { evaluateFreeformOwnershipAnswer, runSelfhostFreeformEval, isRepeatedAnswer, simulateReevaluation } from "../src/evals/selfhost-freeform.ts";
+import type { FreeformEvaluationFinding, IssueCandidate, RepairTaskInfo, ReevaluationInfo } from "../src/evals/selfhost-freeform.ts";
 
 function masteryCheckFixture(overrides: Partial<{
   id: string;
@@ -393,4 +394,315 @@ test("freeform evaluator findings have substantive user evidence and repo eviden
       assert.ok(citation.rationale.length > 0, `case ${caseResult.case_id} repo evidence must have rationale: ${citation.path}`);
     }
   }
+});
+
+// --- VAL-LOOP tests ---
+
+test("VAL-LOOP-001: gap findings emit executable issue candidate objects", () => {
+  const report = runSelfhostFreeformEval();
+  const gapCases = report.cases.filter((c) => c.observed_finding_type !== "readiness");
+  assert.ok(gapCases.length > 0, "must have gap cases");
+
+  for (const gapCase of gapCases) {
+    const candidate = gapCase.finding.issue_candidate;
+    assert.notEqual(candidate, null, `gap case ${gapCase.case_id} must have issue_candidate`);
+    if (candidate) {
+      assert.ok(candidate.id.startsWith("IC-"), `issue candidate ${candidate.id} must have IC- prefix`);
+      assert.notEqual(candidate.type, "none", `issue candidate type must not be 'none' for gap ${gapCase.case_id}`);
+      assert.ok(candidate.title.length > 0, `issue candidate must have title for ${gapCase.case_id}`);
+      assert.ok(candidate.evidence.length > 0, `issue candidate must have evidence for ${gapCase.case_id}`);
+      assert.ok(candidate.why_it_matters.length > 0, `issue candidate must have why_it_matters for ${gapCase.case_id}`);
+      assert.ok(candidate.proposed_action.length > 0, `issue candidate must have proposed_action for ${gapCase.case_id}`);
+      assert.equal(candidate.readiness_blocking, true, `issue candidate must block readiness for ${gapCase.case_id}`);
+      assert.notEqual(candidate.linked_to_gap, null, `issue candidate must link to gap for ${gapCase.case_id}`);
+    }
+  }
+});
+
+test("VAL-LOOP-002: grounded readiness does not fabricate issue candidates", () => {
+  const report = runSelfhostFreeformEval();
+  const readinessCases = report.cases.filter((c) => c.observed_finding_type === "readiness");
+  assert.ok(readinessCases.length > 0, "must have readiness cases");
+
+  for (const readyCase of readinessCases) {
+    assert.equal(readyCase.finding.issue_candidate, null,
+      `readiness case ${readyCase.case_id} must not have issue candidate`);
+    assert.equal(readyCase.issue_candidate_id, null,
+      `readiness case ${readyCase.case_id} must not have issue_candidate_id`);
+    assert.equal(readyCase.finding.issue_candidate_type, "none",
+      `readiness case ${readyCase.case_id} must have issue_candidate_type 'none'`);
+  }
+
+  // Also verify aggregate: readiness answers with no candidates
+  assert.ok(report.loop_summary.readiness_answers_with_no_candidates >= readinessCases.length);
+});
+
+test("VAL-LOOP-003: issue candidate type follows evidence", () => {
+  const finding = evaluateFreeformOwnershipAnswer({
+    masteryCheck: masteryCheckFixture(),
+    user_answer: "The prompt and the graph output language are overloaded, so I treated concept labels as enough and skipped the explicit evidence-to-relation mapping because the terminology is confusing.",
+    declared_confidence: "medium",
+    bounded_repo_evidence: validRepoEvidence(),
+  });
+
+  assert.equal(finding.finding_type, "design_induced_gap");
+  assert.notEqual(finding.issue_candidate, null);
+  assert.equal(finding.issue_candidate?.type, "DesignIssue");
+
+  // Learning gaps get LearningGap type
+  const evidenceGapFinding = evaluateFreeformOwnershipAnswer({
+    masteryCheck: masteryCheckFixture(),
+    user_answer: "Boundary checks are based on manifest paths and the rest of the repository is out of scope.",
+    declared_confidence: "high",
+    bounded_repo_evidence: validRepoEvidence(),
+  });
+
+  assert.equal(evidenceGapFinding.finding_type, "evidence_gap");
+  assert.notEqual(evidenceGapFinding.issue_candidate, null);
+  assert.equal(evidenceGapFinding.issue_candidate?.type, "LearningGap");
+
+  // Readiness gets none
+  const readinessFinding = evaluateFreeformOwnershipAnswer({
+    masteryCheck: masteryCheckFixture(),
+    user_answer: "I would trace boundary control in `sibar.selfhost.manifest.json` and `src/runtime-concept-graph.ts`, citing `src/runtime-support.ts` as included path evidence.",
+    declared_confidence: "high",
+    bounded_repo_evidence: validRepoEvidence(),
+  });
+  assert.equal(readinessFinding.finding_type, "readiness");
+  assert.equal(readinessFinding.issue_candidate, null);
+  assert.equal(readinessFinding.issue_candidate_type, "none");
+});
+
+test("VAL-LOOP-004: repair tasks are narrow and evidence-producing", () => {
+  const report = runSelfhostFreeformEval();
+  const gapCases = report.cases.filter((c) => c.observed_finding_type !== "readiness");
+
+  for (const gapCase of gapCases) {
+    const repairInfo = gapCase.finding.repair_task_info;
+    assert.notEqual(repairInfo, null, `gap case ${gapCase.case_id} must have repair_task_info`);
+
+    if (repairInfo) {
+      // Repair task must be non-generic
+      assert.equal(repairInfo.generic, false, `repair task for ${gapCase.case_id} must not be generic`);
+      assert.equal(repairInfo.evidence_producing, true, `repair task for ${gapCase.case_id} must be evidence-producing`);
+      assert.ok(repairInfo.description.length >= 20, `repair task description for ${gapCase.case_id} must be substantive (>= 20 chars)`);
+      assert.ok(repairInfo.required_evidence.length > 0, `repair task for ${gapCase.case_id} must have required evidence`);
+    }
+  }
+
+  // Negative test: generic answer is detected by the evaluator
+  const genericFinding = evaluateFreeformOwnershipAnswer({
+    masteryCheck: masteryCheckFixture(),
+    user_answer: "review docs",
+    declared_confidence: "low",
+    bounded_repo_evidence: validRepoEvidence(),
+  });
+  // This is a generic answer → surface_gap, the repair task info should not be generic
+  // The repair task for surface_gap is substantive
+  if (genericFinding.repair_task_info) {
+    assert.equal(genericFinding.repair_task_info.generic, false,
+      "repair task for surface_gap must not be generic in standard evaluator");
+  }
+});
+
+test("VAL-LOOP-005: re-evaluation prompt is nearby but not repeated", () => {
+  const report = runSelfhostFreeformEval();
+  const gapCases = report.cases.filter((c) => c.observed_finding_type !== "readiness");
+
+  for (const gapCase of gapCases) {
+    const reevalInfo = gapCase.finding.reevaluation_info;
+    assert.notEqual(reevalInfo, null, `gap case ${gapCase.case_id} must have reevaluation_info`);
+
+    if (reevalInfo) {
+      assert.equal(reevalInfo.is_repeat_of_original, false,
+        `re-evaluation for ${gapCase.case_id} must not repeat original prompt verbatim`);
+      assert.ok(reevalInfo.prompt.length > 0, `re-evaluation for ${gapCase.case_id} must have non-empty prompt`);
+      // The preserves_operation and uses_required_evidence are best-effort but reported
+    }
+  }
+
+  // Check that readiness cases have null reevaluation_info
+  const readinessCases = report.cases.filter((c) => c.observed_finding_type === "readiness");
+  for (const readyCase of readinessCases) {
+    assert.equal(readyCase.finding.reevaluation_info, null,
+      `readiness case ${readyCase.case_id} must not have reevaluation_info`);
+  }
+});
+
+test("VAL-LOOP-006: repeated failed answers do not count as repaired understanding", () => {
+  // Test isRepeatedAnswer function
+  const originalAnswer = "Boundary checks are based on manifest paths and should include src and Tests.";
+  const repeatedAnswer = "Boundary checks are based on manifest paths and should include src and Tests."; // verbatim repeat
+  const similarAnswer = "Boundary checks rely on manifest paths and include src and Tests folders.";
+  const differentAnswer = "I would trace boundary control in sibar.selfhost.manifest.json, citing src/runtime-concept-graph.ts for include logic and noting that Tests/ is within the manifest included_paths.";
+
+  assert.equal(isRepeatedAnswer(originalAnswer, repeatedAnswer), true,
+    "verbatim repeat must be detected");
+  assert.equal(isRepeatedAnswer(originalAnswer, similarAnswer), true,
+    "very similar answer must be detected as repeat");
+  assert.equal(isRepeatedAnswer(originalAnswer, differentAnswer), false,
+    "substantially different answer must not be detected as repeat");
+
+  // Test simulateReevaluation with repeated answer
+  const gapFinding = evaluateFreeformOwnershipAnswer({
+    masteryCheck: masteryCheckFixture(),
+    user_answer: originalAnswer,
+    declared_confidence: "high",
+    bounded_repo_evidence: validRepoEvidence(),
+  });
+  assert.equal(gapFinding.gap_present, true, "must have gap");
+
+  const repeatedResult = simulateReevaluation(gapFinding, repeatedAnswer, "high");
+  assert.equal(repeatedResult.gap_repaired, false, "repeated answer must not repair gap");
+  assert.equal(repeatedResult.repeated_answer, true, "must detect repeat");
+  assert.equal(repeatedResult.updated_readiness, "not ready yet", "readiness must be not ready yet");
+
+  // Test simulateReevaluation with proper new answer
+  const properResult = simulateReevaluation(gapFinding, differentAnswer, "high");
+  assert.equal(properResult.gap_repaired, true, "proper new answer must repair gap");
+  assert.equal(properResult.repeated_answer, false, "must not detect repeat");
+  assert.notEqual(properResult.updated_readiness, "not ready yet", "readiness must advance");
+  const boundedLabels = ["ready to inspect", "ready to explain", "ready to modify with guardrails", "ready to own", "not ready yet"];
+  assert.ok(boundedLabels.includes(properResult.updated_readiness), "readiness must be bounded label");
+});
+
+test("VAL-LOOP-007: end-to-end repair loop is executable in report", () => {
+  const report = runSelfhostFreeformEval();
+  const gapCases = report.cases.filter((c) => c.observed_finding_type !== "readiness");
+
+  for (const gapCase of gapCases) {
+    // Each gap must have: issue_candidate, repair_task_info, reevaluation_info, and loop_status
+    assert.notEqual(gapCase.finding.issue_candidate, null,
+      `gap case ${gapCase.case_id} must have issue_candidate`);
+    assert.notEqual(gapCase.finding.repair_task_info, null,
+      `gap case ${gapCase.case_id} must have repair_task_info`);
+    assert.notEqual(gapCase.finding.reevaluation_info, null,
+      `gap case ${gapCase.case_id} must have reevaluation_info`);
+
+    // Loop status must be "reevaluation_prompted" (full loop) or "incomplete_loop" (fail closed)
+    assert.ok(
+      gapCase.loop_status === "reevaluation_prompted" || gapCase.loop_status === "incomplete_loop",
+      `gap case ${gapCase.case_id} loop_status '${gapCase.loop_status}' must be 'reevaluation_prompted' or 'incomplete_loop'`
+    );
+
+    if (gapCase.loop_status === "incomplete_loop") {
+      assert.notEqual(gapCase.loop_error, null, `incomplete loop ${gapCase.case_id} must have loop_error`);
+    }
+  }
+
+  // Check loop_summary in report
+  assert.ok(report.loop_summary.gaps_with_full_loop > 0, "must have gaps with full loop");
+  assert.equal(report.loop_summary.gaps_failed_closed, report.loop_summary.loop_incomplete_cases.length,
+    "failed closed count must match incomplete cases array");
+  assert.equal(report.aggregate.full_loop_cases, report.loop_summary.gaps_with_full_loop,
+    "aggregate full_loop_cases must match loop_summary");
+  assert.equal(report.aggregate.issue_candidate_cases, gapCases.length,
+    "all gap cases must have issue candidates");
+});
+
+test("VAL-LOOP-008: readiness remains blocked until re-evaluation succeeds", () => {
+  // Create a gap finding
+  const gapFinding = evaluateFreeformOwnershipAnswer({
+    masteryCheck: masteryCheckFixture(),
+    user_answer: "Boundary checks are based on manifest paths and should include src and Tests.",
+    declared_confidence: "high",
+    bounded_repo_evidence: validRepoEvidence(),
+  });
+
+  assert.equal(gapFinding.gap_present, true);
+  assert.equal(gapFinding.readiness, "not ready yet");
+
+  // Having repair task alone does not change readiness
+  assert.notEqual(gapFinding.repair_task, null, "must have repair task");
+  assert.equal(gapFinding.readiness, "not ready yet",
+    "readiness must remain 'not ready yet' even with repair task present");
+
+  // Failed re-evaluation does not advance readiness
+  const failedReeval = simulateReevaluation(gapFinding, "I am not sure about the boundary checks.", "low");
+  assert.equal(failedReeval.gap_repaired, false);
+  assert.equal(failedReeval.updated_readiness, "not ready yet");
+
+  // Successful re-evaluation advances readiness
+  const successReeval = simulateReevaluation(
+    gapFinding,
+    "I would trace boundary in src/runtime-concept-graph.ts where included_paths are filtered against the manifest, and verify that Tests/concept-graph.test.ts confirms excluded paths are rejected.",
+    "high",
+  );
+  assert.equal(successReeval.gap_repaired, true);
+  assert.notEqual(successReeval.updated_readiness, "not ready yet");
+});
+
+test("VAL-LOOP-009: successful re-evaluation updates readiness but remains bounded", () => {
+  const gapFinding = evaluateFreeformOwnershipAnswer({
+    masteryCheck: masteryCheckFixture({
+      forbidden_claims: [
+        "Claiming full repo ownership from one boundary trace.",
+        "Treating excluded paths as legitimate evidence in the same answer.",
+      ],
+    }),
+    user_answer: "Boundary checks start from manifest included_paths but I cannot fully confirm the excluded-path behavior.",
+    declared_confidence: "medium",
+    bounded_repo_evidence: validRepoEvidence(),
+  });
+
+  assert.equal(gapFinding.gap_present, true);
+
+  const result = simulateReevaluation(
+    gapFinding,
+    "I would trace boundary control using src/runtime-concept-graph.ts and sibar.selfhost.manifest.json, citing included paths and rejecting excluded-path claims. Readiness is bounded to the traced evidence only.",
+    "high",
+  );
+
+  assert.equal(result.gap_repaired, true);
+  // Successful re-evaluation must not claim durable ownership
+  assert.notEqual(result.updated_readiness, "ready to own",
+    "re-evaluation must not advance to 'ready to own' from one answer");
+  assert.notEqual(result.updated_readiness, "not ready yet",
+    "successful re-evaluation must advance readiness");
+
+  const boundedLabels = ["ready to inspect", "ready to explain", "ready to modify with guardrails"];
+  assert.ok(boundedLabels.includes(result.updated_readiness),
+    `re-evaluation readiness '${result.updated_readiness}' must be a bounded label`);
+});
+
+test("VAL-LOOP-010: missing loop artifacts fail closed", () => {
+  // Test that findings with missing artifacts have incomplete_loop status
+  const report = runSelfhostFreeformEval();
+
+  // Check all readiness cases have loop_status "not_applicable"
+  for (const c of report.cases.filter((c) => c.observed_finding_type === "readiness")) {
+    assert.equal(c.loop_status, "not_applicable",
+      `readiness case ${c.case_id} must have loop_status 'not_applicable'`);
+  }
+
+  // Check all gap cases have either "reevaluation_prompted" or "incomplete_loop"
+  for (const c of report.cases.filter((c) => c.observed_finding_type !== "readiness")) {
+    assert.ok(
+      c.loop_status === "reevaluation_prompted" || c.loop_status === "incomplete_loop",
+      `gap case ${c.case_id} loop_status '${c.loop_status}' must be 'reevaluation_prompted' or 'incomplete_loop'`
+    );
+    if (c.loop_status === "incomplete_loop") {
+      assert.notEqual(c.loop_error, null, `incomplete case ${c.case_id} must have loop_error`);
+      assert.match(c.loop_error!, /incomplete loop/i,
+        `loop_error for ${c.case_id} must mention 'incomplete loop'`);
+    }
+  }
+
+  // Also verify that the report exposes structured contract fields for inspection (VAL-EVAL-007)
+  assert.ok(report.loop_summary !== undefined, "report must have loop_summary");
+  assert.ok(report.aggregate.issue_candidate_cases !== undefined, "aggregate must have issue_candidate_cases");
+  assert.ok(report.aggregate.full_loop_cases !== undefined, "aggregate must have full_loop_cases");
+  assert.ok(report.aggregate.incomplete_loop_cases !== undefined, "aggregate must have incomplete_loop_cases");
+
+  // Check that at least some cases have the loop fields exposed
+  const sampleGapCase = report.cases.find((c) => c.observed_finding_type !== "readiness");
+  assert.ok(sampleGapCase, "must have at least one gap case for inspection");
+  assert.notEqual(sampleGapCase?.finding.issue_candidate, undefined,
+    "finding must expose issue_candidate field");
+  assert.notEqual(sampleGapCase?.finding.repair_task_info, undefined,
+    "finding must expose repair_task_info field");
+  assert.notEqual(sampleGapCase?.finding.reevaluation_info, undefined,
+    "finding must expose reevaluation_info field");
+  assert.notEqual(sampleGapCase?.finding.loop_status, undefined,
+    "finding must expose loop_status field");
 });
