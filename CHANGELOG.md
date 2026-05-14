@@ -31,6 +31,9 @@ story.
   snapshots and answer submission.
 - Floating `NSPanel` study surface with collapsible mode and Graph + Code canvas
   rendered from runtime-owned snapshots.
+- First self-hosted freeform evaluator slice for artifact-boundary ownership
+  answers, with CLI/report output for readiness, evidence, flow, false-confidence,
+  and design-induced findings.
 
 ### Changed
 
@@ -59,10 +62,13 @@ story.
   contract for the live study panel host.
 - Mission docs: updated Study Panel UI to require an accessory `NSPanel` host
   and explicit Graph + Code canvas behavior.
+- Updated the self-hosted evaluation contract with first freeform evaluator slice
+  results, coverage status, and the next expansion target.
 
 ### Internal
 
-- Nothing yet.
+- Added regression coverage and a saved report for the first five self-hosted
+  freeform evaluator cases.
 
 ## Release Format
 
