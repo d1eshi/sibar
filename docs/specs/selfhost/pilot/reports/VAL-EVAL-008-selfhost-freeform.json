@@ -1,8 +1,8 @@
 {
-  "generated_at": "2026-05-14T23:14:59.401Z",
+  "generated_at": "2026-05-14T23:48:25.886Z",
   "validation": "VAL-EVAL-008-selfhost-freeform",
-  "gold_case_index_path": "/Users/d1eshi/projects/startup/sibar/docs/specs/selfhost/pilot/gold-cases/index.json",
-  "manifest_path": "/Users/d1eshi/projects/startup/sibar/sibar.selfhost.manifest.json",
+  "gold_case_index_path": "docs/specs/selfhost/pilot/gold-cases/index.json",
+  "manifest_path": "sibar.selfhost.manifest.json",
   "mismatches": [],
   "cases": [
     {
@@ -32,19 +32,19 @@
         "user_evidence_excerpt": "I would trace boundary control in `sibar.selfhost.manifest.json` and `src/runtime-concept-graph.ts`, cite at least one included file path such as `src/runtime-support.ts` and one excluded path in the manifest, and explain that only listed included paths can support artifact evidence.",
         "repo_evidence_citations": [
           {
-            "path": "/Users/d1eshi/projects/startup/sibar/src/runtime-concept-graph.ts",
+            "path": "src/runtime-concept-graph.ts",
             "rationale": "Boundary traversal logic (included/excluded checks and inventory walk) defines what is in-scope for concept graph evidence.",
             "excerpt": "linePattern: /\\b(artifact_session|included_paths|excluded_paths|selection|summary|writeState|readState)\\b/,",
             "exists": true
           },
           {
-            "path": "/Users/d1eshi/projects/startup/sibar/src/runtime-support.ts",
+            "path": "src/runtime-support.ts",
             "rationale": "Core types and shared session metadata describe the boundary contract used when reading sessions and sessions' path fields.",
             "excerpt": "included_paths: string[];",
             "exists": true
           },
           {
-            "path": "/Users/d1eshi/projects/startup/sibar/Tests/concept-graph.test.ts",
+            "path": "Tests/concept-graph.test.ts",
             "rationale": "Tests show boundary expectations, especially evidence filtering and exclusion behavior.",
             "excerpt": "\"export type ArtifactSession = { artifact_session_id: string; included_paths: string[]; excluded_paths: string[] };\",",
             "exists": true
@@ -94,9 +94,9 @@
           "type": "LearningGap",
           "title": "artifact_boundary: learner needs evidence-backed repair",
           "evidence": [
-            "/Users/d1eshi/projects/startup/sibar/src/runtime-concept-graph.ts: Boundary traversal logic (included/excluded checks and inventory walk) defines what is in-scope for concept graph evidence.",
-            "/Users/d1eshi/projects/startup/sibar/src/runtime-support.ts: Core types and shared session metadata describe the boundary contract used when reading sessions and sessions' path fields.",
-            "/Users/d1eshi/projects/startup/sibar/Tests/concept-graph.test.ts: Tests show boundary expectations, especially evidence filtering and exclusion behavior."
+            "src/runtime-concept-graph.ts: Boundary traversal logic (included/excluded checks and inventory walk) defines what is in-scope for concept graph evidence.",
+            "src/runtime-support.ts: Core types and shared session metadata describe the boundary contract used when reading sessions and sessions' path fields.",
+            "Tests/concept-graph.test.ts: Tests show boundary expectations, especially evidence filtering and exclusion behavior."
           ],
           "why_it_matters": "The learner still needs a narrow evidence-producing repair before readiness can advance.",
           "proposed_action": "Ask the learner to restate the answer with required repo evidence and the same operation.",
@@ -109,9 +109,9 @@
             "type": "LearningGap",
             "title": "artifact_boundary: learner needs evidence-backed repair",
             "evidence": [
-              "/Users/d1eshi/projects/startup/sibar/src/runtime-concept-graph.ts: Boundary traversal logic (included/excluded checks and inventory walk) defines what is in-scope for concept graph evidence.",
-              "/Users/d1eshi/projects/startup/sibar/src/runtime-support.ts: Core types and shared session metadata describe the boundary contract used when reading sessions and sessions' path fields.",
-              "/Users/d1eshi/projects/startup/sibar/Tests/concept-graph.test.ts: Tests show boundary expectations, especially evidence filtering and exclusion behavior."
+              "src/runtime-concept-graph.ts: Boundary traversal logic (included/excluded checks and inventory walk) defines what is in-scope for concept graph evidence.",
+              "src/runtime-support.ts: Core types and shared session metadata describe the boundary contract used when reading sessions and sessions' path fields.",
+              "Tests/concept-graph.test.ts: Tests show boundary expectations, especially evidence filtering and exclusion behavior."
             ],
             "why_it_matters": "The learner still needs a narrow evidence-producing repair before readiness can advance.",
             "proposed_action": "Ask the learner to restate the answer with required repo evidence and the same operation.",
@@ -122,19 +122,19 @@
         "user_evidence_excerpt": "Boundary checks are based on manifest paths and should include src and Tests.",
         "repo_evidence_citations": [
           {
-            "path": "/Users/d1eshi/projects/startup/sibar/src/runtime-concept-graph.ts",
+            "path": "src/runtime-concept-graph.ts",
             "rationale": "Boundary traversal logic (included/excluded checks and inventory walk) defines what is in-scope for concept graph evidence.",
             "excerpt": "linePattern: /\\b(artifact_session|included_paths|excluded_paths|selection|summary|writeState|readState)\\b/,",
             "exists": true
           },
           {
-            "path": "/Users/d1eshi/projects/startup/sibar/src/runtime-support.ts",
+            "path": "src/runtime-support.ts",
             "rationale": "Core types and shared session metadata describe the boundary contract used when reading sessions and sessions' path fields.",
             "excerpt": "included_paths: string[];",
             "exists": true
           },
           {
-            "path": "/Users/d1eshi/projects/startup/sibar/Tests/concept-graph.test.ts",
+            "path": "Tests/concept-graph.test.ts",
             "rationale": "Tests show boundary expectations, especially evidence filtering and exclusion behavior.",
             "excerpt": "\"export type ArtifactSession = { artifact_session_id: string; included_paths: string[]; excluded_paths: string[] };\",",
             "exists": true
@@ -198,9 +198,9 @@
           "type": "LearningGap",
           "title": "artifact_boundary: learner needs evidence-backed repair",
           "evidence": [
-            "/Users/d1eshi/projects/startup/sibar/src/runtime-concept-graph.ts: Boundary traversal logic (included/excluded checks and inventory walk) defines what is in-scope for concept graph evidence.",
-            "/Users/d1eshi/projects/startup/sibar/src/runtime-support.ts: Core types and shared session metadata describe the boundary contract used when reading sessions and sessions' path fields.",
-            "/Users/d1eshi/projects/startup/sibar/Tests/concept-graph.test.ts: Tests show boundary expectations, especially evidence filtering and exclusion behavior."
+            "src/runtime-concept-graph.ts: Boundary traversal logic (included/excluded checks and inventory walk) defines what is in-scope for concept graph evidence.",
+            "src/runtime-support.ts: Core types and shared session metadata describe the boundary contract used when reading sessions and sessions' path fields.",
+            "Tests/concept-graph.test.ts: Tests show boundary expectations, especially evidence filtering and exclusion behavior."
           ],
           "why_it_matters": "The learner still needs a narrow evidence-producing repair before readiness can advance.",
           "proposed_action": "Ask the learner to restate the answer with required repo evidence and the same operation.",
@@ -213,9 +213,9 @@
             "type": "LearningGap",
             "title": "artifact_boundary: learner needs evidence-backed repair",
             "evidence": [
-              "/Users/d1eshi/projects/startup/sibar/src/runtime-concept-graph.ts: Boundary traversal logic (included/excluded checks and inventory walk) defines what is in-scope for concept graph evidence.",
-              "/Users/d1eshi/projects/startup/sibar/src/runtime-support.ts: Core types and shared session metadata describe the boundary contract used when reading sessions and sessions' path fields.",
-              "/Users/d1eshi/projects/startup/sibar/Tests/concept-graph.test.ts: Tests show boundary expectations, especially evidence filtering and exclusion behavior."
+              "src/runtime-concept-graph.ts: Boundary traversal logic (included/excluded checks and inventory walk) defines what is in-scope for concept graph evidence.",
+              "src/runtime-support.ts: Core types and shared session metadata describe the boundary contract used when reading sessions and sessions' path fields.",
+              "Tests/concept-graph.test.ts: Tests show boundary expectations, especially evidence filtering and exclusion behavior."
             ],
             "why_it_matters": "The learner still needs a narrow evidence-producing repair before readiness can advance.",
             "proposed_action": "Ask the learner to restate the answer with required repo evidence and the same operation.",
@@ -226,19 +226,19 @@
         "user_evidence_excerpt": "I know included paths matter, but I mixed whether the include list is validated during session creation or graph generation, so I cannot explain the full sequence end-to-end.",
         "repo_evidence_citations": [
           {
-            "path": "/Users/d1eshi/projects/startup/sibar/src/runtime-concept-graph.ts",
+            "path": "src/runtime-concept-graph.ts",
             "rationale": "Boundary traversal logic (included/excluded checks and inventory walk) defines what is in-scope for concept graph evidence.",
             "excerpt": "linePattern: /\\b(artifact_session|included_paths|excluded_paths|selection|summary|writeState|readState)\\b/,",
             "exists": true
           },
           {
-            "path": "/Users/d1eshi/projects/startup/sibar/src/runtime-support.ts",
+            "path": "src/runtime-support.ts",
             "rationale": "Core types and shared session metadata describe the boundary contract used when reading sessions and sessions' path fields.",
             "excerpt": "included_paths: string[];",
             "exists": true
           },
           {
-            "path": "/Users/d1eshi/projects/startup/sibar/Tests/concept-graph.test.ts",
+            "path": "Tests/concept-graph.test.ts",
             "rationale": "Tests show boundary expectations, especially evidence filtering and exclusion behavior.",
             "excerpt": "\"export type ArtifactSession = { artifact_session_id: string; included_paths: string[]; excluded_paths: string[] };\",",
             "exists": true
@@ -302,9 +302,9 @@
           "type": "LearningGap",
           "title": "artifact_boundary: learner needs evidence-backed repair",
           "evidence": [
-            "/Users/d1eshi/projects/startup/sibar/src/runtime-concept-graph.ts: Boundary traversal logic (included/excluded checks and inventory walk) defines what is in-scope for concept graph evidence.",
-            "/Users/d1eshi/projects/startup/sibar/src/runtime-support.ts: Core types and shared session metadata describe the boundary contract used when reading sessions and sessions' path fields.",
-            "/Users/d1eshi/projects/startup/sibar/Tests/concept-graph.test.ts: Tests show boundary expectations, especially evidence filtering and exclusion behavior."
+            "src/runtime-concept-graph.ts: Boundary traversal logic (included/excluded checks and inventory walk) defines what is in-scope for concept graph evidence.",
+            "src/runtime-support.ts: Core types and shared session metadata describe the boundary contract used when reading sessions and sessions' path fields.",
+            "Tests/concept-graph.test.ts: Tests show boundary expectations, especially evidence filtering and exclusion behavior."
           ],
           "why_it_matters": "The learner still needs a narrow evidence-producing repair before readiness can advance.",
           "proposed_action": "Ask the learner to restate the answer with required repo evidence and the same operation.",
@@ -317,9 +317,9 @@
             "type": "LearningGap",
             "title": "artifact_boundary: learner needs evidence-backed repair",
             "evidence": [
-              "/Users/d1eshi/projects/startup/sibar/src/runtime-concept-graph.ts: Boundary traversal logic (included/excluded checks and inventory walk) defines what is in-scope for concept graph evidence.",
-              "/Users/d1eshi/projects/startup/sibar/src/runtime-support.ts: Core types and shared session metadata describe the boundary contract used when reading sessions and sessions' path fields.",
-              "/Users/d1eshi/projects/startup/sibar/Tests/concept-graph.test.ts: Tests show boundary expectations, especially evidence filtering and exclusion behavior."
+              "src/runtime-concept-graph.ts: Boundary traversal logic (included/excluded checks and inventory walk) defines what is in-scope for concept graph evidence.",
+              "src/runtime-support.ts: Core types and shared session metadata describe the boundary contract used when reading sessions and sessions' path fields.",
+              "Tests/concept-graph.test.ts: Tests show boundary expectations, especially evidence filtering and exclusion behavior."
             ],
             "why_it_matters": "The learner still needs a narrow evidence-producing repair before readiness can advance.",
             "proposed_action": "Ask the learner to restate the answer with required repo evidence and the same operation.",
@@ -330,19 +330,19 @@
         "user_evidence_excerpt": "Boundary rules belong to the readiness layer; the boundary itself is about what concepts can be explained, not which files are in or out.",
         "repo_evidence_citations": [
           {
-            "path": "/Users/d1eshi/projects/startup/sibar/src/runtime-concept-graph.ts",
+            "path": "src/runtime-concept-graph.ts",
             "rationale": "Boundary traversal logic (included/excluded checks and inventory walk) defines what is in-scope for concept graph evidence.",
             "excerpt": "linePattern: /\\b(artifact_session|included_paths|excluded_paths|selection|summary|writeState|readState)\\b/,",
             "exists": true
           },
           {
-            "path": "/Users/d1eshi/projects/startup/sibar/src/runtime-support.ts",
+            "path": "src/runtime-support.ts",
             "rationale": "Core types and shared session metadata describe the boundary contract used when reading sessions and sessions' path fields.",
             "excerpt": "included_paths: string[];",
             "exists": true
           },
           {
-            "path": "/Users/d1eshi/projects/startup/sibar/Tests/concept-graph.test.ts",
+            "path": "Tests/concept-graph.test.ts",
             "rationale": "Tests show boundary expectations, especially evidence filtering and exclusion behavior.",
             "excerpt": "\"export type ArtifactSession = { artifact_session_id: string; included_paths: string[]; excluded_paths: string[] };\",",
             "exists": true
@@ -406,9 +406,9 @@
           "type": "LearningGap",
           "title": "artifact_boundary: learner needs evidence-backed repair",
           "evidence": [
-            "/Users/d1eshi/projects/startup/sibar/src/runtime-concept-graph.ts: Boundary traversal logic (included/excluded checks and inventory walk) defines what is in-scope for concept graph evidence.",
-            "/Users/d1eshi/projects/startup/sibar/src/runtime-support.ts: Core types and shared session metadata describe the boundary contract used when reading sessions and sessions' path fields.",
-            "/Users/d1eshi/projects/startup/sibar/Tests/concept-graph.test.ts: Tests show boundary expectations, especially evidence filtering and exclusion behavior."
+            "src/runtime-concept-graph.ts: Boundary traversal logic (included/excluded checks and inventory walk) defines what is in-scope for concept graph evidence.",
+            "src/runtime-support.ts: Core types and shared session metadata describe the boundary contract used when reading sessions and sessions' path fields.",
+            "Tests/concept-graph.test.ts: Tests show boundary expectations, especially evidence filtering and exclusion behavior."
           ],
           "why_it_matters": "The learner still needs a narrow evidence-producing repair before readiness can advance.",
           "proposed_action": "Ask the learner to restate the answer with required repo evidence and the same operation.",
@@ -421,9 +421,9 @@
             "type": "LearningGap",
             "title": "artifact_boundary: learner needs evidence-backed repair",
             "evidence": [
-              "/Users/d1eshi/projects/startup/sibar/src/runtime-concept-graph.ts: Boundary traversal logic (included/excluded checks and inventory walk) defines what is in-scope for concept graph evidence.",
-              "/Users/d1eshi/projects/startup/sibar/src/runtime-support.ts: Core types and shared session metadata describe the boundary contract used when reading sessions and sessions' path fields.",
-              "/Users/d1eshi/projects/startup/sibar/Tests/concept-graph.test.ts: Tests show boundary expectations, especially evidence filtering and exclusion behavior."
+              "src/runtime-concept-graph.ts: Boundary traversal logic (included/excluded checks and inventory walk) defines what is in-scope for concept graph evidence.",
+              "src/runtime-support.ts: Core types and shared session metadata describe the boundary contract used when reading sessions and sessions' path fields.",
+              "Tests/concept-graph.test.ts: Tests show boundary expectations, especially evidence filtering and exclusion behavior."
             ],
             "why_it_matters": "The learner still needs a narrow evidence-producing repair before readiness can advance.",
             "proposed_action": "Ask the learner to restate the answer with required repo evidence and the same operation.",
@@ -434,19 +434,19 @@
         "user_evidence_excerpt": "The flow is to read excluded paths first, then remove tests, and finally include everything in `src` because the graph builder always needs all commands.",
         "repo_evidence_citations": [
           {
-            "path": "/Users/d1eshi/projects/startup/sibar/src/runtime-concept-graph.ts",
+            "path": "src/runtime-concept-graph.ts",
             "rationale": "Boundary traversal logic (included/excluded checks and inventory walk) defines what is in-scope for concept graph evidence.",
             "excerpt": "linePattern: /\\b(artifact_session|included_paths|excluded_paths|selection|summary|writeState|readState)\\b/,",
             "exists": true
           },
           {
-            "path": "/Users/d1eshi/projects/startup/sibar/src/runtime-support.ts",
+            "path": "src/runtime-support.ts",
             "rationale": "Core types and shared session metadata describe the boundary contract used when reading sessions and sessions' path fields.",
             "excerpt": "included_paths: string[];",
             "exists": true
           },
           {
-            "path": "/Users/d1eshi/projects/startup/sibar/Tests/concept-graph.test.ts",
+            "path": "Tests/concept-graph.test.ts",
             "rationale": "Tests show boundary expectations, especially evidence filtering and exclusion behavior.",
             "excerpt": "\"export type ArtifactSession = { artifact_session_id: string; included_paths: string[]; excluded_paths: string[] };\",",
             "exists": true
@@ -510,9 +510,9 @@
           "type": "LearningGap",
           "title": "artifact_boundary: learner needs evidence-backed repair",
           "evidence": [
-            "/Users/d1eshi/projects/startup/sibar/src/runtime-concept-graph.ts: Boundary traversal logic (included/excluded checks and inventory walk) defines what is in-scope for concept graph evidence.",
-            "/Users/d1eshi/projects/startup/sibar/src/runtime-support.ts: Core types and shared session metadata describe the boundary contract used when reading sessions and sessions' path fields.",
-            "/Users/d1eshi/projects/startup/sibar/Tests/concept-graph.test.ts: Tests show boundary expectations, especially evidence filtering and exclusion behavior."
+            "src/runtime-concept-graph.ts: Boundary traversal logic (included/excluded checks and inventory walk) defines what is in-scope for concept graph evidence.",
+            "src/runtime-support.ts: Core types and shared session metadata describe the boundary contract used when reading sessions and sessions' path fields.",
+            "Tests/concept-graph.test.ts: Tests show boundary expectations, especially evidence filtering and exclusion behavior."
           ],
           "why_it_matters": "The learner still needs a narrow evidence-producing repair before readiness can advance.",
           "proposed_action": "Ask the learner to restate the answer with required repo evidence and the same operation.",
@@ -525,9 +525,9 @@
             "type": "LearningGap",
             "title": "artifact_boundary: learner needs evidence-backed repair",
             "evidence": [
-              "/Users/d1eshi/projects/startup/sibar/src/runtime-concept-graph.ts: Boundary traversal logic (included/excluded checks and inventory walk) defines what is in-scope for concept graph evidence.",
-              "/Users/d1eshi/projects/startup/sibar/src/runtime-support.ts: Core types and shared session metadata describe the boundary contract used when reading sessions and sessions' path fields.",
-              "/Users/d1eshi/projects/startup/sibar/Tests/concept-graph.test.ts: Tests show boundary expectations, especially evidence filtering and exclusion behavior."
+              "src/runtime-concept-graph.ts: Boundary traversal logic (included/excluded checks and inventory walk) defines what is in-scope for concept graph evidence.",
+              "src/runtime-support.ts: Core types and shared session metadata describe the boundary contract used when reading sessions and sessions' path fields.",
+              "Tests/concept-graph.test.ts: Tests show boundary expectations, especially evidence filtering and exclusion behavior."
             ],
             "why_it_matters": "The learner still needs a narrow evidence-producing repair before readiness can advance.",
             "proposed_action": "Ask the learner to restate the answer with required repo evidence and the same operation.",
@@ -538,19 +538,19 @@
         "user_evidence_excerpt": "I am certain all files under the repo root are in scope unless they are literally impossible to open, so excluded paths do not matter for this slice.",
         "repo_evidence_citations": [
           {
-            "path": "/Users/d1eshi/projects/startup/sibar/src/runtime-concept-graph.ts",
+            "path": "src/runtime-concept-graph.ts",
             "rationale": "Boundary traversal logic (included/excluded checks and inventory walk) defines what is in-scope for concept graph evidence.",
             "excerpt": "linePattern: /\\b(artifact_session|included_paths|excluded_paths|selection|summary|writeState|readState)\\b/,",
             "exists": true
           },
           {
-            "path": "/Users/d1eshi/projects/startup/sibar/src/runtime-support.ts",
+            "path": "src/runtime-support.ts",
             "rationale": "Core types and shared session metadata describe the boundary contract used when reading sessions and sessions' path fields.",
             "excerpt": "included_paths: string[];",
             "exists": true
           },
           {
-            "path": "/Users/d1eshi/projects/startup/sibar/Tests/concept-graph.test.ts",
+            "path": "Tests/concept-graph.test.ts",
             "rationale": "Tests show boundary expectations, especially evidence filtering and exclusion behavior.",
             "excerpt": "\"export type ArtifactSession = { artifact_session_id: string; included_paths: string[]; excluded_paths: string[] };\",",
             "exists": true
@@ -614,9 +614,9 @@
           "type": "LearningGap",
           "title": "artifact_boundary: learner needs evidence-backed repair",
           "evidence": [
-            "/Users/d1eshi/projects/startup/sibar/src/runtime-concept-graph.ts: Boundary traversal logic (included/excluded checks and inventory walk) defines what is in-scope for concept graph evidence.",
-            "/Users/d1eshi/projects/startup/sibar/src/runtime-support.ts: Core types and shared session metadata describe the boundary contract used when reading sessions and sessions' path fields.",
-            "/Users/d1eshi/projects/startup/sibar/Tests/concept-graph.test.ts: Tests show boundary expectations, especially evidence filtering and exclusion behavior."
+            "src/runtime-concept-graph.ts: Boundary traversal logic (included/excluded checks and inventory walk) defines what is in-scope for concept graph evidence.",
+            "src/runtime-support.ts: Core types and shared session metadata describe the boundary contract used when reading sessions and sessions' path fields.",
+            "Tests/concept-graph.test.ts: Tests show boundary expectations, especially evidence filtering and exclusion behavior."
           ],
           "why_it_matters": "The learner still needs a narrow evidence-producing repair before readiness can advance.",
           "proposed_action": "Ask the learner to restate the answer with required repo evidence and the same operation.",
@@ -629,9 +629,9 @@
             "type": "LearningGap",
             "title": "artifact_boundary: learner needs evidence-backed repair",
             "evidence": [
-              "/Users/d1eshi/projects/startup/sibar/src/runtime-concept-graph.ts: Boundary traversal logic (included/excluded checks and inventory walk) defines what is in-scope for concept graph evidence.",
-              "/Users/d1eshi/projects/startup/sibar/src/runtime-support.ts: Core types and shared session metadata describe the boundary contract used when reading sessions and sessions' path fields.",
-              "/Users/d1eshi/projects/startup/sibar/Tests/concept-graph.test.ts: Tests show boundary expectations, especially evidence filtering and exclusion behavior."
+              "src/runtime-concept-graph.ts: Boundary traversal logic (included/excluded checks and inventory walk) defines what is in-scope for concept graph evidence.",
+              "src/runtime-support.ts: Core types and shared session metadata describe the boundary contract used when reading sessions and sessions' path fields.",
+              "Tests/concept-graph.test.ts: Tests show boundary expectations, especially evidence filtering and exclusion behavior."
             ],
             "why_it_matters": "The learner still needs a narrow evidence-producing repair before readiness can advance.",
             "proposed_action": "Ask the learner to restate the answer with required repo evidence and the same operation.",
@@ -642,19 +642,19 @@
         "user_evidence_excerpt": "I am not fully sure how manifest includes and excludes combine before graph construction, so I cannot give a full boundary walk yet.",
         "repo_evidence_citations": [
           {
-            "path": "/Users/d1eshi/projects/startup/sibar/src/runtime-concept-graph.ts",
+            "path": "src/runtime-concept-graph.ts",
             "rationale": "Boundary traversal logic (included/excluded checks and inventory walk) defines what is in-scope for concept graph evidence.",
             "excerpt": "linePattern: /\\b(artifact_session|included_paths|excluded_paths|selection|summary|writeState|readState)\\b/,",
             "exists": true
           },
           {
-            "path": "/Users/d1eshi/projects/startup/sibar/src/runtime-support.ts",
+            "path": "src/runtime-support.ts",
             "rationale": "Core types and shared session metadata describe the boundary contract used when reading sessions and sessions' path fields.",
             "excerpt": "included_paths: string[];",
             "exists": true
           },
           {
-            "path": "/Users/d1eshi/projects/startup/sibar/Tests/concept-graph.test.ts",
+            "path": "Tests/concept-graph.test.ts",
             "rationale": "Tests show boundary expectations, especially evidence filtering and exclusion behavior.",
             "excerpt": "\"export type ArtifactSession = { artifact_session_id: string; included_paths: string[]; excluded_paths: string[] };\",",
             "exists": true
@@ -718,9 +718,9 @@
           "type": "DesignIssue",
           "title": "artifact_boundary: product terminology makes enforcement unclear",
           "evidence": [
-            "/Users/d1eshi/projects/startup/sibar/src/runtime-concept-graph.ts: Boundary traversal logic (included/excluded checks and inventory walk) defines what is in-scope for concept graph evidence.",
-            "/Users/d1eshi/projects/startup/sibar/src/runtime-support.ts: Core types and shared session metadata describe the boundary contract used when reading sessions and sessions' path fields.",
-            "/Users/d1eshi/projects/startup/sibar/Tests/concept-graph.test.ts: Tests show boundary expectations, especially evidence filtering and exclusion behavior."
+            "src/runtime-concept-graph.ts: Boundary traversal logic (included/excluded checks and inventory walk) defines what is in-scope for concept graph evidence.",
+            "src/runtime-support.ts: Core types and shared session metadata describe the boundary contract used when reading sessions and sessions' path fields.",
+            "Tests/concept-graph.test.ts: Tests show boundary expectations, especially evidence filtering and exclusion behavior."
           ],
           "why_it_matters": "When product terminology obscures executable enforcement, users treat optional conventions as binding rules.",
           "proposed_action": "Separate product wording confusion from the executable enforcement behavior in the code; clarify which rules are enforced.",
@@ -733,9 +733,9 @@
             "type": "DesignIssue",
             "title": "artifact_boundary: product terminology makes enforcement unclear",
             "evidence": [
-              "/Users/d1eshi/projects/startup/sibar/src/runtime-concept-graph.ts: Boundary traversal logic (included/excluded checks and inventory walk) defines what is in-scope for concept graph evidence.",
-              "/Users/d1eshi/projects/startup/sibar/src/runtime-support.ts: Core types and shared session metadata describe the boundary contract used when reading sessions and sessions' path fields.",
-              "/Users/d1eshi/projects/startup/sibar/Tests/concept-graph.test.ts: Tests show boundary expectations, especially evidence filtering and exclusion behavior."
+              "src/runtime-concept-graph.ts: Boundary traversal logic (included/excluded checks and inventory walk) defines what is in-scope for concept graph evidence.",
+              "src/runtime-support.ts: Core types and shared session metadata describe the boundary contract used when reading sessions and sessions' path fields.",
+              "Tests/concept-graph.test.ts: Tests show boundary expectations, especially evidence filtering and exclusion behavior."
             ],
             "why_it_matters": "When product terminology obscures executable enforcement, users treat optional conventions as binding rules.",
             "proposed_action": "Separate product wording confusion from the executable enforcement behavior in the code; clarify which rules are enforced.",
@@ -747,9 +747,9 @@
             "type": "DocsIssue",
             "title": "artifact_boundary: documentation gap blocks evidence-backed understanding",
             "evidence": [
-              "/Users/d1eshi/projects/startup/sibar/src/runtime-concept-graph.ts: Boundary traversal logic (included/excluded checks and inventory walk) defines what is in-scope for concept graph evidence.",
-              "/Users/d1eshi/projects/startup/sibar/src/runtime-support.ts: Core types and shared session metadata describe the boundary contract used when reading sessions and sessions' path fields.",
-              "/Users/d1eshi/projects/startup/sibar/Tests/concept-graph.test.ts: Tests show boundary expectations, especially evidence filtering and exclusion behavior."
+              "src/runtime-concept-graph.ts: Boundary traversal logic (included/excluded checks and inventory walk) defines what is in-scope for concept graph evidence.",
+              "src/runtime-support.ts: Core types and shared session metadata describe the boundary contract used when reading sessions and sessions' path fields.",
+              "Tests/concept-graph.test.ts: Tests show boundary expectations, especially evidence filtering and exclusion behavior."
             ],
             "why_it_matters": "Documentation gaps can prevent users from finding the required repo evidence even when the code behavior exists.",
             "proposed_action": "Clarify the documentation so it names the required evidence path and the specific operation being checked.",
@@ -761,9 +761,9 @@
             "type": "LearningGap",
             "title": "artifact_boundary: learner needs evidence-backed repair",
             "evidence": [
-              "/Users/d1eshi/projects/startup/sibar/src/runtime-concept-graph.ts: Boundary traversal logic (included/excluded checks and inventory walk) defines what is in-scope for concept graph evidence.",
-              "/Users/d1eshi/projects/startup/sibar/src/runtime-support.ts: Core types and shared session metadata describe the boundary contract used when reading sessions and sessions' path fields.",
-              "/Users/d1eshi/projects/startup/sibar/Tests/concept-graph.test.ts: Tests show boundary expectations, especially evidence filtering and exclusion behavior."
+              "src/runtime-concept-graph.ts: Boundary traversal logic (included/excluded checks and inventory walk) defines what is in-scope for concept graph evidence.",
+              "src/runtime-support.ts: Core types and shared session metadata describe the boundary contract used when reading sessions and sessions' path fields.",
+              "Tests/concept-graph.test.ts: Tests show boundary expectations, especially evidence filtering and exclusion behavior."
             ],
             "why_it_matters": "The learner still needs a narrow evidence-producing repair before readiness can advance.",
             "proposed_action": "Ask the learner to restate the answer with required repo evidence and the same operation.",
@@ -774,19 +774,19 @@
         "user_evidence_excerpt": "The manifest looks like a style document, not an enforcement rule, so I kept adding references from docs and excluded directories to avoid missing anything.",
         "repo_evidence_citations": [
           {
-            "path": "/Users/d1eshi/projects/startup/sibar/src/runtime-concept-graph.ts",
+            "path": "src/runtime-concept-graph.ts",
             "rationale": "Boundary traversal logic (included/excluded checks and inventory walk) defines what is in-scope for concept graph evidence.",
             "excerpt": "linePattern: /\\b(artifact_session|included_paths|excluded_paths|selection|summary|writeState|readState)\\b/,",
             "exists": true
           },
           {
-            "path": "/Users/d1eshi/projects/startup/sibar/src/runtime-support.ts",
+            "path": "src/runtime-support.ts",
             "rationale": "Core types and shared session metadata describe the boundary contract used when reading sessions and sessions' path fields.",
             "excerpt": "included_paths: string[];",
             "exists": true
           },
           {
-            "path": "/Users/d1eshi/projects/startup/sibar/Tests/concept-graph.test.ts",
+            "path": "Tests/concept-graph.test.ts",
             "rationale": "Tests show boundary expectations, especially evidence filtering and exclusion behavior.",
             "excerpt": "\"export type ArtifactSession = { artifact_session_id: string; included_paths: string[]; excluded_paths: string[] };\",",
             "exists": true
@@ -850,19 +850,19 @@
         "user_evidence_excerpt": "I would start from the artifact session inventory, then follow `src/runtime-concept-graph.ts` node extraction and edge assembly rules in `runtime-support.ts`, and finish at persisted graph output with boundary-validated evidence citations.",
         "repo_evidence_citations": [
           {
-            "path": "/Users/d1eshi/projects/startup/sibar/src/runtime-concept-graph.ts",
+            "path": "src/runtime-concept-graph.ts",
             "rationale": "Primary builder for inventory collection, node inference from regex rules, edge inference, and persistence of the final graph.",
             "excerpt": "linePattern: /\\b(artifact_session|included_paths|excluded_paths|selection|summary|writeState|readState)\\b/,",
             "exists": true
           },
           {
-            "path": "/Users/d1eshi/projects/startup/sibar/src/runtime-support.ts",
+            "path": "src/runtime-support.ts",
             "rationale": "Defines node and edge shapes used by concept graph output and downstream validation.",
             "excerpt": "included_paths: string[];",
             "exists": true
           },
           {
-            "path": "/Users/d1eshi/projects/startup/sibar/Tests/concept-graph.test.ts",
+            "path": "Tests/concept-graph.test.ts",
             "rationale": "Confirms stable graph structure, relation expectations, and citation constraints for generated graph nodes.",
             "excerpt": "\"export type ArtifactSession = { artifact_session_id: string; included_paths: string[]; excluded_paths: string[] };\",",
             "exists": true
@@ -912,9 +912,9 @@
           "type": "LearningGap",
           "title": "concept_graph_generation: learner needs evidence-backed repair",
           "evidence": [
-            "/Users/d1eshi/projects/startup/sibar/src/runtime-concept-graph.ts: Primary builder for inventory collection, node inference from regex rules, edge inference, and persistence of the final graph.",
-            "/Users/d1eshi/projects/startup/sibar/src/runtime-support.ts: Defines node and edge shapes used by concept graph output and downstream validation.",
-            "/Users/d1eshi/projects/startup/sibar/Tests/concept-graph.test.ts: Confirms stable graph structure, relation expectations, and citation constraints for generated graph nodes."
+            "src/runtime-concept-graph.ts: Primary builder for inventory collection, node inference from regex rules, edge inference, and persistence of the final graph.",
+            "src/runtime-support.ts: Defines node and edge shapes used by concept graph output and downstream validation.",
+            "Tests/concept-graph.test.ts: Confirms stable graph structure, relation expectations, and citation constraints for generated graph nodes."
           ],
           "why_it_matters": "The learner still needs a narrow evidence-producing repair before readiness can advance.",
           "proposed_action": "Ask the learner to restate the answer with required repo evidence and the same operation.",
@@ -927,9 +927,9 @@
             "type": "LearningGap",
             "title": "concept_graph_generation: learner needs evidence-backed repair",
             "evidence": [
-              "/Users/d1eshi/projects/startup/sibar/src/runtime-concept-graph.ts: Primary builder for inventory collection, node inference from regex rules, edge inference, and persistence of the final graph.",
-              "/Users/d1eshi/projects/startup/sibar/src/runtime-support.ts: Defines node and edge shapes used by concept graph output and downstream validation.",
-              "/Users/d1eshi/projects/startup/sibar/Tests/concept-graph.test.ts: Confirms stable graph structure, relation expectations, and citation constraints for generated graph nodes."
+              "src/runtime-concept-graph.ts: Primary builder for inventory collection, node inference from regex rules, edge inference, and persistence of the final graph.",
+              "src/runtime-support.ts: Defines node and edge shapes used by concept graph output and downstream validation.",
+              "Tests/concept-graph.test.ts: Confirms stable graph structure, relation expectations, and citation constraints for generated graph nodes."
             ],
             "why_it_matters": "The learner still needs a narrow evidence-producing repair before readiness can advance.",
             "proposed_action": "Ask the learner to restate the answer with required repo evidence and the same operation.",
@@ -940,19 +940,19 @@
         "user_evidence_excerpt": "The flow is inventory -> transform -> persistence and outputs nodes and edges, but I am giving a general answer without anchored file references.",
         "repo_evidence_citations": [
           {
-            "path": "/Users/d1eshi/projects/startup/sibar/src/runtime-concept-graph.ts",
+            "path": "src/runtime-concept-graph.ts",
             "rationale": "Primary builder for inventory collection, node inference from regex rules, edge inference, and persistence of the final graph.",
             "excerpt": "linePattern: /\\b(artifact_session|included_paths|excluded_paths|selection|summary|writeState|readState)\\b/,",
             "exists": true
           },
           {
-            "path": "/Users/d1eshi/projects/startup/sibar/src/runtime-support.ts",
+            "path": "src/runtime-support.ts",
             "rationale": "Defines node and edge shapes used by concept graph output and downstream validation.",
             "excerpt": "included_paths: string[];",
             "exists": true
           },
           {
-            "path": "/Users/d1eshi/projects/startup/sibar/Tests/concept-graph.test.ts",
+            "path": "Tests/concept-graph.test.ts",
             "rationale": "Confirms stable graph structure, relation expectations, and citation constraints for generated graph nodes.",
             "excerpt": "\"export type ArtifactSession = { artifact_session_id: string; included_paths: string[]; excluded_paths: string[] };\",",
             "exists": true
@@ -1016,9 +1016,9 @@
           "type": "LearningGap",
           "title": "concept_graph_generation: learner needs evidence-backed repair",
           "evidence": [
-            "/Users/d1eshi/projects/startup/sibar/src/runtime-concept-graph.ts: Primary builder for inventory collection, node inference from regex rules, edge inference, and persistence of the final graph.",
-            "/Users/d1eshi/projects/startup/sibar/src/runtime-support.ts: Defines node and edge shapes used by concept graph output and downstream validation.",
-            "/Users/d1eshi/projects/startup/sibar/Tests/concept-graph.test.ts: Confirms stable graph structure, relation expectations, and citation constraints for generated graph nodes."
+            "src/runtime-concept-graph.ts: Primary builder for inventory collection, node inference from regex rules, edge inference, and persistence of the final graph.",
+            "src/runtime-support.ts: Defines node and edge shapes used by concept graph output and downstream validation.",
+            "Tests/concept-graph.test.ts: Confirms stable graph structure, relation expectations, and citation constraints for generated graph nodes."
           ],
           "why_it_matters": "The learner still needs a narrow evidence-producing repair before readiness can advance.",
           "proposed_action": "Ask the learner to restate the answer with required repo evidence and the same operation.",
@@ -1031,9 +1031,9 @@
             "type": "LearningGap",
             "title": "concept_graph_generation: learner needs evidence-backed repair",
             "evidence": [
-              "/Users/d1eshi/projects/startup/sibar/src/runtime-concept-graph.ts: Primary builder for inventory collection, node inference from regex rules, edge inference, and persistence of the final graph.",
-              "/Users/d1eshi/projects/startup/sibar/src/runtime-support.ts: Defines node and edge shapes used by concept graph output and downstream validation.",
-              "/Users/d1eshi/projects/startup/sibar/Tests/concept-graph.test.ts: Confirms stable graph structure, relation expectations, and citation constraints for generated graph nodes."
+              "src/runtime-concept-graph.ts: Primary builder for inventory collection, node inference from regex rules, edge inference, and persistence of the final graph.",
+              "src/runtime-support.ts: Defines node and edge shapes used by concept graph output and downstream validation.",
+              "Tests/concept-graph.test.ts: Confirms stable graph structure, relation expectations, and citation constraints for generated graph nodes."
             ],
             "why_it_matters": "The learner still needs a narrow evidence-producing repair before readiness can advance.",
             "proposed_action": "Ask the learner to restate the answer with required repo evidence and the same operation.",
@@ -1044,19 +1044,19 @@
         "user_evidence_excerpt": "I can describe what nodes are produced, but I skipped how boundary filtering and edge rationale are connected before persistence.",
         "repo_evidence_citations": [
           {
-            "path": "/Users/d1eshi/projects/startup/sibar/src/runtime-concept-graph.ts",
+            "path": "src/runtime-concept-graph.ts",
             "rationale": "Primary builder for inventory collection, node inference from regex rules, edge inference, and persistence of the final graph.",
             "excerpt": "linePattern: /\\b(artifact_session|included_paths|excluded_paths|selection|summary|writeState|readState)\\b/,",
             "exists": true
           },
           {
-            "path": "/Users/d1eshi/projects/startup/sibar/src/runtime-support.ts",
+            "path": "src/runtime-support.ts",
             "rationale": "Defines node and edge shapes used by concept graph output and downstream validation.",
             "excerpt": "included_paths: string[];",
             "exists": true
           },
           {
-            "path": "/Users/d1eshi/projects/startup/sibar/Tests/concept-graph.test.ts",
+            "path": "Tests/concept-graph.test.ts",
             "rationale": "Confirms stable graph structure, relation expectations, and citation constraints for generated graph nodes.",
             "excerpt": "\"export type ArtifactSession = { artifact_session_id: string; included_paths: string[]; excluded_paths: string[] };\",",
             "exists": true
@@ -1120,9 +1120,9 @@
           "type": "LearningGap",
           "title": "concept_graph_generation: learner needs evidence-backed repair",
           "evidence": [
-            "/Users/d1eshi/projects/startup/sibar/src/runtime-concept-graph.ts: Primary builder for inventory collection, node inference from regex rules, edge inference, and persistence of the final graph.",
-            "/Users/d1eshi/projects/startup/sibar/src/runtime-support.ts: Defines node and edge shapes used by concept graph output and downstream validation.",
-            "/Users/d1eshi/projects/startup/sibar/Tests/concept-graph.test.ts: Confirms stable graph structure, relation expectations, and citation constraints for generated graph nodes."
+            "src/runtime-concept-graph.ts: Primary builder for inventory collection, node inference from regex rules, edge inference, and persistence of the final graph.",
+            "src/runtime-support.ts: Defines node and edge shapes used by concept graph output and downstream validation.",
+            "Tests/concept-graph.test.ts: Confirms stable graph structure, relation expectations, and citation constraints for generated graph nodes."
           ],
           "why_it_matters": "The learner still needs a narrow evidence-producing repair before readiness can advance.",
           "proposed_action": "Ask the learner to restate the answer with required repo evidence and the same operation.",
@@ -1135,9 +1135,9 @@
             "type": "LearningGap",
             "title": "concept_graph_generation: learner needs evidence-backed repair",
             "evidence": [
-              "/Users/d1eshi/projects/startup/sibar/src/runtime-concept-graph.ts: Primary builder for inventory collection, node inference from regex rules, edge inference, and persistence of the final graph.",
-              "/Users/d1eshi/projects/startup/sibar/src/runtime-support.ts: Defines node and edge shapes used by concept graph output and downstream validation.",
-              "/Users/d1eshi/projects/startup/sibar/Tests/concept-graph.test.ts: Confirms stable graph structure, relation expectations, and citation constraints for generated graph nodes."
+              "src/runtime-concept-graph.ts: Primary builder for inventory collection, node inference from regex rules, edge inference, and persistence of the final graph.",
+              "src/runtime-support.ts: Defines node and edge shapes used by concept graph output and downstream validation.",
+              "Tests/concept-graph.test.ts: Confirms stable graph structure, relation expectations, and citation constraints for generated graph nodes."
             ],
             "why_it_matters": "The learner still needs a narrow evidence-producing repair before readiness can advance.",
             "proposed_action": "Ask the learner to restate the answer with required repo evidence and the same operation.",
@@ -1148,19 +1148,19 @@
         "user_evidence_excerpt": "Readiness generation is responsible for node and edge construction, so concept graph only needs names and then calls are inferred later.",
         "repo_evidence_citations": [
           {
-            "path": "/Users/d1eshi/projects/startup/sibar/src/runtime-concept-graph.ts",
+            "path": "src/runtime-concept-graph.ts",
             "rationale": "Primary builder for inventory collection, node inference from regex rules, edge inference, and persistence of the final graph.",
             "excerpt": "linePattern: /\\b(artifact_session|included_paths|excluded_paths|selection|summary|writeState|readState)\\b/,",
             "exists": true
           },
           {
-            "path": "/Users/d1eshi/projects/startup/sibar/src/runtime-support.ts",
+            "path": "src/runtime-support.ts",
             "rationale": "Defines node and edge shapes used by concept graph output and downstream validation.",
             "excerpt": "included_paths: string[];",
             "exists": true
           },
           {
-            "path": "/Users/d1eshi/projects/startup/sibar/Tests/concept-graph.test.ts",
+            "path": "Tests/concept-graph.test.ts",
             "rationale": "Confirms stable graph structure, relation expectations, and citation constraints for generated graph nodes.",
             "excerpt": "\"export type ArtifactSession = { artifact_session_id: string; included_paths: string[]; excluded_paths: string[] };\",",
             "exists": true
@@ -1224,9 +1224,9 @@
           "type": "LearningGap",
           "title": "concept_graph_generation: learner needs evidence-backed repair",
           "evidence": [
-            "/Users/d1eshi/projects/startup/sibar/src/runtime-concept-graph.ts: Primary builder for inventory collection, node inference from regex rules, edge inference, and persistence of the final graph.",
-            "/Users/d1eshi/projects/startup/sibar/src/runtime-support.ts: Defines node and edge shapes used by concept graph output and downstream validation.",
-            "/Users/d1eshi/projects/startup/sibar/Tests/concept-graph.test.ts: Confirms stable graph structure, relation expectations, and citation constraints for generated graph nodes."
+            "src/runtime-concept-graph.ts: Primary builder for inventory collection, node inference from regex rules, edge inference, and persistence of the final graph.",
+            "src/runtime-support.ts: Defines node and edge shapes used by concept graph output and downstream validation.",
+            "Tests/concept-graph.test.ts: Confirms stable graph structure, relation expectations, and citation constraints for generated graph nodes."
           ],
           "why_it_matters": "The learner still needs a narrow evidence-producing repair before readiness can advance.",
           "proposed_action": "Ask the learner to restate the answer with required repo evidence and the same operation.",
@@ -1239,9 +1239,9 @@
             "type": "LearningGap",
             "title": "concept_graph_generation: learner needs evidence-backed repair",
             "evidence": [
-              "/Users/d1eshi/projects/startup/sibar/src/runtime-concept-graph.ts: Primary builder for inventory collection, node inference from regex rules, edge inference, and persistence of the final graph.",
-              "/Users/d1eshi/projects/startup/sibar/src/runtime-support.ts: Defines node and edge shapes used by concept graph output and downstream validation.",
-              "/Users/d1eshi/projects/startup/sibar/Tests/concept-graph.test.ts: Confirms stable graph structure, relation expectations, and citation constraints for generated graph nodes."
+              "src/runtime-concept-graph.ts: Primary builder for inventory collection, node inference from regex rules, edge inference, and persistence of the final graph.",
+              "src/runtime-support.ts: Defines node and edge shapes used by concept graph output and downstream validation.",
+              "Tests/concept-graph.test.ts: Confirms stable graph structure, relation expectations, and citation constraints for generated graph nodes."
             ],
             "why_it_matters": "The learner still needs a narrow evidence-producing repair before readiness can advance.",
             "proposed_action": "Ask the learner to restate the answer with required repo evidence and the same operation.",
@@ -1252,19 +1252,19 @@
         "user_evidence_excerpt": "The flow is node definitions first, edge definitions after persistence, and evidence gets attached only at the final report stage.",
         "repo_evidence_citations": [
           {
-            "path": "/Users/d1eshi/projects/startup/sibar/src/runtime-concept-graph.ts",
+            "path": "src/runtime-concept-graph.ts",
             "rationale": "Primary builder for inventory collection, node inference from regex rules, edge inference, and persistence of the final graph.",
             "excerpt": "linePattern: /\\b(artifact_session|included_paths|excluded_paths|selection|summary|writeState|readState)\\b/,",
             "exists": true
           },
           {
-            "path": "/Users/d1eshi/projects/startup/sibar/src/runtime-support.ts",
+            "path": "src/runtime-support.ts",
             "rationale": "Defines node and edge shapes used by concept graph output and downstream validation.",
             "excerpt": "included_paths: string[];",
             "exists": true
           },
           {
-            "path": "/Users/d1eshi/projects/startup/sibar/Tests/concept-graph.test.ts",
+            "path": "Tests/concept-graph.test.ts",
             "rationale": "Confirms stable graph structure, relation expectations, and citation constraints for generated graph nodes.",
             "excerpt": "\"export type ArtifactSession = { artifact_session_id: string; included_paths: string[]; excluded_paths: string[] };\",",
             "exists": true
@@ -1328,9 +1328,9 @@
           "type": "LearningGap",
           "title": "concept_graph_generation: learner needs evidence-backed repair",
           "evidence": [
-            "/Users/d1eshi/projects/startup/sibar/src/runtime-concept-graph.ts: Primary builder for inventory collection, node inference from regex rules, edge inference, and persistence of the final graph.",
-            "/Users/d1eshi/projects/startup/sibar/src/runtime-support.ts: Defines node and edge shapes used by concept graph output and downstream validation.",
-            "/Users/d1eshi/projects/startup/sibar/Tests/concept-graph.test.ts: Confirms stable graph structure, relation expectations, and citation constraints for generated graph nodes."
+            "src/runtime-concept-graph.ts: Primary builder for inventory collection, node inference from regex rules, edge inference, and persistence of the final graph.",
+            "src/runtime-support.ts: Defines node and edge shapes used by concept graph output and downstream validation.",
+            "Tests/concept-graph.test.ts: Confirms stable graph structure, relation expectations, and citation constraints for generated graph nodes."
           ],
           "why_it_matters": "The learner still needs a narrow evidence-producing repair before readiness can advance.",
           "proposed_action": "Ask the learner to restate the answer with required repo evidence and the same operation.",
@@ -1343,9 +1343,9 @@
             "type": "LearningGap",
             "title": "concept_graph_generation: learner needs evidence-backed repair",
             "evidence": [
-              "/Users/d1eshi/projects/startup/sibar/src/runtime-concept-graph.ts: Primary builder for inventory collection, node inference from regex rules, edge inference, and persistence of the final graph.",
-              "/Users/d1eshi/projects/startup/sibar/src/runtime-support.ts: Defines node and edge shapes used by concept graph output and downstream validation.",
-              "/Users/d1eshi/projects/startup/sibar/Tests/concept-graph.test.ts: Confirms stable graph structure, relation expectations, and citation constraints for generated graph nodes."
+              "src/runtime-concept-graph.ts: Primary builder for inventory collection, node inference from regex rules, edge inference, and persistence of the final graph.",
+              "src/runtime-support.ts: Defines node and edge shapes used by concept graph output and downstream validation.",
+              "Tests/concept-graph.test.ts: Confirms stable graph structure, relation expectations, and citation constraints for generated graph nodes."
             ],
             "why_it_matters": "The learner still needs a narrow evidence-producing repair before readiness can advance.",
             "proposed_action": "Ask the learner to restate the answer with required repo evidence and the same operation.",
@@ -1356,19 +1356,19 @@
         "user_evidence_excerpt": "I am sure concept graph is built only by tests and any source file can be cited since tests prove everything.",
         "repo_evidence_citations": [
           {
-            "path": "/Users/d1eshi/projects/startup/sibar/src/runtime-concept-graph.ts",
+            "path": "src/runtime-concept-graph.ts",
             "rationale": "Primary builder for inventory collection, node inference from regex rules, edge inference, and persistence of the final graph.",
             "excerpt": "linePattern: /\\b(artifact_session|included_paths|excluded_paths|selection|summary|writeState|readState)\\b/,",
             "exists": true
           },
           {
-            "path": "/Users/d1eshi/projects/startup/sibar/src/runtime-support.ts",
+            "path": "src/runtime-support.ts",
             "rationale": "Defines node and edge shapes used by concept graph output and downstream validation.",
             "excerpt": "included_paths: string[];",
             "exists": true
           },
           {
-            "path": "/Users/d1eshi/projects/startup/sibar/Tests/concept-graph.test.ts",
+            "path": "Tests/concept-graph.test.ts",
             "rationale": "Confirms stable graph structure, relation expectations, and citation constraints for generated graph nodes.",
             "excerpt": "\"export type ArtifactSession = { artifact_session_id: string; included_paths: string[]; excluded_paths: string[] };\",",
             "exists": true
@@ -1432,9 +1432,9 @@
           "type": "LearningGap",
           "title": "concept_graph_generation: learner needs evidence-backed repair",
           "evidence": [
-            "/Users/d1eshi/projects/startup/sibar/src/runtime-concept-graph.ts: Primary builder for inventory collection, node inference from regex rules, edge inference, and persistence of the final graph.",
-            "/Users/d1eshi/projects/startup/sibar/src/runtime-support.ts: Defines node and edge shapes used by concept graph output and downstream validation.",
-            "/Users/d1eshi/projects/startup/sibar/Tests/concept-graph.test.ts: Confirms stable graph structure, relation expectations, and citation constraints for generated graph nodes."
+            "src/runtime-concept-graph.ts: Primary builder for inventory collection, node inference from regex rules, edge inference, and persistence of the final graph.",
+            "src/runtime-support.ts: Defines node and edge shapes used by concept graph output and downstream validation.",
+            "Tests/concept-graph.test.ts: Confirms stable graph structure, relation expectations, and citation constraints for generated graph nodes."
           ],
           "why_it_matters": "The learner still needs a narrow evidence-producing repair before readiness can advance.",
           "proposed_action": "Ask the learner to restate the answer with required repo evidence and the same operation.",
@@ -1447,9 +1447,9 @@
             "type": "LearningGap",
             "title": "concept_graph_generation: learner needs evidence-backed repair",
             "evidence": [
-              "/Users/d1eshi/projects/startup/sibar/src/runtime-concept-graph.ts: Primary builder for inventory collection, node inference from regex rules, edge inference, and persistence of the final graph.",
-              "/Users/d1eshi/projects/startup/sibar/src/runtime-support.ts: Defines node and edge shapes used by concept graph output and downstream validation.",
-              "/Users/d1eshi/projects/startup/sibar/Tests/concept-graph.test.ts: Confirms stable graph structure, relation expectations, and citation constraints for generated graph nodes."
+              "src/runtime-concept-graph.ts: Primary builder for inventory collection, node inference from regex rules, edge inference, and persistence of the final graph.",
+              "src/runtime-support.ts: Defines node and edge shapes used by concept graph output and downstream validation.",
+              "Tests/concept-graph.test.ts: Confirms stable graph structure, relation expectations, and citation constraints for generated graph nodes."
             ],
             "why_it_matters": "The learner still needs a narrow evidence-producing repair before readiness can advance.",
             "proposed_action": "Ask the learner to restate the answer with required repo evidence and the same operation.",
@@ -1460,19 +1460,19 @@
         "user_evidence_excerpt": "I cannot confidently explain the middle stage between inventory and persisted edge relations without checking the implementation first.",
         "repo_evidence_citations": [
           {
-            "path": "/Users/d1eshi/projects/startup/sibar/src/runtime-concept-graph.ts",
+            "path": "src/runtime-concept-graph.ts",
             "rationale": "Primary builder for inventory collection, node inference from regex rules, edge inference, and persistence of the final graph.",
             "excerpt": "linePattern: /\\b(artifact_session|included_paths|excluded_paths|selection|summary|writeState|readState)\\b/,",
             "exists": true
           },
           {
-            "path": "/Users/d1eshi/projects/startup/sibar/src/runtime-support.ts",
+            "path": "src/runtime-support.ts",
             "rationale": "Defines node and edge shapes used by concept graph output and downstream validation.",
             "excerpt": "included_paths: string[];",
             "exists": true
           },
           {
-            "path": "/Users/d1eshi/projects/startup/sibar/Tests/concept-graph.test.ts",
+            "path": "Tests/concept-graph.test.ts",
             "rationale": "Confirms stable graph structure, relation expectations, and citation constraints for generated graph nodes.",
             "excerpt": "\"export type ArtifactSession = { artifact_session_id: string; included_paths: string[]; excluded_paths: string[] };\",",
             "exists": true
@@ -1536,9 +1536,9 @@
           "type": "DesignIssue",
           "title": "concept_graph_generation: product terminology makes enforcement unclear",
           "evidence": [
-            "/Users/d1eshi/projects/startup/sibar/src/runtime-concept-graph.ts: Primary builder for inventory collection, node inference from regex rules, edge inference, and persistence of the final graph.",
-            "/Users/d1eshi/projects/startup/sibar/src/runtime-support.ts: Defines node and edge shapes used by concept graph output and downstream validation.",
-            "/Users/d1eshi/projects/startup/sibar/Tests/concept-graph.test.ts: Confirms stable graph structure, relation expectations, and citation constraints for generated graph nodes."
+            "src/runtime-concept-graph.ts: Primary builder for inventory collection, node inference from regex rules, edge inference, and persistence of the final graph.",
+            "src/runtime-support.ts: Defines node and edge shapes used by concept graph output and downstream validation.",
+            "Tests/concept-graph.test.ts: Confirms stable graph structure, relation expectations, and citation constraints for generated graph nodes."
           ],
           "why_it_matters": "When product terminology obscures executable enforcement, users treat optional conventions as binding rules.",
           "proposed_action": "Separate product wording confusion from the executable enforcement behavior in the code; clarify which rules are enforced.",
@@ -1551,9 +1551,9 @@
             "type": "DesignIssue",
             "title": "concept_graph_generation: product terminology makes enforcement unclear",
             "evidence": [
-              "/Users/d1eshi/projects/startup/sibar/src/runtime-concept-graph.ts: Primary builder for inventory collection, node inference from regex rules, edge inference, and persistence of the final graph.",
-              "/Users/d1eshi/projects/startup/sibar/src/runtime-support.ts: Defines node and edge shapes used by concept graph output and downstream validation.",
-              "/Users/d1eshi/projects/startup/sibar/Tests/concept-graph.test.ts: Confirms stable graph structure, relation expectations, and citation constraints for generated graph nodes."
+              "src/runtime-concept-graph.ts: Primary builder for inventory collection, node inference from regex rules, edge inference, and persistence of the final graph.",
+              "src/runtime-support.ts: Defines node and edge shapes used by concept graph output and downstream validation.",
+              "Tests/concept-graph.test.ts: Confirms stable graph structure, relation expectations, and citation constraints for generated graph nodes."
             ],
             "why_it_matters": "When product terminology obscures executable enforcement, users treat optional conventions as binding rules.",
             "proposed_action": "Separate product wording confusion from the executable enforcement behavior in the code; clarify which rules are enforced.",
@@ -1564,19 +1564,19 @@
         "user_evidence_excerpt": "The prompt and the graph output language are overloaded, so I treated concept labels as enough and skipped the explicit evidence-to-relation mapping.",
         "repo_evidence_citations": [
           {
-            "path": "/Users/d1eshi/projects/startup/sibar/src/runtime-concept-graph.ts",
+            "path": "src/runtime-concept-graph.ts",
             "rationale": "Primary builder for inventory collection, node inference from regex rules, edge inference, and persistence of the final graph.",
             "excerpt": "linePattern: /\\b(artifact_session|included_paths|excluded_paths|selection|summary|writeState|readState)\\b/,",
             "exists": true
           },
           {
-            "path": "/Users/d1eshi/projects/startup/sibar/src/runtime-support.ts",
+            "path": "src/runtime-support.ts",
             "rationale": "Defines node and edge shapes used by concept graph output and downstream validation.",
             "excerpt": "included_paths: string[];",
             "exists": true
           },
           {
-            "path": "/Users/d1eshi/projects/startup/sibar/Tests/concept-graph.test.ts",
+            "path": "Tests/concept-graph.test.ts",
             "rationale": "Confirms stable graph structure, relation expectations, and citation constraints for generated graph nodes.",
             "excerpt": "\"export type ArtifactSession = { artifact_session_id: string; included_paths: string[]; excluded_paths: string[] };\",",
             "exists": true
@@ -1640,19 +1640,19 @@
         "user_evidence_excerpt": "When the answer is verified and linked to artifact evidence, no LearningGap is emitted; I can explain how expected and observed layers align and why the confidence stays high.",
         "repo_evidence_citations": [
           {
-            "path": "/Users/d1eshi/projects/startup/sibar/src/runtime-gap-detection.ts",
+            "path": "src/runtime-gap-detection.ts",
             "rationale": "Contains detectLearningGapFromAnswer and persistGapDetectionResult logic for branch-specific gap/confirmed behavior.",
             "excerpt": "evidence: step.bounded_evidence,",
             "exists": true
           },
           {
-            "path": "/Users/d1eshi/projects/startup/sibar/src/runtime-support.ts",
+            "path": "src/runtime-support.ts",
             "rationale": "Contains LearningGap and answer quality contract used by gap derivation and confidence/severity fields.",
             "excerpt": "included_paths: string[];",
             "exists": true
           },
           {
-            "path": "/Users/d1eshi/projects/startup/sibar/Tests/gap-detection.test.ts",
+            "path": "Tests/gap-detection.test.ts",
             "rationale": "Shows expected branch behavior for partial, verified, uncertainty, and contradiction answer classes.",
             "excerpt": "included_paths: [\"src\", \"Tests\"],",
             "exists": true
@@ -1702,9 +1702,9 @@
           "type": "LearningGap",
           "title": "gap_detection: learner needs evidence-backed repair",
           "evidence": [
-            "/Users/d1eshi/projects/startup/sibar/src/runtime-gap-detection.ts: Contains detectLearningGapFromAnswer and persistGapDetectionResult logic for branch-specific gap/confirmed behavior.",
-            "/Users/d1eshi/projects/startup/sibar/src/runtime-support.ts: Contains LearningGap and answer quality contract used by gap derivation and confidence/severity fields.",
-            "/Users/d1eshi/projects/startup/sibar/Tests/gap-detection.test.ts: Shows expected branch behavior for partial, verified, uncertainty, and contradiction answer classes."
+            "src/runtime-gap-detection.ts: Contains detectLearningGapFromAnswer and persistGapDetectionResult logic for branch-specific gap/confirmed behavior.",
+            "src/runtime-support.ts: Contains LearningGap and answer quality contract used by gap derivation and confidence/severity fields.",
+            "Tests/gap-detection.test.ts: Shows expected branch behavior for partial, verified, uncertainty, and contradiction answer classes."
           ],
           "why_it_matters": "The learner still needs a narrow evidence-producing repair before readiness can advance.",
           "proposed_action": "Ask the learner to restate the answer with required repo evidence and the same operation.",
@@ -1717,9 +1717,9 @@
             "type": "LearningGap",
             "title": "gap_detection: learner needs evidence-backed repair",
             "evidence": [
-              "/Users/d1eshi/projects/startup/sibar/src/runtime-gap-detection.ts: Contains detectLearningGapFromAnswer and persistGapDetectionResult logic for branch-specific gap/confirmed behavior.",
-              "/Users/d1eshi/projects/startup/sibar/src/runtime-support.ts: Contains LearningGap and answer quality contract used by gap derivation and confidence/severity fields.",
-              "/Users/d1eshi/projects/startup/sibar/Tests/gap-detection.test.ts: Shows expected branch behavior for partial, verified, uncertainty, and contradiction answer classes."
+              "src/runtime-gap-detection.ts: Contains detectLearningGapFromAnswer and persistGapDetectionResult logic for branch-specific gap/confirmed behavior.",
+              "src/runtime-support.ts: Contains LearningGap and answer quality contract used by gap derivation and confidence/severity fields.",
+              "Tests/gap-detection.test.ts: Shows expected branch behavior for partial, verified, uncertainty, and contradiction answer classes."
             ],
             "why_it_matters": "The learner still needs a narrow evidence-producing repair before readiness can advance.",
             "proposed_action": "Ask the learner to restate the answer with required repo evidence and the same operation.",
@@ -1730,19 +1730,19 @@
         "user_evidence_excerpt": "I can reason about the branch transitions, but I am not linking that reasoning back to specific cited artifact evidence lines.",
         "repo_evidence_citations": [
           {
-            "path": "/Users/d1eshi/projects/startup/sibar/src/runtime-gap-detection.ts",
+            "path": "src/runtime-gap-detection.ts",
             "rationale": "Contains detectLearningGapFromAnswer and persistGapDetectionResult logic for branch-specific gap/confirmed behavior.",
             "excerpt": "evidence: step.bounded_evidence,",
             "exists": true
           },
           {
-            "path": "/Users/d1eshi/projects/startup/sibar/src/runtime-support.ts",
+            "path": "src/runtime-support.ts",
             "rationale": "Contains LearningGap and answer quality contract used by gap derivation and confidence/severity fields.",
             "excerpt": "included_paths: string[];",
             "exists": true
           },
           {
-            "path": "/Users/d1eshi/projects/startup/sibar/Tests/gap-detection.test.ts",
+            "path": "Tests/gap-detection.test.ts",
             "rationale": "Shows expected branch behavior for partial, verified, uncertainty, and contradiction answer classes.",
             "excerpt": "included_paths: [\"src\", \"Tests\"],",
             "exists": true
@@ -1806,9 +1806,9 @@
           "type": "LearningGap",
           "title": "gap_detection: learner needs evidence-backed repair",
           "evidence": [
-            "/Users/d1eshi/projects/startup/sibar/src/runtime-gap-detection.ts: Contains detectLearningGapFromAnswer and persistGapDetectionResult logic for branch-specific gap/confirmed behavior.",
-            "/Users/d1eshi/projects/startup/sibar/src/runtime-support.ts: Contains LearningGap and answer quality contract used by gap derivation and confidence/severity fields.",
-            "/Users/d1eshi/projects/startup/sibar/Tests/gap-detection.test.ts: Shows expected branch behavior for partial, verified, uncertainty, and contradiction answer classes."
+            "src/runtime-gap-detection.ts: Contains detectLearningGapFromAnswer and persistGapDetectionResult logic for branch-specific gap/confirmed behavior.",
+            "src/runtime-support.ts: Contains LearningGap and answer quality contract used by gap derivation and confidence/severity fields.",
+            "Tests/gap-detection.test.ts: Shows expected branch behavior for partial, verified, uncertainty, and contradiction answer classes."
           ],
           "why_it_matters": "The learner still needs a narrow evidence-producing repair before readiness can advance.",
           "proposed_action": "Ask the learner to restate the answer with required repo evidence and the same operation.",
@@ -1821,9 +1821,9 @@
             "type": "LearningGap",
             "title": "gap_detection: learner needs evidence-backed repair",
             "evidence": [
-              "/Users/d1eshi/projects/startup/sibar/src/runtime-gap-detection.ts: Contains detectLearningGapFromAnswer and persistGapDetectionResult logic for branch-specific gap/confirmed behavior.",
-              "/Users/d1eshi/projects/startup/sibar/src/runtime-support.ts: Contains LearningGap and answer quality contract used by gap derivation and confidence/severity fields.",
-              "/Users/d1eshi/projects/startup/sibar/Tests/gap-detection.test.ts: Shows expected branch behavior for partial, verified, uncertainty, and contradiction answer classes."
+              "src/runtime-gap-detection.ts: Contains detectLearningGapFromAnswer and persistGapDetectionResult logic for branch-specific gap/confirmed behavior.",
+              "src/runtime-support.ts: Contains LearningGap and answer quality contract used by gap derivation and confidence/severity fields.",
+              "Tests/gap-detection.test.ts: Shows expected branch behavior for partial, verified, uncertainty, and contradiction answer classes."
             ],
             "why_it_matters": "The learner still needs a narrow evidence-producing repair before readiness can advance.",
             "proposed_action": "Ask the learner to restate the answer with required repo evidence and the same operation.",
@@ -1834,19 +1834,19 @@
         "user_evidence_excerpt": "I can identify branch differences, but I did not show how expected_layer interacts with observed_layer for this quality level.",
         "repo_evidence_citations": [
           {
-            "path": "/Users/d1eshi/projects/startup/sibar/src/runtime-gap-detection.ts",
+            "path": "src/runtime-gap-detection.ts",
             "rationale": "Contains detectLearningGapFromAnswer and persistGapDetectionResult logic for branch-specific gap/confirmed behavior.",
             "excerpt": "evidence: step.bounded_evidence,",
             "exists": true
           },
           {
-            "path": "/Users/d1eshi/projects/startup/sibar/src/runtime-support.ts",
+            "path": "src/runtime-support.ts",
             "rationale": "Contains LearningGap and answer quality contract used by gap derivation and confidence/severity fields.",
             "excerpt": "included_paths: string[];",
             "exists": true
           },
           {
-            "path": "/Users/d1eshi/projects/startup/sibar/Tests/gap-detection.test.ts",
+            "path": "Tests/gap-detection.test.ts",
             "rationale": "Shows expected branch behavior for partial, verified, uncertainty, and contradiction answer classes.",
             "excerpt": "included_paths: [\"src\", \"Tests\"],",
             "exists": true
@@ -1910,9 +1910,9 @@
           "type": "LearningGap",
           "title": "gap_detection: learner needs evidence-backed repair",
           "evidence": [
-            "/Users/d1eshi/projects/startup/sibar/src/runtime-gap-detection.ts: Contains detectLearningGapFromAnswer and persistGapDetectionResult logic for branch-specific gap/confirmed behavior.",
-            "/Users/d1eshi/projects/startup/sibar/src/runtime-support.ts: Contains LearningGap and answer quality contract used by gap derivation and confidence/severity fields.",
-            "/Users/d1eshi/projects/startup/sibar/Tests/gap-detection.test.ts: Shows expected branch behavior for partial, verified, uncertainty, and contradiction answer classes."
+            "src/runtime-gap-detection.ts: Contains detectLearningGapFromAnswer and persistGapDetectionResult logic for branch-specific gap/confirmed behavior.",
+            "src/runtime-support.ts: Contains LearningGap and answer quality contract used by gap derivation and confidence/severity fields.",
+            "Tests/gap-detection.test.ts: Shows expected branch behavior for partial, verified, uncertainty, and contradiction answer classes."
           ],
           "why_it_matters": "The learner still needs a narrow evidence-producing repair before readiness can advance.",
           "proposed_action": "Ask the learner to restate the answer with required repo evidence and the same operation.",
@@ -1925,9 +1925,9 @@
             "type": "LearningGap",
             "title": "gap_detection: learner needs evidence-backed repair",
             "evidence": [
-              "/Users/d1eshi/projects/startup/sibar/src/runtime-gap-detection.ts: Contains detectLearningGapFromAnswer and persistGapDetectionResult logic for branch-specific gap/confirmed behavior.",
-              "/Users/d1eshi/projects/startup/sibar/src/runtime-support.ts: Contains LearningGap and answer quality contract used by gap derivation and confidence/severity fields.",
-              "/Users/d1eshi/projects/startup/sibar/Tests/gap-detection.test.ts: Shows expected branch behavior for partial, verified, uncertainty, and contradiction answer classes."
+              "src/runtime-gap-detection.ts: Contains detectLearningGapFromAnswer and persistGapDetectionResult logic for branch-specific gap/confirmed behavior.",
+              "src/runtime-support.ts: Contains LearningGap and answer quality contract used by gap derivation and confidence/severity fields.",
+              "Tests/gap-detection.test.ts: Shows expected branch behavior for partial, verified, uncertainty, and contradiction answer classes."
             ],
             "why_it_matters": "The learner still needs a narrow evidence-producing repair before readiness can advance.",
             "proposed_action": "Ask the learner to restate the answer with required repo evidence and the same operation.",
@@ -1938,19 +1938,19 @@
         "user_evidence_excerpt": "Gap detection only checks confidence words and is separate from concept scope; responsibility is mainly in practice generation.",
         "repo_evidence_citations": [
           {
-            "path": "/Users/d1eshi/projects/startup/sibar/src/runtime-gap-detection.ts",
+            "path": "src/runtime-gap-detection.ts",
             "rationale": "Contains detectLearningGapFromAnswer and persistGapDetectionResult logic for branch-specific gap/confirmed behavior.",
             "excerpt": "evidence: step.bounded_evidence,",
             "exists": true
           },
           {
-            "path": "/Users/d1eshi/projects/startup/sibar/src/runtime-support.ts",
+            "path": "src/runtime-support.ts",
             "rationale": "Contains LearningGap and answer quality contract used by gap derivation and confidence/severity fields.",
             "excerpt": "included_paths: string[];",
             "exists": true
           },
           {
-            "path": "/Users/d1eshi/projects/startup/sibar/Tests/gap-detection.test.ts",
+            "path": "Tests/gap-detection.test.ts",
             "rationale": "Shows expected branch behavior for partial, verified, uncertainty, and contradiction answer classes.",
             "excerpt": "included_paths: [\"src\", \"Tests\"],",
             "exists": true
@@ -2014,9 +2014,9 @@
           "type": "LearningGap",
           "title": "gap_detection: learner needs evidence-backed repair",
           "evidence": [
-            "/Users/d1eshi/projects/startup/sibar/src/runtime-gap-detection.ts: Contains detectLearningGapFromAnswer and persistGapDetectionResult logic for branch-specific gap/confirmed behavior.",
-            "/Users/d1eshi/projects/startup/sibar/src/runtime-support.ts: Contains LearningGap and answer quality contract used by gap derivation and confidence/severity fields.",
-            "/Users/d1eshi/projects/startup/sibar/Tests/gap-detection.test.ts: Shows expected branch behavior for partial, verified, uncertainty, and contradiction answer classes."
+            "src/runtime-gap-detection.ts: Contains detectLearningGapFromAnswer and persistGapDetectionResult logic for branch-specific gap/confirmed behavior.",
+            "src/runtime-support.ts: Contains LearningGap and answer quality contract used by gap derivation and confidence/severity fields.",
+            "Tests/gap-detection.test.ts: Shows expected branch behavior for partial, verified, uncertainty, and contradiction answer classes."
           ],
           "why_it_matters": "The learner still needs a narrow evidence-producing repair before readiness can advance.",
           "proposed_action": "Ask the learner to restate the answer with required repo evidence and the same operation.",
@@ -2029,9 +2029,9 @@
             "type": "LearningGap",
             "title": "gap_detection: learner needs evidence-backed repair",
             "evidence": [
-              "/Users/d1eshi/projects/startup/sibar/src/runtime-gap-detection.ts: Contains detectLearningGapFromAnswer and persistGapDetectionResult logic for branch-specific gap/confirmed behavior.",
-              "/Users/d1eshi/projects/startup/sibar/src/runtime-support.ts: Contains LearningGap and answer quality contract used by gap derivation and confidence/severity fields.",
-              "/Users/d1eshi/projects/startup/sibar/Tests/gap-detection.test.ts: Shows expected branch behavior for partial, verified, uncertainty, and contradiction answer classes."
+              "src/runtime-gap-detection.ts: Contains detectLearningGapFromAnswer and persistGapDetectionResult logic for branch-specific gap/confirmed behavior.",
+              "src/runtime-support.ts: Contains LearningGap and answer quality contract used by gap derivation and confidence/severity fields.",
+              "Tests/gap-detection.test.ts: Shows expected branch behavior for partial, verified, uncertainty, and contradiction answer classes."
             ],
             "why_it_matters": "The learner still needs a narrow evidence-producing repair before readiness can advance.",
             "proposed_action": "Ask the learner to restate the answer with required repo evidence and the same operation.",
@@ -2042,19 +2042,19 @@
         "user_evidence_excerpt": "I traced quality labels first, then evidence, and only at the end checked branch severity, which is not the runtime order.",
         "repo_evidence_citations": [
           {
-            "path": "/Users/d1eshi/projects/startup/sibar/src/runtime-gap-detection.ts",
+            "path": "src/runtime-gap-detection.ts",
             "rationale": "Contains detectLearningGapFromAnswer and persistGapDetectionResult logic for branch-specific gap/confirmed behavior.",
             "excerpt": "evidence: step.bounded_evidence,",
             "exists": true
           },
           {
-            "path": "/Users/d1eshi/projects/startup/sibar/src/runtime-support.ts",
+            "path": "src/runtime-support.ts",
             "rationale": "Contains LearningGap and answer quality contract used by gap derivation and confidence/severity fields.",
             "excerpt": "included_paths: string[];",
             "exists": true
           },
           {
-            "path": "/Users/d1eshi/projects/startup/sibar/Tests/gap-detection.test.ts",
+            "path": "Tests/gap-detection.test.ts",
             "rationale": "Shows expected branch behavior for partial, verified, uncertainty, and contradiction answer classes.",
             "excerpt": "included_paths: [\"src\", \"Tests\"],",
             "exists": true
@@ -2118,9 +2118,9 @@
           "type": "LearningGap",
           "title": "gap_detection: learner needs evidence-backed repair",
           "evidence": [
-            "/Users/d1eshi/projects/startup/sibar/src/runtime-gap-detection.ts: Contains detectLearningGapFromAnswer and persistGapDetectionResult logic for branch-specific gap/confirmed behavior.",
-            "/Users/d1eshi/projects/startup/sibar/src/runtime-support.ts: Contains LearningGap and answer quality contract used by gap derivation and confidence/severity fields.",
-            "/Users/d1eshi/projects/startup/sibar/Tests/gap-detection.test.ts: Shows expected branch behavior for partial, verified, uncertainty, and contradiction answer classes."
+            "src/runtime-gap-detection.ts: Contains detectLearningGapFromAnswer and persistGapDetectionResult logic for branch-specific gap/confirmed behavior.",
+            "src/runtime-support.ts: Contains LearningGap and answer quality contract used by gap derivation and confidence/severity fields.",
+            "Tests/gap-detection.test.ts: Shows expected branch behavior for partial, verified, uncertainty, and contradiction answer classes."
           ],
           "why_it_matters": "The learner still needs a narrow evidence-producing repair before readiness can advance.",
           "proposed_action": "Ask the learner to restate the answer with required repo evidence and the same operation.",
@@ -2133,9 +2133,9 @@
             "type": "LearningGap",
             "title": "gap_detection: learner needs evidence-backed repair",
             "evidence": [
-              "/Users/d1eshi/projects/startup/sibar/src/runtime-gap-detection.ts: Contains detectLearningGapFromAnswer and persistGapDetectionResult logic for branch-specific gap/confirmed behavior.",
-              "/Users/d1eshi/projects/startup/sibar/src/runtime-support.ts: Contains LearningGap and answer quality contract used by gap derivation and confidence/severity fields.",
-              "/Users/d1eshi/projects/startup/sibar/Tests/gap-detection.test.ts: Shows expected branch behavior for partial, verified, uncertainty, and contradiction answer classes."
+              "src/runtime-gap-detection.ts: Contains detectLearningGapFromAnswer and persistGapDetectionResult logic for branch-specific gap/confirmed behavior.",
+              "src/runtime-support.ts: Contains LearningGap and answer quality contract used by gap derivation and confidence/severity fields.",
+              "Tests/gap-detection.test.ts: Shows expected branch behavior for partial, verified, uncertainty, and contradiction answer classes."
             ],
             "why_it_matters": "The learner still needs a narrow evidence-producing repair before readiness can advance.",
             "proposed_action": "Ask the learner to restate the answer with required repo evidence and the same operation.",
@@ -2146,19 +2146,19 @@
         "user_evidence_excerpt": "I am absolutely sure wrong answers with `gap_confirmed` are still confirmed if they sound syntactically correct.",
         "repo_evidence_citations": [
           {
-            "path": "/Users/d1eshi/projects/startup/sibar/src/runtime-gap-detection.ts",
+            "path": "src/runtime-gap-detection.ts",
             "rationale": "Contains detectLearningGapFromAnswer and persistGapDetectionResult logic for branch-specific gap/confirmed behavior.",
             "excerpt": "evidence: step.bounded_evidence,",
             "exists": true
           },
           {
-            "path": "/Users/d1eshi/projects/startup/sibar/src/runtime-support.ts",
+            "path": "src/runtime-support.ts",
             "rationale": "Contains LearningGap and answer quality contract used by gap derivation and confidence/severity fields.",
             "excerpt": "included_paths: string[];",
             "exists": true
           },
           {
-            "path": "/Users/d1eshi/projects/startup/sibar/Tests/gap-detection.test.ts",
+            "path": "Tests/gap-detection.test.ts",
             "rationale": "Shows expected branch behavior for partial, verified, uncertainty, and contradiction answer classes.",
             "excerpt": "included_paths: [\"src\", \"Tests\"],",
             "exists": true
@@ -2222,9 +2222,9 @@
           "type": "LearningGap",
           "title": "gap_detection: learner needs evidence-backed repair",
           "evidence": [
-            "/Users/d1eshi/projects/startup/sibar/src/runtime-gap-detection.ts: Contains detectLearningGapFromAnswer and persistGapDetectionResult logic for branch-specific gap/confirmed behavior.",
-            "/Users/d1eshi/projects/startup/sibar/src/runtime-support.ts: Contains LearningGap and answer quality contract used by gap derivation and confidence/severity fields.",
-            "/Users/d1eshi/projects/startup/sibar/Tests/gap-detection.test.ts: Shows expected branch behavior for partial, verified, uncertainty, and contradiction answer classes."
+            "src/runtime-gap-detection.ts: Contains detectLearningGapFromAnswer and persistGapDetectionResult logic for branch-specific gap/confirmed behavior.",
+            "src/runtime-support.ts: Contains LearningGap and answer quality contract used by gap derivation and confidence/severity fields.",
+            "Tests/gap-detection.test.ts: Shows expected branch behavior for partial, verified, uncertainty, and contradiction answer classes."
           ],
           "why_it_matters": "The learner still needs a narrow evidence-producing repair before readiness can advance.",
           "proposed_action": "Ask the learner to restate the answer with required repo evidence and the same operation.",
@@ -2237,9 +2237,9 @@
             "type": "LearningGap",
             "title": "gap_detection: learner needs evidence-backed repair",
             "evidence": [
-              "/Users/d1eshi/projects/startup/sibar/src/runtime-gap-detection.ts: Contains detectLearningGapFromAnswer and persistGapDetectionResult logic for branch-specific gap/confirmed behavior.",
-              "/Users/d1eshi/projects/startup/sibar/src/runtime-support.ts: Contains LearningGap and answer quality contract used by gap derivation and confidence/severity fields.",
-              "/Users/d1eshi/projects/startup/sibar/Tests/gap-detection.test.ts: Shows expected branch behavior for partial, verified, uncertainty, and contradiction answer classes."
+              "src/runtime-gap-detection.ts: Contains detectLearningGapFromAnswer and persistGapDetectionResult logic for branch-specific gap/confirmed behavior.",
+              "src/runtime-support.ts: Contains LearningGap and answer quality contract used by gap derivation and confidence/severity fields.",
+              "Tests/gap-detection.test.ts: Shows expected branch behavior for partial, verified, uncertainty, and contradiction answer classes."
             ],
             "why_it_matters": "The learner still needs a narrow evidence-producing repair before readiness can advance.",
             "proposed_action": "Ask the learner to restate the answer with required repo evidence and the same operation.",
@@ -2250,19 +2250,19 @@
         "user_evidence_excerpt": "I cannot confidently map a specific artifact branch for this answer yet, so I am unsure which suspected misconception should be emitted.",
         "repo_evidence_citations": [
           {
-            "path": "/Users/d1eshi/projects/startup/sibar/src/runtime-gap-detection.ts",
+            "path": "src/runtime-gap-detection.ts",
             "rationale": "Contains detectLearningGapFromAnswer and persistGapDetectionResult logic for branch-specific gap/confirmed behavior.",
             "excerpt": "evidence: step.bounded_evidence,",
             "exists": true
           },
           {
-            "path": "/Users/d1eshi/projects/startup/sibar/src/runtime-support.ts",
+            "path": "src/runtime-support.ts",
             "rationale": "Contains LearningGap and answer quality contract used by gap derivation and confidence/severity fields.",
             "excerpt": "included_paths: string[];",
             "exists": true
           },
           {
-            "path": "/Users/d1eshi/projects/startup/sibar/Tests/gap-detection.test.ts",
+            "path": "Tests/gap-detection.test.ts",
             "rationale": "Shows expected branch behavior for partial, verified, uncertainty, and contradiction answer classes.",
             "excerpt": "included_paths: [\"src\", \"Tests\"],",
             "exists": true
@@ -2326,9 +2326,9 @@
           "type": "DesignIssue",
           "title": "gap_detection: product terminology makes enforcement unclear",
           "evidence": [
-            "/Users/d1eshi/projects/startup/sibar/src/runtime-gap-detection.ts: Contains detectLearningGapFromAnswer and persistGapDetectionResult logic for branch-specific gap/confirmed behavior.",
-            "/Users/d1eshi/projects/startup/sibar/src/runtime-support.ts: Contains LearningGap and answer quality contract used by gap derivation and confidence/severity fields.",
-            "/Users/d1eshi/projects/startup/sibar/Tests/gap-detection.test.ts: Shows expected branch behavior for partial, verified, uncertainty, and contradiction answer classes."
+            "src/runtime-gap-detection.ts: Contains detectLearningGapFromAnswer and persistGapDetectionResult logic for branch-specific gap/confirmed behavior.",
+            "src/runtime-support.ts: Contains LearningGap and answer quality contract used by gap derivation and confidence/severity fields.",
+            "Tests/gap-detection.test.ts: Shows expected branch behavior for partial, verified, uncertainty, and contradiction answer classes."
           ],
           "why_it_matters": "When product terminology obscures executable enforcement, users treat optional conventions as binding rules.",
           "proposed_action": "Separate product wording confusion from the executable enforcement behavior in the code; clarify which rules are enforced.",
@@ -2341,9 +2341,9 @@
             "type": "DesignIssue",
             "title": "gap_detection: product terminology makes enforcement unclear",
             "evidence": [
-              "/Users/d1eshi/projects/startup/sibar/src/runtime-gap-detection.ts: Contains detectLearningGapFromAnswer and persistGapDetectionResult logic for branch-specific gap/confirmed behavior.",
-              "/Users/d1eshi/projects/startup/sibar/src/runtime-support.ts: Contains LearningGap and answer quality contract used by gap derivation and confidence/severity fields.",
-              "/Users/d1eshi/projects/startup/sibar/Tests/gap-detection.test.ts: Shows expected branch behavior for partial, verified, uncertainty, and contradiction answer classes."
+              "src/runtime-gap-detection.ts: Contains detectLearningGapFromAnswer and persistGapDetectionResult logic for branch-specific gap/confirmed behavior.",
+              "src/runtime-support.ts: Contains LearningGap and answer quality contract used by gap derivation and confidence/severity fields.",
+              "Tests/gap-detection.test.ts: Shows expected branch behavior for partial, verified, uncertainty, and contradiction answer classes."
             ],
             "why_it_matters": "When product terminology obscures executable enforcement, users treat optional conventions as binding rules.",
             "proposed_action": "Separate product wording confusion from the executable enforcement behavior in the code; clarify which rules are enforced.",
@@ -2354,19 +2354,19 @@
         "user_evidence_excerpt": "The terminology around `artifact_evidence`, `answer_evidence`, and branches feels overloaded, so I defaulted to broad explanations and skipped exact branch output expectations.",
         "repo_evidence_citations": [
           {
-            "path": "/Users/d1eshi/projects/startup/sibar/src/runtime-gap-detection.ts",
+            "path": "src/runtime-gap-detection.ts",
             "rationale": "Contains detectLearningGapFromAnswer and persistGapDetectionResult logic for branch-specific gap/confirmed behavior.",
             "excerpt": "evidence: step.bounded_evidence,",
             "exists": true
           },
           {
-            "path": "/Users/d1eshi/projects/startup/sibar/src/runtime-support.ts",
+            "path": "src/runtime-support.ts",
             "rationale": "Contains LearningGap and answer quality contract used by gap derivation and confidence/severity fields.",
             "excerpt": "included_paths: string[];",
             "exists": true
           },
           {
-            "path": "/Users/d1eshi/projects/startup/sibar/Tests/gap-detection.test.ts",
+            "path": "Tests/gap-detection.test.ts",
             "rationale": "Shows expected branch behavior for partial, verified, uncertainty, and contradiction answer classes.",
             "excerpt": "included_paths: [\"src\", \"Tests\"],",
             "exists": true
@@ -2430,19 +2430,19 @@
         "user_evidence_excerpt": "For a detected gap I map to one patch-spec challenge, tie trigger_condition to repair_action, include evidence ids, and describe due_after + difficulty from severity.",
         "repo_evidence_citations": [
           {
-            "path": "/Users/d1eshi/projects/startup/sibar/src/runtime-practice.ts",
+            "path": "src/runtime-practice.ts",
             "rationale": "Defines `generatePracticeChallengesCommand`, `challengeFromGap`, and the due/difficulty mapping from gap severity.",
             "excerpt": "import {",
             "exists": true
           },
           {
-            "path": "/Users/d1eshi/projects/startup/sibar/src/runtime-gap-detection.ts",
+            "path": "src/runtime-gap-detection.ts",
             "rationale": "Provides the shape of persisted gap artifacts that practice generation consumes.",
             "excerpt": "evidence: step.bounded_evidence,",
             "exists": true
           },
           {
-            "path": "/Users/d1eshi/projects/startup/sibar/Tests/practice-challenges.test.ts",
+            "path": "Tests/practice-challenges.test.ts",
             "rationale": "Verifies repair challenge persistence, deduplication, due_after, difficulty, and prompt structure for critical/medium gaps.",
             "excerpt": "included_paths: [\"src\", \"Tests\"],",
             "exists": true
@@ -2492,9 +2492,9 @@
           "type": "LearningGap",
           "title": "repair_practice_generation: learner needs evidence-backed repair",
           "evidence": [
-            "/Users/d1eshi/projects/startup/sibar/src/runtime-practice.ts: Defines `generatePracticeChallengesCommand`, `challengeFromGap`, and the due/difficulty mapping from gap severity.",
-            "/Users/d1eshi/projects/startup/sibar/src/runtime-gap-detection.ts: Provides the shape of persisted gap artifacts that practice generation consumes.",
-            "/Users/d1eshi/projects/startup/sibar/Tests/practice-challenges.test.ts: Verifies repair challenge persistence, deduplication, due_after, difficulty, and prompt structure for critical/medium gaps."
+            "src/runtime-practice.ts: Defines `generatePracticeChallengesCommand`, `challengeFromGap`, and the due/difficulty mapping from gap severity.",
+            "src/runtime-gap-detection.ts: Provides the shape of persisted gap artifacts that practice generation consumes.",
+            "Tests/practice-challenges.test.ts: Verifies repair challenge persistence, deduplication, due_after, difficulty, and prompt structure for critical/medium gaps."
           ],
           "why_it_matters": "The learner still needs a narrow evidence-producing repair before readiness can advance.",
           "proposed_action": "Ask the learner to restate the answer with required repo evidence and the same operation.",
@@ -2507,9 +2507,9 @@
             "type": "LearningGap",
             "title": "repair_practice_generation: learner needs evidence-backed repair",
             "evidence": [
-              "/Users/d1eshi/projects/startup/sibar/src/runtime-practice.ts: Defines `generatePracticeChallengesCommand`, `challengeFromGap`, and the due/difficulty mapping from gap severity.",
-              "/Users/d1eshi/projects/startup/sibar/src/runtime-gap-detection.ts: Provides the shape of persisted gap artifacts that practice generation consumes.",
-              "/Users/d1eshi/projects/startup/sibar/Tests/practice-challenges.test.ts: Verifies repair challenge persistence, deduplication, due_after, difficulty, and prompt structure for critical/medium gaps."
+              "src/runtime-practice.ts: Defines `generatePracticeChallengesCommand`, `challengeFromGap`, and the due/difficulty mapping from gap severity.",
+              "src/runtime-gap-detection.ts: Provides the shape of persisted gap artifacts that practice generation consumes.",
+              "Tests/practice-challenges.test.ts: Verifies repair challenge persistence, deduplication, due_after, difficulty, and prompt structure for critical/medium gaps."
             ],
             "why_it_matters": "The learner still needs a narrow evidence-producing repair before readiness can advance.",
             "proposed_action": "Ask the learner to restate the answer with required repo evidence and the same operation.",
@@ -2520,19 +2520,19 @@
         "user_evidence_excerpt": "I can describe a repair mapping in general, but this answer has no concrete evidence references to the generating gap or artifact lines.",
         "repo_evidence_citations": [
           {
-            "path": "/Users/d1eshi/projects/startup/sibar/src/runtime-practice.ts",
+            "path": "src/runtime-practice.ts",
             "rationale": "Defines `generatePracticeChallengesCommand`, `challengeFromGap`, and the due/difficulty mapping from gap severity.",
             "excerpt": "import {",
             "exists": true
           },
           {
-            "path": "/Users/d1eshi/projects/startup/sibar/src/runtime-gap-detection.ts",
+            "path": "src/runtime-gap-detection.ts",
             "rationale": "Provides the shape of persisted gap artifacts that practice generation consumes.",
             "excerpt": "evidence: step.bounded_evidence,",
             "exists": true
           },
           {
-            "path": "/Users/d1eshi/projects/startup/sibar/Tests/practice-challenges.test.ts",
+            "path": "Tests/practice-challenges.test.ts",
             "rationale": "Verifies repair challenge persistence, deduplication, due_after, difficulty, and prompt structure for critical/medium gaps.",
             "excerpt": "included_paths: [\"src\", \"Tests\"],",
             "exists": true
@@ -2596,9 +2596,9 @@
           "type": "LearningGap",
           "title": "repair_practice_generation: learner needs evidence-backed repair",
           "evidence": [
-            "/Users/d1eshi/projects/startup/sibar/src/runtime-practice.ts: Defines `generatePracticeChallengesCommand`, `challengeFromGap`, and the due/difficulty mapping from gap severity.",
-            "/Users/d1eshi/projects/startup/sibar/src/runtime-gap-detection.ts: Provides the shape of persisted gap artifacts that practice generation consumes.",
-            "/Users/d1eshi/projects/startup/sibar/Tests/practice-challenges.test.ts: Verifies repair challenge persistence, deduplication, due_after, difficulty, and prompt structure for critical/medium gaps."
+            "src/runtime-practice.ts: Defines `generatePracticeChallengesCommand`, `challengeFromGap`, and the due/difficulty mapping from gap severity.",
+            "src/runtime-gap-detection.ts: Provides the shape of persisted gap artifacts that practice generation consumes.",
+            "Tests/practice-challenges.test.ts: Verifies repair challenge persistence, deduplication, due_after, difficulty, and prompt structure for critical/medium gaps."
           ],
           "why_it_matters": "The learner still needs a narrow evidence-producing repair before readiness can advance.",
           "proposed_action": "Ask the learner to restate the answer with required repo evidence and the same operation.",
@@ -2611,9 +2611,9 @@
             "type": "LearningGap",
             "title": "repair_practice_generation: learner needs evidence-backed repair",
             "evidence": [
-              "/Users/d1eshi/projects/startup/sibar/src/runtime-practice.ts: Defines `generatePracticeChallengesCommand`, `challengeFromGap`, and the due/difficulty mapping from gap severity.",
-              "/Users/d1eshi/projects/startup/sibar/src/runtime-gap-detection.ts: Provides the shape of persisted gap artifacts that practice generation consumes.",
-              "/Users/d1eshi/projects/startup/sibar/Tests/practice-challenges.test.ts: Verifies repair challenge persistence, deduplication, due_after, difficulty, and prompt structure for critical/medium gaps."
+              "src/runtime-practice.ts: Defines `generatePracticeChallengesCommand`, `challengeFromGap`, and the due/difficulty mapping from gap severity.",
+              "src/runtime-gap-detection.ts: Provides the shape of persisted gap artifacts that practice generation consumes.",
+              "Tests/practice-challenges.test.ts: Verifies repair challenge persistence, deduplication, due_after, difficulty, and prompt structure for critical/medium gaps."
             ],
             "why_it_matters": "The learner still needs a narrow evidence-producing repair before readiness can advance.",
             "proposed_action": "Ask the learner to restate the answer with required repo evidence and the same operation.",
@@ -2624,19 +2624,19 @@
         "user_evidence_excerpt": "I connected some challenge fields but missed that due_after and difficulty come from gap severity and observed layer.",
         "repo_evidence_citations": [
           {
-            "path": "/Users/d1eshi/projects/startup/sibar/src/runtime-practice.ts",
+            "path": "src/runtime-practice.ts",
             "rationale": "Defines `generatePracticeChallengesCommand`, `challengeFromGap`, and the due/difficulty mapping from gap severity.",
             "excerpt": "import {",
             "exists": true
           },
           {
-            "path": "/Users/d1eshi/projects/startup/sibar/src/runtime-gap-detection.ts",
+            "path": "src/runtime-gap-detection.ts",
             "rationale": "Provides the shape of persisted gap artifacts that practice generation consumes.",
             "excerpt": "evidence: step.bounded_evidence,",
             "exists": true
           },
           {
-            "path": "/Users/d1eshi/projects/startup/sibar/Tests/practice-challenges.test.ts",
+            "path": "Tests/practice-challenges.test.ts",
             "rationale": "Verifies repair challenge persistence, deduplication, due_after, difficulty, and prompt structure for critical/medium gaps.",
             "excerpt": "included_paths: [\"src\", \"Tests\"],",
             "exists": true
@@ -2700,9 +2700,9 @@
           "type": "LearningGap",
           "title": "repair_practice_generation: learner needs evidence-backed repair",
           "evidence": [
-            "/Users/d1eshi/projects/startup/sibar/src/runtime-practice.ts: Defines `generatePracticeChallengesCommand`, `challengeFromGap`, and the due/difficulty mapping from gap severity.",
-            "/Users/d1eshi/projects/startup/sibar/src/runtime-gap-detection.ts: Provides the shape of persisted gap artifacts that practice generation consumes.",
-            "/Users/d1eshi/projects/startup/sibar/Tests/practice-challenges.test.ts: Verifies repair challenge persistence, deduplication, due_after, difficulty, and prompt structure for critical/medium gaps."
+            "src/runtime-practice.ts: Defines `generatePracticeChallengesCommand`, `challengeFromGap`, and the due/difficulty mapping from gap severity.",
+            "src/runtime-gap-detection.ts: Provides the shape of persisted gap artifacts that practice generation consumes.",
+            "Tests/practice-challenges.test.ts: Verifies repair challenge persistence, deduplication, due_after, difficulty, and prompt structure for critical/medium gaps."
           ],
           "why_it_matters": "The learner still needs a narrow evidence-producing repair before readiness can advance.",
           "proposed_action": "Ask the learner to restate the answer with required repo evidence and the same operation.",
@@ -2715,9 +2715,9 @@
             "type": "LearningGap",
             "title": "repair_practice_generation: learner needs evidence-backed repair",
             "evidence": [
-              "/Users/d1eshi/projects/startup/sibar/src/runtime-practice.ts: Defines `generatePracticeChallengesCommand`, `challengeFromGap`, and the due/difficulty mapping from gap severity.",
-              "/Users/d1eshi/projects/startup/sibar/src/runtime-gap-detection.ts: Provides the shape of persisted gap artifacts that practice generation consumes.",
-              "/Users/d1eshi/projects/startup/sibar/Tests/practice-challenges.test.ts: Verifies repair challenge persistence, deduplication, due_after, difficulty, and prompt structure for critical/medium gaps."
+              "src/runtime-practice.ts: Defines `generatePracticeChallengesCommand`, `challengeFromGap`, and the due/difficulty mapping from gap severity.",
+              "src/runtime-gap-detection.ts: Provides the shape of persisted gap artifacts that practice generation consumes.",
+              "Tests/practice-challenges.test.ts: Verifies repair challenge persistence, deduplication, due_after, difficulty, and prompt structure for critical/medium gaps."
             ],
             "why_it_matters": "The learner still needs a narrow evidence-producing repair before readiness can advance.",
             "proposed_action": "Ask the learner to restate the answer with required repo evidence and the same operation.",
@@ -2728,19 +2728,19 @@
         "user_evidence_excerpt": "Readiness export should pick challenge fields, while repair practice only stores evidence ids and completion state.",
         "repo_evidence_citations": [
           {
-            "path": "/Users/d1eshi/projects/startup/sibar/src/runtime-practice.ts",
+            "path": "src/runtime-practice.ts",
             "rationale": "Defines `generatePracticeChallengesCommand`, `challengeFromGap`, and the due/difficulty mapping from gap severity.",
             "excerpt": "import {",
             "exists": true
           },
           {
-            "path": "/Users/d1eshi/projects/startup/sibar/src/runtime-gap-detection.ts",
+            "path": "src/runtime-gap-detection.ts",
             "rationale": "Provides the shape of persisted gap artifacts that practice generation consumes.",
             "excerpt": "evidence: step.bounded_evidence,",
             "exists": true
           },
           {
-            "path": "/Users/d1eshi/projects/startup/sibar/Tests/practice-challenges.test.ts",
+            "path": "Tests/practice-challenges.test.ts",
             "rationale": "Verifies repair challenge persistence, deduplication, due_after, difficulty, and prompt structure for critical/medium gaps.",
             "excerpt": "included_paths: [\"src\", \"Tests\"],",
             "exists": true
@@ -2804,9 +2804,9 @@
           "type": "LearningGap",
           "title": "repair_practice_generation: learner needs evidence-backed repair",
           "evidence": [
-            "/Users/d1eshi/projects/startup/sibar/src/runtime-practice.ts: Defines `generatePracticeChallengesCommand`, `challengeFromGap`, and the due/difficulty mapping from gap severity.",
-            "/Users/d1eshi/projects/startup/sibar/src/runtime-gap-detection.ts: Provides the shape of persisted gap artifacts that practice generation consumes.",
-            "/Users/d1eshi/projects/startup/sibar/Tests/practice-challenges.test.ts: Verifies repair challenge persistence, deduplication, due_after, difficulty, and prompt structure for critical/medium gaps."
+            "src/runtime-practice.ts: Defines `generatePracticeChallengesCommand`, `challengeFromGap`, and the due/difficulty mapping from gap severity.",
+            "src/runtime-gap-detection.ts: Provides the shape of persisted gap artifacts that practice generation consumes.",
+            "Tests/practice-challenges.test.ts: Verifies repair challenge persistence, deduplication, due_after, difficulty, and prompt structure for critical/medium gaps."
           ],
           "why_it_matters": "The learner still needs a narrow evidence-producing repair before readiness can advance.",
           "proposed_action": "Ask the learner to restate the answer with required repo evidence and the same operation.",
@@ -2819,9 +2819,9 @@
             "type": "LearningGap",
             "title": "repair_practice_generation: learner needs evidence-backed repair",
             "evidence": [
-              "/Users/d1eshi/projects/startup/sibar/src/runtime-practice.ts: Defines `generatePracticeChallengesCommand`, `challengeFromGap`, and the due/difficulty mapping from gap severity.",
-              "/Users/d1eshi/projects/startup/sibar/src/runtime-gap-detection.ts: Provides the shape of persisted gap artifacts that practice generation consumes.",
-              "/Users/d1eshi/projects/startup/sibar/Tests/practice-challenges.test.ts: Verifies repair challenge persistence, deduplication, due_after, difficulty, and prompt structure for critical/medium gaps."
+              "src/runtime-practice.ts: Defines `generatePracticeChallengesCommand`, `challengeFromGap`, and the due/difficulty mapping from gap severity.",
+              "src/runtime-gap-detection.ts: Provides the shape of persisted gap artifacts that practice generation consumes.",
+              "Tests/practice-challenges.test.ts: Verifies repair challenge persistence, deduplication, due_after, difficulty, and prompt structure for critical/medium gaps."
             ],
             "why_it_matters": "The learner still needs a narrow evidence-producing repair before readiness can advance.",
             "proposed_action": "Ask the learner to restate the answer with required repo evidence and the same operation.",
@@ -2832,19 +2832,19 @@
         "user_evidence_excerpt": "I would choose challenge type first, then decide due_after, and check prompt shape afterward, which does not match runtime sequencing.",
         "repo_evidence_citations": [
           {
-            "path": "/Users/d1eshi/projects/startup/sibar/src/runtime-practice.ts",
+            "path": "src/runtime-practice.ts",
             "rationale": "Defines `generatePracticeChallengesCommand`, `challengeFromGap`, and the due/difficulty mapping from gap severity.",
             "excerpt": "import {",
             "exists": true
           },
           {
-            "path": "/Users/d1eshi/projects/startup/sibar/src/runtime-gap-detection.ts",
+            "path": "src/runtime-gap-detection.ts",
             "rationale": "Provides the shape of persisted gap artifacts that practice generation consumes.",
             "excerpt": "evidence: step.bounded_evidence,",
             "exists": true
           },
           {
-            "path": "/Users/d1eshi/projects/startup/sibar/Tests/practice-challenges.test.ts",
+            "path": "Tests/practice-challenges.test.ts",
             "rationale": "Verifies repair challenge persistence, deduplication, due_after, difficulty, and prompt structure for critical/medium gaps.",
             "excerpt": "included_paths: [\"src\", \"Tests\"],",
             "exists": true
@@ -2908,9 +2908,9 @@
           "type": "LearningGap",
           "title": "repair_practice_generation: learner needs evidence-backed repair",
           "evidence": [
-            "/Users/d1eshi/projects/startup/sibar/src/runtime-practice.ts: Defines `generatePracticeChallengesCommand`, `challengeFromGap`, and the due/difficulty mapping from gap severity.",
-            "/Users/d1eshi/projects/startup/sibar/src/runtime-gap-detection.ts: Provides the shape of persisted gap artifacts that practice generation consumes.",
-            "/Users/d1eshi/projects/startup/sibar/Tests/practice-challenges.test.ts: Verifies repair challenge persistence, deduplication, due_after, difficulty, and prompt structure for critical/medium gaps."
+            "src/runtime-practice.ts: Defines `generatePracticeChallengesCommand`, `challengeFromGap`, and the due/difficulty mapping from gap severity.",
+            "src/runtime-gap-detection.ts: Provides the shape of persisted gap artifacts that practice generation consumes.",
+            "Tests/practice-challenges.test.ts: Verifies repair challenge persistence, deduplication, due_after, difficulty, and prompt structure for critical/medium gaps."
           ],
           "why_it_matters": "The learner still needs a narrow evidence-producing repair before readiness can advance.",
           "proposed_action": "Ask the learner to restate the answer with required repo evidence and the same operation.",
@@ -2923,9 +2923,9 @@
             "type": "LearningGap",
             "title": "repair_practice_generation: learner needs evidence-backed repair",
             "evidence": [
-              "/Users/d1eshi/projects/startup/sibar/src/runtime-practice.ts: Defines `generatePracticeChallengesCommand`, `challengeFromGap`, and the due/difficulty mapping from gap severity.",
-              "/Users/d1eshi/projects/startup/sibar/src/runtime-gap-detection.ts: Provides the shape of persisted gap artifacts that practice generation consumes.",
-              "/Users/d1eshi/projects/startup/sibar/Tests/practice-challenges.test.ts: Verifies repair challenge persistence, deduplication, due_after, difficulty, and prompt structure for critical/medium gaps."
+              "src/runtime-practice.ts: Defines `generatePracticeChallengesCommand`, `challengeFromGap`, and the due/difficulty mapping from gap severity.",
+              "src/runtime-gap-detection.ts: Provides the shape of persisted gap artifacts that practice generation consumes.",
+              "Tests/practice-challenges.test.ts: Verifies repair challenge persistence, deduplication, due_after, difficulty, and prompt structure for critical/medium gaps."
             ],
             "why_it_matters": "The learner still needs a narrow evidence-producing repair before readiness can advance.",
             "proposed_action": "Ask the learner to restate the answer with required repo evidence and the same operation.",
@@ -2936,19 +2936,19 @@
         "user_evidence_excerpt": "I am sure any challenge can be `hard` and `now` because confidence is high, so one generic prompt is enough for every gap.",
         "repo_evidence_citations": [
           {
-            "path": "/Users/d1eshi/projects/startup/sibar/src/runtime-practice.ts",
+            "path": "src/runtime-practice.ts",
             "rationale": "Defines `generatePracticeChallengesCommand`, `challengeFromGap`, and the due/difficulty mapping from gap severity.",
             "excerpt": "import {",
             "exists": true
           },
           {
-            "path": "/Users/d1eshi/projects/startup/sibar/src/runtime-gap-detection.ts",
+            "path": "src/runtime-gap-detection.ts",
             "rationale": "Provides the shape of persisted gap artifacts that practice generation consumes.",
             "excerpt": "evidence: step.bounded_evidence,",
             "exists": true
           },
           {
-            "path": "/Users/d1eshi/projects/startup/sibar/Tests/practice-challenges.test.ts",
+            "path": "Tests/practice-challenges.test.ts",
             "rationale": "Verifies repair challenge persistence, deduplication, due_after, difficulty, and prompt structure for critical/medium gaps.",
             "excerpt": "included_paths: [\"src\", \"Tests\"],",
             "exists": true
@@ -3012,9 +3012,9 @@
           "type": "LearningGap",
           "title": "repair_practice_generation: learner needs evidence-backed repair",
           "evidence": [
-            "/Users/d1eshi/projects/startup/sibar/src/runtime-practice.ts: Defines `generatePracticeChallengesCommand`, `challengeFromGap`, and the due/difficulty mapping from gap severity.",
-            "/Users/d1eshi/projects/startup/sibar/src/runtime-gap-detection.ts: Provides the shape of persisted gap artifacts that practice generation consumes.",
-            "/Users/d1eshi/projects/startup/sibar/Tests/practice-challenges.test.ts: Verifies repair challenge persistence, deduplication, due_after, difficulty, and prompt structure for critical/medium gaps."
+            "src/runtime-practice.ts: Defines `generatePracticeChallengesCommand`, `challengeFromGap`, and the due/difficulty mapping from gap severity.",
+            "src/runtime-gap-detection.ts: Provides the shape of persisted gap artifacts that practice generation consumes.",
+            "Tests/practice-challenges.test.ts: Verifies repair challenge persistence, deduplication, due_after, difficulty, and prompt structure for critical/medium gaps."
           ],
           "why_it_matters": "The learner still needs a narrow evidence-producing repair before readiness can advance.",
           "proposed_action": "Ask the learner to restate the answer with required repo evidence and the same operation.",
@@ -3027,9 +3027,9 @@
             "type": "LearningGap",
             "title": "repair_practice_generation: learner needs evidence-backed repair",
             "evidence": [
-              "/Users/d1eshi/projects/startup/sibar/src/runtime-practice.ts: Defines `generatePracticeChallengesCommand`, `challengeFromGap`, and the due/difficulty mapping from gap severity.",
-              "/Users/d1eshi/projects/startup/sibar/src/runtime-gap-detection.ts: Provides the shape of persisted gap artifacts that practice generation consumes.",
-              "/Users/d1eshi/projects/startup/sibar/Tests/practice-challenges.test.ts: Verifies repair challenge persistence, deduplication, due_after, difficulty, and prompt structure for critical/medium gaps."
+              "src/runtime-practice.ts: Defines `generatePracticeChallengesCommand`, `challengeFromGap`, and the due/difficulty mapping from gap severity.",
+              "src/runtime-gap-detection.ts: Provides the shape of persisted gap artifacts that practice generation consumes.",
+              "Tests/practice-challenges.test.ts: Verifies repair challenge persistence, deduplication, due_after, difficulty, and prompt structure for critical/medium gaps."
             ],
             "why_it_matters": "The learner still needs a narrow evidence-producing repair before readiness can advance.",
             "proposed_action": "Ask the learner to restate the answer with required repo evidence and the same operation.",
@@ -3040,19 +3040,19 @@
         "user_evidence_excerpt": "I am not yet sure whether a challenge should be generated immediately or staged, so I cannot confirm due_after and challenge type.",
         "repo_evidence_citations": [
           {
-            "path": "/Users/d1eshi/projects/startup/sibar/src/runtime-practice.ts",
+            "path": "src/runtime-practice.ts",
             "rationale": "Defines `generatePracticeChallengesCommand`, `challengeFromGap`, and the due/difficulty mapping from gap severity.",
             "excerpt": "import {",
             "exists": true
           },
           {
-            "path": "/Users/d1eshi/projects/startup/sibar/src/runtime-gap-detection.ts",
+            "path": "src/runtime-gap-detection.ts",
             "rationale": "Provides the shape of persisted gap artifacts that practice generation consumes.",
             "excerpt": "evidence: step.bounded_evidence,",
             "exists": true
           },
           {
-            "path": "/Users/d1eshi/projects/startup/sibar/Tests/practice-challenges.test.ts",
+            "path": "Tests/practice-challenges.test.ts",
             "rationale": "Verifies repair challenge persistence, deduplication, due_after, difficulty, and prompt structure for critical/medium gaps.",
             "excerpt": "included_paths: [\"src\", \"Tests\"],",
             "exists": true
@@ -3116,9 +3116,9 @@
           "type": "DesignIssue",
           "title": "repair_practice_generation: product terminology makes enforcement unclear",
           "evidence": [
-            "/Users/d1eshi/projects/startup/sibar/src/runtime-practice.ts: Defines `generatePracticeChallengesCommand`, `challengeFromGap`, and the due/difficulty mapping from gap severity.",
-            "/Users/d1eshi/projects/startup/sibar/src/runtime-gap-detection.ts: Provides the shape of persisted gap artifacts that practice generation consumes.",
-            "/Users/d1eshi/projects/startup/sibar/Tests/practice-challenges.test.ts: Verifies repair challenge persistence, deduplication, due_after, difficulty, and prompt structure for critical/medium gaps."
+            "src/runtime-practice.ts: Defines `generatePracticeChallengesCommand`, `challengeFromGap`, and the due/difficulty mapping from gap severity.",
+            "src/runtime-gap-detection.ts: Provides the shape of persisted gap artifacts that practice generation consumes.",
+            "Tests/practice-challenges.test.ts: Verifies repair challenge persistence, deduplication, due_after, difficulty, and prompt structure for critical/medium gaps."
           ],
           "why_it_matters": "When product terminology obscures executable enforcement, users treat optional conventions as binding rules.",
           "proposed_action": "Separate product wording confusion from the executable enforcement behavior in the code; clarify which rules are enforced.",
@@ -3131,9 +3131,9 @@
             "type": "DesignIssue",
             "title": "repair_practice_generation: product terminology makes enforcement unclear",
             "evidence": [
-              "/Users/d1eshi/projects/startup/sibar/src/runtime-practice.ts: Defines `generatePracticeChallengesCommand`, `challengeFromGap`, and the due/difficulty mapping from gap severity.",
-              "/Users/d1eshi/projects/startup/sibar/src/runtime-gap-detection.ts: Provides the shape of persisted gap artifacts that practice generation consumes.",
-              "/Users/d1eshi/projects/startup/sibar/Tests/practice-challenges.test.ts: Verifies repair challenge persistence, deduplication, due_after, difficulty, and prompt structure for critical/medium gaps."
+              "src/runtime-practice.ts: Defines `generatePracticeChallengesCommand`, `challengeFromGap`, and the due/difficulty mapping from gap severity.",
+              "src/runtime-gap-detection.ts: Provides the shape of persisted gap artifacts that practice generation consumes.",
+              "Tests/practice-challenges.test.ts: Verifies repair challenge persistence, deduplication, due_after, difficulty, and prompt structure for critical/medium gaps."
             ],
             "why_it_matters": "When product terminology obscures executable enforcement, users treat optional conventions as binding rules.",
             "proposed_action": "Separate product wording confusion from the executable enforcement behavior in the code; clarify which rules are enforced.",
@@ -3144,19 +3144,19 @@
         "user_evidence_excerpt": "The challenge taxonomy and phrasing are confusing, so I gave a generic recommendation without matching practice helper naming.",
         "repo_evidence_citations": [
           {
-            "path": "/Users/d1eshi/projects/startup/sibar/src/runtime-practice.ts",
+            "path": "src/runtime-practice.ts",
             "rationale": "Defines `generatePracticeChallengesCommand`, `challengeFromGap`, and the due/difficulty mapping from gap severity.",
             "excerpt": "import {",
             "exists": true
           },
           {
-            "path": "/Users/d1eshi/projects/startup/sibar/src/runtime-gap-detection.ts",
+            "path": "src/runtime-gap-detection.ts",
             "rationale": "Provides the shape of persisted gap artifacts that practice generation consumes.",
             "excerpt": "evidence: step.bounded_evidence,",
             "exists": true
           },
           {
-            "path": "/Users/d1eshi/projects/startup/sibar/Tests/practice-challenges.test.ts",
+            "path": "Tests/practice-challenges.test.ts",
             "rationale": "Verifies repair challenge persistence, deduplication, due_after, difficulty, and prompt structure for critical/medium gaps.",
             "excerpt": "included_paths: [\"src\", \"Tests\"],",
             "exists": true
@@ -3220,19 +3220,19 @@
         "user_evidence_excerpt": "I would transfer readiness logic by showing how one open gap blocks `ready` claims, while confirmed evidence supports verified concepts with evidence ids and `summary.readiness` reflects open gaps.",
         "repo_evidence_citations": [
           {
-            "path": "/Users/d1eshi/projects/startup/sibar/src/runtime-readiness.ts",
+            "path": "src/runtime-readiness.ts",
             "rationale": "Primary generator for readiness scoring, claim levels, evidence indexing, and summary/risk/report composition.",
             "excerpt": "import {",
             "exists": true
           },
           {
-            "path": "/Users/d1eshi/projects/startup/sibar/src/runtime-memory.ts",
+            "path": "src/runtime-memory.ts",
             "rationale": "Constructs understanding memory state that readiness_report consumes for concept/gap/challenge context.",
             "excerpt": "import {",
             "exists": true
           },
           {
-            "path": "/Users/d1eshi/projects/startup/sibar/Tests/readiness-report.test.ts",
+            "path": "Tests/readiness-report.test.ts",
             "rationale": "Demonstrates supported/unsupported report claims and evidence indexing behavior.",
             "excerpt": "included_paths: [\"src\", \"Tests\"],",
             "exists": true
@@ -3282,9 +3282,9 @@
           "type": "LearningGap",
           "title": "readiness_report_generation: learner needs evidence-backed repair",
           "evidence": [
-            "/Users/d1eshi/projects/startup/sibar/src/runtime-readiness.ts: Primary generator for readiness scoring, claim levels, evidence indexing, and summary/risk/report composition.",
-            "/Users/d1eshi/projects/startup/sibar/src/runtime-memory.ts: Constructs understanding memory state that readiness_report consumes for concept/gap/challenge context.",
-            "/Users/d1eshi/projects/startup/sibar/Tests/readiness-report.test.ts: Demonstrates supported/unsupported report claims and evidence indexing behavior."
+            "src/runtime-readiness.ts: Primary generator for readiness scoring, claim levels, evidence indexing, and summary/risk/report composition.",
+            "src/runtime-memory.ts: Constructs understanding memory state that readiness_report consumes for concept/gap/challenge context.",
+            "Tests/readiness-report.test.ts: Demonstrates supported/unsupported report claims and evidence indexing behavior."
           ],
           "why_it_matters": "The learner still needs a narrow evidence-producing repair before readiness can advance.",
           "proposed_action": "Ask the learner to restate the answer with required repo evidence and the same operation.",
@@ -3297,9 +3297,9 @@
             "type": "LearningGap",
             "title": "readiness_report_generation: learner needs evidence-backed repair",
             "evidence": [
-              "/Users/d1eshi/projects/startup/sibar/src/runtime-readiness.ts: Primary generator for readiness scoring, claim levels, evidence indexing, and summary/risk/report composition.",
-              "/Users/d1eshi/projects/startup/sibar/src/runtime-memory.ts: Constructs understanding memory state that readiness_report consumes for concept/gap/challenge context.",
-              "/Users/d1eshi/projects/startup/sibar/Tests/readiness-report.test.ts: Demonstrates supported/unsupported report claims and evidence indexing behavior."
+              "src/runtime-readiness.ts: Primary generator for readiness scoring, claim levels, evidence indexing, and summary/risk/report composition.",
+              "src/runtime-memory.ts: Constructs understanding memory state that readiness_report consumes for concept/gap/challenge context.",
+              "Tests/readiness-report.test.ts: Demonstrates supported/unsupported report claims and evidence indexing behavior."
             ],
             "why_it_matters": "The learner still needs a narrow evidence-producing repair before readiness can advance.",
             "proposed_action": "Ask the learner to restate the answer with required repo evidence and the same operation.",
@@ -3310,19 +3310,19 @@
         "user_evidence_excerpt": "I can describe readiness movement and blocked claims, but I did not cite report fields or evidence entries from in-boundary files.",
         "repo_evidence_citations": [
           {
-            "path": "/Users/d1eshi/projects/startup/sibar/src/runtime-readiness.ts",
+            "path": "src/runtime-readiness.ts",
             "rationale": "Primary generator for readiness scoring, claim levels, evidence indexing, and summary/risk/report composition.",
             "excerpt": "import {",
             "exists": true
           },
           {
-            "path": "/Users/d1eshi/projects/startup/sibar/src/runtime-memory.ts",
+            "path": "src/runtime-memory.ts",
             "rationale": "Constructs understanding memory state that readiness_report consumes for concept/gap/challenge context.",
             "excerpt": "import {",
             "exists": true
           },
           {
-            "path": "/Users/d1eshi/projects/startup/sibar/Tests/readiness-report.test.ts",
+            "path": "Tests/readiness-report.test.ts",
             "rationale": "Demonstrates supported/unsupported report claims and evidence indexing behavior.",
             "excerpt": "included_paths: [\"src\", \"Tests\"],",
             "exists": true
@@ -3386,9 +3386,9 @@
           "type": "LearningGap",
           "title": "readiness_report_generation: learner needs evidence-backed repair",
           "evidence": [
-            "/Users/d1eshi/projects/startup/sibar/src/runtime-readiness.ts: Primary generator for readiness scoring, claim levels, evidence indexing, and summary/risk/report composition.",
-            "/Users/d1eshi/projects/startup/sibar/src/runtime-memory.ts: Constructs understanding memory state that readiness_report consumes for concept/gap/challenge context.",
-            "/Users/d1eshi/projects/startup/sibar/Tests/readiness-report.test.ts: Demonstrates supported/unsupported report claims and evidence indexing behavior."
+            "src/runtime-readiness.ts: Primary generator for readiness scoring, claim levels, evidence indexing, and summary/risk/report composition.",
+            "src/runtime-memory.ts: Constructs understanding memory state that readiness_report consumes for concept/gap/challenge context.",
+            "Tests/readiness-report.test.ts: Demonstrates supported/unsupported report claims and evidence indexing behavior."
           ],
           "why_it_matters": "The learner still needs a narrow evidence-producing repair before readiness can advance.",
           "proposed_action": "Ask the learner to restate the answer with required repo evidence and the same operation.",
@@ -3401,9 +3401,9 @@
             "type": "LearningGap",
             "title": "readiness_report_generation: learner needs evidence-backed repair",
             "evidence": [
-              "/Users/d1eshi/projects/startup/sibar/src/runtime-readiness.ts: Primary generator for readiness scoring, claim levels, evidence indexing, and summary/risk/report composition.",
-              "/Users/d1eshi/projects/startup/sibar/src/runtime-memory.ts: Constructs understanding memory state that readiness_report consumes for concept/gap/challenge context.",
-              "/Users/d1eshi/projects/startup/sibar/Tests/readiness-report.test.ts: Demonstrates supported/unsupported report claims and evidence indexing behavior."
+              "src/runtime-readiness.ts: Primary generator for readiness scoring, claim levels, evidence indexing, and summary/risk/report composition.",
+              "src/runtime-memory.ts: Constructs understanding memory state that readiness_report consumes for concept/gap/challenge context.",
+              "Tests/readiness-report.test.ts: Demonstrates supported/unsupported report claims and evidence indexing behavior."
             ],
             "why_it_matters": "The learner still needs a narrow evidence-producing repair before readiness can advance.",
             "proposed_action": "Ask the learner to restate the answer with required repo evidence and the same operation.",
@@ -3414,19 +3414,19 @@
         "user_evidence_excerpt": "I understand that one open gap blocks readiness, but I missed how `ready_areas`, `open_gaps`, and practice queue all link to specific evidence IDs.",
         "repo_evidence_citations": [
           {
-            "path": "/Users/d1eshi/projects/startup/sibar/src/runtime-readiness.ts",
+            "path": "src/runtime-readiness.ts",
             "rationale": "Primary generator for readiness scoring, claim levels, evidence indexing, and summary/risk/report composition.",
             "excerpt": "import {",
             "exists": true
           },
           {
-            "path": "/Users/d1eshi/projects/startup/sibar/src/runtime-memory.ts",
+            "path": "src/runtime-memory.ts",
             "rationale": "Constructs understanding memory state that readiness_report consumes for concept/gap/challenge context.",
             "excerpt": "import {",
             "exists": true
           },
           {
-            "path": "/Users/d1eshi/projects/startup/sibar/Tests/readiness-report.test.ts",
+            "path": "Tests/readiness-report.test.ts",
             "rationale": "Demonstrates supported/unsupported report claims and evidence indexing behavior.",
             "excerpt": "included_paths: [\"src\", \"Tests\"],",
             "exists": true
@@ -3490,9 +3490,9 @@
           "type": "LearningGap",
           "title": "readiness_report_generation: learner needs evidence-backed repair",
           "evidence": [
-            "/Users/d1eshi/projects/startup/sibar/src/runtime-readiness.ts: Primary generator for readiness scoring, claim levels, evidence indexing, and summary/risk/report composition.",
-            "/Users/d1eshi/projects/startup/sibar/src/runtime-memory.ts: Constructs understanding memory state that readiness_report consumes for concept/gap/challenge context.",
-            "/Users/d1eshi/projects/startup/sibar/Tests/readiness-report.test.ts: Demonstrates supported/unsupported report claims and evidence indexing behavior."
+            "src/runtime-readiness.ts: Primary generator for readiness scoring, claim levels, evidence indexing, and summary/risk/report composition.",
+            "src/runtime-memory.ts: Constructs understanding memory state that readiness_report consumes for concept/gap/challenge context.",
+            "Tests/readiness-report.test.ts: Demonstrates supported/unsupported report claims and evidence indexing behavior."
           ],
           "why_it_matters": "The learner still needs a narrow evidence-producing repair before readiness can advance.",
           "proposed_action": "Ask the learner to restate the answer with required repo evidence and the same operation.",
@@ -3505,9 +3505,9 @@
             "type": "LearningGap",
             "title": "readiness_report_generation: learner needs evidence-backed repair",
             "evidence": [
-              "/Users/d1eshi/projects/startup/sibar/src/runtime-readiness.ts: Primary generator for readiness scoring, claim levels, evidence indexing, and summary/risk/report composition.",
-              "/Users/d1eshi/projects/startup/sibar/src/runtime-memory.ts: Constructs understanding memory state that readiness_report consumes for concept/gap/challenge context.",
-              "/Users/d1eshi/projects/startup/sibar/Tests/readiness-report.test.ts: Demonstrates supported/unsupported report claims and evidence indexing behavior."
+              "src/runtime-readiness.ts: Primary generator for readiness scoring, claim levels, evidence indexing, and summary/risk/report composition.",
+              "src/runtime-memory.ts: Constructs understanding memory state that readiness_report consumes for concept/gap/challenge context.",
+              "Tests/readiness-report.test.ts: Demonstrates supported/unsupported report claims and evidence indexing behavior."
             ],
             "why_it_matters": "The learner still needs a narrow evidence-producing repair before readiness can advance.",
             "proposed_action": "Ask the learner to restate the answer with required repo evidence and the same operation.",
@@ -3518,19 +3518,19 @@
         "user_evidence_excerpt": "Readiness should report only gaps; confirmed concepts and evidence are mainly handled by concept graph generation.",
         "repo_evidence_citations": [
           {
-            "path": "/Users/d1eshi/projects/startup/sibar/src/runtime-readiness.ts",
+            "path": "src/runtime-readiness.ts",
             "rationale": "Primary generator for readiness scoring, claim levels, evidence indexing, and summary/risk/report composition.",
             "excerpt": "import {",
             "exists": true
           },
           {
-            "path": "/Users/d1eshi/projects/startup/sibar/src/runtime-memory.ts",
+            "path": "src/runtime-memory.ts",
             "rationale": "Constructs understanding memory state that readiness_report consumes for concept/gap/challenge context.",
             "excerpt": "import {",
             "exists": true
           },
           {
-            "path": "/Users/d1eshi/projects/startup/sibar/Tests/readiness-report.test.ts",
+            "path": "Tests/readiness-report.test.ts",
             "rationale": "Demonstrates supported/unsupported report claims and evidence indexing behavior.",
             "excerpt": "included_paths: [\"src\", \"Tests\"],",
             "exists": true
@@ -3594,9 +3594,9 @@
           "type": "LearningGap",
           "title": "readiness_report_generation: learner needs evidence-backed repair",
           "evidence": [
-            "/Users/d1eshi/projects/startup/sibar/src/runtime-readiness.ts: Primary generator for readiness scoring, claim levels, evidence indexing, and summary/risk/report composition.",
-            "/Users/d1eshi/projects/startup/sibar/src/runtime-memory.ts: Constructs understanding memory state that readiness_report consumes for concept/gap/challenge context.",
-            "/Users/d1eshi/projects/startup/sibar/Tests/readiness-report.test.ts: Demonstrates supported/unsupported report claims and evidence indexing behavior."
+            "src/runtime-readiness.ts: Primary generator for readiness scoring, claim levels, evidence indexing, and summary/risk/report composition.",
+            "src/runtime-memory.ts: Constructs understanding memory state that readiness_report consumes for concept/gap/challenge context.",
+            "Tests/readiness-report.test.ts: Demonstrates supported/unsupported report claims and evidence indexing behavior."
           ],
           "why_it_matters": "The learner still needs a narrow evidence-producing repair before readiness can advance.",
           "proposed_action": "Ask the learner to restate the answer with required repo evidence and the same operation.",
@@ -3609,9 +3609,9 @@
             "type": "LearningGap",
             "title": "readiness_report_generation: learner needs evidence-backed repair",
             "evidence": [
-              "/Users/d1eshi/projects/startup/sibar/src/runtime-readiness.ts: Primary generator for readiness scoring, claim levels, evidence indexing, and summary/risk/report composition.",
-              "/Users/d1eshi/projects/startup/sibar/src/runtime-memory.ts: Constructs understanding memory state that readiness_report consumes for concept/gap/challenge context.",
-              "/Users/d1eshi/projects/startup/sibar/Tests/readiness-report.test.ts: Demonstrates supported/unsupported report claims and evidence indexing behavior."
+              "src/runtime-readiness.ts: Primary generator for readiness scoring, claim levels, evidence indexing, and summary/risk/report composition.",
+              "src/runtime-memory.ts: Constructs understanding memory state that readiness_report consumes for concept/gap/challenge context.",
+              "Tests/readiness-report.test.ts: Demonstrates supported/unsupported report claims and evidence indexing behavior."
             ],
             "why_it_matters": "The learner still needs a narrow evidence-producing repair before readiness can advance.",
             "proposed_action": "Ask the learner to restate the answer with required repo evidence and the same operation.",
@@ -3622,19 +3622,19 @@
         "user_evidence_excerpt": "I would summarize all concepts as ready first, then decide if open gaps exist, which is opposite to runtime evaluation order.",
         "repo_evidence_citations": [
           {
-            "path": "/Users/d1eshi/projects/startup/sibar/src/runtime-readiness.ts",
+            "path": "src/runtime-readiness.ts",
             "rationale": "Primary generator for readiness scoring, claim levels, evidence indexing, and summary/risk/report composition.",
             "excerpt": "import {",
             "exists": true
           },
           {
-            "path": "/Users/d1eshi/projects/startup/sibar/src/runtime-memory.ts",
+            "path": "src/runtime-memory.ts",
             "rationale": "Constructs understanding memory state that readiness_report consumes for concept/gap/challenge context.",
             "excerpt": "import {",
             "exists": true
           },
           {
-            "path": "/Users/d1eshi/projects/startup/sibar/Tests/readiness-report.test.ts",
+            "path": "Tests/readiness-report.test.ts",
             "rationale": "Demonstrates supported/unsupported report claims and evidence indexing behavior.",
             "excerpt": "included_paths: [\"src\", \"Tests\"],",
             "exists": true
@@ -3698,9 +3698,9 @@
           "type": "LearningGap",
           "title": "readiness_report_generation: learner needs evidence-backed repair",
           "evidence": [
-            "/Users/d1eshi/projects/startup/sibar/src/runtime-readiness.ts: Primary generator for readiness scoring, claim levels, evidence indexing, and summary/risk/report composition.",
-            "/Users/d1eshi/projects/startup/sibar/src/runtime-memory.ts: Constructs understanding memory state that readiness_report consumes for concept/gap/challenge context.",
-            "/Users/d1eshi/projects/startup/sibar/Tests/readiness-report.test.ts: Demonstrates supported/unsupported report claims and evidence indexing behavior."
+            "src/runtime-readiness.ts: Primary generator for readiness scoring, claim levels, evidence indexing, and summary/risk/report composition.",
+            "src/runtime-memory.ts: Constructs understanding memory state that readiness_report consumes for concept/gap/challenge context.",
+            "Tests/readiness-report.test.ts: Demonstrates supported/unsupported report claims and evidence indexing behavior."
           ],
           "why_it_matters": "The learner still needs a narrow evidence-producing repair before readiness can advance.",
           "proposed_action": "Ask the learner to restate the answer with required repo evidence and the same operation.",
@@ -3713,9 +3713,9 @@
             "type": "LearningGap",
             "title": "readiness_report_generation: learner needs evidence-backed repair",
             "evidence": [
-              "/Users/d1eshi/projects/startup/sibar/src/runtime-readiness.ts: Primary generator for readiness scoring, claim levels, evidence indexing, and summary/risk/report composition.",
-              "/Users/d1eshi/projects/startup/sibar/src/runtime-memory.ts: Constructs understanding memory state that readiness_report consumes for concept/gap/challenge context.",
-              "/Users/d1eshi/projects/startup/sibar/Tests/readiness-report.test.ts: Demonstrates supported/unsupported report claims and evidence indexing behavior."
+              "src/runtime-readiness.ts: Primary generator for readiness scoring, claim levels, evidence indexing, and summary/risk/report composition.",
+              "src/runtime-memory.ts: Constructs understanding memory state that readiness_report consumes for concept/gap/challenge context.",
+              "Tests/readiness-report.test.ts: Demonstrates supported/unsupported report claims and evidence indexing behavior."
             ],
             "why_it_matters": "The learner still needs a narrow evidence-producing repair before readiness can advance.",
             "proposed_action": "Ask the learner to restate the answer with required repo evidence and the same operation.",
@@ -3726,19 +3726,19 @@
         "user_evidence_excerpt": "I am sure the report can claim `ready to own` as soon as one concept is confirmed, even with open gaps still present.",
         "repo_evidence_citations": [
           {
-            "path": "/Users/d1eshi/projects/startup/sibar/src/runtime-readiness.ts",
+            "path": "src/runtime-readiness.ts",
             "rationale": "Primary generator for readiness scoring, claim levels, evidence indexing, and summary/risk/report composition.",
             "excerpt": "import {",
             "exists": true
           },
           {
-            "path": "/Users/d1eshi/projects/startup/sibar/src/runtime-memory.ts",
+            "path": "src/runtime-memory.ts",
             "rationale": "Constructs understanding memory state that readiness_report consumes for concept/gap/challenge context.",
             "excerpt": "import {",
             "exists": true
           },
           {
-            "path": "/Users/d1eshi/projects/startup/sibar/Tests/readiness-report.test.ts",
+            "path": "Tests/readiness-report.test.ts",
             "rationale": "Demonstrates supported/unsupported report claims and evidence indexing behavior.",
             "excerpt": "included_paths: [\"src\", \"Tests\"],",
             "exists": true
@@ -3802,9 +3802,9 @@
           "type": "LearningGap",
           "title": "readiness_report_generation: learner needs evidence-backed repair",
           "evidence": [
-            "/Users/d1eshi/projects/startup/sibar/src/runtime-readiness.ts: Primary generator for readiness scoring, claim levels, evidence indexing, and summary/risk/report composition.",
-            "/Users/d1eshi/projects/startup/sibar/src/runtime-memory.ts: Constructs understanding memory state that readiness_report consumes for concept/gap/challenge context.",
-            "/Users/d1eshi/projects/startup/sibar/Tests/readiness-report.test.ts: Demonstrates supported/unsupported report claims and evidence indexing behavior."
+            "src/runtime-readiness.ts: Primary generator for readiness scoring, claim levels, evidence indexing, and summary/risk/report composition.",
+            "src/runtime-memory.ts: Constructs understanding memory state that readiness_report consumes for concept/gap/challenge context.",
+            "Tests/readiness-report.test.ts: Demonstrates supported/unsupported report claims and evidence indexing behavior."
           ],
           "why_it_matters": "The learner still needs a narrow evidence-producing repair before readiness can advance.",
           "proposed_action": "Ask the learner to restate the answer with required repo evidence and the same operation.",
@@ -3817,9 +3817,9 @@
             "type": "LearningGap",
             "title": "readiness_report_generation: learner needs evidence-backed repair",
             "evidence": [
-              "/Users/d1eshi/projects/startup/sibar/src/runtime-readiness.ts: Primary generator for readiness scoring, claim levels, evidence indexing, and summary/risk/report composition.",
-              "/Users/d1eshi/projects/startup/sibar/src/runtime-memory.ts: Constructs understanding memory state that readiness_report consumes for concept/gap/challenge context.",
-              "/Users/d1eshi/projects/startup/sibar/Tests/readiness-report.test.ts: Demonstrates supported/unsupported report claims and evidence indexing behavior."
+              "src/runtime-readiness.ts: Primary generator for readiness scoring, claim levels, evidence indexing, and summary/risk/report composition.",
+              "src/runtime-memory.ts: Constructs understanding memory state that readiness_report consumes for concept/gap/challenge context.",
+              "Tests/readiness-report.test.ts: Demonstrates supported/unsupported report claims and evidence indexing behavior."
             ],
             "why_it_matters": "The learner still needs a narrow evidence-producing repair before readiness can advance.",
             "proposed_action": "Ask the learner to restate the answer with required repo evidence and the same operation.",
@@ -3830,19 +3830,19 @@
         "user_evidence_excerpt": "I am not fully sure how unsupported claims should be represented, so I am avoiding hard statements in my transfer explanation.",
         "repo_evidence_citations": [
           {
-            "path": "/Users/d1eshi/projects/startup/sibar/src/runtime-readiness.ts",
+            "path": "src/runtime-readiness.ts",
             "rationale": "Primary generator for readiness scoring, claim levels, evidence indexing, and summary/risk/report composition.",
             "excerpt": "import {",
             "exists": true
           },
           {
-            "path": "/Users/d1eshi/projects/startup/sibar/src/runtime-memory.ts",
+            "path": "src/runtime-memory.ts",
             "rationale": "Constructs understanding memory state that readiness_report consumes for concept/gap/challenge context.",
             "excerpt": "import {",
             "exists": true
           },
           {
-            "path": "/Users/d1eshi/projects/startup/sibar/Tests/readiness-report.test.ts",
+            "path": "Tests/readiness-report.test.ts",
             "rationale": "Demonstrates supported/unsupported report claims and evidence indexing behavior.",
             "excerpt": "included_paths: [\"src\", \"Tests\"],",
             "exists": true
@@ -3906,9 +3906,9 @@
           "type": "DesignIssue",
           "title": "readiness_report_generation: product terminology makes enforcement unclear",
           "evidence": [
-            "/Users/d1eshi/projects/startup/sibar/src/runtime-readiness.ts: Primary generator for readiness scoring, claim levels, evidence indexing, and summary/risk/report composition.",
-            "/Users/d1eshi/projects/startup/sibar/src/runtime-memory.ts: Constructs understanding memory state that readiness_report consumes for concept/gap/challenge context.",
-            "/Users/d1eshi/projects/startup/sibar/Tests/readiness-report.test.ts: Demonstrates supported/unsupported report claims and evidence indexing behavior."
+            "src/runtime-readiness.ts: Primary generator for readiness scoring, claim levels, evidence indexing, and summary/risk/report composition.",
+            "src/runtime-memory.ts: Constructs understanding memory state that readiness_report consumes for concept/gap/challenge context.",
+            "Tests/readiness-report.test.ts: Demonstrates supported/unsupported report claims and evidence indexing behavior."
           ],
           "why_it_matters": "When product terminology obscures executable enforcement, users treat optional conventions as binding rules.",
           "proposed_action": "Separate product wording confusion from the executable enforcement behavior in the code; clarify which rules are enforced.",
@@ -3921,9 +3921,9 @@
             "type": "DesignIssue",
             "title": "readiness_report_generation: product terminology makes enforcement unclear",
             "evidence": [
-              "/Users/d1eshi/projects/startup/sibar/src/runtime-readiness.ts: Primary generator for readiness scoring, claim levels, evidence indexing, and summary/risk/report composition.",
-              "/Users/d1eshi/projects/startup/sibar/src/runtime-memory.ts: Constructs understanding memory state that readiness_report consumes for concept/gap/challenge context.",
-              "/Users/d1eshi/projects/startup/sibar/Tests/readiness-report.test.ts: Demonstrates supported/unsupported report claims and evidence indexing behavior."
+              "src/runtime-readiness.ts: Primary generator for readiness scoring, claim levels, evidence indexing, and summary/risk/report composition.",
+              "src/runtime-memory.ts: Constructs understanding memory state that readiness_report consumes for concept/gap/challenge context.",
+              "Tests/readiness-report.test.ts: Demonstrates supported/unsupported report claims and evidence indexing behavior."
             ],
             "why_it_matters": "When product terminology obscures executable enforcement, users treat optional conventions as binding rules.",
             "proposed_action": "Separate product wording confusion from the executable enforcement behavior in the code; clarify which rules are enforced.",
@@ -3934,19 +3934,19 @@
         "user_evidence_excerpt": "The many report sections and confidence labels are overwhelming, so I skipped exact section mapping and gave a generic blocked-vs-ready statement.",
         "repo_evidence_citations": [
           {
-            "path": "/Users/d1eshi/projects/startup/sibar/src/runtime-readiness.ts",
+            "path": "src/runtime-readiness.ts",
             "rationale": "Primary generator for readiness scoring, claim levels, evidence indexing, and summary/risk/report composition.",
             "excerpt": "import {",
             "exists": true
           },
           {
-            "path": "/Users/d1eshi/projects/startup/sibar/src/runtime-memory.ts",
+            "path": "src/runtime-memory.ts",
             "rationale": "Constructs understanding memory state that readiness_report consumes for concept/gap/challenge context.",
             "excerpt": "import {",
             "exists": true
           },
           {
-            "path": "/Users/d1eshi/projects/startup/sibar/Tests/readiness-report.test.ts",
+            "path": "Tests/readiness-report.test.ts",
             "rationale": "Demonstrates supported/unsupported report claims and evidence indexing behavior.",
             "excerpt": "included_paths: [\"src\", \"Tests\"],",
             "exists": true
