@@ -1,30 +1,27 @@
 /**
  * Tests for the supply-chain guard.
  *
- * Verifies that the guard detects forbidden patterns and passes for clean configs.
+ * Verifies forbidden pattern detection and guard scan surface behavior.
  */
 
-import { mkdtempSync, writeFileSync, rmSync } from "node:fs";
-import { tmpdir } from "node:os";
+import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
+import { tmpdir } from "node:os";
 import test from "node:test";
 import assert from "node:assert/strict";
 
 import {
-  checkFilePatterns,
   checkDlxLine,
-  checkPackageJsonScripts,
+  checkFilePatterns,
   checkLockfileGuidance,
-  runGuard,
+  checkPackageJsonScripts,
   FORBIDDEN_PATTERNS,
   BASELINE_DEV_DEPENDENCIES,
   BASELINE_DEPENDENCIES,
   REPO_ROOT,
+  runGuard,
+  SCAN_FILES,
 } from "../src/scripts/guard-supply-chain.ts";
-
-// ---------------------------------------------------------------------------
-// Helpers
-// ---------------------------------------------------------------------------
 
 function tempFile(content: string, ext = ".md"): string {
   const dir = mkdtempSync(join(tmpdir(), "sibar-guard-test-"));
@@ -34,9 +31,12 @@ function tempFile(content: string, ext = ".md"): string {
 }
 
 function cleanupTempFile(filePath: string): void {
-  // Extract the temp dir from the file path and remove it
   const dir = filePath.substring(0, filePath.lastIndexOf("/"));
-  try { rmSync(dir, { recursive: true, force: true }); } catch { /* ok */ }
+  try {
+    rmSync(dir, { recursive: true, force: true });
+  } catch {
+    // best effort cleanup in tests
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -71,6 +71,20 @@ test("checkFilePatterns detects npm command", () => {
   const violations = checkFilePatterns(file);
   cleanupTempFile(file);
   assert.ok(violations.some((v) => v.pattern === "npm command"));
+});
+
+test("checkFilePatterns detects npm ci command", () => {
+  const file = tempFile("Run `npm ci` when lockfile is needed.");
+  const violations = checkFilePatterns(file);
+  cleanupTempFile(file);
+  assert.ok(violations.some((v) => v.pattern === "npm command"));
+});
+
+test("checkFilePatterns detects plain rm command", () => {
+  const file = tempFile("Cleanup: rm ./tmp.");
+  const violations = checkFilePatterns(file);
+  cleanupTempFile(file);
+  assert.ok(violations.some((v) => v.pattern === "destructive rm"));
 });
 
 test("checkFilePatterns detects npx command", () => {
@@ -154,12 +168,11 @@ test("checkFilePatterns is clean for pinned lavish-axi dlx", () => {
   const file = tempFile("Optional: pnpm dlx lavish-axi@0.1.10 prototype.html");
   const violations = checkFilePatterns(file);
   cleanupTempFile(file);
-  // Should have no violations since lavish-axi@0.1.10 is the allowed pinned form
   assert.equal(violations.length, 0);
 });
 
 test("checkFilePatterns returns empty for a clean file", () => {
-  const file = tempFile("This file has no violations.\npnpm run build is fine.");
+  const file = tempFile("This file has no violations.\\npnpm run build is fine.");
   const violations = checkFilePatterns(file);
   cleanupTempFile(file);
   assert.equal(violations.length, 0);
@@ -169,21 +182,31 @@ test("checkFilePatterns returns empty for a clean file", () => {
 // Real repository checks (integration)
 // ---------------------------------------------------------------------------
 
-test("guard passes against current package.json scripts", () => {
-  const violations = checkFilePatterns(resolve(REPO_ROOT, "package.json"));
-  assert.equal(violations.length, 0, `Found violations in package.json: ${JSON.stringify(violations)}`);
-});
-
-test("guard passes against scanned selfhost specs", () => {
-  const specFiles = [
+test("guard scan surface includes mission-relevant docs", () => {
+  const surface = [
+    "docs/specs/README.md",
     "docs/specs/selfhost/00_spec_audit_matrix.md",
     "docs/specs/selfhost/01_selfhost_boundary.md",
     "docs/specs/selfhost/02_evaluation_contract.md",
     "docs/specs/selfhost/03_product_improvement_loop.md",
     "docs/specs/selfhost/04_selfhost_gap_detection_benchmark.md",
     "docs/specs/selfhost/05_public_demo_prototype.md",
+    "docs/iterations/README.md",
+    "docs/iterations/01_typescript_runtime_port.md",
+    "docs/iterations/03_swift_bridge_candidate_audit.md",
+    "docs/triage/iteration-spec-adaptation.md",
+    "docs/triage/standalone-swift-app-audit.md",
+    "docs/triage/swift-bridge-candidate-audit.md",
+    "docs/triage/source-triage.md",
   ];
-  for (const relPath of specFiles) {
+  for (const path of surface) {
+    assert.ok(SCAN_FILES.includes(path), `Missing from scan surface: ${path}`);
+  }
+});
+
+test("guard passes against scanned docs and specs", () => {
+  const scannedFiles = SCAN_FILES;
+  for (const relPath of scannedFiles) {
     const violations = checkFilePatterns(resolve(REPO_ROOT, relPath));
     assert.equal(
       violations.length,
@@ -193,9 +216,9 @@ test("guard passes against scanned selfhost specs", () => {
   }
 });
 
-test("guard passes against docs/specs/README.md", () => {
-  const violations = checkFilePatterns(resolve(REPO_ROOT, "docs/specs/README.md"));
-  assert.equal(violations.length, 0, `Found violations: ${JSON.stringify(violations)}`);
+test("guard passes against current package.json scripts", () => {
+  const violations = checkPackageJsonScripts();
+  assert.equal(violations.length, 0, `Found package script violations: ${JSON.stringify(violations)}`);
 });
 
 test("pnpm-lock.yaml exists and package.json declares pnpm packageManager", () => {
@@ -205,13 +228,36 @@ test("pnpm-lock.yaml exists and package.json declares pnpm packageManager", () =
 
 test("full guard run returns no violations", () => {
   const { violations, exitCode } = runGuard();
-  assert.equal(exitCode, 0, `Guard failed with violations:\n${JSON.stringify(violations, null, 2)}`);
+  assert.equal(exitCode, 0, `Guard failed with violations: ${JSON.stringify(violations, null, 2)}`);
   assert.equal(violations.length, 0);
 });
 
 // ---------------------------------------------------------------------------
-// Package.json dependency checks (unit)
+// Package baseline checks
 // ---------------------------------------------------------------------------
+
+test("BASELINE_DEV_DEPENDENCIES contains expected packages", () => {
+  assert.ok(BASELINE_DEV_DEPENDENCIES.has("@types/node"));
+  assert.ok(BASELINE_DEV_DEPENDENCIES.has("typescript"));
+});
+
+test("BASELINE_DEPENDENCIES is empty for this project", () => {
+  assert.equal(BASELINE_DEPENDENCIES.size, 0);
+});
+
+test("FORBIDDEN_PATTERNS covers all required categories", () => {
+  const labels = FORBIDDEN_PATTERNS.map((p) => p.label);
+  assert.ok(labels.includes("npm command"), "missing npm command pattern");
+  assert.ok(labels.includes("npx command"), "missing npx pattern");
+  assert.ok(labels.includes("package-lock reliance"), "missing package-lock pattern");
+  assert.ok(labels.includes("destructive rm"), "missing plain rm pattern");
+  assert.ok(labels.includes("destructive rm -rf"), "missing rm -rf pattern");
+  assert.ok(labels.includes("destructive rm -r"), "missing rm -r pattern");
+  assert.ok(labels.includes("destructive rmdir"), "missing rmdir pattern");
+  assert.ok(labels.includes("remote CDN script"), "missing CDN script pattern");
+  assert.ok(labels.includes("remote stylesheet"), "missing stylesheet pattern");
+  assert.ok(labels.includes("remote font"), "missing Google Fonts pattern");
+});
 
 test("BASELINE_DEV_DEPENDENCIES contains expected packages", () => {
   assert.ok(BASELINE_DEV_DEPENDENCIES.has("@types/node"));
@@ -231,6 +277,7 @@ test("FORBIDDEN_PATTERNS covers all required categories", () => {
   assert.ok(labels.includes("npm command"), "missing npm command pattern");
   assert.ok(labels.includes("npx command"), "missing npx command pattern");
   assert.ok(labels.includes("package-lock reliance"), "missing package-lock pattern");
+  assert.ok(labels.includes("destructive rm"), "missing plain rm pattern");
   assert.ok(labels.includes("destructive rm -rf"), "missing rm -rf pattern");
   assert.ok(labels.includes("destructive rm -r"), "missing rm -r pattern");
   assert.ok(labels.includes("destructive rmdir"), "missing rmdir pattern");

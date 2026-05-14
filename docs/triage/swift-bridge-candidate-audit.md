@@ -18,8 +18,8 @@ Verified from `/Users/d1eshi/projects/startup/sibar` while writing and implement
 | Check | Result |
 |---|---|
 | `git status --short --branch` | Clean `main` before edits. |
-| `npm test` | Pass, 5 tests. |
-| `npm run typecheck` | Pass. |
+| `pnpm test` | Pass, 5 tests. |
+| `pnpm run typecheck` | Pass. |
 | `swift test` | Pass, 12 tests. |
 | STDIO smoke | Pass with `SIBI_RUNTIME_HOME=/tmp/sibi-runtime-swift-bridge-audit`. |
 

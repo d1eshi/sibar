@@ -71,8 +71,8 @@ Relevant source specs:
 
 From `/Users/d1eshi/projects/startup/sibar`:
 
-1. `npm test` passes.
-2. `npm run typecheck` passes.
+1. `pnpm test` passes.
+2. `pnpm run typecheck` passes.
 3. `node --experimental-strip-types src/runtime.ts` accepts a `declare_intent` request over stdin.
 4. A temporary-file `prepare_code_question` request succeeds and returns one question.
 5. `answer_question` persists evidence into the selected `SIBI_RUNTIME_HOME`.
@@ -81,9 +81,9 @@ From `/Users/d1eshi/projects/startup/sibar`:
 ## Verification Commands
 
 ```sh
-npm install
-npm test
-npm run typecheck
+pnpm install
+pnpm test
+pnpm run typecheck
 printf '%s' '{"command":"declare_intent","payload":{"project_label":"sibi","statement":"Validate the TypeScript runtime boundary.","uncertainty":"Need to prove STDIO command execution works."}}' \
   | SIBI_RUNTIME_HOME=/tmp/sibi-runtime-port node --experimental-strip-types src/runtime.ts
 ```
@@ -98,15 +98,15 @@ Completed in this slice:
 4. Adapted `prepare_code_review` to review the copied TypeScript runtime boundary instead of old shell/sidecar files.
 5. Adapted `scripts/sibi-code-question` so JSON stdout works without requiring a native shell target.
 6. Removed `swift-shell` from runtime session tool metadata.
-7. Created `package-lock.json` through `npm install`.
+7. Created `pnpm-lock.yaml` through `pnpm install`.
 
 ## Verification Log
 
 Passed from `/Users/d1eshi/projects/startup/sibar`:
 
-1. `npm install`
-2. `npm test`
-3. `npm run typecheck`
+1. `pnpm install`
+2. `pnpm test`
+3. `pnpm run typecheck`
 4. STDIO smoke with `SIBI_RUNTIME_HOME=/tmp/sibi-runtime-port`
 
 Smoke coverage:

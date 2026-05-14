@@ -103,7 +103,7 @@ This iteration is complete when:
 2. Swift exposes only the five foundation runtime methods.
 3. Swift tests prove envelope decoding, runtime error decoding, command strings, path resolution, and model decoding.
 4. At least one Swift test calls the real TypeScript runtime through `RuntimeClient`.
-5. `npm test` passes.
-6. `npm run typecheck` passes.
+5. `pnpm test` passes.
+6. `pnpm run typecheck` passes.
 7. `swift test` passes.
 8. `docs/triage/swift-bridge-candidate-audit.md` reflects implementation status and next shell/panel boundaries.

@@ -85,8 +85,8 @@ Do not port first:
 
 Verified in source worktree:
 
-1. `npm test` passes: 16 tests.
-2. `npm run typecheck` passes.
+1. `pnpm test` passes: 16 tests.
+2. `pnpm run typecheck` passes.
 3. Runtime command `declare_intent` returns a valid session.
 
 Implemented commands include:

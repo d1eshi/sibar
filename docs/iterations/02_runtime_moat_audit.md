@@ -92,8 +92,8 @@ The audit may override these defaults, but must explain why.
 Before and after the audit artifact:
 
 ```sh
-npm test
-npm run typecheck
+pnpm test
+pnpm run typecheck
 ```
 
 The runtime must remain executable while the audit is being written.
@@ -106,5 +106,5 @@ This iteration is complete when:
 2. Every copied runtime command is classified.
 3. Every copied runtime module is classified.
 4. The next implementation slice is named.
-5. `npm test` passes.
-6. `npm run typecheck` passes.
+5. `pnpm test` passes.
+6. `pnpm run typecheck` passes.

@@ -39,8 +39,8 @@ Spec:
 
 Verification:
 
-1. `npm test` passes
-2. `npm run typecheck` passes
+1. `pnpm test` passes
+2. `pnpm run typecheck` passes
 3. runtime stdin command works for `declare_intent`
 4. temporary-file `prepare_code_question` works
 
@@ -58,8 +58,8 @@ Verification:
 
 1. every copied command is classified as `foundation`, `supporting`, `later`, or `drop`
 2. every copied module is classified
-3. `npm test` passes
-4. `npm run typecheck` passes
+3. `pnpm test` passes
+4. `pnpm run typecheck` passes
 
 ## Iteration 3: Swift Bridge Core
 

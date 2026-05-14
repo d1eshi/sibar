@@ -120,8 +120,8 @@ Completed checks:
 ```text
 swift build
 swift test
-npm test
-npm run typecheck
+pnpm test
+pnpm run typecheck
 ```
 
 Acceptance evidence:
