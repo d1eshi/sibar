@@ -87,6 +87,25 @@ test("checkFilePatterns detects plain rm command", () => {
   assert.ok(violations.some((v) => v.pattern === "destructive rm"));
 });
 
+test("checkFilePatterns detects rm -f command", () => {
+  const file = tempFile("Cleanup: rm -f ./tmp-file.");
+  const violations = checkFilePatterns(file);
+  cleanupTempFile(file);
+  assert.ok(violations.some((v) => v.pattern === "destructive rm"));
+});
+
+test("checkFilePatterns detects combined rm flag variants", () => {
+  for (const command of ["rm -fr ./tmp", "rm -rfv ./tmp", "rm -rvf ./tmp"]) {
+    const file = tempFile(`Cleanup: ${command}.`);
+    const violations = checkFilePatterns(file);
+    cleanupTempFile(file);
+    assert.ok(
+      violations.some((v) => v.pattern === "destructive rm"),
+      `Expected destructive rm violation for ${command}`,
+    );
+  }
+});
+
 test("checkFilePatterns detects npx command", () => {
   const file = tempFile("Use `npx tsc --noEmit` to typecheck.");
   const violations = checkFilePatterns(file);
