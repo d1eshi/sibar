@@ -1,0 +1,1073 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SIBI Public Demo — Codebase Learning Infrastructure</title>
+<style>
+/* ===================================================================
+   SIBI Public Demo — self-contained, fixture-backed, no external assets
+   =================================================================== */
+
+:root {
+  --bg: #0d0d0d;
+  --bg-panel: #1a1a1a;
+  --bg-card: #242424;
+  --border: #333;
+  --text: #e0e0e0;
+  --text-dim: #888;
+  --text-muted: #666;
+  --accent: #f0f0f0;
+  --green: #4ade80;
+  --green-bg: rgba(74, 222, 128, 0.1);
+  --yellow: #facc15;
+  --yellow-bg: rgba(250, 204, 21, 0.1);
+  --blue: #60a5fa;
+  --blue-bg: rgba(96, 165, 250, 0.1);
+  --red: #f87171;
+  --red-bg: rgba(248, 113, 113, 0.1);
+  --purple: #a78bfa;
+  --purple-bg: rgba(167, 139, 250, 0.1);
+  --orange: #fb923c;
+  --orange-bg: rgba(251, 146, 60, 0.1);
+  --radius: 6px;
+  --max-w: 820px;
+  --font-mono: 'Menlo', 'Consolas', 'SF Mono', monospace;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+  font-size: 15px;
+}
+
+/* ---- Prototype banner ---- */
+.prototype-banner {
+  background: #1a1a00;
+  border-bottom: 1px solid #333300;
+  padding: 6px 16px;
+  font-size: 11px;
+  text-align: center;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #888800;
+  font-weight: 600;
+}
+
+/* ---- Layout ---- */
+.container { max-width: var(--max-w); margin: 0 auto; padding: 0 20px; }
+
+/* ---- Header ---- */
+.site-header {
+  padding: 48px 0 20px;
+  text-align: center;
+}
+.site-header h1 {
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin-bottom: 4px;
+}
+.site-header .tagline {
+  font-size: 15px;
+  color: var(--text-dim);
+  max-width: 560px;
+  margin: 0 auto;
+}
+.site-header .spec-ref {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 8px;
+  font-family: var(--font-mono);
+}
+
+/* ---- Sections ---- */
+section { margin: 32px 0; }
+.section-label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--text-muted);
+  margin-bottom: 10px;
+}
+
+/* ---- Narrative ---- */
+.narrative {
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+}
+.narrative h2 { font-size: 18px; margin-bottom: 12px; }
+.narrative p { margin-bottom: 10px; color: var(--text-dim); }
+.narrative .moat-highlight {
+  background: var(--green-bg);
+  border-left: 3px solid var(--green);
+  padding: 10px 14px;
+  border-radius: 0 var(--radius) var(--radius) 0;
+  margin: 16px 0;
+  font-size: 14px;
+}
+.narrative .moat-highlight strong { color: var(--green); }
+
+/* ---- Boundary panel ---- */
+.boundary {
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+}
+.boundary h3 { font-size: 14px; margin-bottom: 10px; }
+.boundary-grid { display: flex; gap: 16px; flex-wrap: wrap; }
+.boundary-col {
+  flex: 1 1 200px;
+  background: var(--bg-card);
+  border-radius: var(--radius);
+  padding: 14px;
+}
+.boundary-col h4 {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 8px;
+}
+.boundary-col.included h4 { color: var(--green); }
+.boundary-col.excluded h4 { color: var(--red); }
+.boundary-col ul {
+  list-style: none;
+  font-size: 13px;
+  font-family: var(--font-mono);
+}
+.boundary-col li {
+  padding: 3px 0;
+  color: var(--text-dim);
+  font-size: 12px;
+}
+.boundary-col.included li::before { content: "+ "; color: var(--green); }
+.boundary-col.excluded li::before { content: "− "; color: var(--red); }
+.boundary-note {
+  margin-top: 14px;
+  font-size: 12px;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+/* ---- Interactive demo ---- */
+.demo-area {
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+}
+
+.question-box {
+  background: var(--bg-card);
+  border-radius: var(--radius);
+  padding: 16px 20px;
+  margin-bottom: 20px;
+}
+.question-box .q-label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+}
+.question-box .q-text {
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+/* Answer state selector */
+.answer-selector {
+  margin-bottom: 20px;
+}
+.answer-selector .as-label {
+  font-size: 12px;
+  color: var(--text-dim);
+  margin-bottom: 8px;
+}
+.state-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.state-btn {
+  flex: 1 1 auto;
+  min-width: 100px;
+  padding: 10px 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-card);
+  color: var(--text-dim);
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 500;
+  text-align: center;
+  transition: all 0.15s ease;
+  font-family: inherit;
+}
+.state-btn:hover { border-color: var(--text-dim); color: var(--text); }
+.state-btn.active { border-color: var(--accent); color: var(--text); background: #2a2a2a; }
+.state-btn.grounded.active { border-color: var(--green); color: var(--green); }
+.state-btn.uncited.active { border-color: var(--yellow); color: var(--yellow); }
+.state-btn.partial.active { border-color: var(--blue); color: var(--blue); }
+.state-btn.overconfident.active { border-color: var(--red); color: var(--red); }
+.state-btn.design.active { border-color: var(--purple); color: var(--purple); }
+
+/* Finding panel */
+.finding-panel {
+  background: var(--bg-card);
+  border-radius: var(--radius);
+  padding: 20px;
+  margin-bottom: 20px;
+}
+.finding-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.finding-badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.badge-readiness { background: var(--green-bg); color: var(--green); }
+.badge-evidence { background: var(--yellow-bg); color: var(--yellow); }
+.badge-flow { background: var(--blue-bg); color: var(--blue); }
+.badge-false { background: var(--red-bg); color: var(--red); }
+.badge-design { background: var(--purple-bg); color: var(--purple); }
+
+.readiness-line {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+.readiness-line span { color: var(--text-dim); font-weight: 400; }
+
+/* Evidence columns */
+.evidence-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+@media (max-width: 600px) {
+  .evidence-grid { grid-template-columns: 1fr; }
+  .boundary-grid { flex-direction: column; }
+  .state-buttons { flex-direction: column; }
+}
+.evidence-col {
+  background: var(--bg);
+  border-radius: var(--radius);
+  padding: 14px;
+}
+.evidence-col h4 {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 8px;
+}
+.evidence-col.user h4 { color: var(--blue); }
+.evidence-col.repo h4 { color: var(--green); }
+.evidence-col .evidence-text {
+  font-size: 13px;
+  color: var(--text-dim);
+  line-height: 1.5;
+}
+.evidence-col .evidence-text.block {
+  background: #111;
+  border-left: 2px solid var(--border);
+  padding: 8px 10px;
+  border-radius: 0 var(--radius) var(--radius) 0;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  margin-top: 6px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* Repo evidence citations */
+.repo-citations {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+.repo-citations span {
+  display: inline-block;
+  background: var(--bg);
+  padding: 2px 8px;
+  border-radius: 999px;
+  margin: 2px 4px 2px 0;
+  font-family: var(--font-mono);
+  font-size: 10px;
+}
+
+/* Repair & Retry */
+.repair-box {
+  border-top: 1px solid var(--border);
+  padding-top: 16px;
+  margin-top: 16px;
+}
+.repair-box h4 {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--orange);
+  margin-bottom: 6px;
+}
+.repair-box .repair-text {
+  font-size: 13px;
+  color: var(--text-dim);
+  margin-bottom: 10px;
+}
+.retry-box {
+  background: var(--bg);
+  border-radius: var(--radius);
+  padding: 12px;
+  margin-top: 8px;
+}
+.retry-box h4 {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--blue);
+  margin-bottom: 6px;
+}
+.retry-box .retry-text {
+  font-size: 12px;
+  color: var(--text-dim);
+  font-style: italic;
+}
+
+.bounded-readiness-note {
+  margin-top: 12px;
+  padding: 10px 14px;
+  background: var(--green-bg);
+  border-left: 3px solid var(--green);
+  border-radius: 0 var(--radius) var(--radius) 0;
+  font-size: 12px;
+  color: var(--green);
+}
+
+/* ---- Constraints label ---- */
+.constraints {
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px 20px;
+}
+.constraints h3 { font-size: 13px; margin-bottom: 8px; }
+.constraints ul {
+  list-style: none;
+  font-size: 12px;
+  color: var(--text-dim);
+}
+.constraints li { padding: 2px 0; }
+.constraints li::before { content: "▸ "; color: var(--text-muted); }
+
+/* ---- Feedback ---- */
+.feedback-area {
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+}
+.feedback-area h2 { font-size: 16px; margin-bottom: 14px; }
+.feedback-field { margin-bottom: 14px; }
+.feedback-field label {
+  display: block;
+  font-size: 12px;
+  color: var(--text-dim);
+  margin-bottom: 4px;
+  font-weight: 500;
+}
+.feedback-field textarea,
+.feedback-field input {
+  width: 100%;
+  padding: 10px 12px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 13px;
+  resize: vertical;
+  min-height: 60px;
+}
+.feedback-field textarea:focus,
+.feedback-field input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+.feedback-buttons {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.feedback-btn {
+  padding: 10px 18px;
+  border: 1px solid var(--accent);
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--accent);
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  font-family: inherit;
+  transition: all 0.15s ease;
+}
+.feedback-btn:hover { background: rgba(255,255,255,0.05); }
+.feedback-btn.copy-btn { border-color: var(--green); color: var(--green); }
+.feedback-btn.copy-btn:hover { background: var(--green-bg); }
+.feedback-status {
+  font-size: 12px;
+  color: var(--green);
+  margin-top: 8px;
+  min-height: 20px;
+}
+
+/* ---- Footer ---- */
+.site-footer {
+  text-align: center;
+  padding: 32px 0;
+  font-size: 11px;
+  color: var(--text-muted);
+  border-top: 1px solid var(--border);
+  margin-top: 40px;
+}
+.site-footer .fixture-label {
+  display: inline-block;
+  background: #1a1a00;
+  color: #888800;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin: 6px 0;
+}
+
+/* ---- Responsive ---- */
+@media (max-width: 480px) {
+  .site-header h1 { font-size: 22px; }
+  .site-header { padding: 32px 0 16px; }
+  section { margin: 24px 0; }
+  .narrative, .boundary, .demo-area, .feedback-area { padding: 16px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ================================================================== -->
+<!-- PROTOTYPE BANNER                                                    -->
+<!-- ================================================================== -->
+<div class="prototype-banner">
+  PROTOTYPE — fixture-backed public demo &middot; no backend &middot; no live repo ingestion &middot; no model calls
+</div>
+
+<div class="container">
+
+<!-- ================================================================== -->
+<!-- HEADER                                                              -->
+<!-- ================================================================== -->
+<header class="site-header">
+  <h1>SIBI Public Demo</h1>
+  <p class="tagline">
+    Codebase learning infrastructure for AI-generated and unfamiliar software.
+    SIBI asks you to reason first, checks your answer against evidence,
+    and declares bounded readiness — not whole-repo mastery.
+  </p>
+  <p class="spec-ref">
+    Spec: docs/specs/selfhost/05_public_demo_prototype.md &middot;
+    Fixtures: docs/specs/selfhost/pilot/reports/VAL-EVAL-006-selfhost-benchmark.json
+  </p>
+</header>
+
+<!-- ================================================================== -->
+<!-- NARRATIVE: Moat vs Repo Chat                                        -->
+<!-- ================================================================== -->
+<section aria-labelledby="narrative-heading">
+  <div class="section-label">The Moat</div>
+  <div class="narrative" id="narrative-heading">
+    <h2>Why SIBI Is Not Repo Chat</h2>
+    <p>
+      Generic repo chat tools optimize for <em>output</em>: generate code, modify files,
+      explain on demand. They reduce friction between you and the answer.
+    </p>
+    <p>
+      SIBI optimizes for a different state: <strong>understanding ownership</strong>.
+      It asks you to attempt an answer first, then compares your reasoning to
+      concrete repository evidence. When you miss something, it diagnoses the gap
+      and gives you a specific repair — not a generic explanation.
+    </p>
+    <div class="moat-highlight">
+      <strong>SIBI vs. chat:</strong> Chat tells you what the code does.
+      SIBI tells you whether <em>you</em> can own a bounded part of the system
+      and what to repair before you touch it.
+    </div>
+    <p>
+      This demo walks through one simulated self-hosted codebase slice.
+      It uses <strong>fixture data only</strong> — no backend, no live repo,
+      no model calls. Every answer state is traced to a concrete evaluator
+      and benchmark report case.
+    </p>
+  </div>
+</section>
+
+<!-- ================================================================== -->
+<!-- ARTIFACT BOUNDARY                                                   -->
+<!-- ================================================================== -->
+<section aria-labelledby="boundary-heading">
+  <div class="section-label">Artifact Boundary</div>
+  <div class="boundary" id="boundary-heading">
+    <h3>What SIBI can evaluate in this demo</h3>
+    <div class="boundary-grid">
+      <div class="boundary-col included">
+        <h4>In Scope</h4>
+        <ul>
+          <li>src/ — runtime, evals, scripts</li>
+          <li>Tests/ — test suite</li>
+          <li>sibar.selfhost.manifest.json</li>
+          <li>package.json, tsconfig.json</li>
+          <li>pnpm-lock.yaml</li>
+          <li>docs/specs/selfhost/pilot/ — gold cases, mastery checks</li>
+        </ul>
+      </div>
+      <div class="boundary-col excluded">
+        <h4>Out of Scope</h4>
+        <ul>
+          <li>docs/product/ — product docs (not evaluated)</li>
+          <li>docs/missions/ — mission artifacts</li>
+          <li>agent-chat-*.md — planning notes</li>
+          <li>node_modules/ — dependencies</li>
+          <li>dist/, .build/, .swiftpm/ — build artifacts</li>
+          <li>Any file not in the manifest included_paths</li>
+        </ul>
+      </div>
+    </div>
+    <p class="boundary-note">
+      Evidence boundaries matter: a claim must cite repo paths inside the
+      artifact boundary. Evidence from outside the boundary cannot support
+      a readiness finding. This prevents overclaiming from partial knowledge.
+    </p>
+  </div>
+</section>
+
+<!-- ================================================================== -->
+<!-- INTERACTIVE DEMO                                                    -->
+<!-- ================================================================== -->
+<section aria-labelledby="demo-heading">
+  <div class="section-label">Interactive Demo</div>
+  <div class="demo-area" id="demo-heading">
+
+    <!-- Question (attempt-first) -->
+    <div class="question-box">
+      <div class="q-label">Ownership Question</div>
+      <div class="q-text">
+        Trace how the SIBI self-hosted runtime enforces artifact boundaries.
+        Which files define what is in scope, and how does the system decide
+        whether a given file path can be used as evidence?
+      </div>
+    </div>
+
+    <!-- Answer state selector -->
+    <div class="answer-selector">
+      <div class="as-label">Select a user answer to see how SIBI evaluates it:</div>
+      <div class="state-buttons" id="stateButtons">
+        <button class="state-btn grounded active" data-state="grounded">Grounded ✓</button>
+        <button class="state-btn uncited" data-state="uncited">Uncited</button>
+        <button class="state-btn partial" data-state="partial">Partial</button>
+        <button class="state-btn overconfident" data-state="overconfident_wrong">Overconfident</button>
+        <button class="state-btn design" data-state="design_induced_confusion">Design Confusion</button>
+      </div>
+    </div>
+
+    <!-- Finding panel (dynamically filled by JS) -->
+    <div class="finding-panel" id="findingPanel">
+      <!-- Filled by JS -->
+    </div>
+
+    <!-- Bounded readiness note -->
+    <div class="bounded-readiness-note" id="readinessNote">
+      <!-- Filled by JS -->
+    </div>
+
+  </div>
+</section>
+
+<!-- ================================================================== -->
+<!-- CONSTRAINTS / PROTOTYPE LABELS                                      -->
+<!-- ================================================================== -->
+<section aria-labelledby="constraints-heading">
+  <div class="section-label">What This Demo Is — and Is Not</div>
+  <div class="constraints" id="constraints-heading">
+    <h3>This demo is:</h3>
+    <ul>
+      <li>Backed by fixture data traced to evaluator/benchmark reports</li>
+      <li>Self-contained static HTML with no backend, database, or auth</li>
+      <li>A prototype showing the Build-to-Learn loop for one concept</li>
+      <li>Deployable as a static site to Vercel, Netlify, or GitHub Pages</li>
+    </ul>
+    <h3 style="margin-top: 12px;">This demo does not claim:</h3>
+    <ul>
+      <li>That SIBI can analyze any arbitrary repository</li>
+      <li>That SIBI understands the whole codebase from one answer</li>
+      <li>That a single correct answer means durable ownership</li>
+      <li>That this demo represents the full product or SwiftUI surface</li>
+      <li>That SIBI is proven superior to any competitor beyond the implemented evidence</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ================================================================== -->
+<!-- FEEDBACK                                                            -->
+<!-- ================================================================== -->
+<section aria-labelledby="feedback-heading">
+  <div class="section-label">Reviewer Feedback</div>
+  <div class="feedback-area" id="feedback-heading">
+    <h2>Help us understand what you saw</h2>
+    <p style="font-size:13px;color:var(--text-dim);margin-bottom:14px;">
+      This feedback is captured locally in your browser. No data is sent to any server.
+      You can copy or download your responses.
+    </p>
+
+    <div class="feedback-field">
+      <label for="fb1">1. What problem does SIBI solve?</label>
+      <textarea id="fb1" placeholder="Describe the problem in your own words..."></textarea>
+    </div>
+    <div class="feedback-field">
+      <label for="fb2">2. Why is this different from asking a chat model to explain code?</label>
+      <textarea id="fb2" placeholder="What makes SIBI's approach different..."></textarea>
+    </div>
+    <div class="feedback-field">
+      <label for="fb3">3. What does "readiness" mean in this demo?</label>
+      <textarea id="fb3" placeholder="What did readiness communicate to you..."></textarea>
+    </div>
+    <div class="feedback-field">
+      <label for="fb4">4. Which part of the flow was confusing?</label>
+      <textarea id="fb4" placeholder="Anything unclear or hard to follow..."></textarea>
+    </div>
+    <div class="feedback-field">
+      <label for="fb5">5. Would you want to try this on software generated by an agent?</label>
+      <input type="text" id="fb5" placeholder="Yes / No / Maybe, because...">
+    </div>
+    <div class="feedback-field">
+      <label for="fb6">6. What would you need before trusting the readiness judgment?</label>
+      <textarea id="fb6" placeholder="What evidence or features would build your trust..."></textarea>
+    </div>
+
+    <div class="feedback-buttons">
+      <button class="feedback-btn copy-btn" id="copyFeedbackBtn">Copy Feedback</button>
+      <button class="feedback-btn" id="downloadFeedbackBtn">Download as Text</button>
+    </div>
+    <div class="feedback-status" id="feedbackStatus"></div>
+  </div>
+</section>
+
+<!-- ================================================================== -->
+<!-- FOOTER                                                              -->
+<!-- ================================================================== -->
+<footer class="site-footer">
+  <div class="fixture-label">FIXTURE-BACKED PROTOTYPE</div>
+  <p style="margin-top:6px;">
+    Demo data traced to
+    <code>docs/specs/selfhost/pilot/reports/VAL-EVAL-006-selfhost-benchmark.json</code>
+    &middot; Cases GC-001 through GC-008
+  </p>
+  <p style="margin-top:4px;">
+    Deployable as static files to Vercel, Netlify, or GitHub Pages.
+    No backend, no database, no auth, no model calls, no remote assets.
+  </p>
+  <p style="margin-top:8px;opacity:0.5;">
+    Spec: <code>docs/specs/selfhost/05_public_demo_prototype.md</code> &middot;
+    Prototype — throwaway review artifact &middot;
+    Iteration: 2026-05-14-public-demo
+  </p>
+</footer>
+
+</div><!-- .container -->
+
+<!-- ================================================================== -->
+<!-- EMBEDDED FIXTURE DATA & INTERACTIVE LOGIC                          -->
+<!-- ================================================================== -->
+<script>
+// =========================================================================
+// Demo fixture data — traced to benchmark report cases.
+// Each entry corresponds to a real evaluator finding from the benchmark.
+// =========================================================================
+
+const DEMO_FIXTURES = {
+  grounded: {
+    answer_state: "grounded",
+    answer_label: "Grounded Answer",
+    case_id: "GC-001",
+    concept: "artifact_boundary",
+    operation: "trace",
+    source_report: "docs/specs/selfhost/pilot/reports/VAL-EVAL-006-selfhost-benchmark.json",
+    observed_finding: "readiness",
+    gap_type: null,
+    issue_candidate_type: "none",
+    readiness: "ready to modify with guardrails",
+    user_evidence: "I would trace boundary control in `sibar.selfhost.manifest.json` and `src/runtime-concept-graph.ts`, cite at least one included file path such as `src/runtime-support.ts` and one excluded path in the manifest, and explain that only listed included paths can support artifact evidence.",
+    repo_evidence: [
+      { path: "src/runtime-concept-graph.ts", rationale: "Boundary traversal logic (included/excluded checks and inventory walk) defines what is in-scope for concept graph evidence.", excerpt: "export function buildConceptGraph" },
+      { path: "src/runtime-support.ts", rationale: "Core types and shared session metadata describe the boundary contract used when reading sessions and sessions' path fields.", excerpt: "included_paths: string[];" },
+      { path: "Tests/concept-graph.test.ts", rationale: "Tests show boundary expectations, especially evidence filtering and exclusion behavior.", excerpt: "excluded_paths" }
+    ],
+    repair_task: null,
+    reevaluation_prompt: null,
+    report_case_passed: true,
+    demo_claimable: true
+  },
+  uncited: {
+    answer_state: "uncited",
+    answer_label: "Uncited Answer",
+    case_id: "GC-002",
+    concept: "artifact_boundary",
+    operation: "trace",
+    source_report: "docs/specs/selfhost/pilot/reports/VAL-EVAL-006-selfhost-benchmark.json",
+    observed_finding: "evidence_gap",
+    gap_type: "evidence_gap",
+    issue_candidate_type: "LearningGap",
+    readiness: "not ready yet",
+    user_evidence: "Boundary checks are based on manifest paths and should include src and Tests.",
+    repo_evidence: [
+      { path: "src/runtime-concept-graph.ts", rationale: "Confirms inclusion logic even when answer semantics are otherwise correct.", excerpt: "export function buildConceptGraph" },
+      { path: "src/runtime-support.ts", rationale: "Confirms metadata contracts for boundary-aware evidence.", excerpt: "included_paths: string[];" },
+      { path: "Tests/concept-graph.test.ts", rationale: "Confirms exclusion of unbounded paths by test assertions.", excerpt: "excluded_paths" }
+    ],
+    repair_task: "Restate the same answer with explicit in-boundary file citations and one allowed/blocked path example.",
+    reevaluation_prompt: "Using the same trace operation, evaluate boundary behavior when only `Tests/` is included and `src/` is excluded; explain how this changes evidence admissibility.",
+    report_case_passed: true,
+    demo_claimable: true
+  },
+  partial: {
+    answer_state: "partial",
+    answer_label: "Partial Answer",
+    case_id: "GC-003",
+    concept: "artifact_boundary",
+    operation: "trace",
+    source_report: "docs/specs/selfhost/pilot/reports/VAL-EVAL-006-selfhost-benchmark.json",
+    observed_finding: "flow_gap",
+    gap_type: "flow_gap",
+    issue_candidate_type: "LearningGap",
+    readiness: "not ready yet",
+    user_evidence: "I know included paths matter, but I mixed whether the include list is validated during session creation or graph generation, so I cannot explain the full sequence end-to-end.",
+    repo_evidence: [
+      { path: "src/runtime-concept-graph.ts", rationale: "Boundary traversal logic (included/excluded checks and inventory walk) defines what is in-scope for concept graph evidence.", excerpt: "export function buildConceptGraph" },
+      { path: "src/runtime-support.ts", rationale: "Core types and shared session metadata describe the boundary contract used when reading sessions and sessions' path fields.", excerpt: "included_paths: string[];" },
+      { path: "Tests/concept-graph.test.ts", rationale: "Tests show boundary expectations, especially evidence filtering and exclusion behavior.", excerpt: "excluded_paths" }
+    ],
+    repair_task: "Trace the boundary sequence end-to-end and connect each phase to repository evidence.",
+    reevaluation_prompt: "Using the same trace operation, evaluate boundary behavior when only `Tests/` is included and `src/` is excluded; explain how this changes evidence admissibility.",
+    report_case_passed: true,
+    demo_claimable: true
+  },
+  overconfident_wrong: {
+    answer_state: "overconfident_wrong",
+    answer_label: "Overconfident Wrong Answer",
+    case_id: "GC-006",
+    concept: "artifact_boundary",
+    operation: "trace",
+    source_report: "docs/specs/selfhost/pilot/reports/VAL-EVAL-006-selfhost-benchmark.json",
+    observed_finding: "false_confidence_gap",
+    gap_type: "false_confidence_gap",
+    issue_candidate_type: "LearningGap",
+    readiness: "not ready yet",
+    user_evidence: "I am certain all files under the repo root are in scope unless they are literally impossible to open, so excluded paths do not matter for this slice.",
+    repo_evidence: [
+      { path: "src/runtime-concept-graph.ts", rationale: "Boundary traversal logic (included/excluded checks and inventory walk) defines what is in-scope for concept graph evidence.", excerpt: "export function buildConceptGraph" },
+      { path: "src/runtime-support.ts", rationale: "Core types and shared session metadata describe the boundary contract used when reading sessions and sessions' path fields.", excerpt: "included_paths: string[];" },
+      { path: "Tests/concept-graph.test.ts", rationale: "Tests show boundary expectations, especially evidence filtering and exclusion behavior.", excerpt: "excluded_paths" }
+    ],
+    repair_task: "Re-ground the confidence claim by contrasting manifest boundaries with excluded-path behavior.",
+    reevaluation_prompt: "Using the same trace operation, evaluate boundary behavior when only `Tests/` is included and `src/` is excluded; explain how this changes evidence admissibility.",
+    report_case_passed: true,
+    demo_claimable: true
+  },
+  design_induced_confusion: {
+    answer_state: "design_induced_confusion",
+    answer_label: "Design-Induced Confusion",
+    case_id: "GC-008",
+    concept: "artifact_boundary",
+    operation: "trace",
+    source_report: "docs/specs/selfhost/pilot/reports/VAL-EVAL-006-selfhost-benchmark.json",
+    observed_finding: "design_induced_gap",
+    gap_type: "design_induced_gap",
+    issue_candidate_type: "DesignIssue",
+    readiness: "not ready yet",
+    user_evidence: "The manifest looks like a style document, not an enforcement rule, so I kept adding references from docs and excluded directories to avoid missing anything.",
+    repo_evidence: [
+      { path: "src/runtime-concept-graph.ts", rationale: "Conflicting expectation that the manifest is only descriptive.", excerpt: "export function buildConceptGraph" },
+      { path: "src/runtime-concept-graph.ts", rationale: "Shows manifest values are executed as filtering rules.", excerpt: "included_paths" },
+      { path: "Tests/concept-graph.test.ts", rationale: "Validates actual enforcement behavior from tests.", excerpt: "excluded_paths" }
+    ],
+    repair_task: "Add product-improvement style repair for interface affordance: make manifest boundary intent and enforcement behavior explicit before re-test.",
+    reevaluation_prompt: "Using the same trace operation, evaluate boundary behavior when only `Tests/` is included and `src/` is excluded; explain how this changes evidence admissibility.",
+    report_case_passed: true,
+    demo_claimable: true
+  }
+};
+
+// =========================================================================
+// Badge color map for finding types
+// =========================================================================
+
+const BADGE_CLASSES = {
+  "readiness": "badge-readiness",
+  "evidence_gap": "badge-evidence",
+  "flow_gap": "badge-flow",
+  "false_confidence_gap": "badge-false",
+  "design_induced_gap": "badge-design"
+};
+
+const BADGE_LABELS = {
+  "readiness": "Readiness",
+  "evidence_gap": "Evidence Gap",
+  "flow_gap": "Flow / Causal Gap",
+  "false_confidence_gap": "False Confidence Gap",
+  "design_induced_gap": "Design-Induced Gap"
+};
+
+const READINESS_COLORS = {
+  "ready to modify with guardrails": "#4ade80",
+  "not ready yet": "#f87171"
+};
+
+// =========================================================================
+// Render finding panel for the selected state
+// =========================================================================
+
+var currentState = "grounded";
+
+function renderFinding(stateKey) {
+  currentState = stateKey;
+  var d = DEMO_FIXTURES[stateKey];
+  var panel = document.getElementById("findingPanel");
+  var readinessNote = document.getElementById("readinessNote");
+
+  var badgeClass = BADGE_CLASSES[d.observed_finding] || "badge-evidence";
+  var badgeLabel = BADGE_LABELS[d.observed_finding] || d.observed_finding;
+  var readinessColor = READINESS_COLORS[d.readiness] || "#888";
+  var isReadiness = d.observed_finding === "readiness";
+
+  // Build repo evidence HTML
+  var repoHTML = "";
+  for (var i = 0; i < d.repo_evidence.length; i++) {
+    var cite = d.repo_evidence[i];
+    repoHTML += '<div class="evidence-text block" style="margin-bottom:8px;">' +
+      '<strong>' + escapeHTML(cite.path) + '</strong>' +
+      '<div style="font-size:11px;color:var(--text-muted);margin-top:2px;">' + escapeHTML(cite.rationale) + '</div>' +
+      '<code style="font-size:10px;opacity:0.7;">' + escapeHTML(cite.excerpt) + '</code>' +
+      '</div>';
+  }
+
+  // Build repo citation chips
+  var chipsHTML = "";
+  for (var j = 0; j < d.repo_evidence.length; j++) {
+    chipsHTML += '<span>' + escapeHTML(d.repo_evidence[j].path) + '</span>';
+  }
+
+  var html = '';
+
+  // Finding header
+  html += '<div class="finding-header">';
+  html += '<span class="finding-badge ' + badgeClass + '">' + badgeLabel + '</span>';
+  html += '<span style="font-size:11px;color:var(--text-muted);font-family:var(--font-mono);">' +
+    d.case_id + ' · ' + d.concept + ' · ' + d.operation + '</span>';
+  html += '</div>';
+
+  // Readiness line
+  html += '<div class="readiness-line">';
+  html += '<span>Readiness: </span>';
+  html += '<strong style="color:' + readinessColor + ';">' + escapeHTML(d.readiness) + '</strong>';
+  if (d.issue_candidate_type !== "none") {
+    html += ' · <span style="font-size:11px;color:var(--text-dim);">Issue: ' +
+      escapeHTML(d.issue_candidate_type) + '</span>';
+  }
+  html += '</div>';
+
+  // Evidence grid
+  html += '<div class="evidence-grid">';
+
+  // User evidence column
+  html += '<div class="evidence-col user">';
+  html += '<h4>User Evidence</h4>';
+  html += '<div class="evidence-text">' + escapeHTML(d.user_evidence) + '</div>';
+  html += '</div>';
+
+  // Repo evidence column
+  html += '<div class="evidence-col repo">';
+  html += '<h4>Repo Evidence</h4>';
+  html += repoHTML;
+  html += '<div class="repo-citations">' + chipsHTML + '</div>';
+  html += '</div>';
+
+  html += '</div>'; // evidence-grid
+
+  // Repair & Retry (only for gap states)
+  if (!isReadiness && d.repair_task) {
+    html += '<div class="repair-box">';
+    html += '<h4>Repair Task</h4>';
+    html += '<div class="repair-text">' + escapeHTML(d.repair_task) + '</div>';
+
+    html += '<div class="retry-box">';
+    html += '<h4>Re-evaluation Prompt</h4>';
+    html += '<div class="retry-text">' + escapeHTML(d.reevaluation_prompt) + '</div>';
+    html += '</div>';
+
+    html += '<p style="font-size:11px;color:var(--text-muted);margin-top:8px;">';
+    html += 'The user must submit a new, evidence-backed answer to the re-evaluation prompt. ';
+    html += 'Readiness remains blocked until the repair succeeds.';
+    html += '</p>';
+    html += '</div>';
+  } else if (isReadiness) {
+    html += '<p style="font-size:12px;color:var(--green);margin-top:8px;">';
+    html += '✓ This answer cites in-boundary repo paths and gives bounded readiness only. ';
+    html += 'No gap detected — no repair needed for this check.';
+    html += '</p>';
+  }
+
+  panel.innerHTML = html;
+
+  // Bounded readiness note
+  if (isReadiness) {
+    readinessNote.innerHTML = '<strong>Bounded readiness:</strong> ' +
+      'This finding only covers the artifact_boundary/trace check. ' +
+      'It does not claim whole-repo mastery, durable ownership from one answer, ' +
+      'or readiness for any other concept or operation.';
+    readinessNote.style.display = "block";
+  } else {
+    readinessNote.innerHTML = '<strong>Readiness blocked:</strong> ' +
+      'A gap was detected. Readiness remains "not ready yet" until the user ' +
+      'completes the repair task and passes re-evaluation with evidence-backed reasoning.';
+    readinessNote.style.display = "block";
+  }
+
+  // Update buttons
+  var buttons = document.querySelectorAll(".state-btn");
+  for (var k = 0; k < buttons.length; k++) {
+    buttons[k].classList.remove("active");
+  }
+  var activeBtn = document.querySelector('[data-state="' + stateKey + '"]');
+  if (activeBtn) activeBtn.classList.add("active");
+}
+
+// =========================================================================
+// Feedback capture (no backend)
+// =========================================================================
+
+function collectFeedback() {
+  var fields = [
+    { id: "fb1", question: "What problem does SIBI solve?" },
+    { id: "fb2", question: "Why is this different from asking a chat model to explain code?" },
+    { id: "fb3", question: 'What does "readiness" mean in this demo?' },
+    { id: "fb4", question: "Which part of the flow was confusing?" },
+    { id: "fb5", question: "Would you want to try this on software generated by an agent?" },
+    { id: "fb6", question: "What would you need before trusting the readiness judgment?" }
+  ];
+
+  var lines = [];
+  lines.push("=== SIBI Public Demo — Reviewer Feedback ===");
+  lines.push("Date: " + new Date().toISOString());
+  lines.push("Demo: fixture-backed static prototype");
+  lines.push("Spec: docs/specs/selfhost/05_public_demo_prototype.md");
+  lines.push("");
+
+  for (var i = 0; i < fields.length; i++) {
+    var f = fields[i];
+    var el = document.getElementById(f.id);
+    var val = el ? el.value.trim() : "";
+    lines.push((i + 1) + ". " + f.question);
+    lines.push("   " + (val || "(no response)"));
+    lines.push("");
+  }
+
+  return lines.join("\n");
+}
+
+function copyFeedback() {
+  var text = collectFeedback();
+  navigator.clipboard.writeText(text).then(function() {
+    var status = document.getElementById("feedbackStatus");
+    status.textContent = "✓ Feedback copied to clipboard.";
+    status.style.color = "var(--green)";
+    setTimeout(function() { status.textContent = ""; }, 3000);
+  }).catch(function() {
+    var status = document.getElementById("feedbackStatus");
+    status.textContent = "Copy failed. Use the Download button instead.";
+    status.style.color = "var(--red)";
+  });
+}
+
+function downloadFeedback() {
+  var text = collectFeedback();
+  var blob = new Blob([text], { type: "text/plain;charset=utf-8" });
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement("a");
+  a.href = url;
+  a.download = "sibi-demo-feedback-" + new Date().toISOString().slice(0, 10) + ".txt";
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  var status = document.getElementById("feedbackStatus");
+  status.textContent = "✓ Feedback downloaded.";
+  status.style.color = "var(--green)";
+  setTimeout(function() { status.textContent = ""; }, 3000);
+}
+
+// =========================================================================
+// Helpers
+// =========================================================================
+
+function escapeHTML(str) {
+  if (!str) return "";
+  return String(str)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
+// =========================================================================
+// Init
+// =========================================================================
+
+document.addEventListener("DOMContentLoaded", function() {
+  // Render initial state
+  renderFinding("grounded");
+
+  // Wire up state buttons
+  var buttons = document.querySelectorAll(".state-btn");
+  for (var i = 0; i < buttons.length; i++) {
+    buttons[i].addEventListener("click", function() {
+      var state = this.getAttribute("data-state");
+      renderFinding(state);
+    });
+  }
+
+  // Wire up feedback buttons
+  var copyBtn = document.getElementById("copyFeedbackBtn");
+  if (copyBtn) copyBtn.addEventListener("click", copyFeedback);
+
+  var downloadBtn = document.getElementById("downloadFeedbackBtn");
+  if (downloadBtn) downloadBtn.addEventListener("click", downloadFeedback);
+});
+</script>
+
+</body>
+</html>

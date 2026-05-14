@@ -51,6 +51,7 @@ const SCAN_FILES = [
 /** Directories to scan recursively for .html and .ts files. */
 const SCAN_DIRS = [
   "docs/specs/selfhost/pilot/prototypes",
+  "docs/demo",
   "src/scripts",
 ];
 
@@ -254,6 +255,20 @@ function checkPrototypeFiles(): Violation[] {
 }
 
 /**
+ * Scan demo HTML files (public static demo).
+ */
+function checkDemoFiles(): Violation[] {
+  const violations: Violation[] = [];
+  const demoDir = resolve(REPO_ROOT, "docs/demo");
+  if (!fileExists(demoDir)) return violations;
+
+  for (const file of walkDir(demoDir, ".html")) {
+    violations.push(...checkFilePatterns(file));
+  }
+  return violations;
+}
+
+/**
  * Scan script TS files, excluding the guard itself.
  */
 function checkScriptFiles(): Violation[] {
@@ -323,7 +338,10 @@ function runGuard(): { violations: Violation[]; exitCode: number } {
   // 4. Scan prototype files recursively
   allViolations.push(...checkPrototypeFiles());
 
-  // 5. Scan script files (excluding guard itself)
+  // 5. Scan demo files recursively
+  allViolations.push(...checkDemoFiles());
+
+  // 6. Scan script files (excluding guard itself)
   allViolations.push(...checkScriptFiles());
 
   // Deduplicate by file+pattern+line
@@ -365,5 +383,5 @@ if (isMain) {
 }
 
 // Exports for testing
-export { runGuard, checkPackageJsonScripts, checkFilePatterns, checkLockfileGuidance, checkDlxLine, FORBIDDEN_PATTERNS, BASELINE_DEV_DEPENDENCIES, BASELINE_DEPENDENCIES, REPO_ROOT, SCAN_FILES, SCAN_DIRS };
+export { runGuard, checkPackageJsonScripts, checkFilePatterns, checkLockfileGuidance, checkDlxLine, checkDemoFiles, FORBIDDEN_PATTERNS, BASELINE_DEV_DEPENDENCIES, BASELINE_DEPENDENCIES, REPO_ROOT, SCAN_FILES, SCAN_DIRS };
 export type { Violation };

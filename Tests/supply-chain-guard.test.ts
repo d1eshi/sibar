@@ -21,6 +21,7 @@ import {
   REPO_ROOT,
   runGuard,
   SCAN_FILES,
+  checkDemoFiles,
 } from "../src/scripts/guard-supply-chain.ts";
 
 function tempFile(content: string, ext = ".md"): string {
@@ -221,6 +222,15 @@ test("guard scan surface includes mission-relevant docs", () => {
   for (const path of surface) {
     assert.ok(SCAN_FILES.includes(path), `Missing from scan surface: ${path}`);
   }
+});
+
+test("guard demo scan passes with no violations", () => {
+  const violations = checkDemoFiles();
+  assert.equal(
+    violations.length,
+    0,
+    `Demo files have violations: ${JSON.stringify(violations)}`,
+  );
 });
 
 test("guard passes against scanned docs and specs", () => {
