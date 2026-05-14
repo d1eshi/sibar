@@ -105,24 +105,32 @@ export type TraceabilityReport = {
 // Demo fixture data
 // ---------------------------------------------------------------------------
 
-const BENCHMARK_REPORT_PATH = "docs/specs/selfhost/pilot/reports/VAL-EVAL-006-selfhost-benchmark.json";
+export const BENCHMARK_REPORT_PATH = "docs/specs/selfhost/pilot/reports/VAL-EVAL-006-selfhost-benchmark.json";
+
+/**
+ * The freeform evaluator report contains the detailed evidence-bearing fields
+ * (user_evidence_excerpt, repo_evidence_citations, repair_task, reevaluation_prompt)
+ * that the benchmark report omits. Demo fixtures with evidence-bearing fields MUST
+ * reference this freeform report as their source_report_path so that VAL-CROSS-001
+ * traceability checks can verify the evidence actually exists in the referenced artifact.
+ */
+const FREEFORM_REPORT_PATH = "docs/specs/selfhost/pilot/reports/VAL-EVAL-008-selfhost-freeform.json";
 
 /**
  * Demo fixtures — one per answer state.
  *
- * Each entry is traced to a specific case in the benchmark report
- * (`docs/specs/selfhost/pilot/reports/VAL-EVAL-006-selfhost-benchmark.json`)
- * which in turn embeds the freeform evaluator output and the deterministic
- * pilot validation pass.
+ * Evidence-bearing fields (user_evidence, repo_evidence, repair_task,
+ * reevaluation_prompt) are derived from the freeform evaluator report
+ * (`docs/specs/selfhost/pilot/reports/VAL-EVAL-008-selfhost-freeform.json`).
  *
- * The data below is extracted from the actual report to ensure it does
- * not contradict evaluator or benchmark output.
+ * Benchmark report is used separately for spec-closure gating
+ * (`specs02to04Passed`, `demoClaimsAreGated`) and summary consistency.
  */
 export const DEMO_FIXTURES: DemoFixtureEntry[] = [
   // ---- grounded (GC-001) ----
   {
     answer_state: "grounded",
-    source_report_path: BENCHMARK_REPORT_PATH,
+    source_report_path: FREEFORM_REPORT_PATH,
     case_id: "GC-001",
     mastery_check_id: "SC-001-artifact-boundary",
     concept_id: "artifact_boundary",
@@ -139,7 +147,8 @@ export const DEMO_FIXTURES: DemoFixtureEntry[] = [
         path: "src/runtime-concept-graph.ts",
         rationale:
           "Boundary traversal logic (included/excluded checks and inventory walk) defines what is in-scope for concept graph evidence.",
-        excerpt: "export function buildConceptGraph",
+        excerpt:
+          "linePattern: /\\b(artifact_session|included_paths|excluded_paths|selection|summary|writeState|readState)\\b/,",
       },
       {
         path: "src/runtime-support.ts",
@@ -164,7 +173,7 @@ export const DEMO_FIXTURES: DemoFixtureEntry[] = [
   // ---- uncited (GC-002) ----
   {
     answer_state: "uncited",
-    source_report_path: BENCHMARK_REPORT_PATH,
+    source_report_path: FREEFORM_REPORT_PATH,
     case_id: "GC-002",
     mastery_check_id: "SC-001-artifact-boundary",
     concept_id: "artifact_boundary",
@@ -180,18 +189,22 @@ export const DEMO_FIXTURES: DemoFixtureEntry[] = [
       {
         path: "src/runtime-concept-graph.ts",
         rationale:
-          "Confirms inclusion logic even when answer semantics are otherwise correct.",
-        excerpt: "export function buildConceptGraph",
+          "Boundary traversal logic (included/excluded checks and inventory walk) defines what is in-scope for concept graph evidence.",
+        excerpt:
+          "linePattern: /\\b(artifact_session|included_paths|excluded_paths|selection|summary|writeState|readState)\\b/,",
       },
       {
         path: "src/runtime-support.ts",
-        rationale: "Confirms metadata contracts for boundary-aware evidence.",
+        rationale:
+          "Core types and shared session metadata describe the boundary contract used when reading sessions and sessions' path fields.",
         excerpt: "included_paths: string[];",
       },
       {
         path: "Tests/concept-graph.test.ts",
-        rationale: "Confirms exclusion of unbounded paths by test assertions.",
-        excerpt: "excluded_paths",
+        rationale:
+          "Tests show boundary expectations, especially evidence filtering and exclusion behavior.",
+        excerpt:
+          '"export type ArtifactSession = { artifact_session_id: string; included_paths: string[]; excluded_paths: string[] };",',
       },
     ],
     repair_task:
@@ -205,7 +218,7 @@ export const DEMO_FIXTURES: DemoFixtureEntry[] = [
   // ---- partial (GC-003) ----
   {
     answer_state: "partial",
-    source_report_path: BENCHMARK_REPORT_PATH,
+    source_report_path: FREEFORM_REPORT_PATH,
     case_id: "GC-003",
     mastery_check_id: "SC-001-artifact-boundary",
     concept_id: "artifact_boundary",
@@ -222,7 +235,8 @@ export const DEMO_FIXTURES: DemoFixtureEntry[] = [
         path: "src/runtime-concept-graph.ts",
         rationale:
           "Boundary traversal logic (included/excluded checks and inventory walk) defines what is in-scope for concept graph evidence.",
-        excerpt: "export function buildConceptGraph",
+        excerpt:
+          "linePattern: /\\b(artifact_session|included_paths|excluded_paths|selection|summary|writeState|readState)\\b/,",
       },
       {
         path: "src/runtime-support.ts",
@@ -234,7 +248,8 @@ export const DEMO_FIXTURES: DemoFixtureEntry[] = [
         path: "Tests/concept-graph.test.ts",
         rationale:
           "Tests show boundary expectations, especially evidence filtering and exclusion behavior.",
-        excerpt: "excluded_paths",
+        excerpt:
+          '"export type ArtifactSession = { artifact_session_id: string; included_paths: string[]; excluded_paths: string[] };",',
       },
     ],
     repair_task:
@@ -248,7 +263,7 @@ export const DEMO_FIXTURES: DemoFixtureEntry[] = [
   // ---- overconfident_wrong (GC-006) ----
   {
     answer_state: "overconfident_wrong",
-    source_report_path: BENCHMARK_REPORT_PATH,
+    source_report_path: FREEFORM_REPORT_PATH,
     case_id: "GC-006",
     mastery_check_id: "SC-001-artifact-boundary",
     concept_id: "artifact_boundary",
@@ -265,7 +280,8 @@ export const DEMO_FIXTURES: DemoFixtureEntry[] = [
         path: "src/runtime-concept-graph.ts",
         rationale:
           "Boundary traversal logic (included/excluded checks and inventory walk) defines what is in-scope for concept graph evidence.",
-        excerpt: "export function buildConceptGraph",
+        excerpt:
+          "linePattern: /\\b(artifact_session|included_paths|excluded_paths|selection|summary|writeState|readState)\\b/,",
       },
       {
         path: "src/runtime-support.ts",
@@ -277,7 +293,8 @@ export const DEMO_FIXTURES: DemoFixtureEntry[] = [
         path: "Tests/concept-graph.test.ts",
         rationale:
           "Tests show boundary expectations, especially evidence filtering and exclusion behavior.",
-        excerpt: "excluded_paths",
+        excerpt:
+          '"export type ArtifactSession = { artifact_session_id: string; included_paths: string[]; excluded_paths: string[] };",',
       },
     ],
     repair_task:
@@ -291,7 +308,7 @@ export const DEMO_FIXTURES: DemoFixtureEntry[] = [
   // ---- design_induced_confusion (GC-008) ----
   {
     answer_state: "design_induced_confusion",
-    source_report_path: BENCHMARK_REPORT_PATH,
+    source_report_path: FREEFORM_REPORT_PATH,
     case_id: "GC-008",
     mastery_check_id: "SC-001-artifact-boundary",
     concept_id: "artifact_boundary",
@@ -307,22 +324,26 @@ export const DEMO_FIXTURES: DemoFixtureEntry[] = [
       {
         path: "src/runtime-concept-graph.ts",
         rationale:
-          "Conflicting expectation that the manifest is only descriptive.",
-        excerpt: "export function buildConceptGraph",
+          "Boundary traversal logic (included/excluded checks and inventory walk) defines what is in-scope for concept graph evidence.",
+        excerpt:
+          "linePattern: /\\b(artifact_session|included_paths|excluded_paths|selection|summary|writeState|readState)\\b/,",
       },
       {
-        path: "src/runtime-concept-graph.ts",
-        rationale: "Shows manifest values are executed as filtering rules.",
-        excerpt: "included_paths",
+        path: "src/runtime-support.ts",
+        rationale:
+          "Core types and shared session metadata describe the boundary contract used when reading sessions and sessions' path fields.",
+        excerpt: "included_paths: string[];",
       },
       {
         path: "Tests/concept-graph.test.ts",
-        rationale: "Validates actual enforcement behavior from tests.",
-        excerpt: "excluded_paths",
+        rationale:
+          "Tests show boundary expectations, especially evidence filtering and exclusion behavior.",
+        excerpt:
+          '"export type ArtifactSession = { artifact_session_id: string; included_paths: string[]; excluded_paths: string[] };",',
       },
     ],
     repair_task:
-      "Add product-improvement style repair for interface affordance: make manifest boundary intent and enforcement behavior explicit before re-test.",
+      "Clarify the product affordance that makes manifest enforcement visible, then retry the boundary trace.",
     reevaluation_prompt:
       "Using the same trace operation, evaluate boundary behavior when only `Tests/` is included and `src/` is excluded; explain how this changes evidence admissibility.",
     report_case_passed: true,
@@ -362,6 +383,36 @@ export function findCaseInBenchmarkReport(
 }
 
 /**
+ * Look up a case in the freeform evaluator report by case_id,
+ * returning the `finding` sub-object which contains evidence-bearing fields
+ * (user_evidence_excerpt, repo_evidence_citations, repair_task, reevaluation_prompt).
+ * Returns null if the case or finding is not found.
+ */
+export function findCaseInFreeformReport(
+  report: Record<string, unknown>,
+  caseId: string,
+): Record<string, unknown> | null {
+  const cases = report["cases"] as Array<Record<string, unknown>> | undefined;
+  if (!cases || !Array.isArray(cases)) return null;
+  const reportCase = cases.find((c) => c["case_id"] === caseId);
+  if (!reportCase) return null;
+  return (reportCase["finding"] as Record<string, unknown>) ?? null;
+}
+
+/**
+ * Strip the repo root prefix from an absolute path, returning a repo-relative path.
+ */
+function repoRelativePath(absolutePath: string): string {
+  const cwd = process.cwd();
+  if (absolutePath.startsWith(cwd)) {
+    let rel = absolutePath.slice(cwd.length);
+    if (rel.startsWith("/")) rel = rel.slice(1);
+    return rel;
+  }
+  return absolutePath;
+}
+
+/**
  * Check whether all spec 02-04 engineering checks pass by inspecting
  * the most recent benchmark report. Returns true when:
  * - The report exists and is parseable
@@ -395,7 +446,12 @@ export function specs02to04Passed(): boolean {
 }
 
 /**
- * Validate a single demo fixture entry against its source report.
+ * Validate a single demo fixture entry against its source report
+ * (freeform evaluator report) and the benchmark report.
+ *
+ * The source_report_path must reference the freeform evaluator report
+ * for evidence-bearing field checks. The benchmark report is used
+ * separately for gating and summary consistency.
  */
 export function traceFixture(
   entry: DemoFixtureEntry,
@@ -427,19 +483,15 @@ export function traceFixture(
       } else {
         caseFoundInReport = true;
 
-        // Check consistency: observed finding should match
-        const reportObservedGapType = reportCase["observed_gap_type"];
-        if (entry.gap_type !== null && reportObservedGapType !== entry.gap_type) {
+        // Check gap_type consistency (from top-level case in freeform report)
+        const reportObservedFindingType = reportCase["observed_finding_type"];
+        const expectedObservedFinding =
+          entry.gap_present && entry.gap_type !== null
+            ? entry.gap_type
+            : "readiness";
+        if (reportObservedFindingType !== expectedObservedFinding) {
           inconsistencies.push(
-            `gap_type mismatch: fixture says "${entry.gap_type}", report says "${String(reportObservedGapType)}"`,
-          );
-        }
-
-        // Check readiness consistency
-        const reportReadiness = reportCase["observed_readiness"];
-        if (reportReadiness !== entry.readiness) {
-          inconsistencies.push(
-            `readiness mismatch: fixture says "${entry.readiness}", report says "${String(reportReadiness)}"`,
+            `gap_type mismatch: fixture says "${expectedObservedFinding}", report observed_finding_type says "${String(reportObservedFindingType)}"`,
           );
         }
 
@@ -451,20 +503,100 @@ export function traceFixture(
           );
         }
 
-        // Check issue candidate type consistency
-        const reportIssueType = reportCase["observed_issue_candidate_type"];
-        if (
-          entry.issue_candidate_type !== "none" &&
-          reportIssueType !== entry.issue_candidate_type
-        ) {
+        // --- Evidence-bearing field checks (from `finding` sub-object) ---
+        const finding = findCaseInFreeformReport(raw, entry.case_id);
+        if (!finding) {
           inconsistencies.push(
-            `issue_candidate_type mismatch: fixture says "${entry.issue_candidate_type}", report says "${String(reportIssueType)}"`,
+            `finding sub-object not found for case "${entry.case_id}" in freeform report`,
           );
+        } else {
+          // Check user_evidence matches user_evidence_excerpt
+          const reportUserEvidence = finding["user_evidence_excerpt"];
+          if (
+            typeof reportUserEvidence === "string" &&
+            reportUserEvidence !== entry.user_evidence
+          ) {
+            inconsistencies.push(
+              `user_evidence mismatch: fixture text differs from report user_evidence_excerpt`,
+            );
+          }
+
+          // Check repair_task matches
+          const reportRepairTask = finding["repair_task"];
+          if (reportRepairTask !== entry.repair_task) {
+            inconsistencies.push(
+              `repair_task mismatch: fixture says "${String(entry.repair_task)}", report says "${String(reportRepairTask)}"`,
+            );
+          }
+
+          // Check reevaluation_prompt matches
+          const reportReevalPrompt = finding["reevaluation_prompt"];
+          if (reportReevalPrompt !== entry.reevaluation_prompt) {
+            inconsistencies.push(
+              `reevaluation_prompt mismatch: fixture says "${String(entry.reevaluation_prompt)}", report says "${String(reportReevalPrompt)}"`,
+            );
+          }
+
+          // Check repo_evidence matches repo_evidence_citations
+          const reportCitations = finding["repo_evidence_citations"] as
+            | Array<Record<string, unknown>>
+            | undefined;
+          if (!reportCitations || !Array.isArray(reportCitations)) {
+            inconsistencies.push(
+              `repo_evidence_citations missing or not an array for case "${entry.case_id}"`,
+            );
+          } else if (reportCitations.length !== entry.repo_evidence.length) {
+            inconsistencies.push(
+              `repo_evidence length mismatch: fixture has ${entry.repo_evidence.length} citations, report has ${reportCitations.length}`,
+            );
+          } else {
+            for (let ri = 0; ri < entry.repo_evidence.length; ri++) {
+              const fixtureCitation = entry.repo_evidence[ri];
+              const reportCitation = reportCitations[ri];
+              const reportPathRel = repoRelativePath(
+                String(reportCitation["path"] ?? ""),
+              );
+              if (reportPathRel !== fixtureCitation.path) {
+                inconsistencies.push(
+                  `repo_evidence[${ri}] path mismatch: fixture says "${fixtureCitation.path}", report says "${reportPathRel}"`,
+                );
+              }
+              if (String(reportCitation["rationale"] ?? "") !== fixtureCitation.rationale) {
+                inconsistencies.push(
+                  `repo_evidence[${ri}] rationale mismatch for "${fixtureCitation.path}"`,
+                );
+              }
+              if (String(reportCitation["excerpt"] ?? "") !== fixtureCitation.excerpt) {
+                inconsistencies.push(
+                  `repo_evidence[${ri}] excerpt mismatch for "${fixtureCitation.path}"`,
+                );
+              }
+            }
+          }
+
+          // Check readiness consistency (from finding sub-object for freeform)
+          const findingReadiness = finding["readiness"];
+          if (findingReadiness !== entry.readiness) {
+            inconsistencies.push(
+              `readiness mismatch: fixture says "${entry.readiness}", finding says "${String(findingReadiness)}"`,
+            );
+          }
+
+          // Check issue candidate type consistency
+          const findingIssueType = finding["issue_candidate_type"];
+          if (
+            entry.issue_candidate_type !== "none" &&
+            findingIssueType !== entry.issue_candidate_type
+          ) {
+            inconsistencies.push(
+              `issue_candidate_type mismatch: fixture says "${entry.issue_candidate_type}", finding says "${String(findingIssueType)}"`,
+            );
+          }
         }
       }
-    } catch {
+    } catch (err) {
       inconsistencies.push(
-        `failed to parse report: ${entry.source_report_path}`,
+        `failed to parse report: ${entry.source_report_path}: ${String(err)}`,
       );
     }
   }

@@ -18,11 +18,13 @@ import assert from "node:assert/strict";
 
 import {
   DEMO_FIXTURES,
+  BENCHMARK_REPORT_PATH,
   validateDemoFixturesTraceability,
   demoClaimsAreGated,
   specs02to04Passed,
   loadBenchmarkReport,
   findCaseInBenchmarkReport,
+  findCaseInFreeformReport,
   type DemoFixtureEntry,
 } from "../src/demo/fixtures.ts";
 
@@ -163,7 +165,7 @@ test("every demo fixture case_id exists in its source report", () => {
 });
 
 test("demo fixtures do not contradict benchmark report data", () => {
-  const absPath = resolve(DEMO_FIXTURES[0].source_report_path);
+  const absPath = resolve(BENCHMARK_REPORT_PATH);
   const raw = JSON.parse(readFileSync(absPath, "utf8")) as Record<
     string,
     unknown
@@ -407,6 +409,107 @@ test("demo fixture evidence includes repo paths within artifact boundary", () =>
         typeof citation.excerpt === "string" && citation.excerpt.length > 0,
         `repo evidence for "${entry.answer_state}" must have non-empty excerpt`,
       );
+    }
+  }
+});
+
+// ---------------------------------------------------------------------------
+// VAL-CROSS-001: Evidence-bearing fields trace to the referenced artifact
+// ---------------------------------------------------------------------------
+
+test("fixture evidence-bearing fields exist in the referenced freeform report", () => {
+  for (let i = 0; i < DEMO_FIXTURES.length; i++) {
+    const entry = DEMO_FIXTURES[i];
+    const absPath = resolve(entry.source_report_path);
+    assert.ok(
+      existsSync(absPath),
+      `source report for "${entry.answer_state}" must exist: ${entry.source_report_path}`,
+    );
+
+    const raw = JSON.parse(readFileSync(absPath, "utf8")) as Record<
+      string,
+      unknown
+    >;
+    const finding = findCaseInFreeformReport(raw, entry.case_id);
+    assert.ok(
+      finding !== null,
+      `finding sub-object not found for case "${entry.case_id}" in ${entry.source_report_path} for answer_state "${entry.answer_state}"`,
+    );
+
+    if (finding) {
+      // user_evidence must match user_evidence_excerpt exactly
+      const reportUserEvidence = finding["user_evidence_excerpt"];
+      assert.equal(
+        reportUserEvidence,
+        entry.user_evidence,
+        `user_evidence mismatch for "${entry.answer_state}": fixture text differs from report user_evidence_excerpt`,
+      );
+
+      // repair_task must match exactly (both null or both equal strings)
+      assert.equal(
+        finding["repair_task"],
+        entry.repair_task,
+        `repair_task mismatch for "${entry.answer_state}": fixture says "${String(entry.repair_task)}", report says "${String(finding["repair_task"])}"`,
+      );
+
+      // reevaluation_prompt must match exactly
+      assert.equal(
+        finding["reevaluation_prompt"],
+        entry.reevaluation_prompt,
+        `reevaluation_prompt mismatch for "${entry.answer_state}": fixture says "${String(entry.reevaluation_prompt)}", report says "${String(finding["reevaluation_prompt"])}"`,
+      );
+
+      // repo_evidence must match repo_evidence_citations
+      const reportCitations = finding["repo_evidence_citations"] as
+        | Array<Record<string, unknown>>
+        | undefined;
+      assert.ok(
+        Array.isArray(reportCitations) && reportCitations.length > 0,
+        `repo_evidence_citations missing or empty for "${entry.answer_state}"`,
+      );
+
+      assert.equal(
+        reportCitations!.length,
+        entry.repo_evidence.length,
+        `repo_evidence length mismatch for "${entry.answer_state}": fixture has ${entry.repo_evidence.length}, report has ${reportCitations!.length}`,
+      );
+
+      // Strip repo root prefix from report paths for comparison
+      const cwd = process.cwd();
+      const toRelative = (p: string): string => {
+        if (p.startsWith(cwd)) {
+          let rel = p.slice(cwd.length);
+          if (rel.startsWith("/")) rel = rel.slice(1);
+          return rel;
+        }
+        return p;
+      };
+
+      for (let ri = 0; ri < entry.repo_evidence.length; ri++) {
+        const fixtureCitation = entry.repo_evidence[ri];
+        const reportCitation = reportCitations![ri] as Record<string, unknown>;
+        const reportPathRel = toRelative(
+          String(reportCitation["path"] ?? ""),
+        );
+
+        assert.equal(
+          reportPathRel,
+          fixtureCitation.path,
+          `repo_evidence[${ri}] path mismatch for "${entry.answer_state}": fixture says "${fixtureCitation.path}", report says "${reportPathRel}"`,
+        );
+
+        assert.equal(
+          String(reportCitation["rationale"] ?? ""),
+          fixtureCitation.rationale,
+          `repo_evidence[${ri}] rationale mismatch for "${entry.answer_state}" path "${fixtureCitation.path}"`,
+        );
+
+        assert.equal(
+          String(reportCitation["excerpt"] ?? ""),
+          fixtureCitation.excerpt,
+          `repo_evidence[${ri}] excerpt mismatch for "${entry.answer_state}" path "${fixtureCitation.path}"`,
+        );
+      }
     }
   }
 });
