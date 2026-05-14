@@ -72,3 +72,92 @@ New work must produce at least one of:
 
 Work that does not produce one of those artifacts remains foundation or backlog,
 even if it is useful later.
+
+## Feature Outcome
+
+This spec gives the team one map of the active MVP gate. A developer or reviewer
+should be able to see which foundation specs are active, which executable specs
+own each feature outcome, what coverage exists, and which outcome should be
+improved next.
+
+## Manual Harness
+
+Use this spec during planning and manual review:
+
+1. Pick one proposed feature or fix.
+2. Confirm it strengthens an active self-hosted loop step.
+3. Confirm it produces one accepted artifact: manifest, mastery check, gold
+   case, evaluator behavior, benchmark report, or readiness evidence.
+4. Confirm its iteration notes live in the self-hosted spec that owns the
+   outcome.
+5. Reject the work as backlog when it does not improve executable evidence.
+
+## Eval Coverage
+
+Current coverage:
+
+1. `npm run eval:selfhost-pilot`
+2. `npm run eval:selfhost-benchmark`
+3. `npm test -- Tests/selfhost-pilot-evals.test.ts Tests/selfhost-benchmark.test.ts`
+4. `npm run typecheck`
+
+This spec is not itself an evaluator. It is the audit map that decides whether
+new work belongs in the executable MVP gate.
+
+## Iteration Log
+
+### 2026-05-14: SDD living-spec standard
+
+Input used:
+
+- The self-hosted execution-layer handoff.
+- The current five self-hosted specs.
+- The foundation spec index in `docs/specs/README.md`.
+
+Expected outcome:
+
+- A developer can tell that foundation specs are conceptual contracts and
+  self-hosted specs are executable MVP specs.
+
+Actual outcome:
+
+- The SDD routing is documented in the foundation README.
+- Each self-hosted spec now owns a feature outcome, harness, coverage, log,
+  acceptance gate, and next iteration.
+
+What worked:
+
+- The existing self-hosted specs already map cleanly to the MVP loop.
+- No new `selfhost/features` directory was needed.
+
+What failed or remains weak:
+
+- The audit still reports deterministic coverage, not freeform user-answer
+  behavior.
+- The generic chat baseline is specified but not yet executable.
+
+Coverage added or missing:
+
+- Added documentation coverage for SDD reading and iteration rules.
+- Missing automated coverage that enforces presence of living-spec sections.
+
+Decision:
+
+- Keep the five self-hosted specs as the initial executable spec set.
+- Add new specs only when a feature has independent outcome, I/O, manual
+  harness, and eval gate.
+
+## Acceptance Gate
+
+This audit map is MVP-ready when:
+
+1. every active self-hosted feature maps to one live spec
+2. every live spec names its user outcome and next iteration
+3. every completed iteration links to eval coverage or explicitly marks the gap
+4. no feature work lands only as untracked notes outside self-hosted specs
+
+## Next Iteration
+
+Add a lightweight documentation check that fails when any self-hosted spec lacks
+the standard living-spec sections. Keep it docs-only unless the team decides to
+enforce the check through `npm test`.

@@ -150,3 +150,124 @@ This contract is proven when deterministic cases show:
 4. wrong responsibility answers produce responsibility gaps
 5. overconfident wrong answers produce false confidence gaps
 6. plausible confusion can become a product/design issue instead of a user gap
+
+## Feature Outcome
+
+The user receives an evidence-backed evaluation of a freeform ownership answer.
+Given a `MasteryCheck`, the user's answer, and bounded repo evidence, SIBI emits
+either a bounded readiness finding or a `GapFinding` with user evidence, repo
+evidence, typed insufficiency, missing reasoning step, repair linkage, and no
+whole-repo overclaim.
+
+This spec owns three feature outcomes:
+
+1. freeform answer evaluator
+2. evidence index for user plus repo evidence
+3. typed gap classification
+
+## Manual Harness
+
+Use one mastery check from `docs/specs/selfhost/pilot/mastery-checks/` and test
+the following freeform answers manually:
+
+| Case | Input answer shape | Expected outcome |
+|---|---|---|
+| grounded | cites the required paths and explains the required operation | bounded readiness only |
+| uncited | gives the right explanation without repo evidence | `evidence_gap` |
+| partial | names the concept but skips the required reasoning step | `flow_gap` or `causal_gap` |
+| overconfident wrong | declares high confidence while contradicting evidence | `false_confidence_gap` |
+| design confusion | gives a reasonable answer that fails because the product hides the evidence | `design_induced_gap` plus `DesignIssue` |
+
+Manual testers should record:
+
+1. the `MasteryCheck` used
+2. the user answer text
+3. expected finding
+4. actual finding
+5. user evidence excerpt
+6. repo evidence citation
+7. repair or readiness result
+
+## Eval Coverage
+
+Current coverage:
+
+1. `npm run eval:selfhost-pilot` validates the manifest, mastery checks, gold
+   cases, required fields, and evidence boundaries.
+2. `npm run eval:selfhost-benchmark` reports deterministic precision, recall,
+   gap type accuracy, evidence quality, false-confidence detection, and
+   design-issue detection over 40 gold cases.
+3. `Tests/selfhost-pilot-evals.test.ts` and `Tests/selfhost-benchmark.test.ts`
+   protect validator and benchmark regressions.
+
+Missing coverage:
+
+1. a freeform evaluator that infers outcomes from `user_answer` instead of
+   trusting `answer_class`
+2. regression tests for freeform grounded, uncited, partial, overconfident
+   wrong, and design-induced answers
+3. exact user-evidence excerpts and repo-evidence excerpts in observed findings
+
+## Iteration Log
+
+### 2026-05-14: First freeform evaluator spec iteration
+
+Input used:
+
+- existing mastery checks
+- 40 gold cases with simulated user answers
+- deterministic self-hosted benchmark report
+
+Expected outcome:
+
+- Define the first feature iteration that moves from labeled fixtures toward
+  freeform answer evaluation.
+
+Actual outcome:
+
+- This spec now names the freeform evaluator as the next executable feature and
+  defines manual cases, expected findings, missing coverage, and acceptance
+  criteria.
+
+What worked:
+
+- The existing gold cases already contain simulated freeform answer text.
+- The current gap labels map cleanly to the five required manual cases.
+
+What failed or remains weak:
+
+- The benchmark currently derives observations from `answer_class`, so it proves
+  schema discipline more than answer understanding.
+- Evidence quality is scored deterministically instead of from actual extracted
+  user and repo evidence.
+
+Coverage added or missing:
+
+- Added documentation coverage for manual freeform cases.
+- Missing evaluator behavior and regression tests for freeform answers.
+
+Decision:
+
+- Implement freeform answer evaluation here before adding model-signal
+  validation, UI, full RAG, or new spec directories.
+
+## Acceptance Gate
+
+This feature is MVP-ready when:
+
+1. the evaluator accepts `MasteryCheck + user_answer + bounded repo evidence`
+2. it emits `GapFinding | ReadinessFinding` without using `answer_class` as the
+   authority
+3. every gap includes both user evidence and repo evidence
+4. grounded answers can produce bounded readiness
+5. uncited answers produce evidence gaps
+6. partial answers produce flow or causal gaps
+7. high-confidence contradictions produce false-confidence gaps
+8. plausible product-caused confusion can produce a design issue
+9. tests fail when output is generic, uncited, or overconfident
+
+## Next Iteration
+
+Build the first freeform evaluator slice inside the existing eval/runtime
+surface. Start with five cases, one per manual answer shape above, and report
+both observed finding type and whether user plus repo evidence were attached.

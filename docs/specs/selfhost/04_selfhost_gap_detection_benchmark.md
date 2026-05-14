@@ -141,3 +141,112 @@ artifacts remain in `docs/specs/selfhost/pilot/`.
 
 Do not add a new eval framework until the pilot dataset proves that the
 self-hosted contract needs behavior not supported by the current eval runner.
+
+## Feature Outcome
+
+The team receives a repeatable benchmark that proves whether SIBI is more
+grounded, more precise, and more useful than generic chat for the bounded
+self-hosted MVP slice.
+
+This spec owns three feature outcomes:
+
+1. executable eval harness
+2. benchmark reports
+3. generic chat baseline comparison
+
+## Manual Harness
+
+Use the current report at
+`docs/specs/selfhost/pilot/reports/VAL-EVAL-006-selfhost-benchmark.json` and
+confirm:
+
+1. all 40 cases load
+2. every answer class appears exactly five times
+3. every gap-bearing case has repair and re-evaluation presence
+4. false-confidence cases are detected
+5. design-induced cases produce design issues
+6. evidence quality is visible in the aggregate
+
+For the future generic chat baseline, run the same mastery check and answer
+against:
+
+1. SIBI with the evaluation contract
+2. a generic chat prompt with the same files
+3. a generic chat prompt without enforced evidence schema
+
+Record unsupported claims, evidence quality, false-confidence handling, and
+repair usefulness.
+
+## Eval Coverage
+
+Current coverage:
+
+1. `npm run eval:selfhost-benchmark`
+2. `Tests/selfhost-benchmark.test.ts`
+3. generated benchmark report with 40/40 passing cases
+4. aggregate metrics for precision, recall, type accuracy, evidence quality,
+   false-confidence recall, and design-issue recall
+
+Missing coverage:
+
+1. generic chat baseline execution
+2. freeform answer evaluation from answer text
+3. repair usefulness scoring
+4. unsupported claim rate
+5. readiness calibration after re-evaluation
+
+## Iteration Log
+
+### 2026-05-14: Living benchmark spec
+
+Input used:
+
+- current deterministic benchmark implementation
+- generated self-hosted benchmark report
+- pilot gold case dataset
+
+Expected outcome:
+
+- Make the benchmark spec explicit about what is already executable and what is
+  still only specified.
+
+Actual outcome:
+
+- The spec now separates current deterministic harness coverage from missing
+  freeform and generic-chat baseline coverage.
+
+What worked:
+
+- The benchmark is executable and returns stable aggregate metrics.
+- It catches malformed labels, invalid gap types, and load mismatches.
+
+What failed or remains weak:
+
+- Observed behavior is still tied to expected labels.
+- The benchmark cannot yet prove superiority over generic chat.
+
+Coverage added or missing:
+
+- Added documentation coverage for benchmark manual review and baseline intent.
+- Missing generic chat and freeform evaluator execution.
+
+Decision:
+
+- Extend the current harness before introducing a new eval framework.
+
+## Acceptance Gate
+
+This feature is MVP-ready when:
+
+1. benchmark cases can run through freeform answer evaluation
+2. SIBI reports evidence quality from actual attached evidence
+3. the generic chat baseline runs over the same cases
+4. SIBI beats generic chat on evidence quality and false-confidence detection
+5. repair usefulness passes for at least 80 percent of real gap cases
+6. unsupported readiness claims are counted and fail the benchmark
+
+## Next Iteration
+
+Add a small freeform benchmark mode with five cases first. After that passes,
+add generic chat baseline comparison without changing the current deterministic
+40-case harness.

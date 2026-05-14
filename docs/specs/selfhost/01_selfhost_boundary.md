@@ -112,3 +112,99 @@ This boundary is valid only when:
 3. every concept maps to at least one included path
 4. every mastery check states its required evidence
 5. readiness claims are limited to this boundary
+
+## Feature Outcome
+
+The user receives a visible, bounded artifact session for the self-hosted MVP.
+SIBI can say which files are in scope, which files are out of scope, which
+concepts are being evaluated, and which readiness claims are forbidden because
+they exceed the manifest boundary.
+
+## Manual Harness
+
+Manual testers should use `sibar.selfhost.manifest.json` and inspect:
+
+1. `included_paths` contain only the first runtime learning-loop slice.
+2. `excluded_paths` block `Sources/`, build artifacts, mission handoffs, and
+   dependencies.
+3. every concept maps to an included source or test path.
+4. a proposed readiness claim can be rejected when it cites an excluded path.
+5. a proposed feature can be rejected when it tries to evaluate the whole repo.
+
+Expected manual outcome:
+
+```text
+SIBI evaluates only the declared self-hosted slice and cannot use out-of-bound
+evidence to support gaps or readiness.
+```
+
+## Eval Coverage
+
+Current coverage:
+
+1. `npm run eval:selfhost-pilot` checks manifest existence, included-path
+   existence, concept set, mastery check index, gold case index, and out-of-scope
+   required evidence paths.
+2. `Tests/selfhost-pilot-evals.test.ts` mutates gold cases to prove out-of-bound
+   required evidence is rejected.
+3. Runtime artifact boundary behavior is also covered by `Tests/runtime.test.ts`.
+
+Missing coverage:
+
+1. manual freeform answers are not yet evaluated against boundary leakage.
+2. readiness reports are not yet benchmarked against adversarial excluded-path
+   citations in this self-hosted harness.
+
+## Iteration Log
+
+### 2026-05-14: Living boundary spec
+
+Input used:
+
+- `sibar.selfhost.manifest.json`
+- the five first-slice concepts
+- current self-hosted pilot validator behavior
+
+Expected outcome:
+
+- Boundary becomes the first executable feature gate, not only manifest metadata.
+
+Actual outcome:
+
+- The spec now states what the user receives, how to manually test boundary
+  behavior, and which coverage protects it.
+
+What worked:
+
+- The manifest already contains the paths, concepts, test commands, and
+  out-of-scope list needed for manual review.
+
+What failed or remains weak:
+
+- Boundary is enforced for fixtures and manifest validation, but not yet shown
+  through a freeform user-answer session.
+
+Coverage added or missing:
+
+- Added documentation coverage for manual boundary testing.
+- Missing adversarial freeform boundary cases.
+
+Decision:
+
+- Keep boundary work in this spec. Do not split it into a separate feature spec.
+
+## Acceptance Gate
+
+This feature is MVP-ready when:
+
+1. every self-hosted answer, gap, repair, and readiness claim can be traced back
+   to manifest-allowed evidence
+2. excluded paths are rejected in both fixtures and freeform answer evaluation
+3. manual testers can reproduce one accepted in-bound claim and one rejected
+   out-of-bound claim
+
+## Next Iteration
+
+Add freeform boundary-leak cases to the first freeform answer evaluator slice:
+one answer should cite only included paths, one should cite an excluded path, and
+one should mix included and excluded evidence.

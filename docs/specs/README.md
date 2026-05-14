@@ -4,6 +4,23 @@ v0.1 has 10 foundation specs. Specs 01-08 define the Build-to-Learn loop.
 Specs 09-10 add the bounded project-learning agent and the reusable study UI.
 Treat these as the specs that govern the launch track.
 
+## Spec-Driven Development Map
+
+Sibi uses spec-driven development with three spec layers:
+
+1. `docs/specs/`: Foundation specs. These are product and architecture
+   contracts. They define what Sibi promises, what it refuses to do, and which
+   invariants must survive implementation.
+2. `docs/specs/selfhost/`: Executable MVP specs. These are the active specs for
+   building, testing, and iterating self-hosted MVP features.
+3. `docs/specs/selfhost/pilot/`: Harness artifacts. These contain mastery
+   checks, gold cases, reports, and fixtures that prove executable specs.
+
+A developer should read the foundation specs as conceptual contracts and the
+self-hosted specs as live implementation gates. The self-hosted specs record
+what the user receives, how to test it manually, what eval coverage exists,
+what failed in the last iteration, and what must change next.
+
 | # | Spec | Purpose |
 |---|------|---------|
 | 1 | `01_artifact_intake.md` | Define how a real repo, folder, or file set enters Sibi. |
@@ -56,3 +73,52 @@ For the self-hosted MVP, new work must produce at least one of:
 4. evaluator
 5. benchmark report
 6. readiness evidence
+
+## Self-Hosted Feature Rule
+
+Do not create `docs/specs/selfhost/features/`. Iterate inside the existing
+self-hosted specs unless a feature has all of these:
+
+1. an independent user-visible outcome
+2. its own input/output contract
+3. its own manual harness
+4. its own eval gate
+5. no clean home inside one of the current self-hosted specs
+
+Start with the five live self-hosted specs. Move toward ten only when a new spec
+prevents mixed outcomes inside an existing spec.
+
+## Living Spec Sections
+
+Every live self-hosted spec should keep these sections current:
+
+1. `Feature Outcome`: what the user receives.
+2. `Manual Harness`: how to test the feature by hand.
+3. `Eval Coverage`: which tests, evals, reports, or fixtures protect it.
+4. `Iteration Log`: input used, expected outcome, actual outcome, what worked,
+   what failed, and what changed.
+5. `Acceptance Gate`: when the feature is MVP-ready.
+6. `Next Iteration`: the next narrow improvement.
+
+An iteration is valid only when it records:
+
+1. input used
+2. expected outcome
+3. actual outcome
+4. what worked
+5. what failed
+6. coverage added or still missing
+7. the decision for the next iteration
+
+## Valid MVP Outcomes
+
+A self-hosted feature is valid only when it produces at least one of these
+outcomes:
+
+1. the user can answer an ownership question
+2. SIBI can evaluate a freeform answer with evidence
+3. SIBI can detect a typed gap
+4. SIBI can generate actionable repair
+5. SIBI can re-evaluate without repeating the prompt
+6. SIBI can emit bounded readiness with citations
+7. the benchmark demonstrates improvement over generic chat
