@@ -181,7 +181,7 @@ repair usefulness.
 
 Current coverage:
 
-1. `npm run eval:selfhost-benchmark`
+1. `pnpm run eval:selfhost-benchmark`
 2. `Tests/selfhost-benchmark.test.ts`
 3. generated benchmark report with 40/40 passing cases
 4. aggregate metrics for precision, recall, type accuracy, evidence quality,

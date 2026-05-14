@@ -188,17 +188,77 @@ Manual testers should record:
 6. repo evidence citation
 7. repair or readiness result
 
+## Prototype Artifact
+
+Path:
+
+```text
+docs/specs/selfhost/pilot/prototypes/02_evaluation_contract/freeform-first-slice.html
+```
+
+Review command:
+
+```sh
+pnpm dlx lavish-axi@0.1.10 docs/specs/selfhost/pilot/prototypes/02_evaluation_contract/freeform-first-slice.html
+```
+
+Feedback commands:
+
+```sh
+pnpm dlx lavish-axi@0.1.10 poll docs/specs/selfhost/pilot/prototypes/02_evaluation_contract/freeform-first-slice.html
+pnpm dlx lavish-axi@0.1.10 end docs/specs/selfhost/pilot/prototypes/02_evaluation_contract/freeform-first-slice.html
+```
+
+Question answered:
+
+```text
+Can a user understand the freeform evaluation loop without reading JSON?
+```
+
+What the user should inspect:
+
+1. mastery check context
+2. user answer
+3. observed finding
+4. user evidence
+5. repo evidence
+6. gap or bounded readiness
+7. repair task
+8. re-evaluation prompt
+9. bounded readiness status
+
+The first prototype should compare the five first-slice answer shapes:
+
+1. grounded
+2. uncited
+3. partial
+4. overconfident wrong
+5. design-induced confusion
+
+Feedback captured:
+
+```text
+Pending. A future agent should create the HTML prototype and run the Lavish
+review session when explicitly requested.
+```
+
+Decision:
+
+```text
+Do not translate this interaction to SwiftUI until the Lavish prototype shows
+that the evaluation loop is understandable without inspecting raw JSON.
+```
 
 ## Eval Coverage
 
 Current coverage:
 
-1. `npm run eval:selfhost-pilot` validates the manifest, mastery checks, gold
+1. `pnpm run eval:selfhost-pilot` validates the manifest, mastery checks, gold
    cases, required fields, and evidence boundaries.
-2. `npm run eval:selfhost-benchmark` reports deterministic precision, recall,
+2. `pnpm run eval:selfhost-benchmark` reports deterministic precision, recall,
    gap type accuracy, evidence quality, false-confidence detection, and
    design-issue detection over 40 gold cases.
-3. `npm run eval:selfhost-freeform` runs the first freeform evaluator slice over
+3. `pnpm run eval:selfhost-freeform` runs the first freeform evaluator slice over
    five artifact-boundary answers: grounded, uncited, partial, overconfident
    wrong, and design-induced confusion. It reports the observed finding type and
    whether user plus repo evidence were attached.
@@ -275,7 +335,7 @@ Expected outcome:
 
 Actual outcome:
 
-- Added `src/evals/selfhost-freeform.ts` and `npm run eval:selfhost-freeform`.
+- Added `src/evals/selfhost-freeform.ts` and `pnpm run eval:selfhost-freeform`.
 - Added `Tests/selfhost-freeform.test.ts` for grounded, uncited, partial,
   overconfident wrong, and design-induced answers.
 - Wrote the first-slice report to

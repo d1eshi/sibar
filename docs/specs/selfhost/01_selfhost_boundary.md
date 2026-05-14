@@ -142,7 +142,7 @@ evidence to support gaps or readiness.
 
 Current coverage:
 
-1. `npm run eval:selfhost-pilot` checks manifest existence, included-path
+1. `pnpm run eval:selfhost-pilot` checks manifest existence, included-path
    existence, concept set, mastery check index, gold case index, and out-of-scope
    required evidence paths.
 2. `Tests/selfhost-pilot-evals.test.ts` mutates gold cases to prove out-of-bound

@@ -96,10 +96,10 @@ Use this spec during planning and manual review:
 
 Current coverage:
 
-1. `npm run eval:selfhost-pilot`
-2. `npm run eval:selfhost-benchmark`
-3. `npm test -- Tests/selfhost-pilot-evals.test.ts Tests/selfhost-benchmark.test.ts`
-4. `npm run typecheck`
+1. `pnpm run eval:selfhost-pilot`
+2. `pnpm run eval:selfhost-benchmark`
+3. `pnpm test -- Tests/selfhost-pilot-evals.test.ts Tests/selfhost-benchmark.test.ts`
+4. `pnpm run typecheck`
 
 This spec is not itself an evaluator. It is the audit map that decides whether
 new work belongs in the executable MVP gate.
@@ -160,4 +160,4 @@ This audit map is MVP-ready when:
 
 Add a lightweight documentation check that fails when any self-hosted spec lacks
 the standard living-spec sections. Keep it docs-only unless the team decides to
-enforce the check through `npm test`.
+enforce the check through `pnpm test`.

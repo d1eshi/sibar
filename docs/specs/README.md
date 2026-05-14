@@ -85,8 +85,9 @@ self-hosted specs unless a feature has all of these:
 4. its own eval gate
 5. no clean home inside one of the current self-hosted specs
 
-Start with the five live self-hosted specs. Move toward ten only when a new spec
-prevents mixed outcomes inside an existing spec.
+Start with the live self-hosted execution specs. Move toward ten only when a new
+spec prevents mixed outcomes inside an existing spec or translates the execution
+layer into a distinct public demo outcome.
 
 ## Living Spec Sections
 
@@ -94,11 +95,13 @@ Every live self-hosted spec should keep these sections current:
 
 1. `Feature Outcome`: what the user receives.
 2. `Manual Harness`: how to test the feature by hand.
-3. `Eval Coverage`: which tests, evals, reports, or fixtures protect it.
-4. `Iteration Log`: input used, expected outcome, actual outcome, what worked,
+3. `Prototype Artifact`: how a human reviews the iteration when logic,
+   interaction, or UI needs to be understood before production work.
+4. `Eval Coverage`: which tests, evals, reports, or fixtures protect it.
+5. `Iteration Log`: input used, expected outcome, actual outcome, what worked,
    what failed, and what changed.
-5. `Acceptance Gate`: when the feature is MVP-ready.
-6. `Next Iteration`: the next narrow improvement.
+6. `Acceptance Gate`: when the feature is MVP-ready.
+7. `Next Iteration`: the next narrow improvement.
 
 An iteration is valid only when it records:
 
@@ -108,7 +111,51 @@ An iteration is valid only when it records:
 4. what worked
 5. what failed
 6. coverage added or still missing
-7. the decision for the next iteration
+7. prototype feedback when a prototype was required
+8. the decision for the next iteration
+
+## Prototype Artifact Rule
+
+Use `pnpm dlx lavish-axi@0.1.10` for self-hosted iteration prototypes. These prototypes are
+local HTML review artifacts, not product code, runtime dependencies, or
+substitutes for eval coverage. They exist so the user can inspect the logic,
+interaction, or UI of an iteration before it is translated into production code
+or SwiftUI.
+
+A prototype is required when an iteration needs human review of:
+
+1. logic or state transitions
+2. interaction flow
+3. UI structure
+4. evidence/readiness presentation
+5. benchmark or report interpretation
+
+Prototype files live under:
+
+```text
+docs/specs/selfhost/pilot/prototypes/<spec-id>/<iteration-id>.html
+```
+
+Every prototype HTML must be self-contained and begin with this visible header:
+
+```text
+PROTOTYPE - throwaway review artifact
+Spec: docs/specs/selfhost/<spec-file>.md
+Iteration: <iteration-id>
+Question answered: <what this prototype helps the user review>
+```
+
+Review commands:
+
+```sh
+pnpm dlx lavish-axi@0.1.10 docs/specs/selfhost/pilot/prototypes/<spec-id>/<iteration-id>.html
+pnpm dlx lavish-axi@0.1.10 poll docs/specs/selfhost/pilot/prototypes/<spec-id>/<iteration-id>.html
+pnpm dlx lavish-axi@0.1.10 end docs/specs/selfhost/pilot/prototypes/<spec-id>/<iteration-id>.html
+```
+
+Do not add `lavish-axi` as a package dependency. Do not commit `.lavish-axi/`.
+When the review is complete, record the feedback and decision in the owning
+self-hosted spec's `Prototype Artifact` and `Iteration Log` sections.
 
 ## Valid MVP Outcomes
 
