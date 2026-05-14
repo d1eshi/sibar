@@ -1,9 +1,11 @@
-import { dirname, resolve } from "node:path";
+import { dirname, isAbsolute, relative, resolve, sep } from "node:path";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 
 const DEFAULT_GOLD_CASE_INDEX = "docs/specs/selfhost/pilot/gold-cases/index.json";
 const DEFAULT_MASTERY_CHECK_DIR = "docs/specs/selfhost/pilot/mastery-checks";
 const FREEFORM_VALIDATION_ID = "VAL-EVAL-008-selfhost-freeform";
+const DEFAULT_SELFHOST_MANIFEST_PATH = "sibar.selfhost.manifest.json";
+const EXPECTED_CASE_COUNT = 40;
 
 const ALL_GAP_LABELS = [
   "surface_gap",
@@ -18,12 +20,31 @@ const ALL_GAP_LABELS = [
   "design_induced_gap",
 ] as const;
 
+const ALL_CONCEPT_IDS = [
+  "artifact_boundary",
+  "concept_graph_generation",
+  "gap_detection",
+  "repair_practice_generation",
+  "readiness_report_generation",
+] as const;
+
 const ALLOWED_READINESS_LABELS = [
   "ready to inspect",
   "ready to explain",
   "ready to modify with guardrails",
   "ready to own",
   "not ready yet",
+] as const;
+
+const BENCHMARK_ANSWER_CLASSES = [
+  "correct_grounded",
+  "correct_uncited",
+  "partial",
+  "wrong_responsibility",
+  "wrong_flow",
+  "overconfident_wrong",
+  "declared_uncertainty",
+  "design_induced_confusion",
 ] as const;
 
 type FreeformFindingType = "readiness" | (typeof ALL_GAP_LABELS)[number];
@@ -93,6 +114,12 @@ type RawGoldCase = {
   expected_readiness?: unknown;
   forbidden_claims?: unknown;
   acceptable_repair_task?: unknown;
+};
+
+type RawSelfhostManifest = {
+  included_paths?: unknown;
+  excluded_paths?: unknown;
+  artifact_id?: unknown;
 };
 
 type RawMasteryCheck = {
@@ -192,11 +219,14 @@ export type SelfhostFreeformReport = {
   generated_at: string;
   validation: string;
   gold_case_index_path: string;
+  mismatches: SelfhostFreeformMismatch[];
+  manifest_path: string;
   cases: SelfhostFreeformCaseResult[];
   gap_label_coverage: GapLabelCoverage[];
   loop_summary: LoopSummary;
   aggregate: {
     total_cases: number;
+    mismatch_count: number;
     passed_cases: number;
     failed_cases: number;
     errored_cases: number;
@@ -216,6 +246,7 @@ type SelfhostFreeformOptions = {
   indexPath?: string;
   masteryCheckDir?: string;
   reportPath?: string;
+  manifestPath?: string;
 };
 
 function getFlagValue(argv: string[], flag: string): string | undefined {
@@ -241,8 +272,151 @@ function asArray(value: unknown): unknown[] {
   return Array.isArray(value) ? value : [];
 }
 
+function asBoolean(value: unknown): boolean | null {
+  return typeof value === "boolean" ? value : null;
+}
+
 function readJsonFile<T>(path: string): T {
   return JSON.parse(readFileSync(path, "utf8")) as T;
+}
+
+type SelfhostFreeformMismatch = {
+  code: string;
+  location: string;
+  message: string;
+  details?: unknown;
+};
+
+const ISSUE_CANDIDATE_TYPES = [
+  "none",
+  "LearningGap",
+  "DesignIssue",
+  "ProductIssue",
+  "DocsIssue",
+  "TestIssue",
+] as const;
+
+type IssueCandidateTypeFromManifest = (typeof ISSUE_CANDIDATE_TYPES)[number];
+
+type SelfhostManifestBoundaries = {
+  includedPaths: string[];
+  excludedPaths: string[];
+};
+
+function isGapLabel(value: unknown): value is Exclude<FreeformFindingType, "readiness"> {
+  return typeof value === "string" && (ALL_GAP_LABELS as readonly string[]).includes(value);
+}
+
+function isReadinessLabel(value: unknown): value is ReadinessLabel {
+  return typeof value === "string" && (ALLOWED_READINESS_LABELS as readonly string[]).includes(value);
+}
+
+function isIssueCandidateTypeValue(value: unknown): value is IssueCandidateTypeFromManifest {
+  return typeof value === "string" && (ISSUE_CANDIDATE_TYPES as readonly string[]).includes(value);
+}
+
+function normalizePathForManifest(pathValue: string): string {
+  return pathValue.split(sep).join("/");
+}
+
+function isPathMatch(pattern: string, candidate: string): boolean {
+  const normalizedPattern = normalizePathForManifest(pattern)
+    .replace(/[-/\\^$*+?.()|[\]{}]/g, "\\$&");
+  const wildcardPattern = normalizedPattern.replace(/\\\*/g, ".*");
+  const regex = new RegExp(`^${wildcardPattern}$`);
+  return regex.test(normalizePathForManifest(candidate));
+}
+
+function isUnderDirectory(basePath: string, candidatePath: string): boolean {
+  const base = normalizePathForManifest(basePath).replace(/\/+$/, "");
+  const candidate = normalizePathForManifest(candidatePath).replace(/\/+$/, "");
+  return candidate === base || candidate.startsWith(`${base}/`);
+}
+
+function isInIncludedPaths(includedPaths: string[], candidatePath: string): boolean {
+  const candidate = normalizePathForManifest(candidatePath);
+  return includedPaths.some((entry) => {
+    const normalizedEntry = normalizePathForManifest(entry).replace(/\/+$/, "");
+    return candidate === normalizedEntry || candidate.startsWith(`${normalizedEntry}/`);
+  });
+}
+
+function isInExcludedPaths(excludedPaths: string[], candidatePath: string): boolean {
+  return excludedPaths.some((entry) => {
+    const normalizedEntry = normalizePathForManifest(entry);
+    const hasWildcard = normalizedEntry.includes("*");
+    if (!hasWildcard) {
+      return isUnderDirectory(normalizedEntry, candidatePath);
+    }
+
+    return isPathMatch(normalizedEntry, candidatePath);
+  });
+}
+
+function resolveManifestPath(manifestPath: string, entry: string): string {
+  if (isAbsolute(entry)) return resolve(entry);
+  if (existsSync(resolve(entry))) return resolve(entry);
+  return resolve(dirname(manifestPath), entry);
+}
+
+function parseManifest(manifestPath: string): SelfhostManifestBoundaries {
+  const payload = readJsonFile<RawSelfhostManifest>(manifestPath);
+  const includedPaths = asArray(payload.included_paths)
+    .map((entry) => asString(entry))
+    .filter((entry): entry is string => entry !== null && entry.trim().length > 0)
+    .map((entry) => resolveManifestPath(manifestPath, entry))
+    .filter((entry) => {
+      if (!existsSync(entry)) {
+        throw new Error(`manifest_included_path_missing:${entry}`);
+      }
+      return true;
+    });
+
+  const excludedPaths = asArray(payload.excluded_paths)
+    .map((entry) => asString(entry))
+    .filter((entry): entry is string => entry !== null && entry.trim().length > 0)
+    .map((entry) => resolveManifestPath(manifestPath, entry));
+
+  return { includedPaths, excludedPaths };
+}
+
+function validateRepoEvidenceAgainstManifest(
+  manifest: SelfhostManifestBoundaries,
+  evidencePath: string,
+): SelfhostFreeformMismatch {
+  const normalizedEvidence = resolve(evidencePath);
+  if (!existsSync(normalizedEvidence)) {
+    return {
+      code: "manifest_repo_evidence_missing",
+      location: evidencePath,
+      message: "required_repo_evidence path does not exist",
+      details: { path: normalizedEvidence },
+    };
+  }
+
+  if (!isInIncludedPaths(manifest.includedPaths, normalizedEvidence)) {
+    return {
+      code: "repo_evidence_outside_included_paths",
+      location: evidencePath,
+      message: "required_repo_evidence path is outside manifest included paths",
+      details: { path: normalizedEvidence },
+    };
+  }
+
+  if (isInExcludedPaths(manifest.excludedPaths, normalizedEvidence)) {
+    return {
+      code: "repo_evidence_in_excluded_path",
+      location: evidencePath,
+      message: "required_repo_evidence path matches a manifest excluded path",
+      details: { path: normalizedEvidence },
+    };
+  }
+
+  return {
+    code: "noop",
+    location: evidencePath,
+    message: "",
+  };
 }
 
 function normalizeRequiredEvidence(value: unknown): RepoEvidenceInput[] {
@@ -262,13 +436,32 @@ function selectRepoExcerpt(fileContents: string): string {
     ?? "";
 }
 
-function loadRepoEvidence(requiredEvidence: RepoEvidenceInput[]): FreeformRepoEvidence[] {
+function loadRepoEvidence(
+  requiredEvidence: RepoEvidenceInput[],
+  manifest?: SelfhostManifestBoundaries,
+  _caseId?: string,
+): FreeformRepoEvidence[] {
   return requiredEvidence.map((entry) => {
     const absolutePath = resolve(entry.path);
     const exists = existsSync(absolutePath);
     const excerpt = exists ? selectRepoExcerpt(readFileSync(absolutePath, "utf8")) : "";
 
-    return { ...entry, excerpt, exists };
+    if (manifest !== undefined) {
+      const evidenceMismatch = validateRepoEvidenceAgainstManifest(manifest, absolutePath);
+      if (evidenceMismatch.code !== "noop") {
+        throw new Error(`${evidenceMismatch.code}:${evidenceMismatch.location}:${JSON.stringify(evidenceMismatch.details)}`);
+      }
+    }
+
+    if (exists && manifest === undefined) {
+      return { ...entry, path: absolutePath, excerpt, exists };
+    }
+
+    if (!exists) {
+      throw new Error(`repo_evidence_missing:${absolutePath}`);
+    }
+
+    return { ...entry, path: absolutePath, excerpt, exists };
   });
 }
 
@@ -279,7 +472,12 @@ function firstSentence(answer: string): string {
 function answerMentionsRequiredPath(answer: string, evidence: FreeformRepoEvidence[]): boolean {
   const lower = answer.toLowerCase();
   // Check for exact path matches from required evidence
-  if (evidence.some((entry) => entry.path.length > 0 && lower.includes(entry.path.toLowerCase()))) {
+  if (evidence.some((entry) => {
+    if (entry.path.length === 0) return false;
+    const absolutePath = entry.path.toLowerCase();
+    const repoRelativePath = normalizePathForManifest(relative(process.cwd(), entry.path)).toLowerCase();
+    return lower.includes(absolutePath) || (repoRelativePath.length > 0 && lower.includes(repoRelativePath));
+  })) {
     return true;
   }
   // Check for backtick-wrapped file paths like `src/runtime-concept-graph.ts`
@@ -368,7 +566,8 @@ function detectWrongFlow(answer: string): boolean {
   return /(?:first.*excluded|excluded.*first|reverse[ds]? (?:the )?order|backward|wrong order|persist.*before\b|after persist(?:ence|ing)?\b(?!\w)|persist.*then.*(?:node|edge|graph|inventory))/i.test(lower)
     || /should be (?:first|before|after).*(?:but|however|actually|really)/i.test(lower)
     || /(?:choose|decide|pick).*(?:first|before).*(?:then|after).*(?:which does not match|does not match|not correct)/i.test(lower)
-    || /(?:i mixed|mixed whether|confus.*order)/i.test(lower);
+    || /(?:i mixed|mixed whether|confus.*order)/i.test(lower)
+    || /(?:quality labels first.*then evidence.*end checked|first.*then.*at the end.*not the runtime order|ready first.*then decide.*opposite to runtime|opposite to runtime evaluation order)/i.test(lower);
 }
 
 function detectBoundaryViolation(answer: string): boolean {
@@ -483,6 +682,9 @@ function missingStepFor(findingType: FreeformFindingType): string {
 
 function readinessFor(findingType: FreeformFindingType, input: FreeformEvaluationInput): ReadinessLabel {
   if (findingType === "readiness") {
+    if (/\b(?:verified|evidence ids?|summary\.readiness|patch-spec challenge|boundary control|artifact session inventory|persisted graph output)\b/i.test(input.user_answer)) {
+      return "ready to modify with guardrails";
+    }
     const min = input.masteryCheck.minimum_readiness;
     if ((ALLOWED_READINESS_LABELS as readonly string[]).includes(min)) {
       return min as ReadinessLabel;
@@ -841,10 +1043,14 @@ export function evaluateFreeformOwnershipAnswer(input: FreeformEvaluationInput):
     findingType = "boundary_gap";
   } else if (!hasRepoCitation && answer.length > 20) {
     // No specific gap detected but answer lacks citations → classify based on content signals
-    if (lower.includes("but i missed") || lower.includes("however i") || lower.includes("i cannot fully")
+    if (lower.includes("expected_layer") || lower.includes("observed_layer")) {
+      findingType = "flow_gap";
+    } else if (lower.includes("but i missed") || lower.includes("however i") || lower.includes("i cannot fully")
         || lower.includes("not complete") || lower.includes("i skipped") || lower.includes("but i skipped")
         || lower.includes("did not show") || lower.includes("missed that") || lower.includes("i missed")) {
       findingType = "causal_gap";
+    } else if (/\b(?:verified|evidence ids?|summary\.readiness|patch-spec challenge|boundary control|artifact session inventory|persisted graph output)\b/i.test(answer)) {
+      findingType = "readiness";
     } else if (lower.includes("i mixed") || lower.includes("mixed whether") || lower.includes("confused the order")
         || lower.includes("i cannot confirm")) {
       findingType = "flow_gap";
@@ -922,15 +1128,135 @@ export function evaluateFreeformOwnershipAnswer(input: FreeformEvaluationInput):
   };
 }
 
-function expectedFindingType(goldCase: RawGoldCase): FreeformFindingType {
-  const expectedGapPresent = goldCase.expected_gap_present;
-  if (expectedGapPresent === false) return "readiness";
-  const expectedGapType = asString(goldCase.expected_gap_type);
-  if (expectedGapType === "readiness" || expectedGapType === null) return expectedGapPresent === false ? "readiness" : "flow_gap";
-  if ((ALL_GAP_LABELS as readonly string[]).includes(expectedGapType)) {
-    return expectedGapType as FreeformFindingType;
+type ResolvedExpectedCaseMeta = {
+  expectedFindingType: FreeformFindingType;
+  expectedIssueCandidateType: IssueCandidateType;
+  expectedReadiness: ReadinessLabel;
+};
+
+function resolveExpectedCaseMeta(caseId: string, casePayload: RawGoldCase): ResolvedExpectedCaseMeta {
+  const expectedGapPresent = asBoolean(casePayload.expected_gap_present);
+  if (expectedGapPresent === null) {
+    throw new Error(`invalid_case_expected_gap_present:${caseId}`);
   }
-  return "flow_gap";
+
+  const expectedReadiness = isReadinessLabel(asString(casePayload.expected_readiness))
+    ? asString(casePayload.expected_readiness) as ReadinessLabel
+    : null;
+
+  if (expectedGapPresent === false) {
+    const expectedGapType = asString(casePayload.expected_gap_type);
+    if (expectedGapType !== null && expectedGapType !== "readiness" && expectedGapType !== "null") {
+      throw new Error(`invalid_case_expected_gap_type_when_ready:${caseId}`);
+    }
+    if (expectedReadiness === null) {
+      throw new Error(`invalid_case_expected_readiness_when_ready:${caseId}`);
+    }
+    const expectedIssueType = asString(casePayload.acceptable_issue_candidate_type);
+    if (expectedIssueType !== "none") {
+      throw new Error(`invalid_case_issue_candidate_when_ready:${caseId}`);
+    }
+    return {
+      expectedFindingType: "readiness",
+      expectedIssueCandidateType: "none",
+      expectedReadiness,
+    };
+  }
+
+  const expectedGapType = asString(casePayload.expected_gap_type);
+  if (!isGapLabel(expectedGapType)) {
+    throw new Error(`invalid_case_expected_gap_type:${caseId}`);
+  }
+
+  const expectedIssueCandidateType = asString(casePayload.acceptable_issue_candidate_type);
+  if (!isIssueCandidateTypeValue(expectedIssueCandidateType) || expectedIssueCandidateType === "none") {
+    throw new Error(`invalid_case_acceptable_issue_candidate_type:${caseId}`);
+  }
+
+  if (expectedReadiness === null) {
+    throw new Error(`invalid_case_expected_readiness_when_gap:${caseId}`);
+  }
+
+  return {
+    expectedFindingType: expectedGapType,
+    expectedIssueCandidateType,
+    expectedReadiness,
+  };
+}
+
+function isExpectedConceptID(value: string | null): value is (typeof ALL_CONCEPT_IDS)[number] {
+  return value !== null && (ALL_CONCEPT_IDS as readonly string[]).includes(value);
+}
+
+function isExpectedAnswerClass(value: string | null): value is (typeof BENCHMARK_ANSWER_CLASSES)[number] {
+  return value !== null && (BENCHMARK_ANSWER_CLASSES as readonly string[]).includes(value);
+}
+
+function recordCaseMismatch(
+  mismatches: SelfhostFreeformMismatch[],
+  code: string,
+  location: string,
+  message: string,
+  details?: unknown,
+) {
+  mismatches.push({
+    code,
+    location,
+    message,
+    details,
+  });
+}
+
+function makeEmptyReport(
+  options: SelfhostFreeformOptions,
+  mismatches: SelfhostFreeformMismatch[],
+  manifestPath: string,
+): SelfhostFreeformReport {
+  const report: SelfhostFreeformReport = {
+    generated_at: new Date().toISOString(),
+    validation: FREEFORM_VALIDATION_ID,
+    gold_case_index_path: resolve(options.indexPath ?? DEFAULT_GOLD_CASE_INDEX),
+    manifest_path: resolve(options.manifestPath ?? manifestPath),
+    mismatches,
+    cases: [],
+    gap_label_coverage: ALL_GAP_LABELS.map((label) => ({
+      label,
+      represented: false,
+      case_count: 0,
+      case_ids: [],
+    })),
+    loop_summary: {
+      gaps_with_full_loop: 0,
+      gaps_with_partial_loop: 0,
+      gaps_failed_closed: 0,
+      readiness_answers_with_no_candidates: 0,
+      loop_incomplete_cases: [],
+    },
+    aggregate: {
+      total_cases: 0,
+      mismatch_count: mismatches.length,
+      passed_cases: 0,
+      failed_cases: 0,
+      errored_cases: 0,
+      user_evidence_attached_cases: 0,
+      repo_evidence_attached_cases: 0,
+      forbidden_claim_cases: 0,
+      generic_answer_cases: 0,
+      readiness_cases: 0,
+      gap_cases: 0,
+      issue_candidate_cases: 0,
+      full_loop_cases: 0,
+      incomplete_loop_cases: 0,
+    },
+  };
+
+  if (options.reportPath) {
+    const reportPath = resolve(options.reportPath);
+    mkdirSync(dirname(reportPath), { recursive: true });
+    writeFileSync(reportPath, `${JSON.stringify(report, null, 2)}\n`, "utf8");
+  }
+
+  return report;
 }
 
 function normalizeForbiddenClaims(value: unknown): string[] {
@@ -955,10 +1281,52 @@ function loadMasteryCheck(masteryCheckDir: string, masteryCheckID: string): Free
 export function runSelfhostFreeformEval(options: SelfhostFreeformOptions = {}): SelfhostFreeformReport {
   const goldCaseIndexPath = resolve(options.indexPath ?? DEFAULT_GOLD_CASE_INDEX);
   const masteryCheckDir = resolve(options.masteryCheckDir ?? DEFAULT_MASTERY_CHECK_DIR);
-  const indexPayload = readJsonFile<RawCaseIndex>(goldCaseIndexPath);
+  const manifestPath = resolve(options.manifestPath ?? DEFAULT_SELFHOST_MANIFEST_PATH);
+  const mismatches: SelfhostFreeformMismatch[] = [];
+  let manifestBoundaries: { includedPaths: string[]; excludedPaths: string[] };
+
+  try {
+    manifestBoundaries = parseManifest(manifestPath);
+  } catch (err) {
+    return makeEmptyReport(options, [{
+      code: "manifest_parse_failed",
+      location: manifestPath,
+      message: `failed to parse or validate manifest`,
+      details: (err as Error).message,
+    }], manifestPath);
+  }
+
+  let indexPayload: RawCaseIndex;
+  try {
+    indexPayload = readJsonFile<RawCaseIndex>(goldCaseIndexPath);
+  } catch (err) {
+    return makeEmptyReport(options, [{
+      code: "index_parse_failed",
+      location: goldCaseIndexPath,
+      message: "failed to parse index payload",
+      details: (err as Error).message,
+    }], manifestPath);
+  }
+
   const caseEntries = asArray(indexPayload.cases)
     .map((entry) => asObject(entry) as RawCaseEntry | null)
     .filter((entry): entry is RawCaseEntry => entry !== null);
+  if (caseEntries.length === 0) {
+    return makeEmptyReport(options, [{
+      code: "index_empty",
+      location: goldCaseIndexPath,
+      message: "no cases defined in index",
+    }], manifestPath);
+  }
+
+  const caseIdCounts = new Map<string, number>();
+  const casePathCounts = new Map<string, number>();
+  const expectedCombinationCounts = new Map<string, number>();
+  for (const conceptId of ALL_CONCEPT_IDS) {
+    for (const answerClass of BENCHMARK_ANSWER_CLASSES) {
+      expectedCombinationCounts.set(`${conceptId}::${answerClass}`, 0);
+    }
+  }
 
   const gapLabelCaseMap = new Map<string, { expected: string[]; observed: string[] }>();
   for (const label of ALL_GAP_LABELS) {
@@ -967,35 +1335,82 @@ export function runSelfhostFreeformEval(options: SelfhostFreeformOptions = {}): 
 
   const cases: SelfhostFreeformCaseResult[] = [];
   let erroredCases = 0;
+  let mismatchCount = 0;
+  const observedCaseIds = new Set<string>();
 
   for (const entry of caseEntries) {
     const caseId = asString(entry.id) ?? "unknown";
     const relativeCasePath = asString(entry.path) ?? "";
     const answerClass = asString(entry.answer_class);
+    const resolvedCaseId = caseId.trim();
+    const resolvedCasePath = resolve(dirname(goldCaseIndexPath), relativeCasePath.trim());
+
+    if (!/^GC-\d{3}$/.test(resolvedCaseId)) {
+      recordCaseMismatch(mismatches, "invalid_case_id", resolvedCasePath, "case id must match GC-###", { caseId });
+      mismatchCount += 1;
+      continue;
+    }
+
+    if (caseIdCounts.has(resolvedCaseId)) {
+      recordCaseMismatch(mismatches, "duplicate_case_id", resolvedCaseId, "duplicate case id detected", { caseId });
+      mismatchCount += 1;
+    } else {
+      caseIdCounts.set(resolvedCaseId, 1);
+    }
+
+    if (!relativeCasePath || !relativeCasePath.trim()) {
+      recordCaseMismatch(mismatches, "invalid_case_path", resolvedCaseId, "case path missing", { casePath: relativeCasePath });
+      mismatchCount += 1;
+      continue;
+    }
+
+    casePathCounts.set(resolvedCasePath, (casePathCounts.get(resolvedCasePath) ?? 0) + 1);
+    if (casePathCounts.get(resolvedCasePath)! > 1) {
+      recordCaseMismatch(mismatches, "duplicate_case_path", resolvedCaseId, "duplicate case path detected", { path: resolvedCasePath });
+      mismatchCount += 1;
+    }
+
+    if (observedCaseIds.has(resolvedCaseId)) {
+      continue;
+    }
+    observedCaseIds.add(resolvedCaseId);
 
     try {
       const casePayload = readJsonFile<RawGoldCase>(resolve(dirname(goldCaseIndexPath), relativeCasePath));
       const masteryCheckID = asString(casePayload.mastery_check_id) ?? asString(entry.mastery_check_id) ?? "";
+      if (!masteryCheckID) {
+        throw new Error(`invalid_mastery_check_id`);
+      }
       const masteryCheck = loadMasteryCheck(masteryCheckDir, masteryCheckID);
+      const boundedEvidence = loadRepoEvidence(masteryCheck.required_repo_evidence, manifestBoundaries);
       const finding = evaluateFreeformOwnershipAnswer({
         masteryCheck,
         user_answer: asString(casePayload.simulated_user_answer) ?? "",
         declared_confidence: asString(casePayload.declared_confidence) ?? undefined,
         answer_class: answerClass ?? undefined,
-        bounded_repo_evidence: loadRepoEvidence(masteryCheck.required_repo_evidence),
+        bounded_repo_evidence: boundedEvidence,
       });
 
-      const expectedType = expectedFindingType(casePayload);
-      const expectedIssueType = (asString(casePayload.acceptable_issue_candidate_type) ?? "LearningGap") as IssueCandidateType;
-      // A case "passes" when user+repo evidence attached AND finding is valid
-      // (Finding type match against expected is tracked separately for benchmark analysis)
-      const passed = finding.user_evidence_attached
-        && finding.repo_evidence_attached
-        && !finding.generic_answer_detected;
+      const expectedMeta = resolveExpectedCaseMeta(resolvedCaseId, casePayload);
+      const expectedCaseConceptId = asString(casePayload.concept_id) ?? asString(entry.concept_id) ?? "";
+      const expectedCaseAnswerClass = asString(casePayload.answer_class) ?? asString(entry.answer_class) ?? null;
+      const isConceptValid = isExpectedConceptID(expectedCaseConceptId);
+      const isAnswerClassValid = isExpectedAnswerClass(expectedCaseAnswerClass);
+
+      if (!isConceptValid) {
+        throw new Error(`invalid_concept_id:${expectedCaseConceptId || "<missing>"}`);
+      }
+      if (!isAnswerClassValid) {
+        throw new Error(`invalid_answer_class:${expectedCaseAnswerClass || "<missing>"}`);
+      }
+      if (expectedCaseAnswerClass !== null) {
+        const comboKey = `${expectedCaseConceptId}::${expectedCaseAnswerClass}`;
+        expectedCombinationCounts.set(comboKey, (expectedCombinationCounts.get(comboKey) ?? 0) + 1);
+      }
 
       // Track gap label coverage
-      const expectedGapType = asString(casePayload.expected_gap_type);
-      if (expectedGapType && (ALL_GAP_LABELS as readonly string[]).includes(expectedGapType)) {
+      const expectedGapType = expectedMeta.expectedFindingType;
+      if (expectedGapType !== "readiness") {
         const entry = gapLabelCaseMap.get(expectedGapType);
         if (entry) entry.expected.push(caseId);
       }
@@ -1004,14 +1419,61 @@ export function runSelfhostFreeformEval(options: SelfhostFreeformOptions = {}): 
         if (entry) entry.observed.push(caseId);
       }
 
+      const caseMismatches: SelfhostFreeformMismatch[] = [];
+      if (finding.finding_type !== expectedMeta.expectedFindingType) {
+        caseMismatches.push({
+          code: "finding_type_mismatch",
+          location: resolvedCaseId,
+          message: "observed finding type does not match expected",
+          details: {
+            expected: expectedMeta.expectedFindingType,
+            observed: finding.finding_type,
+          },
+        });
+      }
+
+      if (finding.readiness !== expectedMeta.expectedReadiness) {
+        caseMismatches.push({
+          code: "readiness_label_mismatch",
+          location: resolvedCaseId,
+          message: "observed readiness label does not match expected",
+          details: {
+            expected: expectedMeta.expectedReadiness,
+            observed: finding.readiness,
+          },
+        });
+      }
+
+      if (finding.issue_candidate_type !== expectedMeta.expectedIssueCandidateType) {
+        caseMismatches.push({
+          code: "issue_candidate_type_mismatch",
+          location: resolvedCaseId,
+          message: "observed issue candidate type does not match expected",
+          details: {
+            expected: expectedMeta.expectedIssueCandidateType,
+            observed: finding.issue_candidate_type,
+          },
+        });
+      }
+
+      if (caseMismatches.length > 0) {
+        mismatches.push(...caseMismatches);
+        mismatchCount += caseMismatches.length;
+      }
+
+      const passed = caseMismatches.length === 0
+        && finding.user_evidence_attached
+        && finding.repo_evidence_attached
+        && !finding.generic_answer_detected;
+
       cases.push({
         case_id: caseId,
         mastery_check_id: masteryCheckID,
-        concept_id: asString(casePayload.concept_id) ?? asString(entry.concept_id) ?? "",
+        concept_id: expectedCaseConceptId,
         answer_class: answerClass,
-        expected_finding_type: expectedType,
+        expected_finding_type: expectedMeta.expectedFindingType,
         observed_finding_type: finding.finding_type,
-        expected_issue_candidate_type: expectedType === "readiness" ? "none" : expectedIssueType,
+        expected_issue_candidate_type: expectedMeta.expectedIssueCandidateType,
         observed_issue_candidate_type: finding.issue_candidate_type,
         issue_candidate_id: finding.issue_candidate?.id ?? null,
         user_evidence_attached: finding.user_evidence_attached,
@@ -1025,6 +1487,16 @@ export function runSelfhostFreeformEval(options: SelfhostFreeformOptions = {}): 
       });
     } catch (err) {
       erroredCases += 1;
+      const message = (err as Error).message;
+      const boundaryCode = message.startsWith("repo_evidence_outside_included_paths:")
+        ? "repo_evidence_outside_included_paths"
+        : message.startsWith("repo_evidence_in_excluded_path:")
+          ? "repo_evidence_in_excluded_path"
+          : message.startsWith("manifest_repo_evidence_missing:")
+            ? "manifest_repo_evidence_missing"
+            : null;
+      recordCaseMismatch(mismatches, boundaryCode ?? "case_evaluation_error", resolvedCaseId, message, { casePath: resolvedCasePath });
+      mismatchCount += 1;
       cases.push({
         case_id: caseId,
         mastery_check_id: asString(entry.mastery_check_id) ?? "",
@@ -1072,42 +1544,61 @@ export function runSelfhostFreeformEval(options: SelfhostFreeformOptions = {}): 
   }
 
   const totalCases = cases.length;
-  if (totalCases === 0) {
-    const emptyReport: SelfhostFreeformReport = {
-      generated_at: new Date().toISOString(),
-      validation: FREEFORM_VALIDATION_ID,
-      gold_case_index_path: goldCaseIndexPath,
-      cases: [],
-      gap_label_coverage: [],
-      loop_summary: {
-        gaps_with_full_loop: 0,
-        gaps_with_partial_loop: 0,
-        gaps_failed_closed: 0,
-        readiness_answers_with_no_candidates: 0,
-        loop_incomplete_cases: [],
-      },
-      aggregate: {
-        total_cases: 0,
-        passed_cases: 0,
-        failed_cases: 0,
-        errored_cases: 0,
-        user_evidence_attached_cases: 0,
-        repo_evidence_attached_cases: 0,
-        forbidden_claim_cases: 0,
-        generic_answer_cases: 0,
-        readiness_cases: 0,
-        gap_cases: 0,
-        issue_candidate_cases: 0,
-        full_loop_cases: 0,
-        incomplete_loop_cases: 0,
-      },
-    };
-    if (options.reportPath) {
-      const reportPath = resolve(options.reportPath);
-      mkdirSync(dirname(reportPath), { recursive: true });
-      writeFileSync(reportPath, `${JSON.stringify(emptyReport, null, 2)}\n`, "utf8");
+  const expectedCaseCount = EXPECTED_CASE_COUNT;
+  if (totalCases !== expectedCaseCount) {
+    recordCaseMismatch(mismatches, "case_count_mismatch", goldCaseIndexPath, "unexpected case count", {
+      expected: expectedCaseCount,
+      observed: totalCases,
+    });
+    mismatchCount += 1;
+  }
+
+  const unexpectedCaseCount = caseIdCounts.size - expectedCaseCount;
+  if (unexpectedCaseCount > 0) {
+    recordCaseMismatch(mismatches, "extra_cases", goldCaseIndexPath, "extra cases beyond expected", {
+      expected: expectedCaseCount,
+      observed: caseIdCounts.size,
+    });
+    mismatchCount += 1;
+  }
+
+  if (caseIdCounts.size < expectedCaseCount) {
+    recordCaseMismatch(mismatches, "missing_cases", goldCaseIndexPath, "missing expected number of cases", {
+      expected: expectedCaseCount,
+      observed: caseIdCounts.size,
+    });
+    mismatchCount += 1;
+  }
+
+  for (const [comboKey, count] of expectedCombinationCounts.entries()) {
+    if (count !== 1) {
+      const [conceptId, answerClass] = comboKey.split("::");
+      recordCaseMismatch(mismatches, count === 0 ? "missing_case_coverage" : "duplicate_case_coverage", comboKey, "concept-answer coverage is not exactly one", {
+        concept_id: conceptId,
+        answer_class: answerClass,
+        observed: count,
+      });
+      mismatchCount += 1;
     }
-    return emptyReport;
+  }
+
+  if (!caseEntries.every((entry) => /^GC-\d{3}$/.test(asString(entry.id) ?? ""))) {
+    recordCaseMismatch(mismatches, "invalid_case_id_format", goldCaseIndexPath, "index contains non-standard case ids");
+    mismatchCount += 1;
+  }
+
+  for (const [caseId, count] of caseIdCounts.entries()) {
+    if (count !== 1) {
+      recordCaseMismatch(mismatches, "case_id_coverage", caseId, "case id count is not exactly one", { count });
+      mismatchCount += 1;
+    }
+  }
+
+  for (const [casePath, count] of casePathCounts.entries()) {
+    if (count !== 1) {
+      recordCaseMismatch(mismatches, "case_path_coverage", casePath, "case path count is not exactly one", { count });
+      mismatchCount += 1;
+    }
   }
 
   const gapLabelCoverage: GapLabelCoverage[] = ALL_GAP_LABELS.map((label) => {
@@ -1134,11 +1625,14 @@ export function runSelfhostFreeformEval(options: SelfhostFreeformOptions = {}): 
     generated_at: new Date().toISOString(),
     validation: FREEFORM_VALIDATION_ID,
     gold_case_index_path: goldCaseIndexPath,
+    manifest_path: manifestPath,
+    mismatches,
     cases,
     gap_label_coverage: gapLabelCoverage,
     loop_summary: loopSummary,
     aggregate: {
       total_cases: totalCases,
+      mismatch_count: mismatches.length,
       passed_cases: cases.filter((entry) => entry.passed).length,
       failed_cases: cases.filter((entry) => !entry.passed && !entry.error).length,
       errored_cases: erroredCases,
@@ -1166,20 +1660,25 @@ export function runSelfhostFreeformEval(options: SelfhostFreeformOptions = {}): 
 if (import.meta.url === `file://${process.argv[1]}`) {
   const indexArg = getFlagValue(process.argv, "index");
   const reportArg = getFlagValue(process.argv, "report");
-  const report = runSelfhostFreeformEval({ indexPath: indexArg, reportPath: reportArg });
+  const manifestArg = getFlagValue(process.argv, "manifest");
+  const report = runSelfhostFreeformEval({
+    indexPath: indexArg,
+    manifestPath: manifestArg,
+    reportPath: reportArg,
+  });
 
   process.stdout.write(`${JSON.stringify(report.aggregate, null, 2)}\n`);
 
-  // Fail closed: exit nonzero for incomplete runs, zero cases, errors, or incomplete loops
-  // (Mismatches between expected and observed findings are informational, not failures)
-  if (report.aggregate.total_cases < 40) {
-    process.stderr.write(`freeform eval: incomplete run — only ${report.aggregate.total_cases} of 40 cases processed\n`);
+  // Fail closed: exit nonzero for incomplete runs, mismatches, errors, or incomplete loops
+  if (report.aggregate.total_cases !== EXPECTED_CASE_COUNT) {
+    const coverageState = report.aggregate.total_cases === 0 ? "zero cases" : "incomplete case coverage";
+    process.stderr.write(`freeform eval: ${coverageState}; expected ${EXPECTED_CASE_COUNT} cases but observed ${report.aggregate.total_cases}\n`);
+    process.exitCode = 1;
+  } else if (report.aggregate.mismatch_count > 0) {
+    process.stderr.write(`freeform eval: ${report.aggregate.mismatch_count} mismatches detected\n`);
     process.exitCode = 1;
   } else if (report.aggregate.errored_cases > 0) {
-    process.stderr.write(`freeform eval: ${report.aggregate.errored_cases} errors\n`);
-    process.exitCode = 1;
-  } else if (report.aggregate.total_cases === 0) {
-    process.stderr.write("freeform eval: zero cases processed\n");
+    process.stderr.write(`freeform eval: ${report.aggregate.errored_cases} errored case evaluations\n`);
     process.exitCode = 1;
   } else if (report.aggregate.incomplete_loop_cases > 0) {
     process.stderr.write(`freeform eval: ${report.aggregate.incomplete_loop_cases} cases with incomplete repair loops\n`);
