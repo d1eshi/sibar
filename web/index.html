@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sibar Reader</title>
+<script>
+window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
+window.va("beforeSend", (event) => {
+  if (location.hostname === "localhost" || location.hostname === "127.0.0.1") return null;
+  if (event?.url) {
+    const url = new URL(event.url);
+    url.search = "";
+    url.hash = "";
+    return { ...event, url: url.href };
+  }
+  return event;
+});
+if (location.hostname !== "localhost" && location.hostname !== "127.0.0.1") {
+  const analyticsScript = document.createElement("script");
+  analyticsScript.defer = true;
+  analyticsScript.src = "/_vercel/insights/script.js";
+  document.head.appendChild(analyticsScript);
+}
+</script>
+<link rel="stylesheet" href="/styles/reader.css">
+</head>
+<body>
+<div class="shell">
+  <aside class="history-drawer">
+    <header class="history-header">
+      <div class="history-title">Session</div>
+      <div class="count" id="historyCount">0</div>
+    </header>
+    <nav class="history-list" id="historyList" aria-label="Ultimos articulos leidos"></nav>
+  </aside>
+
+  <main class="workspace">
+    <form class="topbar" id="loadForm">
+      <input class="url-input" id="urlInput" type="url" placeholder="https://..." autocomplete="url">
+      <button class="btn primary" type="submit">Cargar</button>
+      <button class="btn ghost" type="button" id="sampleBtn">Demo</button>
+    </form>
+    <section class="reader-scroll" id="readerScroll">
+      <div class="empty" id="emptyState">
+        <h2>Deep knowledge improves what you build.</h2>
+        <p>Pega una fuente, leela sin ruido y deja un Learning Log de highlights, preguntas e ideas atomicas mientras la evidencia todavia esta fresca.</p>
+        <button class="btn primary" type="button" id="emptySampleBtn">Abrir demo</button>
+      </div>
+      <article class="article" id="article" hidden>
+        <section class="reader-brief" aria-label="Proposito del reader">
+          <p class="reader-brief-label">Sibar / Reader</p>
+          <h2>Read for evidence.</h2>
+          <p>El objetivo no es guardar mucho: es capturar lo justo para recordar que cambio tu modelo mental, que pregunta quedo abierta y que idea merece convertirse en practica.</p>
+        </section>
+        <div class="article-kicker">
+          <span class="pill" id="hostLabel"></span>
+          <span class="pill" id="paragraphCount"></span>
+        </div>
+        <h1 id="articleTitle"></h1>
+        <div class="article-body" id="articleBody"></div>
+      </article>
+    </section>
+  </main>
+
+  <aside class="assistant">
+    <header class="assistant-header">
+      <div class="assistant-title">Learning Log</div>
+      <div class="count" id="noteCount">0 notas</div>
+    </header>
+    <div class="assistant-body">
+      <section class="card selection-card" id="selectionCard" hidden>
+        <div class="card-label">Seleccion</div>
+        <p class="selection-text" id="selectionText"></p>
+        <textarea id="selectionNote" placeholder="Nota breve..."></textarea>
+        <div class="kind-row" role="tablist" aria-label="Tipo de nota">
+          <button class="small kind-btn active" type="button" role="tab" aria-selected="true" data-kind="highlight">Highlight</button>
+          <button class="small kind-btn" type="button" role="tab" aria-selected="false" data-kind="question">Pregunta</button>
+          <button class="small kind-btn" type="button" role="tab" aria-selected="false" data-kind="key">Idea</button>
+        </div>
+        <div class="actions" style="margin-top: 8px;">
+          <button class="btn primary small" type="button" id="saveSelectionBtn">Guardar</button>
+          <button class="btn ghost small" type="button" id="clearSelectionBtn">Cancelar</button>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="card-label" style="margin-bottom: 8px;">Nota local</div>
+        <textarea id="looseNote" placeholder="Nota atomica..."></textarea>
+        <div class="actions" style="margin-top: 8px;">
+          <button class="btn primary small" type="button" id="saveLooseBtn">Guardar nota</button>
+        </div>
+      </section>
+
+      <section class="notes" id="notes"></section>
+    </div>
+    <div class="status" id="status"></div>
+  </aside>
+</div>
+
+<div class="toolbar" id="selectionToolbar">
+  <button type="button" data-toolbar-kind="highlight">Highlight</button>
+  <button type="button" data-toolbar-kind="question">Pregunta</button>
+  <button type="button" data-toolbar-kind="key">Idea</button>
+</div>
+
+<script type="module" src="/scripts/app.js"></script>
+</body>
+</html>
