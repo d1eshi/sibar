@@ -48,3 +48,9 @@ test("article workspace keeps logs session-only without localStorage or export",
   assert.match(html, /Learning Log/);
   assert.match(html, /const MAX_SESSION_NOTES = 12/);
 });
+
+test("article workspace presents the reader as evidence-first learning", () => {
+  assert.match(html, /Deep knowledge improves what you build\./);
+  assert.match(html, /Read for evidence\./);
+  assert.match(html, /que cambio tu modelo mental/);
+});

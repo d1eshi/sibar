@@ -49,6 +49,8 @@ story.
   last articles and their saved notes.
 - Article workspace reader state is now session-only for the public demo: no
   browser persistence, no export button, and a capped Learning Log.
+- Article workspace now opens with a clearer reader presentation around
+  evidence-first learning and atomic notes.
 
 ### Fixed
 
