@@ -4,6 +4,10 @@ export function getElements() {
   const $ = (id) => document.getElementById(id);
   return {
     form: $("loadForm"),
+    startView: $("startView"),
+    loadingView: $("loadingView"),
+    readerView: $("readerView"),
+    recentSources: $("recentSources"),
     urlInput: $("urlInput"),
     sampleBtn: $("sampleBtn"),
     emptySampleBtn: $("emptySampleBtn"),
@@ -23,6 +27,10 @@ export function getElements() {
     saveLooseBtn: $("saveLooseBtn"),
     notes: $("notes"),
     noteCount: $("noteCount"),
+    savedChip: $("savedChip"),
+    savedToast: $("savedToast"),
+    savedDrawer: $("savedDrawer"),
+    closeSavedBtn: $("closeSavedBtn"),
     historyCount: $("historyCount"),
     historyList: $("historyList"),
     status: $("status")
@@ -72,8 +80,8 @@ function renderParagraph(paragraph, index, notes) {
 
 export function renderArticle(elements, state) {
   const article = state.article;
-  elements.emptyState.hidden = Boolean(article);
-  elements.article.hidden = !article;
+  if (elements.emptyState) elements.emptyState.hidden = Boolean(article);
+  if (elements.article) elements.article.hidden = !article;
   if (!article) return;
 
   elements.hostLabel.textContent = article.host;
@@ -91,7 +99,12 @@ export function kindLabel(kind) {
 }
 
 export function renderNotes(elements, state) {
-  elements.noteCount.textContent = `${state.notes.length} notas`;
+  if (elements.noteCount) elements.noteCount.textContent = `${state.notes.length} notas`;
+  if (elements.savedChip) {
+    const count = state.notes.length;
+    elements.savedChip.hidden = count === 0;
+    elements.savedChip.textContent = `${count} ${count === 1 ? "guardada" : "guardadas"}`;
+  }
   elements.notes.innerHTML = state.notes.map((note) => `
     <article class="note">
       <div class="note-head">
@@ -106,6 +119,7 @@ export function renderNotes(elements, state) {
 
 export function renderHistory(elements, history, activeUrl) {
   elements.historyCount.textContent = String(history.length);
+  if (elements.recentSources) elements.recentSources.hidden = history.length === 0;
   if (history.length === 0) {
     elements.historyList.innerHTML = "";
     return;
@@ -158,4 +172,13 @@ export function positionToolbar(elements) {
   elements.selectionToolbar.style.left = `${window.scrollX + rect.left + rect.width / 2 - 112}px`;
   elements.selectionToolbar.style.top = `${window.scrollY + rect.top - 46}px`;
   elements.selectionToolbar.classList.add("visible");
+}
+
+export function positionSelectionCard(elements) {
+  const selection = window.getSelection();
+  if (!selection || selection.isCollapsed || selection.rangeCount === 0) return;
+  const range = selection.getRangeAt(0);
+  const rect = range.getBoundingClientRect();
+  elements.selectionCard.style.left = `${Math.min(window.innerWidth - 330, Math.max(16, rect.left + rect.width / 2 - 156))}px`;
+  elements.selectionCard.style.top = `${window.scrollY + rect.bottom + 14}px`;
 }

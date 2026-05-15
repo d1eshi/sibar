@@ -60,6 +60,8 @@ story.
 - Web reader now serves from `/` in the deploy surface, with the public HTML,
   styles, and browser behavior split across `web/index.html`, `web/styles`, and
   `web/scripts` for product iteration.
+- Web reader now applies the focused source-ingestion visual direction to the
+  real `/web` product surface instead of leaving it only in docs prototypes.
 
 ### Fixed
 

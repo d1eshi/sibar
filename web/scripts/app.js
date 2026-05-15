@@ -14,6 +14,7 @@ import {
   flashStatus,
   getElements,
   KIND_ORDER,
+  positionSelectionCard,
   positionToolbar,
   renderArticle,
   renderHistory,
@@ -29,12 +30,39 @@ let state = { article: null, notes: [] };
 let sessionHistory = loadHistory();
 let pendingSelection = null;
 let pendingKind = "highlight";
+let toastTimer = null;
 
 function render() {
   renderArticle(elements, state);
   renderNotes(elements, state);
   renderHistory(elements, sessionHistory, state.article?.url);
   renderPending(elements, pendingSelection, pendingKind);
+}
+
+function showStart() {
+  elements.startView.hidden = false;
+  elements.loadingView.hidden = true;
+  elements.readerView.hidden = true;
+  elements.selectionCard.hidden = true;
+  elements.selectionToolbar.classList.remove("visible");
+  renderHistory(elements, sessionHistory, state.article?.url);
+}
+
+function showLoading() {
+  elements.startView.hidden = true;
+  elements.loadingView.hidden = false;
+  elements.readerView.hidden = true;
+  elements.selectionCard.hidden = true;
+  elements.selectionToolbar.classList.remove("visible");
+}
+
+function showReader() {
+  elements.startView.hidden = true;
+  elements.loadingView.hidden = true;
+  elements.readerView.hidden = false;
+  elements.selectionCard.hidden = true;
+  elements.selectionToolbar.classList.remove("visible");
+  window.scrollTo({ top: 0 });
 }
 
 function persist() {
@@ -54,10 +82,17 @@ function restore(article) {
   state = saved ? { article, notes: saved.notes || [] } : { article, notes: [] };
   persist();
   render();
+  showReader();
 }
 
-function openSample() {
+function delay(ms) {
+  return new Promise((resolve) => window.setTimeout(resolve, ms));
+}
+
+async function openSample() {
   elements.urlInput.value = "";
+  showLoading();
+  await delay(350);
   restore(sampleArticle);
   setStatus(elements, "Demo cargada.");
 }
@@ -65,6 +100,7 @@ function openSample() {
 async function loadUrl(rawUrl) {
   const url = normalizeArticleUrl(rawUrl);
   elements.urlInput.value = url;
+  showLoading();
 
   const saved = getSavedWorkspaceByUrl(url);
   if (saved?.article) {
@@ -100,6 +136,22 @@ function clearPending() {
   renderPending(elements, pendingSelection, pendingKind);
 }
 
+function showToast(message) {
+  if (!elements.savedToast) {
+    setStatus(elements, message);
+    return;
+  }
+  window.clearTimeout(toastTimer);
+  elements.savedToast.textContent = message;
+  elements.savedToast.hidden = false;
+  elements.savedToast.classList.remove("flash");
+  void elements.savedToast.offsetWidth;
+  elements.savedToast.classList.add("flash");
+  toastTimer = window.setTimeout(() => {
+    elements.savedToast.hidden = true;
+  }, 1700);
+}
+
 function createNote(input) {
   if (!state.article) return;
   state.notes = [{
@@ -114,6 +166,7 @@ function createNote(input) {
   }, ...state.notes].slice(0, MAX_SESSION_NOTES);
   persist();
   render();
+  showToast("Guardado");
 }
 
 function savePending() {
@@ -124,7 +177,6 @@ function savePending() {
     note: elements.selectionNote.value.trim()
   });
   clearPending();
-  setStatus(elements, "Nota guardada.");
 }
 
 function setPendingKind(kind) {
@@ -144,7 +196,6 @@ function saveLooseNote() {
   if (!note) return;
   createNote({ kind: "highlight", note });
   elements.looseNote.value = "";
-  setStatus(elements, "Nota guardada.");
 }
 
 function stageSelection(kind) {
@@ -165,6 +216,8 @@ function stageSelection(kind) {
   setPendingKind(kind);
   elements.selectionNote.value = "";
   renderPending(elements, pendingSelection, pendingKind);
+  positionSelectionCard(elements);
+  elements.selectionToolbar.classList.remove("visible");
   elements.selectionNote.focus();
 }
 
@@ -178,10 +231,16 @@ elements.form.addEventListener("submit", async (event) => {
 });
 
 elements.sampleBtn.addEventListener("click", openSample);
-elements.emptySampleBtn.addEventListener("click", openSample);
+if (elements.emptySampleBtn) elements.emptySampleBtn.addEventListener("click", openSample);
 elements.saveSelectionBtn.addEventListener("click", savePending);
 elements.clearSelectionBtn.addEventListener("click", clearPending);
 elements.saveLooseBtn.addEventListener("click", saveLooseNote);
+elements.savedChip.addEventListener("click", () => {
+  elements.savedDrawer.hidden = false;
+});
+elements.closeSavedBtn.addEventListener("click", () => {
+  elements.savedDrawer.hidden = true;
+});
 elements.historyList.addEventListener("click", (event) => {
   const button = event.target.closest("[data-history-url]");
   if (!button) return;
@@ -227,4 +286,9 @@ document.addEventListener("keydown", (event) => {
   if (event.key === "Escape") clearPending();
 });
 
-openSample();
+document.querySelectorAll(".source-chip").forEach((button) => {
+  button.addEventListener("click", () => elements.urlInput.focus());
+});
+
+render();
+showStart();
