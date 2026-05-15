@@ -422,7 +422,7 @@ textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(37, 109
 <div class="shell">
   <aside class="history-drawer">
     <header class="history-header">
-      <div class="history-title">History</div>
+      <div class="history-title">Session</div>
       <div class="count" id="historyCount">0</div>
     </header>
     <nav class="history-list" id="historyList" aria-label="Ultimos articulos leidos"></nav>
@@ -453,7 +453,7 @@ textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(37, 109
 
   <aside class="assistant">
     <header class="assistant-header">
-      <div class="assistant-title">Knowledge Layer</div>
+      <div class="assistant-title">Learning Log</div>
       <div class="count" id="noteCount">0 notas</div>
     </header>
     <div class="assistant-body">
@@ -473,11 +473,10 @@ textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(37, 109
       </section>
 
       <section class="card">
-        <div class="card-label" style="margin-bottom: 8px;">Nota suelta</div>
+        <div class="card-label" style="margin-bottom: 8px;">Nota de sesion</div>
         <textarea id="looseNote" placeholder="Nota atomica..."></textarea>
         <div class="actions" style="margin-top: 8px;">
           <button class="btn primary small" type="button" id="saveLooseBtn">Guardar nota</button>
-          <button class="btn ghost small" type="button" id="exportBtn">Exportar JSON</button>
         </div>
       </section>
 
@@ -494,9 +493,8 @@ textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(37, 109
 </div>
 
 <script>
-const STORAGE_KEY = "sibi.article.workspace.v1";
-const HISTORY_KEY = "sibi.article.history.v1";
 const HISTORY_LIMIT = 20;
+const MAX_SESSION_NOTES = 12;
 const sampleArticle = {
   url: "demo://sibi/article-workspace",
   title: "Aprender una fuente sin perder evidencia",
@@ -535,7 +533,6 @@ const elements = {
   clearSelectionBtn: $("clearSelectionBtn"),
   looseNote: $("looseNote"),
   saveLooseBtn: $("saveLooseBtn"),
-  exportBtn: $("exportBtn"),
   notes: $("notes"),
   noteCount: $("noteCount"),
   historyCount: $("historyCount"),
@@ -543,14 +540,8 @@ const elements = {
   status: $("status")
 };
 
-function loadStore() {
-  try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}"); }
-  catch { return {}; }
-}
-
-function saveStore(store) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(store));
-}
+const sessionWorkspaces = new Map();
+let sessionHistory = [];
 
 function isHistoryUrl(value) {
   try {
@@ -559,21 +550,6 @@ function isHistoryUrl(value) {
   } catch {
     return false;
   }
-}
-
-function loadHistory() {
-  try {
-    const history = JSON.parse(localStorage.getItem(HISTORY_KEY) || "[]");
-    if (!Array.isArray(history)) return [];
-    const filtered = history.filter((item) => item && isHistoryUrl(item.url));
-    if (filtered.length !== history.length) saveHistory(filtered);
-    return filtered;
-  }
-  catch { return []; }
-}
-
-function saveHistory(history) {
-  localStorage.setItem(HISTORY_KEY, JSON.stringify(history.filter((item) => item && isHistoryUrl(item.url)).slice(0, HISTORY_LIMIT)));
 }
 
 function workspaceKey(article) {
@@ -590,20 +566,20 @@ function normalizeArticleUrl(rawUrl) {
 }
 
 function getSavedWorkspaceByUrl(url) {
-  const store = loadStore();
-  return store[url] || null;
+  return sessionWorkspaces.get(url) || null;
 }
 
 function persist() {
   if (!state.article) return;
-  const store = loadStore();
-  store[workspaceKey(state.article)] = state;
-  saveStore(store);
+  sessionWorkspaces.set(workspaceKey(state.article), {
+    article: state.article,
+    notes: [...state.notes]
+  });
   updateHistory(state.article);
 }
 
 function restore(article) {
-  const saved = loadStore()[workspaceKey(article)];
+  const saved = getSavedWorkspaceByUrl(workspaceKey(article));
   state = saved ? { article, notes: saved.notes || [] } : { article, notes: [] };
   persist();
   render();
@@ -619,8 +595,9 @@ function updateHistory(article) {
     noteCount: state.notes.length,
     lastOpenedAt: new Date().toISOString()
   };
-  const history = loadHistory().filter((item) => item.url !== article.url);
-  saveHistory([nextItem, ...history]);
+  sessionHistory = [nextItem, ...sessionHistory.filter((item) => item.url !== article.url)]
+    .filter((item) => item && isHistoryUrl(item.url))
+    .slice(0, HISTORY_LIMIT);
 }
 
 function escapeHtml(value) {
@@ -699,14 +676,13 @@ function renderNotes() {
 }
 
 function renderHistory() {
-  const history = loadHistory();
-  elements.historyCount.textContent = String(history.length);
-  if (history.length === 0) {
-    elements.historyList.innerHTML = `<p class="history-empty">Los articulos que abras van a quedar aca.</p>`;
+  elements.historyCount.textContent = String(sessionHistory.length);
+  if (sessionHistory.length === 0) {
+    elements.historyList.innerHTML = `<p class="history-empty">Los articulos web que abras en esta sesion van a quedar aca.</p>`;
     return;
   }
 
-  elements.historyList.innerHTML = history.map((item) => `
+  elements.historyList.innerHTML = sessionHistory.map((item) => `
     <button class="history-item${state.article?.url === item.url ? " active" : ""}" type="button" data-history-url="${escapeHtml(item.url)}">
       <span class="history-item-title">${escapeHtml(item.title)}</span>
       <span class="history-item-meta">
@@ -762,7 +738,7 @@ async function loadUrl(rawUrl) {
   const saved = getSavedWorkspaceByUrl(url);
   if (saved?.article) {
     restore(saved.article);
-    flashStatus("Ya estaba guardado. Abrimos la copia local sin pedirlo al servidor.");
+    flashStatus("Ya estaba abierto en esta sesion. Lo recuperamos sin pedirlo al servidor.");
     return;
   }
 
@@ -779,7 +755,7 @@ async function openHistoryUrl(url) {
   if (saved?.article) {
     elements.urlInput.value = saved.article.url.startsWith("demo://") ? "" : saved.article.url;
     restore(saved.article);
-    flashStatus("Abierto desde historial local.");
+    flashStatus("Abierto desde el historial de esta sesion.");
     return;
   }
 
@@ -806,7 +782,7 @@ function createNote(input) {
     sourceUrl: state.article.url,
     sourceTitle: state.article.title,
     createdAt: new Date().toISOString()
-  }, ...state.notes];
+  }, ...state.notes].slice(0, MAX_SESSION_NOTES);
   persist();
   render();
 }
@@ -888,15 +864,6 @@ elements.emptySampleBtn.addEventListener("click", openSample);
 elements.saveSelectionBtn.addEventListener("click", savePending);
 elements.clearSelectionBtn.addEventListener("click", clearPending);
 elements.saveLooseBtn.addEventListener("click", saveLooseNote);
-elements.exportBtn.addEventListener("click", () => {
-  const blob = new Blob([JSON.stringify(state, null, 2)], { type: "application/json" });
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement("a");
-  link.href = url;
-  link.download = "sibi-article-workspace.json";
-  link.click();
-  URL.revokeObjectURL(url);
-});
 elements.historyList.addEventListener("click", (event) => {
   const button = event.target.closest("[data-history-url]");
   if (!button) return;

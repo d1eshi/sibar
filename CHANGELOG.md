@@ -47,6 +47,8 @@ story.
   visible saved-state flash before making another server request.
 - Article workspace now includes a local recent-reading drawer for reopening the
   last articles and their saved notes.
+- Article workspace reader state is now session-only for the public demo: no
+  browser persistence, no export button, and a capped Learning Log.
 
 ### Fixed
 
