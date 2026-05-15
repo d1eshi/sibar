@@ -116,11 +116,11 @@ An iteration is valid only when it records:
 
 ## Prototype Artifact Rule
 
-Use `pnpm dlx lavish-axi@0.1.10` for self-hosted iteration prototypes. These prototypes are
-local HTML review artifacts, not product code, runtime dependencies, or
-substitutes for eval coverage. They exist so the user can inspect the logic,
-interaction, or UI of an iteration before it is translated into production code
-or SwiftUI.
+Self-hosted iteration prototypes must use the product app, a repo-owned local
+route, a static screenshot, or a small checked-in fixture. They must not depend
+on external review tooling, agent-only UI wrappers, or global packages. They are
+review aids, not product code, runtime dependencies, or substitutes for eval
+coverage.
 
 A prototype is required when an iteration needs human review of:
 
@@ -130,13 +130,13 @@ A prototype is required when an iteration needs human review of:
 4. evidence/readiness presentation
 5. benchmark or report interpretation
 
-Prototype files live under:
+Prototype source files or captured assets live under:
 
 ```text
-docs/specs/selfhost/pilot/prototypes/<spec-id>/<iteration-id>.html
+docs/specs/selfhost/pilot/prototypes/<spec-id>/<iteration-id>/
 ```
 
-Every prototype HTML must be self-contained and begin with this visible header:
+Every prototype must identify:
 
 ```text
 PROTOTYPE - throwaway review artifact
@@ -145,17 +145,10 @@ Iteration: <iteration-id>
 Question answered: <what this prototype helps the user review>
 ```
 
-Review commands:
-
-```sh
-pnpm dlx lavish-axi@0.1.10 docs/specs/selfhost/pilot/prototypes/<spec-id>/<iteration-id>.html
-pnpm dlx lavish-axi@0.1.10 poll docs/specs/selfhost/pilot/prototypes/<spec-id>/<iteration-id>.html
-pnpm dlx lavish-axi@0.1.10 end docs/specs/selfhost/pilot/prototypes/<spec-id>/<iteration-id>.html
-```
-
-Do not add `lavish-axi` as a package dependency. Do not commit `.lavish-axi/`.
-When the review is complete, record the feedback and decision in the owning
-self-hosted spec's `Prototype Artifact` and `Iteration Log` sections.
+Do not add prototype review CLIs as package dependencies. Do not use `pnpm dlx`
+for prototype review. When the review is complete, record the feedback and
+decision in the owning self-hosted spec's `Prototype Artifact` and
+`Iteration Log` sections.
 
 ## Valid MVP Outcomes
 

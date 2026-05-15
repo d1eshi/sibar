@@ -193,20 +193,7 @@ Manual testers should record:
 Path:
 
 ```text
-docs/specs/selfhost/pilot/prototypes/02_evaluation_contract/freeform-first-slice.html
-```
-
-Review command:
-
-```sh
-pnpm dlx lavish-axi@0.1.10 docs/specs/selfhost/pilot/prototypes/02_evaluation_contract/freeform-first-slice.html
-```
-
-Feedback commands:
-
-```sh
-pnpm dlx lavish-axi@0.1.10 poll docs/specs/selfhost/pilot/prototypes/02_evaluation_contract/freeform-first-slice.html
-pnpm dlx lavish-axi@0.1.10 end docs/specs/selfhost/pilot/prototypes/02_evaluation_contract/freeform-first-slice.html
+docs/specs/selfhost/pilot/prototypes/02_evaluation_contract/freeform-first-slice/
 ```
 
 Question answered:
@@ -238,15 +225,15 @@ The first prototype should compare the five first-slice answer shapes:
 Feedback captured:
 
 ```text
-Pending. A future agent should create the HTML prototype and run the Lavish
-review session when explicitly requested.
+Pending. A future agent should review this through the product app, a repo-owned
+local route, or static captures.
 ```
 
 Decision:
 
 ```text
-Do not translate this interaction to SwiftUI until the Lavish prototype shows
-that the evaluation loop is understandable without inspecting raw JSON.
+Do not translate this interaction to SwiftUI until a local prototype or capture
+shows that the evaluation loop is understandable without inspecting raw JSON.
 ```
 
 ## Eval Coverage
