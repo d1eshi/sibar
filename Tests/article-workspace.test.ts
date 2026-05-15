@@ -32,3 +32,8 @@ test("assertHttpUrl rejects non-web protocols", () => {
   assert.throws(() => assertHttpUrl("file:///tmp/article.html"), /Only http and https/);
   assert.equal(assertHttpUrl("https://example.com").hostname, "example.com");
 });
+
+test("assertHttpUrl normalizes fragments and rejects credentials", () => {
+  assert.equal(assertHttpUrl("https://example.com/article#comments").href, "https://example.com/article");
+  assert.throws(() => assertHttpUrl("https://user:pass@example.com/article"), /cannot include credentials/);
+});
