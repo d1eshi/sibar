@@ -41,6 +41,8 @@ story.
 
 - Article workspace note capture now uses tab-style note kinds and supports
   keyboard capture with Tab and Command/Control+Enter.
+- Article workspace URL reads now use server-side cache, public URL validation,
+  request limits, fetch timeouts, and bounded response size for public launch.
 
 ### Fixed
 

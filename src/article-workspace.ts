@@ -28,6 +28,13 @@ function decodeHtml(value: string): string {
   });
 }
 
+function sanitizeText(value: string): string {
+  return decodeHtml(value)
+    .replace(/[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
 function stripNoise(html: string): string {
   return html
     .replace(/<!--[\s\S]*?-->/g, " ")
@@ -35,16 +42,14 @@ function stripNoise(html: string): string {
 }
 
 function stripTags(html: string): string {
-  return decodeHtml(html.replace(/<[^>]+>/g, " "))
-    .replace(/\s+/g, " ")
-    .trim();
+  return sanitizeText(html.replace(/<[^>]+>/g, " "));
 }
 
 function metaContent(html: string, name: string): string | null {
   const escaped = name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
   const propertyFirst = new RegExp(`<meta[^>]+(?:property|name)=["']${escaped}["'][^>]+content=["']([^"']+)["'][^>]*>`, "i");
   const contentFirst = new RegExp(`<meta[^>]+content=["']([^"']+)["'][^>]+(?:property|name)=["']${escaped}["'][^>]*>`, "i");
-  return decodeHtml((html.match(propertyFirst)?.[1] ?? html.match(contentFirst)?.[1] ?? "").trim()) || null;
+  return sanitizeText((html.match(propertyFirst)?.[1] ?? html.match(contentFirst)?.[1] ?? "").trim()) || null;
 }
 
 function titleFromHtml(html: string, fallback: string): string {
@@ -75,7 +80,7 @@ function paragraphsFromBlock(block: string): string[] {
   return readable
     .split(/\n{2,}/)
     .map(stripTags)
-    .map((paragraph) => paragraph.replace(/\s+/g, " ").trim())
+    .map(sanitizeText)
     .filter((paragraph) => paragraph.length >= 48)
     .slice(0, 80);
 }
@@ -106,9 +111,13 @@ export function extractReadableArticle(input: { url: string; html: string }): Re
 }
 
 export function assertHttpUrl(rawUrl: string): URL {
-  const parsedUrl = new URL(rawUrl);
+  const parsedUrl = new URL(rawUrl.trim());
   if (parsedUrl.protocol !== "http:" && parsedUrl.protocol !== "https:") {
     throw new Error("Only http and https article URLs are supported.");
   }
+  if (parsedUrl.username || parsedUrl.password) {
+    throw new Error("Article URLs cannot include credentials.");
+  }
+  parsedUrl.hash = "";
   return parsedUrl;
 }
