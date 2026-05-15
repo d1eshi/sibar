@@ -51,6 +51,14 @@ test("article workspace persists notes locally without export", () => {
   assert.match(html, /const MAX_SESSION_NOTES = 12/);
 });
 
+test("article workspace enables only aggregate Vercel page analytics", () => {
+  assert.match(html, /window\.va = window\.va \|\| function/);
+  assert.match(html, /window\.va\("beforeSend"/);
+  assert.match(html, /url\.search = ""/);
+  assert.match(html, /\/_vercel\/insights\/script\.js/);
+  assert.doesNotMatch(html, /window\.va\("event"/);
+});
+
 test("article workspace presents the reader as evidence-first learning", () => {
   assert.match(html, /Deep knowledge improves what you build\./);
   assert.match(html, /Read for evidence\./);

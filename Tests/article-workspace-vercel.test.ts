@@ -7,6 +7,7 @@ import test from "node:test";
 const root = process.cwd();
 const webHtml = readFileSync(join(root, "web/article-workspace.html"), "utf8");
 const webApi = readFileSync(join(root, "web/api/read.mjs"), "utf8");
+const analyticsResearch = readFileSync(join(root, "web/ANALYTICS_RESEARCH.md"), "utf8");
 const vercelConfig = JSON.parse(readFileSync(join(root, "web/vercel.json"), "utf8"));
 
 test("article workspace web deploy is rooted under /web", () => {
@@ -33,4 +34,11 @@ test("article workspace Vercel API rejects invalid URLs before fetching", async 
 
   assert.equal(response.status, 400);
   assert.match(body.error, /Only http and https/);
+});
+
+test("article workspace documents analytics privacy boundaries", () => {
+  assert.match(analyticsResearch, /Do not track article URLs/);
+  assert.match(analyticsResearch, /does not use cookies/);
+  assert.match(analyticsResearch, /We do not send your notes/);
+  assert.match(analyticsResearch, /reading time/);
 });
