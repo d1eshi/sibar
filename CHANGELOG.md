@@ -43,6 +43,8 @@ story.
   keyboard capture with Tab and Command/Control+Enter.
 - Article workspace URL reads now use server-side cache, public URL validation,
   request limits, fetch timeouts, and bounded response size for public launch.
+- Article workspace now opens repeated article URLs from local storage with a
+  visible saved-state flash before making another server request.
 
 ### Fixed
 
