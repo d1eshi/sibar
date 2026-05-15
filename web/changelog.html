@@ -10,34 +10,33 @@
 <main class="changelog-shell">
   <header class="changelog-hero">
     <p class="eyebrow">Sibar / Changelog</p>
-    <h1>Product presentation releases</h1>
-    <p>Registro de slices de producto para revisar el reader antes de promoverlo a produccion.</p>
+    <h1>Actualizaciones del reader</h1>
+    <p>Cambios visibles para equipos y clientes que estan evaluando como Sibar ayuda a leer, pensar y guardar conocimiento profundo.</p>
   </header>
 
   <section class="release">
-    <p class="release-kicker">Preview slice 2</p>
-    <h2>Focused Reader Visual Iteration</h2>
-    <p class="release-summary">La direccion visual del prototipo paso al producto real en `/web`, con ruta final `/`, reader enfocado y una demo que comunica el posicionamiento de Sibar.</p>
+    <p class="release-kicker">Actualizacion 2</p>
+    <h2>Reader enfocado</h2>
+    <p class="release-summary">Una experiencia de lectura mas simple, editorial y directa para entender una fuente sin quedar atrapado en paneles o decisiones innecesarias.</p>
     <ul>
-      <li>La UI de source-ingestion vive ahora en el deploy surface real, no solo en docs.</li>
-      <li>El reader se sirve desde `/`; la ruta vieja redirige por compatibilidad.</li>
-      <li>HTML, CSS y JavaScript quedaron separados para iterar sin React, SSR ni build step.</li>
-      <li>La demo presenta el manifiesto de conocimiento profundo y critica el consumo puramente resumido.</li>
-      <li>Las marcas demo muestran highlight, pregunta e idea con sus colores sin crear notas guardadas.</li>
-      <li>Guardadas usa count en header, toast temporal, drawer con slide, click afuera, scroll lock y atajo visible.</li>
+      <li>Nueva pantalla de entrada para cargar una fuente con menos friccion.</li>
+      <li>Reader visualmente mas limpio, con foco en el texto y sin metadatos innecesarios.</li>
+      <li>Demo editorial que explica el posicionamiento de Sibar sobre conocimiento profundo.</li>
+      <li>Marcas visuales para reconocer highlights, preguntas e ideas durante la lectura.</li>
+      <li>Panel de guardadas mas discreto, con cierre fluido, atajos visibles y mejor comportamiento de scroll.</li>
     </ul>
   </section>
 
   <section class="release">
-    <p class="release-kicker">Preview slice 1</p>
-    <h2>Public Reader Foundation</h2>
-    <p class="release-summary">Primer deploy surface publico del reader: pegar una fuente, extraer el articulo, leer, seleccionar y guardar notas atomicas en el navegador.</p>
+    <p class="release-kicker">Actualizacion 1</p>
+    <h2>Primer reader publico</h2>
+    <p class="release-summary">Primera version revisable del reader: cargar una fuente, leerla en una vista limpia y guardar fragmentos importantes mientras la comprension todavia esta fresca.</p>
     <ul>
-      <li>`/web` quedo aislado como superficie deployable para Vercel.</li>
-      <li>`/api/read` extrae articulos con validacion de URL, bloqueos de red privada y limites de fetch.</li>
-      <li>Notas e historial reciente se guardan en `localStorage`, sin login ni backend de usuario.</li>
-      <li>Analytics queda limitado a page views agregados; no se envian URLs de articulos ni notas.</li>
-      <li>Tests cubren API, privacidad, persistencia local, historial y contratos principales de UI.</li>
+      <li>Carga de fuentes web para leerlas en una experiencia enfocada.</li>
+      <li>Seleccion de fragmentos importantes durante la lectura.</li>
+      <li>Guardado de notas y selecciones en el navegador.</li>
+      <li>Historial reciente para retomar lecturas abiertas anteriormente.</li>
+      <li>Analitica limitada a visitas agregadas; no se comparten notas ni contenido personal.</li>
     </ul>
   </section>
 </main>
