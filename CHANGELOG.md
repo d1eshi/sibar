@@ -39,7 +39,8 @@ story.
 
 ### Changed
 
-- Nothing yet.
+- Article workspace note capture now uses tab-style note kinds and supports
+  keyboard capture with Tab and Command/Control+Enter.
 
 ### Fixed
 

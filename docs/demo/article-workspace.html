@@ -191,6 +191,8 @@ mark.kind-key { background: rgba(61, 122, 77, 0.22); }
 }
 
 .selection-card { border-left: 4px solid var(--accent); }
+.selection-card[data-active-kind="question"] { border-left-color: var(--accent-2); }
+.selection-card[data-active-kind="key"] { border-left-color: var(--green); }
 .selection-text {
   margin: 8px 0;
   color: var(--ink);
@@ -212,8 +214,33 @@ mark.kind-key { background: rgba(61, 122, 77, 0.22); }
   gap: 6px;
   align-items: center;
 }
-.kind-row { margin-top: 8px; }
-.kind-btn.active { border-color: var(--accent); color: var(--accent); background: rgba(37, 109, 133, 0.08); }
+.kind-row {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0;
+  margin-top: 8px;
+  padding: 3px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface-2);
+}
+.kind-btn {
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--muted);
+}
+.kind-btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+.kind-btn.active {
+  color: var(--ink);
+  background: var(--surface);
+  box-shadow: 0 1px 4px rgba(39, 34, 25, 0.14);
+}
+.kind-btn[data-kind="question"].active { color: var(--accent-2); }
+.kind-btn[data-kind="key"].active { color: var(--green); }
 
 textarea {
   width: 100%;
@@ -339,10 +366,10 @@ textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(37, 109
         <div class="card-label">Seleccion</div>
         <p class="selection-text" id="selectionText"></p>
         <textarea id="selectionNote" placeholder="Nota breve..."></textarea>
-        <div class="kind-row">
-          <button class="btn small kind-btn active" type="button" data-kind="highlight">Highlight</button>
-          <button class="btn small kind-btn" type="button" data-kind="question">Pregunta</button>
-          <button class="btn small kind-btn" type="button" data-kind="key">Idea</button>
+        <div class="kind-row" role="tablist" aria-label="Tipo de nota">
+          <button class="small kind-btn active" type="button" role="tab" aria-selected="true" data-kind="highlight">Highlight</button>
+          <button class="small kind-btn" type="button" role="tab" aria-selected="false" data-kind="question">Pregunta</button>
+          <button class="small kind-btn" type="button" role="tab" aria-selected="false" data-kind="key">Idea</button>
         </div>
         <div class="actions" style="margin-top: 8px;">
           <button class="btn primary small" type="button" id="saveSelectionBtn">Guardar</button>
@@ -389,6 +416,7 @@ const sampleArticle = {
 let state = { article: null, notes: [] };
 let pendingSelection = null;
 let pendingKind = "highlight";
+const KIND_ORDER = ["highlight", "question", "key"];
 
 const $ = (id) => document.getElementById(id);
 const elements = {
@@ -521,9 +549,12 @@ function renderNotes() {
 function renderPending() {
   elements.selectionCard.hidden = !pendingSelection;
   if (!pendingSelection) return;
+  elements.selectionCard.dataset.activeKind = pendingKind;
   elements.selectionText.textContent = pendingSelection.selectedText;
   document.querySelectorAll(".kind-btn").forEach((button) => {
-    button.classList.toggle("active", button.dataset.kind === pendingKind);
+    const active = button.dataset.kind === pendingKind;
+    button.classList.toggle("active", active);
+    button.setAttribute("aria-selected", active ? "true" : "false");
   });
 }
 
@@ -556,6 +587,7 @@ async function loadUrl(rawUrl) {
 
 function clearPending() {
   pendingSelection = null;
+  delete elements.selectionCard.dataset.activeKind;
   elements.selectionNote.value = "";
   elements.selectionToolbar.classList.remove("visible");
   window.getSelection()?.removeAllRanges();
@@ -589,6 +621,26 @@ function savePending() {
   setStatus("Nota guardada.");
 }
 
+function setPendingKind(kind) {
+  if (!KIND_ORDER.includes(kind)) return;
+  pendingKind = kind;
+  renderPending();
+}
+
+function cyclePendingKind(direction) {
+  const currentIndex = KIND_ORDER.indexOf(pendingKind);
+  const nextIndex = (currentIndex + direction + KIND_ORDER.length) % KIND_ORDER.length;
+  setPendingKind(KIND_ORDER[nextIndex]);
+}
+
+function saveLooseNote() {
+  const note = elements.looseNote.value.trim();
+  if (!note) return;
+  createNote({ kind: "highlight", note });
+  elements.looseNote.value = "";
+  setStatus("Nota guardada.");
+}
+
 function stageSelection(kind) {
   const selection = window.getSelection();
   if (!selection || selection.isCollapsed || selection.rangeCount === 0) return;
@@ -604,7 +656,7 @@ function stageSelection(kind) {
     selectedText,
     paragraphIndex: paragraph ? Number(paragraph.dataset.paragraphIndex) : null
   };
-  pendingKind = kind;
+  setPendingKind(kind);
   elements.selectionNote.value = "";
   renderPending();
   elements.selectionNote.focus();
@@ -634,13 +686,7 @@ elements.sampleBtn.addEventListener("click", openSample);
 elements.emptySampleBtn.addEventListener("click", openSample);
 elements.saveSelectionBtn.addEventListener("click", savePending);
 elements.clearSelectionBtn.addEventListener("click", clearPending);
-elements.saveLooseBtn.addEventListener("click", () => {
-  const note = elements.looseNote.value.trim();
-  if (!note) return;
-  createNote({ kind: "highlight", note });
-  elements.looseNote.value = "";
-  setStatus("Nota guardada.");
-});
+elements.saveLooseBtn.addEventListener("click", saveLooseNote);
 elements.exportBtn.addEventListener("click", () => {
   const blob = new Blob([JSON.stringify(state, null, 2)], { type: "application/json" });
   const url = URL.createObjectURL(blob);
@@ -652,10 +698,7 @@ elements.exportBtn.addEventListener("click", () => {
 });
 
 document.querySelectorAll(".kind-btn").forEach((button) => {
-  button.addEventListener("click", () => {
-    pendingKind = button.dataset.kind;
-    renderPending();
-  });
+  button.addEventListener("click", () => setPendingKind(button.dataset.kind));
 });
 
 document.querySelectorAll("[data-toolbar-kind]").forEach((button) => {
@@ -670,6 +713,24 @@ elements.articleBody.addEventListener("mousedown", (event) => {
   if (!event.target.closest(".toolbar")) elements.selectionToolbar.classList.remove("visible");
 });
 document.addEventListener("keydown", (event) => {
+  if (pendingSelection && event.key === "Tab") {
+    event.preventDefault();
+    cyclePendingKind(event.shiftKey ? -1 : 1);
+    return;
+  }
+
+  if (event.key === "Enter" && (event.metaKey || event.ctrlKey)) {
+    event.preventDefault();
+    if (pendingSelection) {
+      savePending();
+      return;
+    }
+    if (document.activeElement === elements.looseNote) {
+      saveLooseNote();
+    }
+    return;
+  }
+
   if (event.key === "Escape") clearPending();
 });
 
