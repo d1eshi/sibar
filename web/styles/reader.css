@@ -544,7 +544,6 @@ textarea {
 
 .toolbar button:hover { background: rgba(255, 255, 255, 0.12); }
 
-.saved-chip,
 .saved-toast {
   position: fixed;
   z-index: 10;
@@ -553,8 +552,6 @@ textarea {
 }
 
 .saved-chip {
-  left: 44px;
-  bottom: 40px;
   min-height: 46px;
   display: inline-flex;
   align-items: center;
@@ -564,6 +561,7 @@ textarea {
   padding: 0 18px;
   color: #4b4944;
   font-size: 16px;
+  box-shadow: 0 12px 36px rgba(41, 35, 27, 0.08);
 }
 
 .saved-toast {
@@ -720,11 +718,6 @@ textarea {
 
   .saved-header {
     padding-inline: 18px;
-  }
-
-  .saved-chip {
-    left: 16px;
-    bottom: 20px;
   }
 
   .saved-toast {
