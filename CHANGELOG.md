@@ -57,6 +57,9 @@ story.
   evidence-first learning and atomic notes.
 - Article workspace demo files moved from `docs/demo` into root-level `/web`
   so the public reader can deploy without the TypeScript runtime or sidecar.
+- Web reader now serves from `/` in the deploy surface, with the public HTML,
+  styles, and browser behavior split across `web/index.html`, `web/styles`, and
+  `web/scripts` for product iteration.
 
 ### Fixed
 

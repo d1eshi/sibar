@@ -5,18 +5,28 @@ import { pathToFileURL } from "node:url";
 import test from "node:test";
 
 const root = process.cwd();
-const webHtml = readFileSync(join(root, "web/article-workspace.html"), "utf8");
+const webHtml = readFileSync(join(root, "web/index.html"), "utf8");
+const legacyHtml = readFileSync(join(root, "web/article-workspace.html"), "utf8");
+const webApiClient = readFileSync(join(root, "web/scripts/api.js"), "utf8");
 const webApi = readFileSync(join(root, "web/api/read.mjs"), "utf8");
 const analyticsResearch = readFileSync(join(root, "web/ANALYTICS_RESEARCH.md"), "utf8");
 const vercelConfig = JSON.parse(readFileSync(join(root, "web/vercel.json"), "utf8"));
 
 test("article workspace web deploy is rooted under /web", () => {
-  assert.match(webHtml, /Sibi Article Workspace/);
-  assert.match(webHtml, /fetch\(`\/api\/read\?url=\$\{encodeURIComponent\(url\)\}`\)/);
+  assert.match(webHtml, /Sibar Reader/);
+  assert.match(webHtml, /<link rel="stylesheet" href="\/styles\/reader\.css">/);
+  assert.match(webHtml, /<script type="module" src="\/scripts\/app\.js"><\/script>/);
+  assert.match(webApiClient, /fetch\(`\/api\/read\?url=\$\{encodeURIComponent\(url\)\}`\)/);
   assert.equal(vercelConfig.framework, null);
   assert.equal(vercelConfig.cleanUrls, true);
   assert.equal(vercelConfig.installCommand, "");
   assert.equal(vercelConfig.buildCommand, null);
+  assert.doesNotMatch(JSON.stringify(vercelConfig), /article-workspace/);
+});
+
+test("legacy article workspace path redirects to the root reader", () => {
+  assert.match(legacyHtml, /location\.replace\('\/' \+ location\.search \+ location\.hash\)/);
+  assert.match(legacyHtml, /<link rel="canonical" href="\/">/);
 });
 
 test("article workspace Vercel API is self-contained JavaScript", () => {
