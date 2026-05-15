@@ -533,7 +533,7 @@ textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(37, 109
       </section>
 
       <section class="card">
-        <div class="card-label" style="margin-bottom: 8px;">Nota de sesion</div>
+        <div class="card-label" style="margin-bottom: 8px;">Nota local</div>
         <textarea id="looseNote" placeholder="Nota atomica..."></textarea>
         <div class="actions" style="margin-top: 8px;">
           <button class="btn primary small" type="button" id="saveLooseBtn">Guardar nota</button>
@@ -553,6 +553,8 @@ textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(37, 109
 </div>
 
 <script>
+const STORAGE_KEY = "sibi.article.workspace.v1";
+const HISTORY_KEY = "sibi.article.history.v1";
 const HISTORY_LIMIT = 20;
 const MAX_SESSION_NOTES = 12;
 const sampleArticle = {
@@ -600,8 +602,33 @@ const elements = {
   status: $("status")
 };
 
-const sessionWorkspaces = new Map();
 let sessionHistory = [];
+
+function loadJson(key, fallback) {
+  try {
+    const value = localStorage.getItem(key);
+    return value ? JSON.parse(value) : fallback;
+  } catch {
+    return fallback;
+  }
+}
+
+function saveJson(key, value) {
+  try {
+    localStorage.setItem(key, JSON.stringify(value));
+  } catch {
+    setStatus("No se pudo guardar en este navegador.");
+  }
+}
+
+function loadWorkspaceStore() {
+  const store = loadJson(STORAGE_KEY, {});
+  return store && typeof store === "object" && !Array.isArray(store) ? store : {};
+}
+
+function saveWorkspaceStore(store) {
+  saveJson(STORAGE_KEY, store);
+}
 
 function isHistoryUrl(value) {
   try {
@@ -626,15 +653,17 @@ function normalizeArticleUrl(rawUrl) {
 }
 
 function getSavedWorkspaceByUrl(url) {
-  return sessionWorkspaces.get(url) || null;
+  return loadWorkspaceStore()[url] || null;
 }
 
 function persist() {
   if (!state.article) return;
-  sessionWorkspaces.set(workspaceKey(state.article), {
+  const store = loadWorkspaceStore();
+  store[workspaceKey(state.article)] = {
     article: state.article,
     notes: [...state.notes]
-  });
+  };
+  saveWorkspaceStore(store);
   updateHistory(state.article);
 }
 
@@ -658,6 +687,15 @@ function updateHistory(article) {
   sessionHistory = [nextItem, ...sessionHistory.filter((item) => item.url !== article.url)]
     .filter((item) => item && isHistoryUrl(item.url))
     .slice(0, HISTORY_LIMIT);
+  saveJson(HISTORY_KEY, sessionHistory);
+}
+
+function loadHistory() {
+  const history = loadJson(HISTORY_KEY, []);
+  if (!Array.isArray(history)) return [];
+  const filtered = history.filter((item) => item && isHistoryUrl(item.url)).slice(0, HISTORY_LIMIT);
+  if (filtered.length !== history.length) saveJson(HISTORY_KEY, filtered);
+  return filtered;
 }
 
 function escapeHtml(value) {
@@ -738,7 +776,7 @@ function renderNotes() {
 function renderHistory() {
   elements.historyCount.textContent = String(sessionHistory.length);
   if (sessionHistory.length === 0) {
-    elements.historyList.innerHTML = `<p class="history-empty">Los articulos web que abras en esta sesion van a quedar aca.</p>`;
+    elements.historyList.innerHTML = `<p class="history-empty">Los articulos web que abras quedan aca en este navegador.</p>`;
     return;
   }
 
@@ -798,7 +836,7 @@ async function loadUrl(rawUrl) {
   const saved = getSavedWorkspaceByUrl(url);
   if (saved?.article) {
     restore(saved.article);
-    flashStatus("Ya estaba abierto en esta sesion. Lo recuperamos sin pedirlo al servidor.");
+    flashStatus("Ya estaba guardado en este navegador. Lo recuperamos sin pedirlo al servidor.");
     return;
   }
 
@@ -815,7 +853,7 @@ async function openHistoryUrl(url) {
   if (saved?.article) {
     elements.urlInput.value = saved.article.url.startsWith("demo://") ? "" : saved.article.url;
     restore(saved.article);
-    flashStatus("Abierto desde el historial de esta sesion.");
+    flashStatus("Abierto desde el historial local.");
     return;
   }
 
@@ -969,6 +1007,7 @@ document.addEventListener("keydown", (event) => {
   if (event.key === "Escape") clearPending();
 });
 
+sessionHistory = loadHistory();
 openSample();
 </script>
 </body>

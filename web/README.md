@@ -11,6 +11,10 @@ It contains only:
 It intentionally does not depend on the TypeScript runtime, Swift sidecar, local
 workspace server, or evaluator code.
 
+Reader notes and recent article history are stored in browser `localStorage`.
+This avoids data loss for the demo without introducing login or profile-backed
+persistence.
+
 ## Vercel Setup
 
 Create a Vercel project with this repository and set:
