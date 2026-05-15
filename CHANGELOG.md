@@ -43,7 +43,7 @@ story.
   keyboard capture with Tab and Command/Control+Enter.
 - Article workspace URL reads now use server-side cache, public URL validation,
   request limits, fetch timeouts, and bounded response size for public launch.
-- Article workspace now opens repeated article URLs from local storage with a
+- Article workspace now opens repeated article URLs from session state with a
   visible saved-state flash before making another server request.
 - Article workspace now includes a local recent-reading drawer for reopening the
   last articles and their saved notes.
@@ -80,6 +80,9 @@ story.
   and explicit Graph + Code canvas behavior.
 - Updated the self-hosted evaluation contract with first freeform evaluator slice
   results, coverage status, and the next expansion target.
+- Documented article reader persistence sequencing: validate session-only notes
+  first, use `localStorage` only as a bridge, and wait for profiles before
+  durable cross-device note memory.
 
 ### Internal
 

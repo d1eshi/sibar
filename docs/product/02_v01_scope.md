@@ -68,3 +68,29 @@ The important line is:
 
 > You are ready to make this change.
 
+## Article Reader Persistence Note
+
+The article reader demo should keep login out of the first validation loop.
+
+For the public MVP, session-only notes are enough to validate the learning
+gesture: paste a source, read, highlight evidence, write atomic notes, and see
+whether the user understands the source better.
+
+`localStorage` is an acceptable technical bridge after the gesture is validated.
+It can preserve article notes on the same browser without forcing account
+creation. That should still be treated as local device persistence, not product
+memory.
+
+Durable persistence should wait until there is a user profile. At that point,
+each note should be associated with:
+
+1. user profile id
+2. article canonical URL
+3. article title and host
+4. selected evidence text and paragraph index when available
+5. note kind: highlight, question, or idea
+6. note text and creation time
+
+Do not add login just to save notes. Add login when users explicitly need to
+recover notes across devices, build a learning history, or connect article notes
+to the broader understanding memory.
