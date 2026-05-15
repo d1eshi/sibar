@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Attempt-First UX Review — Prototype</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+    background: #fff;
+    color: #111;
+    line-height: 1.6;
+    font-size: 15px;
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 0 20px;
+  }
+  header {
+    border-bottom: 2px solid #111;
+    padding: 20px 0 12px;
+    margin-bottom: 28px;
+  }
+  .proto-label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: #555;
+    margin-bottom: 4px;
+  }
+  .proto-label strong {
+    background: #111;
+    color: #fff;
+    padding: 2px 8px;
+    font-weight: 700;
+  }
+  h1 { font-size: 22px; font-weight: 700; margin-bottom: 4px; }
+  .meta {
+    font-size: 12px;
+    color: #555;
+    font-family: 'Menlo', 'Consolas', monospace;
+  }
+  .meta span { margin-right: 16px; }
+  section { margin: 28px 0; }
+  h2 {
+    font-size: 16px;
+    font-weight: 700;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 6px;
+    margin-bottom: 14px;
+  }
+  h3 { font-size: 14px; font-weight: 600; margin-bottom: 8px; }
+  p { margin-bottom: 10px; }
+  .question-box {
+    border: 2px solid #111;
+    padding: 16px;
+    margin-bottom: 20px;
+  }
+  .question-box .q-label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #555;
+    margin-bottom: 6px;
+  }
+  .comparison {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+  @media (max-width: 640px) { .comparison { grid-template-columns: 1fr; } }
+  .variant {
+    border: 1px solid #ccc;
+    padding: 14px;
+    background: #fafafa;
+  }
+  .variant h3 { font-size: 13px; margin-bottom: 6px; }
+  .variant .flow-steps {
+    list-style: none;
+    font-size: 12px;
+  }
+  .variant .flow-steps li {
+    padding: 3px 0;
+    border-bottom: 1px dotted #ddd;
+  }
+  .variant .flow-steps li::before { content: "→ "; color: #111; font-weight: 700; }
+  .finding-block {
+    border-left: 3px solid #111;
+    padding: 8px 12px;
+    margin: 8px 0;
+    font-size: 12px;
+    background: #f4f4f4;
+  }
+  .finding-block.hidden-block {
+    border-color: #999;
+    background: #eee;
+    color: #999;
+    font-style: italic;
+  }
+  .choice-area {
+    border: 2px solid #111;
+    padding: 16px;
+    margin-bottom: 20px;
+  }
+  .choice-area label {
+    display: block;
+    padding: 10px 12px;
+    margin: 6px 0;
+    border: 1px solid #ccc;
+    cursor: pointer;
+    font-size: 13px;
+  }
+  .choice-area label:hover { background: #f4f4f4; }
+  .choice-area input[type="radio"] { margin-right: 8px; }
+  .choice-area .choice-reason {
+    display: block;
+    font-size: 12px;
+    color: #555;
+    margin-top: 4px;
+    margin-left: 24px;
+  }
+  .feedback-field { margin-bottom: 14px; }
+  .feedback-field label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+  .feedback-field textarea, .feedback-field input {
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid #ccc;
+    font-family: inherit;
+    font-size: 13px;
+    resize: vertical;
+    min-height: 60px;
+  }
+  .feedback-field textarea:focus, .feedback-field input:focus {
+    outline: none;
+    border-color: #111;
+  }
+  .btn-row { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 12px; }
+  .btn {
+    padding: 10px 18px;
+    border: 2px solid #111;
+    background: #fff;
+    color: #111;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+    font-family: inherit;
+  }
+  .btn:hover { background: #111; color: #fff; }
+  .btn.copy { border-color: #333; }
+  .status-msg {
+    font-size: 12px;
+    color: #555;
+    min-height: 20px;
+    margin-top: 8px;
+  }
+  .status-msg.success { color: #111; }
+  footer {
+    border-top: 2px solid #111;
+    padding: 16px 0;
+    margin-top: 32px;
+    font-size: 11px;
+    color: #555;
+  }
+  footer .status-badge {
+    display: inline-block;
+    padding: 2px 10px;
+    border: 1px solid #555;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-weight: 700;
+  }
+  .note-box {
+    border-left: 3px solid #111;
+    padding: 10px 14px;
+    margin: 12px 0;
+    background: #f8f8f8;
+    font-size: 12px;
+  }
+  hr { border: none; border-top: 1px solid #ddd; margin: 20px 0; }
+</style>
+</head>
+<body>
+
+<!-- ================================================================== -->
+<header>
+  <div class="proto-label"><strong>PROTOTYPE</strong> — throwaway review artifact</div>
+  <h1>Attempt-First UX: Manual Visual Review</h1>
+  <div class="meta">
+    <span>Spec: docs/specs/selfhost/05_public_demo_prototype.md</span>
+    <span>Iteration: 2026-05-14-feedback-pass</span>
+    <span>Question: Should the finding panel be visible before the user selects an answer state?</span>
+  </div>
+</header>
+
+<!-- ================================================================== -->
+<!-- REVIEWER SCRIPT                                                      -->
+<!-- ================================================================== -->
+<section>
+  <h2>Reviewer Script</h2>
+
+  <p><strong>Goal:</strong> Decide whether the SIBI public demo should show a default finding
+  immediately, or hide the finding until the reviewer explicitly selects an answer state.</p>
+
+  <p><strong>Time needed:</strong> ~5 minutes</p>
+
+  <p><strong>Steps:</strong></p>
+  <ol style="padding-left:20px;font-size:13px;margin-bottom:14px;">
+    <li>Read the ownership question below.</li>
+    <li>Consider how you would answer it (you don't need to type an actual answer).</li>
+    <li>Review Variant A and Variant B below — two UX flows for the demo.</li>
+    <li>Select your preferred variant and explain why.</li>
+    <li>Answer the comprehension questions at the bottom.</li>
+    <li>Copy or download your feedback.</li>
+  </ol>
+
+  <div class="note-box">
+    <strong>Attempt-First UX Note (from public-demo validator):</strong>
+    The current demo shows a default finding (the "grounded" answer) immediately upon page load,
+    before the reviewer has selected any answer state. The question for this review is:
+    <em>Is seeing the default finding immediately acceptable, or should findings stay hidden
+    until the reviewer explicitly selects an answer state?</em> Seeing the finding first may
+    influence how a reviewer thinks about the question; hiding it preserves strict attempt-first
+    ordering but requires one more click.
+  </div>
+</section>
+
+<!-- ================================================================== -->
+<!-- OWNERSHIP QUESTION (same as public demo)                             -->
+<!-- ================================================================== -->
+<section>
+  <h2>Ownership Question</h2>
+  <div class="question-box">
+    <div class="q-label">Question (from the public demo)</div>
+    <p style="font-size:15px;font-weight:500;">
+      Trace how the SIBI self-hosted runtime enforces artifact boundaries.
+      Which files define what is in scope, and how does the system decide
+      whether a given file path can be used as evidence?
+    </p>
+  </div>
+</section>
+
+<!-- ================================================================== -->
+<!-- TWO UX VARIANTS                                                     -->
+<!-- ================================================================== -->
+<section>
+  <h2>UX Variants to Compare</h2>
+
+  <div class="comparison">
+
+    <!-- Variant A: Default finding visible -->
+    <div class="variant">
+      <h3>Variant A: Default Finding Visible</h3>
+      <p style="font-size:12px;color:#555;">
+        (This is the current public demo behavior.)
+      </p>
+      <ul class="flow-steps">
+        <li>Page loads → ownership question visible</li>
+        <li>Five answer-state buttons visible below the question</li>
+        <li><strong>Default: "Grounded ✓" answer is pre-selected, and its finding is shown immediately</strong></li>
+        <li>Reviewer can click other states to see different findings</li>
+      </ul>
+      <div class="finding-block">
+        <strong>Finding (visible on load):</strong> Readiness — ready to modify with guardrails.
+        User evidence and repo evidence are displayed.
+      </div>
+    </div>
+
+    <!-- Variant B: Finding hidden until selection -->
+    <div class="variant">
+      <h3>Variant B: Finding Hidden Until Selection</h3>
+      <p style="font-size:12px;color:#555;">
+        (Alternative: no default answer, finding hidden.)
+      </p>
+      <ul class="flow-steps">
+        <li>Page loads → ownership question visible</li>
+        <li>Five answer-state buttons visible below the question</li>
+        <li><strong>No answer is pre-selected. Finding panel shows a prompt:</strong></li>
+        <li>Reviewer must click an answer state to reveal the finding</li>
+      </ul>
+      <div class="finding-block hidden-block">
+        <strong>Prompt (visible on load):</strong> "Select an answer state above to see how SIBI evaluates it."
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ================================================================== -->
+<!-- CHOICE                                                              -->
+<!-- ================================================================== -->
+<section>
+  <h2>Your Choice</h2>
+  <div class="choice-area">
+    <p style="font-size:13px;margin-bottom:10px;">
+      Which UX variant do you prefer for the SIBI public demo?
+    </p>
+
+    <label>
+      <input type="radio" name="uxChoice" value="variant-a" id="choiceA">
+      <strong>Variant A — Default finding visible.</strong>
+      <span class="choice-reason">Seeing the finding immediately gives context. The reviewer can see what SIBI does without guessing which button to press first.</span>
+    </label>
+
+    <label>
+      <input type="radio" name="uxChoice" value="variant-b" id="choiceB">
+      <strong>Variant B — Finding hidden until selection.</strong>
+      <span class="choice-reason">Strict attempt-first ordering: the reviewer should form a mental answer before seeing any finding, preserving the ownership check experience.</span>
+    </label>
+
+    <label>
+      <input type="radio" name="uxChoice" value="variant-c" id="choiceC">
+      <strong>Hybrid or other (describe below).</strong>
+      <span class="choice-reason">For example: show a collapsed preview or show the question with a "Reveal finding" button instead of answer-state buttons.</span>
+    </label>
+
+    <div class="feedback-field" style="margin-top:10px;">
+      <label for="uxReason">Why did you choose this variant? What trade-offs matter?</label>
+      <textarea id="uxReason" placeholder="Explain your reasoning..."></textarea>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================== -->
+<!-- COMPREHENSION QUESTIONS                                             -->
+<!-- ================================================================== -->
+<section>
+  <h2>Comprehension Check</h2>
+  <p style="font-size:12px;color:#555;margin-bottom:10px;">
+    These questions check whether the demo communicates the product idea clearly.
+    Answer based on what you saw in the public demo, not the prototype.
+  </p>
+
+  <div class="feedback-field">
+    <label for="comp1">1. What problem does SIBI solve? (In your own words)</label>
+    <textarea id="comp1" placeholder="Describe the problem SIBI addresses..."></textarea>
+  </div>
+
+  <div class="feedback-field">
+    <label for="comp2">2. Why is SIBI different from generic repo chat?</label>
+    <textarea id="comp2" placeholder="What makes SIBI's approach distinct..."></textarea>
+  </div>
+
+  <div class="feedback-field">
+    <label for="comp3">3. What does "readiness" mean in this demo? What does it NOT mean?</label>
+    <textarea id="comp3" placeholder="What readiness communicates and its limits..."></textarea>
+  </div>
+
+  <div class="feedback-field">
+    <label for="comp4">4. What confused you, if anything, about the repair/retry/readiness flow?</label>
+    <textarea id="comp4" placeholder="Anything unclear or hard to follow..."></textarea>
+  </div>
+
+  <div class="feedback-field">
+    <label for="comp5">5. Would you use this for AI-generated software? What would you need before trusting the readiness judgment?</label>
+    <textarea id="comp5" placeholder="Trust threshold and missing evidence..."></textarea>
+  </div>
+</section>
+
+<!-- ================================================================== -->
+<!-- FEEDBACK CAPTURE (no backend)                                        -->
+<!-- ================================================================== -->
+<section>
+  <h2>Submit &amp; Capture</h2>
+  <p style="font-size:12px;color:#555;margin-bottom:10px;">
+    All responses are captured locally in your browser. No data is sent anywhere.
+    Copy or download to share with the team.
+  </p>
+
+  <div class="btn-row">
+    <button class="btn copy" id="copyBtn">Copy Responses</button>
+    <button class="btn" id="downloadBtn">Download as Text</button>
+  </div>
+  <div class="status-msg" id="statusMsg"></div>
+</section>
+
+<hr>
+
+<!-- ================================================================== -->
+<!-- FOOTER / STATUS                                                     -->
+<!-- ================================================================== -->
+<footer>
+  <span class="status-badge">READY FOR USER TESTING</span>
+  <p style="margin-top:8px;">
+    <strong>Status:</strong> External human reviewer feedback is pending.
+    This artifact is ready for manual visual validation by two or three reviewers.
+    No reviewers were available in-session, so comprehension results are not yet recorded.
+    If you are a reviewer, please complete the form above and share your responses.
+  </p>
+  <p style="margin-top:4px;color:#888;">
+    Spec: docs/specs/selfhost/05_public_demo_prototype.md &middot;
+    Iteration: 2026-05-14-feedback-pass &middot;
+    Prototype — throwaway review artifact &middot;
+    Optional Lavish review: pnpm dlx lavish-axi@0.1.10
+  </p>
+</footer>
+
+<!-- ================================================================== -->
+<!-- CAPTURE LOGIC (no external dependencies)                             -->
+<!-- ================================================================== -->
+<script>
+function collectResponses() {
+  var choice = document.querySelector('input[name="uxChoice"]:checked');
+  var choiceVal = choice ? choice.value : "(no choice)";
+
+  var lines = [];
+  lines.push("=== SIBI Attempt-First UX Review — Reviewer Responses ===");
+  lines.push("Date: " + new Date().toISOString());
+  lines.push("Prototype: docs/specs/selfhost/pilot/prototypes/feedback-pass/attempt-first-ux-review.html");
+  lines.push("Spec: docs/specs/selfhost/05_public_demo_prototype.md");
+  lines.push("Iteration: 2026-05-14-feedback-pass");
+  lines.push("");
+  lines.push("--- UX Choice ---");
+  lines.push("Selected variant: " + choiceVal);
+  lines.push("Reasoning: " + (document.getElementById("uxReason").value.trim() || "(no response)"));
+  lines.push("");
+  lines.push("--- Comprehension Check ---");
+  lines.push("1. What problem does SIBI solve?");
+  lines.push("   " + (document.getElementById("comp1").value.trim() || "(no response)"));
+  lines.push("");
+  lines.push("2. Why is SIBI different from generic repo chat?");
+  lines.push("   " + (document.getElementById("comp2").value.trim() || "(no response)"));
+  lines.push("");
+  lines.push('3. What does "readiness" mean? What does it NOT mean?');
+  lines.push("   " + (document.getElementById("comp3").value.trim() || "(no response)"));
+  lines.push("");
+  lines.push("4. What confused you about the repair/retry/readiness flow?");
+  lines.push("   " + (document.getElementById("comp4").value.trim() || "(no response)"));
+  lines.push("");
+  lines.push("5. Would you use this? Trust threshold?");
+  lines.push("   " + (document.getElementById("comp5").value.trim() || "(no response)"));
+  lines.push("");
+  lines.push("=== End of responses ===");
+  return lines.join("\n");
+}
+
+function copyResponses() {
+  var text = collectResponses();
+  var status = document.getElementById("statusMsg");
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(function() {
+      status.textContent = "✓ Responses copied to clipboard.";
+      status.className = "status-msg success";
+    }).catch(function() {
+      status.textContent = "Copy failed. Use the Download button instead.";
+      status.className = "status-msg";
+    });
+  } else {
+    status.textContent = "Clipboard not available. Use the Download button.";
+    status.className = "status-msg";
+  }
+}
+
+function downloadResponses() {
+  var text = collectResponses();
+  var blob = new Blob([text], { type: "text/plain;charset=utf-8" });
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement("a");
+  a.href = url;
+  a.download = "sibi-ux-review-" + new Date().toISOString().slice(0, 10) + ".txt";
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  var status = document.getElementById("statusMsg");
+  status.textContent = "✓ Responses downloaded.";
+  status.className = "status-msg success";
+}
+
+document.addEventListener("DOMContentLoaded", function() {
+  document.getElementById("copyBtn").addEventListener("click", copyResponses);
+  document.getElementById("downloadBtn").addEventListener("click", downloadResponses);
+});
+</script>
+
+</body>
+</html>
