@@ -54,6 +54,8 @@ story.
 
 ### Fixed
 
+- Article workspace desktop layout now keeps the reader, session drawer, and
+  Learning Log as independent scroll areas.
 - Article workspace history now excludes local demo articles and prunes any
   previously saved non-web entries.
 
