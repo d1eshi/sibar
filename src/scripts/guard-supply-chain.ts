@@ -106,21 +106,10 @@ function fileExists(p: string): boolean {
 
 /**
  * Detect unpinned/unauthorized pnpm dlx usage in a line.
- * Allowed: `pnpm dlx lavish-axi@0.1.10` (pinned, authorized).
- * Rejected: any other `pnpm dlx ...` (unpinned or unauthorized package).
+ * Rejected: any `pnpm dlx ...` invocation.
  */
 function checkDlxLine(line: string): boolean {
-  // Find all "pnpm dlx" occurrences
-  const dlxRe = /\bpnpm\s+dlx\s+\S+/g;
-  let match: RegExpExecArray | null;
-  while ((match = dlxRe.exec(line)) !== null) {
-    const fullMatch = match[0];
-    // Allow only lavish-axi@0.1.10
-    if (!/\bpnpm\s+dlx\s+lavish-axi@0\.1\.10\b/.test(fullMatch)) {
-      return true; // violation
-    }
-  }
-  return false;
+  return /\bpnpm\s+dlx\s+\S+/.test(line);
 }
 
 /**
