@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 
-const html = readFileSync(join(process.cwd(), "docs/demo/article-workspace.html"), "utf8");
+const html = readFileSync(join(process.cwd(), "web/article-workspace.html"), "utf8");
 
 test("article workspace exposes tab-style note kind controls", () => {
   assert.match(html, /role="tablist" aria-label="Tipo de nota"/);

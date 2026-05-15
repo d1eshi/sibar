@@ -1,0 +1,19 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": null,
+  "cleanUrls": true,
+  "installCommand": "",
+  "buildCommand": null,
+  "functions": {
+    "api/read.mjs": {
+      "maxDuration": 10
+    }
+  },
+  "redirects": [
+    {
+      "source": "/",
+      "destination": "/article-workspace",
+      "permanent": false
+    }
+  ]
+}

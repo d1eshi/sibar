@@ -8,7 +8,7 @@ import { assertHttpUrl, extractReadableArticle, type ReadableArticle } from "./a
 
 const root = process.cwd();
 const port = Number(process.env.PORT ?? 4177);
-const demoPath = join(root, "docs", "demo", "article-workspace.html");
+const demoPath = join(root, "web", "article-workspace.html");
 const fetchTimeoutMs = Number(process.env.ARTICLE_FETCH_TIMEOUT_MS ?? 8_000);
 const maxHtmlBytes = Number(process.env.ARTICLE_MAX_HTML_BYTES ?? 2_000_000);
 const articleCacheTtlMs = Number(process.env.ARTICLE_CACHE_TTL_MS ?? 15 * 60_000);

@@ -33,6 +33,8 @@ story.
   rendered from runtime-owned snapshots.
 - Local article workspace prototype for URL-based reader extraction, atomic
   highlight capture, and per-article notes stored in the browser.
+- Isolated `/web` deploy surface for the article workspace, with static HTML and
+  a self-contained Vercel `/api/read` function.
 - First self-hosted freeform evaluator slice for artifact-boundary ownership
   answers, with CLI/report output for readiness, evidence, flow, false-confidence,
   and design-induced findings.
@@ -51,6 +53,8 @@ story.
   browser persistence, no export button, and a capped Learning Log.
 - Article workspace now opens with a clearer reader presentation around
   evidence-first learning and atomic notes.
+- Article workspace demo files moved from `docs/demo` into root-level `/web`
+  so the public reader can deploy without the TypeScript runtime or sidecar.
 
 ### Fixed
 
