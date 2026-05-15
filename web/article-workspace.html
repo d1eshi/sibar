@@ -201,12 +201,17 @@ button:disabled { cursor: not-allowed; opacity: 0.55; }
   margin: 0 auto;
 }
 
-.reader-brief {
-  margin: 0 0 28px;
-  padding: 0 0 22px;
-  border-bottom: 1px solid var(--border);
+.reader-presentation {
+  max-width: 620px;
+  margin: 14vh auto 0;
+  padding: 28px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  user-select: none;
 }
-.reader-brief-label {
+.reader-presentation-label {
   margin: 0 0 8px;
   color: var(--accent);
   font-family: var(--mono);
@@ -215,7 +220,7 @@ button:disabled { cursor: not-allowed; opacity: 0.55; }
   letter-spacing: 0.11em;
   text-transform: uppercase;
 }
-.reader-brief h2 {
+.reader-presentation h2 {
   margin: 0 0 10px;
   max-width: 11ch;
   font-family: var(--serif);
@@ -223,9 +228,9 @@ button:disabled { cursor: not-allowed; opacity: 0.55; }
   line-height: 1.02;
   letter-spacing: 0;
 }
-.reader-brief p {
+.reader-presentation-copy {
   max-width: 58ch;
-  margin: 0;
+  margin: 0 0 18px;
   color: var(--muted);
   font-size: 16px;
   line-height: 1.55;
@@ -278,25 +283,6 @@ mark.atomic-highlight {
 }
 mark.kind-question { background: rgba(141, 75, 50, 0.22); }
 mark.kind-key { background: rgba(61, 122, 77, 0.22); }
-
-.empty {
-  max-width: 620px;
-  margin: 14vh auto 0;
-  padding: 28px;
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  background: var(--surface);
-  box-shadow: var(--shadow);
-}
-.empty h2 {
-  margin: 0 0 8px;
-  max-width: 13ch;
-  font-family: var(--serif);
-  font-size: 34px;
-  line-height: 1.04;
-  letter-spacing: 0;
-}
-.empty p { margin: 0 0 16px; color: var(--muted); line-height: 1.5; }
 
 .assistant {
   height: 100vh;
@@ -509,17 +495,13 @@ textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(37, 109
       <button class="btn ghost" type="button" id="sampleBtn">Demo</button>
     </form>
     <section class="reader-scroll" id="readerScroll">
-      <div class="empty" id="emptyState">
-        <h2>Deep knowledge improves what you build.</h2>
-        <p>Pega una fuente, leela sin ruido y deja un Learning Log de highlights, preguntas e ideas atomicas mientras la evidencia todavia esta fresca.</p>
+      <section class="reader-presentation" id="emptyState" aria-label="Presentacion del reader">
+        <p class="reader-presentation-label">Sibi Reader</p>
+        <h2>Read for evidence.</h2>
+        <p class="reader-presentation-copy">El objetivo no es guardar mucho: es capturar lo justo para recordar que cambio tu modelo mental, que pregunta quedo abierta y que idea merece convertirse en practica.</p>
         <button class="btn primary" type="button" id="emptySampleBtn">Abrir demo</button>
-      </div>
+      </section>
       <article class="article" id="article" hidden>
-        <section class="reader-brief" aria-label="Proposito del reader">
-          <p class="reader-brief-label">Sibi Reader</p>
-          <h2>Read for evidence.</h2>
-          <p>El objetivo no es guardar mucho: es capturar lo justo para recordar que cambio tu modelo mental, que pregunta quedo abierta y que idea merece convertirse en practica.</p>
-        </section>
         <div class="article-kicker">
           <span class="pill" id="hostLabel"></span>
           <span class="pill" id="paragraphCount"></span>
@@ -939,7 +921,10 @@ function stageSelection(kind) {
   const selection = window.getSelection();
   if (!selection || selection.isCollapsed || selection.rangeCount === 0) return;
   const range = selection.getRangeAt(0);
-  if (!elements.articleBody.contains(range.commonAncestorContainer)) return;
+  if (!elements.articleBody.contains(range.commonAncestorContainer)) {
+    elements.selectionToolbar.classList.remove("visible");
+    return;
+  }
 
   const selectedText = selection.toString().trim().replace(/\s+/g, " ");
   if (!selectedText) return;
@@ -963,7 +948,10 @@ function positionToolbar() {
     return;
   }
   const range = selection.getRangeAt(0);
-  if (!elements.articleBody.contains(range.commonAncestorContainer)) return;
+  if (!elements.articleBody.contains(range.commonAncestorContainer)) {
+    elements.selectionToolbar.classList.remove("visible");
+    return;
+  }
   const rect = range.getBoundingClientRect();
   elements.selectionToolbar.style.left = `${window.scrollX + rect.left + rect.width / 2 - 112}px`;
   elements.selectionToolbar.style.top = `${window.scrollY + rect.top - 46}px`;
@@ -1003,6 +991,14 @@ elements.articleBody.addEventListener("mouseup", () => {
 });
 elements.articleBody.addEventListener("mousedown", (event) => {
   if (!event.target.closest(".toolbar")) elements.selectionToolbar.classList.remove("visible");
+});
+document.addEventListener("selectionchange", () => {
+  const selection = window.getSelection();
+  if (!selection || selection.rangeCount === 0 || selection.isCollapsed) return;
+  const range = selection.getRangeAt(0);
+  if (!elements.articleBody.contains(range.commonAncestorContainer)) {
+    elements.selectionToolbar.classList.remove("visible");
+  }
 });
 document.addEventListener("keydown", (event) => {
   if (pendingSelection && event.key === "Tab") {

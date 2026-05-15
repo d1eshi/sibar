@@ -60,6 +60,8 @@ story.
 
 ### Fixed
 
+- Article workspace presentation copy now lives outside the selectable reader
+  article, so only article text participates in highlight capture.
 - Article workspace desktop layout now keeps the reader, session drawer, and
   Learning Log as independent scroll areas.
 - Article workspace history now excludes local demo articles and prunes any
