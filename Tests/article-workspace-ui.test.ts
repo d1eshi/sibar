@@ -20,15 +20,15 @@ test("article workspace wires keyboard shortcuts for pending note capture", () =
   assert.match(html, /savePending\(\)/);
 });
 
-test("article workspace opens duplicate URLs from session state before fetching", () => {
+test("article workspace opens duplicate URLs from local browser state before fetching", () => {
   assert.match(html, /function normalizeArticleUrl\(rawUrl\)/);
   assert.match(html, /function getSavedWorkspaceByUrl\(url\)/);
-  assert.match(html, /Ya estaba abierto en esta sesion\. Lo recuperamos sin pedirlo al servidor\./);
+  assert.match(html, /Ya estaba guardado en este navegador\. Lo recuperamos sin pedirlo al servidor\./);
   assert.match(html, /fetch\(`\/api\/read\?url=\$\{encodeURIComponent\(url\)\}`\)/);
 });
 
-test("article workspace renders a session-only recent-reading drawer", () => {
-  assert.match(html, /let sessionHistory = \[\]/);
+test("article workspace renders a local recent-reading drawer", () => {
+  assert.match(html, /const HISTORY_KEY = "sibi\.article\.history\.v1"/);
   assert.match(html, /class="history-drawer"/);
   assert.match(html, /function isHistoryUrl\(value\)/);
   assert.match(html, /function renderHistory\(\)/);
@@ -42,8 +42,10 @@ test("article workspace excludes demo URLs from recent reading history", () => {
   assert.match(html, /sessionHistory = \[nextItem, \.\.\.sessionHistory\.filter/);
 });
 
-test("article workspace keeps logs session-only without localStorage or export", () => {
-  assert.doesNotMatch(html, /localStorage/);
+test("article workspace persists notes locally without export", () => {
+  assert.match(html, /const STORAGE_KEY = "sibi\.article\.workspace\.v1"/);
+  assert.match(html, /localStorage\.setItem\(key, JSON\.stringify\(value\)\)/);
+  assert.match(html, /function loadWorkspaceStore\(\)/);
   assert.doesNotMatch(html, /Exportar JSON/);
   assert.match(html, /Learning Log/);
   assert.match(html, /const MAX_SESSION_NOTES = 12/);

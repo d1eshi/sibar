@@ -72,14 +72,14 @@ The important line is:
 
 The article reader demo should keep login out of the first validation loop.
 
-For the public MVP, session-only notes are enough to validate the learning
-gesture: paste a source, read, highlight evidence, write atomic notes, and see
-whether the user understands the source better.
+For the public MVP, browser-local notes are enough to validate the learning
+gesture: paste a source, read, highlight evidence, write atomic notes, come back
+later on the same browser, and see whether the user understands the source
+better.
 
-`localStorage` is an acceptable technical bridge after the gesture is validated.
-It can preserve article notes on the same browser without forcing account
-creation. That should still be treated as local device persistence, not product
-memory.
+`localStorage` is the acceptable technical bridge for this stage. It preserves
+article notes on the same browser without forcing account creation. That should
+still be treated as local device persistence, not product memory.
 
 Durable persistence should wait until there is a user profile. At that point,
 each note should be associated with:
