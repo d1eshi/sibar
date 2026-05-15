@@ -26,3 +26,11 @@ test("article workspace opens duplicate URLs from local storage before fetching"
   assert.match(html, /Ya estaba guardado\. Abrimos la copia local sin pedirlo al servidor\./);
   assert.match(html, /fetch\(`\/api\/read\?url=\$\{encodeURIComponent\(url\)\}`\)/);
 });
+
+test("article workspace renders a local recent-reading drawer", () => {
+  assert.match(html, /const HISTORY_KEY = "sibi\.article\.history\.v1"/);
+  assert.match(html, /class="history-drawer"/);
+  assert.match(html, /function renderHistory\(\)/);
+  assert.match(html, /data-history-url=/);
+  assert.match(html, /function openHistoryUrl\(url\)/);
+});

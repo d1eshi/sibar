@@ -39,7 +39,81 @@ button:disabled { cursor: not-allowed; opacity: 0.55; }
 .shell {
   min-height: 100vh;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 360px;
+  grid-template-columns: 260px minmax(0, 1fr) 360px;
+}
+
+.history-drawer {
+  min-height: 100vh;
+  border-right: 1px solid var(--border);
+  background: #eee9dd;
+  display: flex;
+  flex-direction: column;
+}
+
+.history-header {
+  min-height: 66px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 14px;
+  border-bottom: 1px solid var(--border);
+}
+
+.history-title {
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+}
+
+.history-list {
+  display: grid;
+  gap: 6px;
+  overflow: auto;
+  padding: 10px;
+}
+
+.history-empty {
+  margin: 4px;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.history-item {
+  width: 100%;
+  display: grid;
+  gap: 5px;
+  text-align: left;
+  border: 1px solid transparent;
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--ink);
+  padding: 10px;
+}
+
+.history-item:hover,
+.history-item.active {
+  border-color: var(--border);
+  background: var(--surface);
+}
+
+.history-item-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.history-item-meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 10px;
 }
 
 .workspace {
@@ -337,6 +411,8 @@ textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(37, 109
 
 @media (max-width: 900px) {
   .shell { grid-template-columns: 1fr; }
+  .history-drawer { min-height: auto; border-right: 0; border-bottom: 1px solid var(--border); }
+  .history-list { grid-auto-flow: column; grid-auto-columns: minmax(190px, 240px); overflow-x: auto; }
   .assistant { min-height: auto; border-left: 0; border-top: 1px solid var(--border); }
   .topbar { grid-template-columns: 1fr; }
 }
@@ -344,6 +420,14 @@ textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(37, 109
 </head>
 <body>
 <div class="shell">
+  <aside class="history-drawer">
+    <header class="history-header">
+      <div class="history-title">History</div>
+      <div class="count" id="historyCount">0</div>
+    </header>
+    <nav class="history-list" id="historyList" aria-label="Ultimos articulos leidos"></nav>
+  </aside>
+
   <main class="workspace">
     <form class="topbar" id="loadForm">
       <input class="url-input" id="urlInput" type="url" placeholder="https://..." autocomplete="url">
@@ -411,6 +495,8 @@ textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(37, 109
 
 <script>
 const STORAGE_KEY = "sibi.article.workspace.v1";
+const HISTORY_KEY = "sibi.article.history.v1";
+const HISTORY_LIMIT = 20;
 const sampleArticle = {
   url: "demo://sibi/article-workspace",
   title: "Aprender una fuente sin perder evidencia",
@@ -452,6 +538,8 @@ const elements = {
   exportBtn: $("exportBtn"),
   notes: $("notes"),
   noteCount: $("noteCount"),
+  historyCount: $("historyCount"),
+  historyList: $("historyList"),
   status: $("status")
 };
 
@@ -462,6 +550,15 @@ function loadStore() {
 
 function saveStore(store) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(store));
+}
+
+function loadHistory() {
+  try { return JSON.parse(localStorage.getItem(HISTORY_KEY) || "[]"); }
+  catch { return []; }
+}
+
+function saveHistory(history) {
+  localStorage.setItem(HISTORY_KEY, JSON.stringify(history.slice(0, HISTORY_LIMIT)));
 }
 
 function workspaceKey(article) {
@@ -487,6 +584,7 @@ function persist() {
   const store = loadStore();
   store[workspaceKey(state.article)] = state;
   saveStore(store);
+  updateHistory(state.article);
 }
 
 function restore(article) {
@@ -494,6 +592,18 @@ function restore(article) {
   state = saved ? { article, notes: saved.notes || [] } : { article, notes: [] };
   persist();
   render();
+}
+
+function updateHistory(article) {
+  const nextItem = {
+    url: article.url,
+    title: article.title,
+    host: article.host,
+    noteCount: state.notes.length,
+    lastOpenedAt: new Date().toISOString()
+  };
+  const history = loadHistory().filter((item) => item.url !== article.url);
+  saveHistory([nextItem, ...history]);
 }
 
 function escapeHtml(value) {
@@ -571,6 +681,25 @@ function renderNotes() {
   `).join("");
 }
 
+function renderHistory() {
+  const history = loadHistory();
+  elements.historyCount.textContent = String(history.length);
+  if (history.length === 0) {
+    elements.historyList.innerHTML = `<p class="history-empty">Los articulos que abras van a quedar aca.</p>`;
+    return;
+  }
+
+  elements.historyList.innerHTML = history.map((item) => `
+    <button class="history-item${state.article?.url === item.url ? " active" : ""}" type="button" data-history-url="${escapeHtml(item.url)}">
+      <span class="history-item-title">${escapeHtml(item.title)}</span>
+      <span class="history-item-meta">
+        <span>${escapeHtml(item.host)}</span>
+        <span>${item.noteCount || 0} notas</span>
+      </span>
+    </button>
+  `).join("");
+}
+
 function renderPending() {
   elements.selectionCard.hidden = !pendingSelection;
   if (!pendingSelection) return;
@@ -586,6 +715,7 @@ function renderPending() {
 function render() {
   renderArticle();
   renderNotes();
+  renderHistory();
   renderPending();
 }
 
@@ -625,6 +755,18 @@ async function loadUrl(rawUrl) {
   if (!response.ok) throw new Error(payload.error || "No se pudo cargar.");
   restore(payload.article);
   setStatus(payload.cache === "hit" ? "Articulo cargado desde cache del servidor." : "Articulo cargado.");
+}
+
+async function openHistoryUrl(url) {
+  const saved = getSavedWorkspaceByUrl(url);
+  if (saved?.article) {
+    elements.urlInput.value = saved.article.url.startsWith("demo://") ? "" : saved.article.url;
+    restore(saved.article);
+    flashStatus("Abierto desde historial local.");
+    return;
+  }
+
+  await loadUrl(url);
 }
 
 function clearPending() {
@@ -737,6 +879,13 @@ elements.exportBtn.addEventListener("click", () => {
   link.download = "sibi-article-workspace.json";
   link.click();
   URL.revokeObjectURL(url);
+});
+elements.historyList.addEventListener("click", (event) => {
+  const button = event.target.closest("[data-history-url]");
+  if (!button) return;
+  void openHistoryUrl(button.dataset.historyUrl).catch((error) => {
+    setStatus(error instanceof Error ? error.message : "No se pudo abrir el historial.");
+  });
 });
 
 document.querySelectorAll(".kind-btn").forEach((button) => {
