@@ -78,7 +78,7 @@ Mockup:
 
 ![Source loaded reading state](assets/source-ingestion-02-reading.png)
 
-Coded prototype: [source-ingestion-reading.html](prototypes/source-ingestion-reading.html)
+Coded prototype: [source-ingestion-start.html](prototypes/source-ingestion-start.html)
 
 ### 3. Saved
 
@@ -93,7 +93,7 @@ Mockup:
 
 ![Saved reading state](assets/source-ingestion-03-saved.png)
 
-Coded prototype: [source-ingestion-saved.html](prototypes/source-ingestion-saved.html)
+Coded prototype: [source-ingestion-start.html](prototypes/source-ingestion-start.html)
 
 ## Acceptance Criteria
 
