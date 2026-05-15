@@ -7,6 +7,7 @@ const html = readFileSync(join(process.cwd(), "web/index.html"), "utf8");
 const css = readFileSync(join(process.cwd(), "web/styles/reader.css"), "utf8");
 const app = readFileSync(join(process.cwd(), "web/scripts/app.js"), "utf8");
 const api = readFileSync(join(process.cwd(), "web/scripts/api.js"), "utf8");
+const sample = readFileSync(join(process.cwd(), "web/scripts/sample-article.js"), "utf8");
 const storage = readFileSync(join(process.cwd(), "web/scripts/storage.js"), "utf8");
 const ui = readFileSync(join(process.cwd(), "web/scripts/ui.js"), "utf8");
 
@@ -82,6 +83,15 @@ test("article workspace uses the focused source-ingestion visual shell", () => {
   assert.match(css, /\.ghost-reader \{[\s\S]*border-left: 1px dashed var\(--line\);/);
   assert.match(css, /\.article-shell \{[\s\S]*padding: 56px 24px 72px;/);
   assert.match(css, /\.saved-drawer \{[\s\S]*position: fixed;/);
+});
+
+test("article workspace seeds demo-only mark colors without saved notes", () => {
+  assert.match(sample, /demoMarks: \[/);
+  assert.match(sample, /selectedText: "conservar la frase exacta que te movio"/);
+  assert.match(sample, /kind: "question"/);
+  assert.match(sample, /kind: "key"/);
+  assert.match(ui, /demoMarks/);
+  assert.match(ui, /demo-mark/);
 });
 
 test("article workspace dismisses saved drawer with an animated slide", () => {
