@@ -13,8 +13,6 @@ export function getElements() {
     emptySampleBtn: $("emptySampleBtn"),
     emptyState: $("emptyState"),
     article: $("article"),
-    hostLabel: $("hostLabel"),
-    paragraphCount: $("paragraphCount"),
     articleTitle: $("articleTitle"),
     articleBody: $("articleBody"),
     selectionToolbar: $("selectionToolbar"),
@@ -84,8 +82,6 @@ export function renderArticle(elements, state) {
   if (elements.article) elements.article.hidden = !article;
   if (!article) return;
 
-  elements.hostLabel.textContent = article.host;
-  elements.paragraphCount.textContent = `${article.paragraphs.length} bloques`;
   elements.articleTitle.textContent = article.title;
   elements.articleBody.innerHTML = article.paragraphs
     .map((paragraph, index) => `<p data-paragraph-index="${index}">${renderParagraph(paragraph, index, state.notes)}</p>`)
