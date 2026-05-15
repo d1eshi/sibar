@@ -48,6 +48,10 @@ story.
 - Added the self-hosted SDD loop, clarifying foundation specs, executable MVP
   specs, harness artifacts, living-spec sections, and the first freeform answer
   evaluator iteration target.
+- Replaced the external prototype review-tooling standard with a repo-owned
+  prototype rule for local routes, product UI, fixtures, and static captures.
+- Added the public demo prototype spec that packages the self-hosted execution
+  layer into a fixture-based web demo for external feedback.
 - Added release readiness rules tied to completed specs, verified acceptance
   criteria, and explicit version bump decisions.
 - Added the atomic commit to changelog bridge so agents know when a commit must
