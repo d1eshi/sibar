@@ -8,7 +8,8 @@ It contains only:
 2. `styles/` - reader styling
 3. `scripts/` - client behavior split by API, storage, UI, and app orchestration
 4. `api/read.mjs` - minimal Vercel Function for URL fetching and article extraction
-5. `vercel.json` - Vercel function config
+5. `changelog.html` - direct URL product changelog for preview/release review
+6. `vercel.json` - Vercel function config
 
 It intentionally does not depend on the TypeScript runtime, Swift sidecar, local
 workspace server, or evaluator code.
@@ -37,6 +38,13 @@ The public route is:
 
 ```text
 /
+```
+
+The product changelog is intentionally not linked from the reader UI, but is
+available by direct URL:
+
+```text
+/changelog
 ```
 
 The reader calls:
