@@ -7,6 +7,7 @@ import test from "node:test";
 const root = process.cwd();
 const webHtml = readFileSync(join(root, "web/index.html"), "utf8");
 const legacyHtml = readFileSync(join(root, "web/article-workspace.html"), "utf8");
+const changelogHtml = readFileSync(join(root, "web/changelog.html"), "utf8");
 const webApiClient = readFileSync(join(root, "web/scripts/api.js"), "utf8");
 const webApi = readFileSync(join(root, "web/api/read.mjs"), "utf8");
 const analyticsResearch = readFileSync(join(root, "web/ANALYTICS_RESEARCH.md"), "utf8");
@@ -27,6 +28,14 @@ test("article workspace web deploy is rooted under /web", () => {
 test("legacy article workspace path redirects to the root reader", () => {
   assert.match(legacyHtml, /location\.replace\('\/' \+ location\.search \+ location\.hash\)/);
   assert.match(legacyHtml, /<link rel="canonical" href="\/">/);
+});
+
+test("web changelog is a direct URL page and not linked from the reader", () => {
+  assert.match(changelogHtml, /Sibar Changelog/);
+  assert.match(changelogHtml, /Focused Reader Visual Iteration/);
+  assert.match(changelogHtml, /Public Reader Foundation/);
+  assert.match(changelogHtml, /href="\/styles\/changelog\.css"/);
+  assert.doesNotMatch(webHtml, /href="\/changelog"|href="\/changelog\.html"/);
 });
 
 test("article workspace Vercel API is self-contained JavaScript", () => {
