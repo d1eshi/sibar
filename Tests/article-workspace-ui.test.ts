@@ -19,3 +19,10 @@ test("article workspace wires keyboard shortcuts for pending note capture", () =
   assert.match(html, /event\.key === "Enter" && \(event\.metaKey \|\| event\.ctrlKey\)/);
   assert.match(html, /savePending\(\)/);
 });
+
+test("article workspace opens duplicate URLs from local storage before fetching", () => {
+  assert.match(html, /function normalizeArticleUrl\(rawUrl\)/);
+  assert.match(html, /function getSavedWorkspaceByUrl\(url\)/);
+  assert.match(html, /Ya estaba guardado\. Abrimos la copia local sin pedirlo al servidor\./);
+  assert.match(html, /fetch\(`\/api\/read\?url=\$\{encodeURIComponent\(url\)\}`\)/);
+});

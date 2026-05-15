@@ -323,6 +323,17 @@ textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(37, 109
   font-size: 12px;
   padding: 0 12px 12px;
 }
+.status.flash {
+  color: var(--accent);
+  font-weight: 750;
+  animation: ws-flash 700ms ease-out;
+}
+
+@keyframes ws-flash {
+  0% { transform: translateY(0); opacity: 1; }
+  30% { transform: translateY(-2px); opacity: 1; }
+  100% { transform: translateY(0); opacity: 1; }
+}
 
 @media (max-width: 900px) {
   .shell { grid-template-columns: 1fr; }
@@ -457,6 +468,20 @@ function workspaceKey(article) {
   return article.url;
 }
 
+function normalizeArticleUrl(rawUrl) {
+  const parsed = new URL(rawUrl.trim());
+  if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
+    throw new Error("Solo se aceptan URLs http o https.");
+  }
+  parsed.hash = "";
+  return parsed.href;
+}
+
+function getSavedWorkspaceByUrl(url) {
+  const store = loadStore();
+  return store[url] || null;
+}
+
 function persist() {
   if (!state.article) return;
   const store = loadStore();
@@ -566,6 +591,14 @@ function render() {
 
 function setStatus(message) {
   elements.status.textContent = message;
+  elements.status.classList.remove("flash");
+}
+
+function flashStatus(message) {
+  elements.status.textContent = message;
+  elements.status.classList.remove("flash");
+  void elements.status.offsetWidth;
+  elements.status.classList.add("flash");
 }
 
 function openSample() {
@@ -575,14 +608,23 @@ function openSample() {
 }
 
 async function loadUrl(rawUrl) {
-  const url = rawUrl.trim();
+  const url = normalizeArticleUrl(rawUrl);
   if (!url) return;
+  elements.urlInput.value = url;
+
+  const saved = getSavedWorkspaceByUrl(url);
+  if (saved?.article) {
+    restore(saved.article);
+    flashStatus("Ya estaba guardado. Abrimos la copia local sin pedirlo al servidor.");
+    return;
+  }
+
   setStatus("Cargando articulo...");
   const response = await fetch(`/api/read?url=${encodeURIComponent(url)}`);
   const payload = await response.json();
   if (!response.ok) throw new Error(payload.error || "No se pudo cargar.");
   restore(payload.article);
-  setStatus("Articulo cargado.");
+  setStatus(payload.cache === "hit" ? "Articulo cargado desde cache del servidor." : "Articulo cargado.");
 }
 
 function clearPending() {
