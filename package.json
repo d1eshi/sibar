@@ -13,6 +13,7 @@
     "eval:selfhost-pilot": "node --experimental-strip-types src/evals/selfhost-pilot.ts",
     "eval:selfhost-freeform": "node --experimental-strip-types src/evals/selfhost-freeform.ts",
     "eval:selfhost-benchmark": "node --experimental-strip-types src/evals/selfhost-benchmark.ts",
+    "article:workspace": "node --experimental-strip-types src/article-workspace-server.ts",
     "test": "node --test --test-concurrency=1 --experimental-strip-types Tests/**/*.test.ts",
     "typecheck": "pnpm exec tsc -p tsconfig.json --noEmit",
     "guard:supply-chain": "node --experimental-strip-types src/scripts/guard-supply-chain.ts"
