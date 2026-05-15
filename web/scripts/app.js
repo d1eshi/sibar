@@ -156,6 +156,7 @@ function showToast(message) {
 function openSavedDrawer() {
   window.clearTimeout(drawerCloseTimer);
   elements.savedDrawer.hidden = false;
+  document.body.classList.add("drawer-open");
   requestAnimationFrame(() => {
     elements.savedDrawer.classList.add("is-open");
   });
@@ -167,6 +168,7 @@ function closeSavedDrawer() {
   drawerCloseTimer = window.setTimeout(() => {
     if (!elements.savedDrawer.classList.contains("is-open")) {
       elements.savedDrawer.hidden = true;
+      document.body.classList.remove("drawer-open");
     }
   }, 240);
 }
