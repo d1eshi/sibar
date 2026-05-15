@@ -44,13 +44,9 @@ function cleanupTempFile(filePath: string): void {
 // checkDlxLine tests
 // ---------------------------------------------------------------------------
 
-test("checkDlxLine allows pinned lavish-axi@0.1.10", () => {
-  assert.equal(checkDlxLine("pnpm dlx lavish-axi@0.1.10 some-file.html"), false);
-  assert.equal(checkDlxLine("Review with `pnpm dlx lavish-axi@0.1.10`"), false);
-});
-
-test("checkDlxLine rejects unpinned lavish-axi (no version)", () => {
-  assert.equal(checkDlxLine("pnpm dlx lavish-axi some-file.html"), true);
+test("checkDlxLine rejects all dlx packages", () => {
+  assert.equal(checkDlxLine("pnpm dlx prototype-tool@1.0.0 some-file.html"), true);
+  assert.equal(checkDlxLine("Review with `pnpm dlx local-review-tool@1.0.0`"), true);
 });
 
 test("checkDlxLine rejects other dlx packages", () => {
@@ -184,11 +180,11 @@ test("checkFilePatterns is clean for pnpm commands", () => {
   assert.equal(violations.length, 0);
 });
 
-test("checkFilePatterns is clean for pinned lavish-axi dlx", () => {
-  const file = tempFile("Optional: pnpm dlx lavish-axi@0.1.10 prototype.html");
+test("checkFilePatterns rejects pinned dlx", () => {
+  const file = tempFile("Optional: pnpm dlx prototype-tool@1.0.0 prototype.html");
   const violations = checkFilePatterns(file);
   cleanupTempFile(file);
-  assert.equal(violations.length, 0);
+  assert.ok(violations.some((v) => v.pattern === "unpinned or unauthorized dlx"));
 });
 
 test("checkFilePatterns returns empty for a clean file", () => {
