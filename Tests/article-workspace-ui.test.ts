@@ -54,3 +54,11 @@ test("article workspace presents the reader as evidence-first learning", () => {
   assert.match(html, /Read for evidence\./);
   assert.match(html, /que cambio tu modelo mental/);
 });
+
+test("article workspace keeps reader and side panels as independent scroll areas", () => {
+  assert.match(html, /body \{[\s\S]*overflow: hidden;/);
+  assert.match(html, /\.workspace \{[\s\S]*height: 100vh;/);
+  assert.match(html, /\.reader-scroll \{[\s\S]*min-height: 0;[\s\S]*overflow: auto;/);
+  assert.match(html, /\.history-list \{[\s\S]*flex: 1;[\s\S]*overflow: auto;/);
+  assert.match(html, /\.assistant-body \{[\s\S]*flex: 1;[\s\S]*overflow: auto;/);
+});
