@@ -643,6 +643,14 @@ textarea {
   margin-top: 10px;
 }
 
+.input-hint {
+  display: block;
+  margin-top: 8px;
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 11px;
+}
+
 .notes {
   display: grid;
   gap: 10px;
