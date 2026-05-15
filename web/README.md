@@ -15,6 +15,10 @@ Reader notes and recent article history are stored in browser `localStorage`.
 This avoids data loss for the demo without introducing login or profile-backed
 persistence.
 
+The page includes Vercel Web Analytics for aggregate page views only. See
+`ANALYTICS_RESEARCH.md` before adding behavioral events such as reading time,
+article hosts, highlights, or note counts.
+
 ## Vercel Setup
 
 Create a Vercel project with this repository and set:

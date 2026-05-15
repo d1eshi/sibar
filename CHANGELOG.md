@@ -35,6 +35,8 @@ story.
   highlight capture, and per-article notes stored in the browser.
 - Isolated `/web` deploy surface for the article workspace, with static HTML and
   a self-contained Vercel `/api/read` function.
+- Vercel Web Analytics page-view tracking for the article workspace, limited to
+  aggregate page analytics.
 - First self-hosted freeform evaluator slice for artifact-boundary ownership
   answers, with CLI/report output for readiness, evidence, flow, false-confidence,
   and design-induced findings.
@@ -87,6 +89,8 @@ story.
 - Documented article reader persistence sequencing: use browser-local notes
   first, treat `localStorage` as a bridge, and wait for profiles before
   durable cross-device note memory.
+- Added article reader analytics research covering Vercel Analytics, cookie
+  expectations, consent boundaries, and future observer events.
 
 ### Internal
 
