@@ -45,31 +45,35 @@ export function escapeHtml(value) {
   })[char]);
 }
 
-function rangesForParagraph(paragraph, index, notes) {
+function rangesForParagraph(paragraph, index, notes, demoMarks = []) {
   const ranges = [];
-  const paragraphNotes = notes
-    .filter((note) => note.paragraphIndex === index && note.selectedText)
+  const paragraphNotes = [
+    ...demoMarks
+      .filter((mark) => mark.paragraphIndex === index && mark.selectedText)
+      .map((mark) => ({ ...mark, demo: true, id: `demo_${index}_${mark.kind}` })),
+    ...notes.filter((note) => note.paragraphIndex === index && note.selectedText)
+  ]
     .sort((a, b) => b.selectedText.length - a.selectedText.length);
 
   for (const note of paragraphNotes) {
     const start = paragraph.indexOf(note.selectedText);
     const end = start + note.selectedText.length;
     if (start < 0 || ranges.some((range) => start < range.end && end > range.start)) continue;
-    ranges.push({ start, end, kind: note.kind, id: note.id });
+    ranges.push({ start, end, kind: note.kind, id: note.id, demo: Boolean(note.demo) });
   }
 
   return ranges.sort((a, b) => a.start - b.start);
 }
 
-function renderParagraph(paragraph, index, notes) {
-  const ranges = rangesForParagraph(paragraph, index, notes);
+function renderParagraph(paragraph, index, notes, demoMarks) {
+  const ranges = rangesForParagraph(paragraph, index, notes, demoMarks);
   if (ranges.length === 0) return escapeHtml(paragraph);
 
   let html = "";
   let cursor = 0;
   for (const range of ranges) {
     html += escapeHtml(paragraph.slice(cursor, range.start));
-    html += `<mark class="atomic-highlight kind-${range.kind}" data-note-id="${range.id}">${escapeHtml(paragraph.slice(range.start, range.end))}</mark>`;
+    html += `<mark class="atomic-highlight${range.demo ? " demo-mark" : ""} kind-${range.kind}" data-note-id="${range.id}">${escapeHtml(paragraph.slice(range.start, range.end))}</mark>`;
     cursor = range.end;
   }
   html += escapeHtml(paragraph.slice(cursor));
@@ -84,7 +88,7 @@ export function renderArticle(elements, state) {
 
   elements.articleTitle.textContent = article.title;
   elements.articleBody.innerHTML = article.paragraphs
-    .map((paragraph, index) => `<p data-paragraph-index="${index}">${renderParagraph(paragraph, index, state.notes)}</p>`)
+    .map((paragraph, index) => `<p data-paragraph-index="${index}">${renderParagraph(paragraph, index, state.notes, article.demoMarks)}</p>`)
     .join("");
 }
 

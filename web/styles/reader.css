@@ -406,6 +406,10 @@ mark.atomic-highlight {
   -webkit-box-decoration-break: clone;
 }
 
+mark.demo-mark {
+  box-shadow: 0 0 0 1px rgba(36, 35, 31, 0.03);
+}
+
 mark.kind-question { background: rgba(141, 75, 50, 0.22); }
 mark.kind-key { background: rgba(61, 122, 77, 0.22); }
 
