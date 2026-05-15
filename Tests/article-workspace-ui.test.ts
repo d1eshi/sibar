@@ -32,12 +32,13 @@ test("article workspace opens duplicate URLs from local browser state before fet
   assert.match(api, /fetch\(`\/api\/read\?url=\$\{encodeURIComponent\(url\)\}`\)/);
 });
 
-test("article workspace renders a local recent-reading drawer", () => {
+test("article workspace renders local recent reading only when it exists", () => {
   assert.match(storage, /const HISTORY_KEY = "sibar\.reader\.history\.v1"/);
   assert.match(storage, /const LEGACY_HISTORY_KEY = "sibi\.article\.history\.v1"/);
-  assert.match(html, /class="history-drawer"/);
+  assert.match(html, /class="recent-sources" id="recentSources"/);
   assert.match(storage, /function isHistoryUrl\(value\)/);
   assert.match(ui, /function renderHistory\(elements, history, activeUrl\)/);
+  assert.match(ui, /recentSources\.hidden = history\.length === 0/);
   assert.match(ui, /data-history-url=/);
   assert.match(app, /function openHistoryUrl\(url\)/);
 });
@@ -54,7 +55,8 @@ test("article workspace persists notes locally without export", () => {
   assert.match(storage, /localStorage\.setItem\(key, JSON\.stringify\(value\)\)/);
   assert.match(storage, /function loadWorkspaceStore\(\)/);
   assert.doesNotMatch(html, /Exportar JSON/);
-  assert.match(html, /Learning Log/);
+  assert.match(html, /Guardadas/);
+  assert.match(html, /id="savedChip"/);
   assert.match(app, /const MAX_SESSION_NOTES = 12/);
 });
 
@@ -67,16 +69,16 @@ test("article workspace enables only aggregate Vercel page analytics", () => {
 });
 
 test("article workspace presents the reader as evidence-first learning", () => {
-  assert.match(html, /Deep knowledge improves what you build\./);
-  assert.match(html, /Read for evidence\./);
-  assert.match(html, /que cambio tu modelo mental/);
-  assert.match(html, /Sibar \/ Reader/);
+  assert.match(html, /<p class="brand-mark">Sibar<\/p>/);
+  assert.match(html, /<h1 class="start-mark">Reader<\/h1>/);
+  assert.match(html, /Lee, selecciona y guarda lo importante\./);
+  assert.match(html, /Pega una fuente/);
 });
 
-test("article workspace keeps reader and side panels as independent scroll areas", () => {
-  assert.match(css, /body \{[\s\S]*overflow: hidden;/);
-  assert.match(css, /\.workspace \{[\s\S]*height: 100vh;/);
-  assert.match(css, /\.reader-scroll \{[\s\S]*min-height: 0;[\s\S]*overflow: auto;/);
-  assert.match(css, /\.history-list \{[\s\S]*flex: 1;[\s\S]*overflow: auto;/);
-  assert.match(css, /\.assistant-body \{[\s\S]*flex: 1;[\s\S]*overflow: auto;/);
+test("article workspace uses the focused source-ingestion visual shell", () => {
+  assert.match(css, /\.start-screen \{[\s\S]*min-height: 100vh;/);
+  assert.match(css, /\.ingest-row \{[\s\S]*grid-template-columns: minmax\(0, 1fr\) 128px 108px;/);
+  assert.match(css, /\.ghost-reader \{[\s\S]*border-left: 1px dashed var\(--line\);/);
+  assert.match(css, /\.article-shell \{[\s\S]*padding: 56px 24px 72px;/);
+  assert.match(css, /\.saved-drawer \{[\s\S]*position: fixed;/);
 });

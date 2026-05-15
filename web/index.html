@@ -26,77 +26,114 @@ if (location.hostname !== "localhost" && location.hostname !== "127.0.0.1") {
 <link rel="stylesheet" href="/styles/reader.css">
 </head>
 <body>
-<div class="shell">
-  <aside class="history-drawer">
-    <header class="history-header">
-      <div class="history-title">Session</div>
-      <div class="count" id="historyCount">0</div>
-    </header>
-    <nav class="history-list" id="historyList" aria-label="Ultimos articulos leidos"></nav>
-  </aside>
+<main>
+  <section class="start-screen" id="startView">
+    <p class="brand-mark">Sibar</p>
+    <h1 class="start-mark">Reader</h1>
+    <p class="start-subtitle">Lee, selecciona y guarda lo importante.</p>
 
-  <main class="workspace">
-    <form class="topbar" id="loadForm">
-      <input class="url-input" id="urlInput" type="url" placeholder="https://..." autocomplete="url">
-      <button class="btn primary" type="submit">Cargar</button>
-      <button class="btn ghost" type="button" id="sampleBtn">Demo</button>
-    </form>
-    <section class="reader-scroll" id="readerScroll">
-      <div class="empty" id="emptyState">
-        <h2>Deep knowledge improves what you build.</h2>
-        <p>Pega una fuente, leela sin ruido y deja un Learning Log de highlights, preguntas e ideas atomicas mientras la evidencia todavia esta fresca.</p>
-        <button class="btn primary" type="button" id="emptySampleBtn">Abrir demo</button>
+    <form class="ingest-form" id="loadForm">
+      <label class="ingest-label" for="urlInput">Pega una fuente</label>
+      <div class="ingest-row">
+        <input class="source-input" id="urlInput" type="url" placeholder="https://..." autocomplete="url">
+        <button class="primary-btn" type="submit">Cargar</button>
+        <button class="secondary-btn" type="button" id="sampleBtn">Demo</button>
       </div>
-      <article class="article" id="article" hidden>
-        <section class="reader-brief" aria-label="Proposito del reader">
-          <p class="reader-brief-label">Sibar / Reader</p>
-          <h2>Read for evidence.</h2>
-          <p>El objetivo no es guardar mucho: es capturar lo justo para recordar que cambio tu modelo mental, que pregunta quedo abierta y que idea merece convertirse en practica.</p>
-        </section>
-        <div class="article-kicker">
-          <span class="pill" id="hostLabel"></span>
-          <span class="pill" id="paragraphCount"></span>
+    </form>
+
+    <section class="source-examples" aria-label="Ejemplos de fuentes">
+      <button class="source-chip" type="button"><span>01</span> Articulo</button>
+      <button class="source-chip" type="button"><span>02</span> Paper</button>
+      <button class="source-chip" type="button"><span>03</span> Newsletter</button>
+      <button class="source-chip" type="button"><span>04</span> Post tecnico</button>
+    </section>
+
+    <section class="recent-sources" id="recentSources" aria-label="Lecturas recientes" hidden>
+      <div class="recent-header">
+        <span>Recientes</span>
+        <span id="historyCount">0</span>
+      </div>
+      <nav class="history-list" id="historyList" aria-label="Ultimos articulos leidos"></nav>
+    </section>
+
+    <section class="ghost-reader" aria-label="Vista de lectura futura">
+      <div class="ghost-line title"></div>
+      <div class="ghost-line mid"></div>
+      <div class="ghost-line mid"></div>
+      <div class="ghost-line"></div>
+      <div class="ghost-line short"></div>
+      <br>
+      <div class="ghost-line mid"></div>
+      <div class="ghost-line"></div>
+      <div class="ghost-line"></div>
+      <div class="ghost-line mid"></div>
+    </section>
+    <p class="screen-status" id="status"></p>
+  </section>
+
+  <section class="loading-screen" id="loadingView" hidden>
+    <div class="loading-block">
+      <p class="loading-kicker">Cargando fuente</p>
+      <div class="loading-title"></div>
+      <div class="loading-line"></div>
+      <div class="loading-line wide"></div>
+      <div class="loading-line short"></div>
+    </div>
+  </section>
+
+  <section class="reader-view" id="readerView" hidden>
+    <header class="saved-header">
+      <div class="sibi-wordmark">Sibar</div>
+    </header>
+
+    <main class="article-shell">
+      <article class="article" id="article">
+        <div class="source-row">
+          <span id="hostLabel"></span>
+          <span class="divider" aria-hidden="true"></span>
+          <span id="paragraphCount"></span>
         </div>
+
         <h1 id="articleTitle"></h1>
+        <div class="article-rule"></div>
         <div class="article-body" id="articleBody"></div>
       </article>
-    </section>
-  </main>
+    </main>
+  </section>
+</main>
 
-  <aside class="assistant">
-    <header class="assistant-header">
-      <div class="assistant-title">Learning Log</div>
-      <div class="count" id="noteCount">0 notas</div>
-    </header>
-    <div class="assistant-body">
-      <section class="card selection-card" id="selectionCard" hidden>
-        <div class="card-label">Seleccion</div>
-        <p class="selection-text" id="selectionText"></p>
-        <textarea id="selectionNote" placeholder="Nota breve..."></textarea>
-        <div class="kind-row" role="tablist" aria-label="Tipo de nota">
-          <button class="small kind-btn active" type="button" role="tab" aria-selected="true" data-kind="highlight">Highlight</button>
-          <button class="small kind-btn" type="button" role="tab" aria-selected="false" data-kind="question">Pregunta</button>
-          <button class="small kind-btn" type="button" role="tab" aria-selected="false" data-kind="key">Idea</button>
-        </div>
-        <div class="actions" style="margin-top: 8px;">
-          <button class="btn primary small" type="button" id="saveSelectionBtn">Guardar</button>
-          <button class="btn ghost small" type="button" id="clearSelectionBtn">Cancelar</button>
-        </div>
-      </section>
+<form class="save-popover floating" id="selectionCard" hidden>
+  <div class="card-label">Seleccion</div>
+  <p class="selection-text" id="selectionText"></p>
+  <textarea id="selectionNote" placeholder="Nota breve..."></textarea>
+  <div class="kind-row" role="tablist" aria-label="Tipo de nota">
+    <button class="small kind-btn active" type="button" role="tab" aria-selected="true" data-kind="highlight">Highlight</button>
+    <button class="small kind-btn" type="button" role="tab" aria-selected="false" data-kind="question">Pregunta</button>
+    <button class="small kind-btn" type="button" role="tab" aria-selected="false" data-kind="key">Idea</button>
+  </div>
+  <div class="actions">
+    <button class="primary-btn small" type="button" id="saveSelectionBtn">Guardar</button>
+    <button class="secondary-btn small" type="button" id="clearSelectionBtn">Cancelar</button>
+  </div>
+</form>
 
-      <section class="card">
-        <div class="card-label" style="margin-bottom: 8px;">Nota local</div>
-        <textarea id="looseNote" placeholder="Nota atomica..."></textarea>
-        <div class="actions" style="margin-top: 8px;">
-          <button class="btn primary small" type="button" id="saveLooseBtn">Guardar nota</button>
-        </div>
-      </section>
-
-      <section class="notes" id="notes"></section>
+<aside class="saved-drawer" id="savedDrawer" hidden>
+  <header class="saved-drawer-header">
+    <div>
+      <p class="drawer-kicker">Sibar / Reader</p>
+      <h2>Guardadas</h2>
     </div>
-    <div class="status" id="status"></div>
-  </aside>
-</div>
+    <button class="icon-btn" type="button" id="closeSavedBtn" aria-label="Cerrar">×</button>
+  </header>
+  <section class="loose-note">
+    <textarea id="looseNote" placeholder="Nota atomica..."></textarea>
+    <button class="primary-btn small" type="button" id="saveLooseBtn">Guardar nota</button>
+  </section>
+  <section class="notes" id="notes"></section>
+</aside>
+
+<button class="saved-chip" type="button" id="savedChip" hidden>0 guardadas</button>
+<div class="saved-toast" id="savedToast" hidden>Guardado</div>
 
 <div class="toolbar" id="selectionToolbar">
   <button type="button" data-toolbar-kind="highlight">Highlight</button>
