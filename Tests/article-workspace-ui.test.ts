@@ -30,7 +30,14 @@ test("article workspace opens duplicate URLs from local storage before fetching"
 test("article workspace renders a local recent-reading drawer", () => {
   assert.match(html, /const HISTORY_KEY = "sibi\.article\.history\.v1"/);
   assert.match(html, /class="history-drawer"/);
+  assert.match(html, /function isHistoryUrl\(value\)/);
   assert.match(html, /function renderHistory\(\)/);
   assert.match(html, /data-history-url=/);
   assert.match(html, /function openHistoryUrl\(url\)/);
+});
+
+test("article workspace excludes demo URLs from recent reading history", () => {
+  assert.match(html, /parsed\.protocol === "http:" \|\| parsed\.protocol === "https:"/);
+  assert.match(html, /if \(!isHistoryUrl\(article\.url\)\) return/);
+  assert.match(html, /saveHistory\(filtered\)/);
 });

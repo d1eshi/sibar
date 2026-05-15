@@ -50,7 +50,8 @@ story.
 
 ### Fixed
 
-- Nothing yet.
+- Article workspace history now excludes local demo articles and prunes any
+  previously saved non-web entries.
 
 ### Docs
 
