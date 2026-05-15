@@ -552,13 +552,28 @@ function saveStore(store) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(store));
 }
 
+function isHistoryUrl(value) {
+  try {
+    const parsed = new URL(value);
+    return parsed.protocol === "http:" || parsed.protocol === "https:";
+  } catch {
+    return false;
+  }
+}
+
 function loadHistory() {
-  try { return JSON.parse(localStorage.getItem(HISTORY_KEY) || "[]"); }
+  try {
+    const history = JSON.parse(localStorage.getItem(HISTORY_KEY) || "[]");
+    if (!Array.isArray(history)) return [];
+    const filtered = history.filter((item) => item && isHistoryUrl(item.url));
+    if (filtered.length !== history.length) saveHistory(filtered);
+    return filtered;
+  }
   catch { return []; }
 }
 
 function saveHistory(history) {
-  localStorage.setItem(HISTORY_KEY, JSON.stringify(history.slice(0, HISTORY_LIMIT)));
+  localStorage.setItem(HISTORY_KEY, JSON.stringify(history.filter((item) => item && isHistoryUrl(item.url)).slice(0, HISTORY_LIMIT)));
 }
 
 function workspaceKey(article) {
@@ -595,6 +610,8 @@ function restore(article) {
 }
 
 function updateHistory(article) {
+  if (!isHistoryUrl(article.url)) return;
+
   const nextItem = {
     url: article.url,
     title: article.title,
