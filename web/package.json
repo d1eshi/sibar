@@ -1,0 +1,8 @@
+{
+  "name": "sibi-article-workspace-web",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22.0.0"
+  }
+}
