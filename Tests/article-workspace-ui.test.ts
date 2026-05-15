@@ -82,3 +82,12 @@ test("article workspace uses the focused source-ingestion visual shell", () => {
   assert.match(css, /\.article-shell \{[\s\S]*padding: 56px 24px 72px;/);
   assert.match(css, /\.saved-drawer \{[\s\S]*position: fixed;/);
 });
+
+test("article workspace dismisses saved drawer with an animated slide", () => {
+  assert.match(css, /\.saved-drawer \{[\s\S]*transform: translateX\(calc\(100% \+ 36px\)\);[\s\S]*transition:/);
+  assert.match(css, /\.saved-drawer\.is-open \{[\s\S]*transform: translateX\(0\);/);
+  assert.match(app, /function openSavedDrawer\(\)/);
+  assert.match(app, /function closeSavedDrawer\(\)/);
+  assert.match(app, /document\.addEventListener\("pointerdown"/);
+  assert.match(app, /elements\.savedDrawer\.contains\(event\.target\) \|\| elements\.savedChip\.contains\(event\.target\)/);
+});

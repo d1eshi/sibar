@@ -31,6 +31,7 @@ let sessionHistory = loadHistory();
 let pendingSelection = null;
 let pendingKind = "highlight";
 let toastTimer = null;
+let drawerCloseTimer = null;
 
 function render() {
   renderArticle(elements, state);
@@ -152,6 +153,24 @@ function showToast(message) {
   }, 1700);
 }
 
+function openSavedDrawer() {
+  window.clearTimeout(drawerCloseTimer);
+  elements.savedDrawer.hidden = false;
+  requestAnimationFrame(() => {
+    elements.savedDrawer.classList.add("is-open");
+  });
+}
+
+function closeSavedDrawer() {
+  if (elements.savedDrawer.hidden) return;
+  elements.savedDrawer.classList.remove("is-open");
+  drawerCloseTimer = window.setTimeout(() => {
+    if (!elements.savedDrawer.classList.contains("is-open")) {
+      elements.savedDrawer.hidden = true;
+    }
+  }, 240);
+}
+
 function createNote(input) {
   if (!state.article) return;
   state.notes = [{
@@ -235,12 +254,12 @@ if (elements.emptySampleBtn) elements.emptySampleBtn.addEventListener("click", o
 elements.saveSelectionBtn.addEventListener("click", savePending);
 elements.clearSelectionBtn.addEventListener("click", clearPending);
 elements.saveLooseBtn.addEventListener("click", saveLooseNote);
-elements.savedChip.addEventListener("click", () => {
-  elements.savedDrawer.hidden = false;
+elements.savedChip.addEventListener("click", (event) => {
+  event.stopPropagation();
+  openSavedDrawer();
 });
-elements.closeSavedBtn.addEventListener("click", () => {
-  elements.savedDrawer.hidden = true;
-});
+elements.closeSavedBtn.addEventListener("click", closeSavedDrawer);
+elements.savedDrawer.addEventListener("click", (event) => event.stopPropagation());
 elements.historyList.addEventListener("click", (event) => {
   const button = event.target.closest("[data-history-url]");
   if (!button) return;
@@ -283,7 +302,16 @@ document.addEventListener("keydown", (event) => {
     return;
   }
 
-  if (event.key === "Escape") clearPending();
+  if (event.key === "Escape") {
+    clearPending();
+    closeSavedDrawer();
+  }
+});
+
+document.addEventListener("pointerdown", (event) => {
+  if (elements.savedDrawer.hidden) return;
+  if (elements.savedDrawer.contains(event.target) || elements.savedChip.contains(event.target)) return;
+  closeSavedDrawer();
 });
 
 document.querySelectorAll(".source-chip").forEach((button) => {
