@@ -67,6 +67,8 @@ story.
 
 ### Docs
 
+- Added the web reader source-ingestion iteration with focused-reader mockups for
+  first open, reading, and saved states.
 - Added the self-hosted SDD loop, clarifying foundation specs, executable MVP
   specs, harness artifacts, living-spec sections, and the first freeform answer
   evaluator iteration target.
