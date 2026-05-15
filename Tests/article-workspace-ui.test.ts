@@ -57,6 +57,7 @@ test("article workspace persists notes locally without export", () => {
   assert.doesNotMatch(html, /Exportar JSON/);
   assert.match(html, /Guardadas/);
   assert.match(html, /id="savedChip"/);
+  assert.match(html, /⌘\/Ctrl \+ Enter para guardar/);
   assert.match(app, /const MAX_SESSION_NOTES = 12/);
 });
 
