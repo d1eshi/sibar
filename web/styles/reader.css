@@ -34,6 +34,11 @@ body {
     var(--bg);
 }
 
+body.drawer-open {
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
 button,
 input,
 textarea {
@@ -572,6 +577,7 @@ textarea {
   bottom: 18px;
   width: min(410px, calc(100vw - 36px));
   overflow: auto;
+  overscroll-behavior: contain;
   border: 1px solid var(--line);
   border-radius: 12px;
   background: rgba(255, 253, 248, 0.98);
