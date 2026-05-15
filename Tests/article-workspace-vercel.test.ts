@@ -32,8 +32,10 @@ test("legacy article workspace path redirects to the root reader", () => {
 
 test("web changelog is a direct URL page and not linked from the reader", () => {
   assert.match(changelogHtml, /Sibar Changelog/);
-  assert.match(changelogHtml, /Focused Reader Visual Iteration/);
-  assert.match(changelogHtml, /Public Reader Foundation/);
+  assert.match(changelogHtml, /Reader enfocado/);
+  assert.match(changelogHtml, /Primer reader publico/);
+  assert.match(changelogHtml, /Analitica limitada a visitas agregadas/);
+  assert.doesNotMatch(changelogHtml, /\/api|localStorage|deploy surface|SSR|build step|Tests cubren/);
   assert.match(changelogHtml, /href="\/styles\/changelog\.css"/);
   assert.doesNotMatch(webHtml, /href="\/changelog"|href="\/changelog\.html"/);
 });
