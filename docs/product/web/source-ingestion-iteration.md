@@ -62,6 +62,8 @@ Mockup:
 
 ![Source ingestion start](assets/source-ingestion-01-start.png)
 
+Coded prototype: [source-ingestion-start.html](prototypes/source-ingestion-start.html)
+
 ### 2. Reading
 
 After loading, ingestion recedes into a small source row near the article:
@@ -76,6 +78,8 @@ Mockup:
 
 ![Source loaded reading state](assets/source-ingestion-02-reading.png)
 
+Coded prototype: [source-ingestion-reading.html](prototypes/source-ingestion-reading.html)
+
 ### 3. Saved
 
 After saving, the reader stays in flow:
@@ -88,6 +92,8 @@ After saving, the reader stays in flow:
 Mockup:
 
 ![Saved reading state](assets/source-ingestion-03-saved.png)
+
+Coded prototype: [source-ingestion-saved.html](prototypes/source-ingestion-saved.html)
 
 ## Acceptance Criteria
 

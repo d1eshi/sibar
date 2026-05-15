@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sibi Reader - Source Ingestion Start</title>
+  <link rel="stylesheet" href="source-ingestion.css">
+</head>
+<body>
+  <nav class="prototype-switcher" aria-label="Prototype screens">
+    <a class="active" href="source-ingestion-start.html">01</a>
+    <a href="source-ingestion-reading.html">02</a>
+    <a href="source-ingestion-saved.html">03</a>
+  </nav>
+
+  <main class="start-screen">
+    <h1 class="start-mark">Sibi Reader</h1>
+    <p class="start-subtitle">Lee, selecciona y guarda lo importante.</p>
+
+    <form class="ingest-form">
+      <label class="ingest-label" for="sourceUrl">Pega una fuente</label>
+      <div class="ingest-row">
+        <input class="source-input" id="sourceUrl" type="url" placeholder="https://...">
+        <button class="primary-btn" type="button">Cargar</button>
+        <button class="secondary-btn" type="button">Demo</button>
+      </div>
+    </form>
+
+    <section class="source-examples" aria-label="Source examples">
+      <button class="source-chip" type="button"><span>01</span> Articulo</button>
+      <button class="source-chip" type="button"><span>02</span> Paper</button>
+      <button class="source-chip" type="button"><span>03</span> Newsletter</button>
+      <button class="source-chip" type="button"><span>04</span> Post tecnico</button>
+    </section>
+
+    <section class="ghost-reader" aria-label="Future reading surface">
+      <div class="ghost-line title"></div>
+      <div class="ghost-line mid"></div>
+      <div class="ghost-line mid"></div>
+      <div class="ghost-line"></div>
+      <div class="ghost-line short"></div>
+      <br>
+      <div class="ghost-line mid"></div>
+      <div class="ghost-line"></div>
+      <div class="ghost-line"></div>
+      <div class="ghost-line mid"></div>
+    </section>
+  </main>
+</body>
+</html>
