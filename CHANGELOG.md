@@ -45,6 +45,8 @@ story.
   request limits, fetch timeouts, and bounded response size for public launch.
 - Article workspace now opens repeated article URLs from local storage with a
   visible saved-state flash before making another server request.
+- Article workspace now includes a local recent-reading drawer for reopening the
+  last articles and their saved notes.
 
 ### Fixed
 
