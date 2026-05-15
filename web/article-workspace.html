@@ -1,0 +1,1033 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sibi Article Workspace</title>
+<script>
+window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
+window.va("beforeSend", (event) => {
+  if (location.hostname === "localhost" || location.hostname === "127.0.0.1") return null;
+  if (event?.url) {
+    const url = new URL(event.url);
+    url.search = "";
+    url.hash = "";
+    return { ...event, url: url.href };
+  }
+  return event;
+});
+if (location.hostname !== "localhost" && location.hostname !== "127.0.0.1") {
+  const analyticsScript = document.createElement("script");
+  analyticsScript.defer = true;
+  analyticsScript.src = "/_vercel/insights/script.js";
+  document.head.appendChild(analyticsScript);
+}
+</script>
+<style>
+:root {
+  --bg: #f5f2ea;
+  --surface: #fffdf7;
+  --surface-2: #ebe7dc;
+  --ink: #20201d;
+  --muted: #68645b;
+  --border: #d8d1c2;
+  --accent: #256d85;
+  --accent-2: #8d4b32;
+  --green: #3d7a4d;
+  --yellow: #b9871b;
+  --shadow: 0 18px 50px rgba(39, 34, 25, 0.12);
+  --radius: 8px;
+  --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --serif: ui-serif, Georgia, Cambria, "Times New Roman", serif;
+  --sans: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+* { box-sizing: border-box; }
+html { height: 100%; }
+body {
+  margin: 0;
+  height: 100%;
+  min-height: 100vh;
+  overflow: hidden;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--sans);
+}
+
+button, input, textarea { font: inherit; }
+button { cursor: pointer; }
+button:disabled { cursor: not-allowed; opacity: 0.55; }
+
+.shell {
+  height: 100vh;
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: 260px minmax(0, 1fr) 360px;
+}
+
+.history-drawer {
+  height: 100vh;
+  min-height: 0;
+  border-right: 1px solid var(--border);
+  background: #eee9dd;
+  display: flex;
+  flex-direction: column;
+}
+
+.history-header {
+  min-height: 66px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 14px;
+  border-bottom: 1px solid var(--border);
+}
+
+.history-title {
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+}
+
+.history-list {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  gap: 6px;
+  overflow: auto;
+  padding: 10px;
+}
+
+.history-empty {
+  margin: 4px;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.history-item {
+  width: 100%;
+  display: grid;
+  gap: 5px;
+  text-align: left;
+  border: 1px solid transparent;
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--ink);
+  padding: 10px;
+}
+
+.history-item:hover,
+.history-item.active {
+  border-color: var(--border);
+  background: var(--surface);
+}
+
+.history-item-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.history-item-meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 10px;
+}
+
+.workspace {
+  min-width: 0;
+  min-height: 0;
+  height: 100vh;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+}
+
+.topbar {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  gap: 8px;
+  align-items: center;
+  padding: 12px;
+  border-bottom: 1px solid var(--border);
+  background: rgba(255, 253, 247, 0.92);
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  backdrop-filter: blur(12px);
+}
+
+.url-input {
+  width: 100%;
+  min-width: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--ink);
+  padding: 10px 12px;
+  outline: none;
+}
+.url-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(37, 109, 133, 0.14); }
+
+.btn {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--ink);
+  padding: 9px 12px;
+  font-weight: 750;
+}
+.btn:hover { border-color: var(--accent); }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: white; }
+.btn.ghost { background: transparent; }
+.btn.small { padding: 6px 8px; font-size: 12px; }
+
+.reader-scroll {
+  min-height: 0;
+  overflow: auto;
+  overscroll-behavior: contain;
+  padding: 34px clamp(18px, 5vw, 64px) 80px;
+}
+
+.article {
+  max-width: 76ch;
+  margin: 0 auto;
+}
+
+.reader-brief {
+  margin: 0 0 28px;
+  padding: 0 0 22px;
+  border-bottom: 1px solid var(--border);
+}
+.reader-brief-label {
+  margin: 0 0 8px;
+  color: var(--accent);
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+}
+.reader-brief h2 {
+  margin: 0 0 10px;
+  max-width: 11ch;
+  font-family: var(--serif);
+  font-size: clamp(34px, 4.6vw, 54px);
+  line-height: 1.02;
+  letter-spacing: 0;
+}
+.reader-brief p {
+  max-width: 58ch;
+  margin: 0;
+  color: var(--muted);
+  font-size: 16px;
+  line-height: 1.55;
+}
+
+.article-kicker {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+  color: var(--muted);
+  font-size: 12px;
+  font-family: var(--mono);
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  min-height: 22px;
+  padding: 2px 8px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface);
+}
+
+h1 {
+  margin: 0 0 24px;
+  font-family: var(--serif);
+  font-size: clamp(34px, 5vw, 58px);
+  line-height: 1.04;
+  letter-spacing: 0;
+}
+
+.article-body {
+  font-family: var(--serif);
+  font-size: 20px;
+  line-height: 1.78;
+}
+
+.article-body p {
+  margin: 0 0 25px;
+}
+
+mark.atomic-highlight {
+  padding: 0.08em 0.12em;
+  border-radius: 4px;
+  background: rgba(185, 135, 27, 0.28);
+  color: inherit;
+}
+mark.kind-question { background: rgba(141, 75, 50, 0.22); }
+mark.kind-key { background: rgba(61, 122, 77, 0.22); }
+
+.empty {
+  max-width: 620px;
+  margin: 14vh auto 0;
+  padding: 28px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+.empty h2 {
+  margin: 0 0 8px;
+  max-width: 13ch;
+  font-family: var(--serif);
+  font-size: 34px;
+  line-height: 1.04;
+  letter-spacing: 0;
+}
+.empty p { margin: 0 0 16px; color: var(--muted); line-height: 1.5; }
+
+.assistant {
+  height: 100vh;
+  min-height: 0;
+  border-left: 1px solid var(--border);
+  background: var(--surface);
+  display: flex;
+  flex-direction: column;
+}
+
+.assistant-header {
+  padding: 14px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: center;
+}
+.assistant-title { font-size: 12px; font-weight: 900; letter-spacing: 0.11em; text-transform: uppercase; }
+.count { color: var(--muted); font-family: var(--mono); font-size: 12px; }
+
+.assistant-body {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  overscroll-behavior: contain;
+  padding: 12px;
+  display: grid;
+  gap: 12px;
+}
+
+.card {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: #fffaf0;
+  padding: 12px;
+}
+
+.selection-card { border-left: 4px solid var(--accent); }
+.selection-card[data-active-kind="question"] { border-left-color: var(--accent-2); }
+.selection-card[data-active-kind="key"] { border-left-color: var(--green); }
+.selection-text {
+  margin: 8px 0;
+  color: var(--ink);
+  font-family: var(--serif);
+  font-style: italic;
+  line-height: 1.45;
+}
+.card-label {
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.kind-row, .actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+.kind-row {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0;
+  margin-top: 8px;
+  padding: 3px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface-2);
+}
+.kind-btn {
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--muted);
+}
+.kind-btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+.kind-btn.active {
+  color: var(--ink);
+  background: var(--surface);
+  box-shadow: 0 1px 4px rgba(39, 34, 25, 0.14);
+}
+.kind-btn[data-kind="question"].active { color: var(--accent-2); }
+.kind-btn[data-kind="key"].active { color: var(--green); }
+
+textarea {
+  width: 100%;
+  min-height: 74px;
+  resize: vertical;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--ink);
+  padding: 10px;
+  outline: none;
+}
+textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(37, 109, 133, 0.14); }
+
+.notes {
+  display: grid;
+  gap: 8px;
+}
+.note {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  padding: 10px;
+}
+.note-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 7px;
+}
+.note-kind {
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.note-kind.highlight { color: var(--yellow); }
+.note-kind.question { color: var(--accent-2); }
+.note-kind.key { color: var(--green); }
+.note time { color: var(--muted); font-size: 11px; }
+.note blockquote {
+  margin: 0 0 8px;
+  padding-left: 10px;
+  border-left: 3px solid var(--border);
+  color: var(--muted);
+  font-family: var(--serif);
+  line-height: 1.42;
+}
+.note p { margin: 0; line-height: 1.45; }
+
+.toolbar {
+  position: absolute;
+  z-index: 30;
+  display: none;
+  gap: 4px;
+  align-items: center;
+  padding: 5px;
+  border: 1px solid rgba(32, 32, 29, 0.18);
+  border-radius: var(--radius);
+  background: #20201d;
+  color: white;
+  box-shadow: var(--shadow);
+}
+.toolbar.visible { display: flex; }
+.toolbar button {
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: white;
+  padding: 6px 8px;
+  font-size: 12px;
+  font-weight: 750;
+}
+.toolbar button:hover { background: rgba(255, 255, 255, 0.12); }
+
+.status {
+  min-height: 18px;
+  color: var(--muted);
+  font-size: 12px;
+  padding: 0 12px 12px;
+}
+.status.flash {
+  color: var(--accent);
+  font-weight: 750;
+  animation: ws-flash 700ms ease-out;
+}
+
+@keyframes ws-flash {
+  0% { transform: translateY(0); opacity: 1; }
+  30% { transform: translateY(-2px); opacity: 1; }
+  100% { transform: translateY(0); opacity: 1; }
+}
+
+@media (max-width: 900px) {
+  body { height: auto; overflow: auto; }
+  .shell { height: auto; min-height: 100vh; overflow: visible; grid-template-columns: 1fr; }
+  .history-drawer { height: auto; min-height: auto; border-right: 0; border-bottom: 1px solid var(--border); }
+  .history-list { grid-auto-flow: column; grid-auto-columns: minmax(190px, 240px); overflow-x: auto; }
+  .workspace { height: auto; }
+  .reader-scroll { overflow: visible; }
+  .assistant { height: auto; min-height: auto; border-left: 0; border-top: 1px solid var(--border); }
+  .topbar { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+<div class="shell">
+  <aside class="history-drawer">
+    <header class="history-header">
+      <div class="history-title">Session</div>
+      <div class="count" id="historyCount">0</div>
+    </header>
+    <nav class="history-list" id="historyList" aria-label="Ultimos articulos leidos"></nav>
+  </aside>
+
+  <main class="workspace">
+    <form class="topbar" id="loadForm">
+      <input class="url-input" id="urlInput" type="url" placeholder="https://..." autocomplete="url">
+      <button class="btn primary" type="submit">Cargar</button>
+      <button class="btn ghost" type="button" id="sampleBtn">Demo</button>
+    </form>
+    <section class="reader-scroll" id="readerScroll">
+      <div class="empty" id="emptyState">
+        <h2>Deep knowledge improves what you build.</h2>
+        <p>Pega una fuente, leela sin ruido y deja un Learning Log de highlights, preguntas e ideas atomicas mientras la evidencia todavia esta fresca.</p>
+        <button class="btn primary" type="button" id="emptySampleBtn">Abrir demo</button>
+      </div>
+      <article class="article" id="article" hidden>
+        <section class="reader-brief" aria-label="Proposito del reader">
+          <p class="reader-brief-label">Sibi Reader</p>
+          <h2>Read for evidence.</h2>
+          <p>El objetivo no es guardar mucho: es capturar lo justo para recordar que cambio tu modelo mental, que pregunta quedo abierta y que idea merece convertirse en practica.</p>
+        </section>
+        <div class="article-kicker">
+          <span class="pill" id="hostLabel"></span>
+          <span class="pill" id="paragraphCount"></span>
+        </div>
+        <h1 id="articleTitle"></h1>
+        <div class="article-body" id="articleBody"></div>
+      </article>
+    </section>
+  </main>
+
+  <aside class="assistant">
+    <header class="assistant-header">
+      <div class="assistant-title">Learning Log</div>
+      <div class="count" id="noteCount">0 notas</div>
+    </header>
+    <div class="assistant-body">
+      <section class="card selection-card" id="selectionCard" hidden>
+        <div class="card-label">Seleccion</div>
+        <p class="selection-text" id="selectionText"></p>
+        <textarea id="selectionNote" placeholder="Nota breve..."></textarea>
+        <div class="kind-row" role="tablist" aria-label="Tipo de nota">
+          <button class="small kind-btn active" type="button" role="tab" aria-selected="true" data-kind="highlight">Highlight</button>
+          <button class="small kind-btn" type="button" role="tab" aria-selected="false" data-kind="question">Pregunta</button>
+          <button class="small kind-btn" type="button" role="tab" aria-selected="false" data-kind="key">Idea</button>
+        </div>
+        <div class="actions" style="margin-top: 8px;">
+          <button class="btn primary small" type="button" id="saveSelectionBtn">Guardar</button>
+          <button class="btn ghost small" type="button" id="clearSelectionBtn">Cancelar</button>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="card-label" style="margin-bottom: 8px;">Nota local</div>
+        <textarea id="looseNote" placeholder="Nota atomica..."></textarea>
+        <div class="actions" style="margin-top: 8px;">
+          <button class="btn primary small" type="button" id="saveLooseBtn">Guardar nota</button>
+        </div>
+      </section>
+
+      <section class="notes" id="notes"></section>
+    </div>
+    <div class="status" id="status"></div>
+  </aside>
+</div>
+
+<div class="toolbar" id="selectionToolbar">
+  <button type="button" data-toolbar-kind="highlight">Highlight</button>
+  <button type="button" data-toolbar-kind="question">Pregunta</button>
+  <button type="button" data-toolbar-kind="key">Idea</button>
+</div>
+
+<script>
+const STORAGE_KEY = "sibi.article.workspace.v1";
+const HISTORY_KEY = "sibi.article.history.v1";
+const HISTORY_LIMIT = 20;
+const MAX_SESSION_NOTES = 12;
+const sampleArticle = {
+  url: "demo://sibi/article-workspace",
+  title: "Deep knowledge improves what you build",
+  host: "sibi.local",
+  excerpt: "Leer con evidencia cerca mejora la calidad de cada decision que tomas despues.",
+  paragraphs: [
+    "El conocimiento profundo mejora lo que construis porque cambia la calidad de tus decisiones. No alcanza con leer rapido: necesitas conservar la linea exacta que te movio, la duda que aparecio y la idea que vale probar.",
+    "El workspace lector existe para bajar friccion. El usuario pega una URL, lee en una vista limpia, selecciona una frase y decide si esa seleccion es un highlight, una pregunta abierta o una idea clave.",
+    "La capa pedagogica empieza en la captura. Un highlight preserva evidencia, una pregunta marca una brecha de comprension y una idea clave senala material que luego puede convertirse en practica, explicacion o evaluacion.",
+    "Para este demo no hace falta login, sincronizacion ni memoria global. Una sesion corta alcanza para validar si leer, marcar y escribir notas atomicas mejora el entendimiento sin interrumpir la lectura."
+  ]
+};
+
+let state = { article: null, notes: [] };
+let pendingSelection = null;
+let pendingKind = "highlight";
+const KIND_ORDER = ["highlight", "question", "key"];
+
+const $ = (id) => document.getElementById(id);
+const elements = {
+  form: $("loadForm"),
+  urlInput: $("urlInput"),
+  sampleBtn: $("sampleBtn"),
+  emptySampleBtn: $("emptySampleBtn"),
+  emptyState: $("emptyState"),
+  article: $("article"),
+  hostLabel: $("hostLabel"),
+  paragraphCount: $("paragraphCount"),
+  articleTitle: $("articleTitle"),
+  articleBody: $("articleBody"),
+  selectionToolbar: $("selectionToolbar"),
+  selectionCard: $("selectionCard"),
+  selectionText: $("selectionText"),
+  selectionNote: $("selectionNote"),
+  saveSelectionBtn: $("saveSelectionBtn"),
+  clearSelectionBtn: $("clearSelectionBtn"),
+  looseNote: $("looseNote"),
+  saveLooseBtn: $("saveLooseBtn"),
+  notes: $("notes"),
+  noteCount: $("noteCount"),
+  historyCount: $("historyCount"),
+  historyList: $("historyList"),
+  status: $("status")
+};
+
+let sessionHistory = [];
+
+function loadJson(key, fallback) {
+  try {
+    const value = localStorage.getItem(key);
+    return value ? JSON.parse(value) : fallback;
+  } catch {
+    return fallback;
+  }
+}
+
+function saveJson(key, value) {
+  try {
+    localStorage.setItem(key, JSON.stringify(value));
+  } catch {
+    setStatus("No se pudo guardar en este navegador.");
+  }
+}
+
+function loadWorkspaceStore() {
+  const store = loadJson(STORAGE_KEY, {});
+  return store && typeof store === "object" && !Array.isArray(store) ? store : {};
+}
+
+function saveWorkspaceStore(store) {
+  saveJson(STORAGE_KEY, store);
+}
+
+function isHistoryUrl(value) {
+  try {
+    const parsed = new URL(value);
+    return parsed.protocol === "http:" || parsed.protocol === "https:";
+  } catch {
+    return false;
+  }
+}
+
+function workspaceKey(article) {
+  return article.url;
+}
+
+function normalizeArticleUrl(rawUrl) {
+  const parsed = new URL(rawUrl.trim());
+  if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
+    throw new Error("Solo se aceptan URLs http o https.");
+  }
+  parsed.hash = "";
+  return parsed.href;
+}
+
+function getSavedWorkspaceByUrl(url) {
+  return loadWorkspaceStore()[url] || null;
+}
+
+function persist() {
+  if (!state.article) return;
+  const store = loadWorkspaceStore();
+  store[workspaceKey(state.article)] = {
+    article: state.article,
+    notes: [...state.notes]
+  };
+  saveWorkspaceStore(store);
+  updateHistory(state.article);
+}
+
+function restore(article) {
+  const saved = getSavedWorkspaceByUrl(workspaceKey(article));
+  state = saved ? { article, notes: saved.notes || [] } : { article, notes: [] };
+  persist();
+  render();
+}
+
+function updateHistory(article) {
+  if (!isHistoryUrl(article.url)) return;
+
+  const nextItem = {
+    url: article.url,
+    title: article.title,
+    host: article.host,
+    noteCount: state.notes.length,
+    lastOpenedAt: new Date().toISOString()
+  };
+  sessionHistory = [nextItem, ...sessionHistory.filter((item) => item.url !== article.url)]
+    .filter((item) => item && isHistoryUrl(item.url))
+    .slice(0, HISTORY_LIMIT);
+  saveJson(HISTORY_KEY, sessionHistory);
+}
+
+function loadHistory() {
+  const history = loadJson(HISTORY_KEY, []);
+  if (!Array.isArray(history)) return [];
+  const filtered = history.filter((item) => item && isHistoryUrl(item.url)).slice(0, HISTORY_LIMIT);
+  if (filtered.length !== history.length) saveJson(HISTORY_KEY, filtered);
+  return filtered;
+}
+
+function escapeHtml(value) {
+  return value.replace(/[&<>"']/g, (char) => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    "\"": "&quot;",
+    "'": "&#39;"
+  })[char]);
+}
+
+function rangesForParagraph(paragraph, index) {
+  const ranges = [];
+  const paragraphNotes = state.notes
+    .filter((note) => note.paragraphIndex === index && note.selectedText)
+    .sort((a, b) => b.selectedText.length - a.selectedText.length);
+
+  for (const note of paragraphNotes) {
+    const start = paragraph.indexOf(note.selectedText);
+    const end = start + note.selectedText.length;
+    if (start < 0 || ranges.some((range) => start < range.end && end > range.start)) continue;
+    ranges.push({ start, end, kind: note.kind, id: note.id });
+  }
+
+  return ranges.sort((a, b) => a.start - b.start);
+}
+
+function renderParagraph(paragraph, index) {
+  const ranges = rangesForParagraph(paragraph, index);
+  if (ranges.length === 0) return escapeHtml(paragraph);
+
+  let html = "";
+  let cursor = 0;
+  for (const range of ranges) {
+    html += escapeHtml(paragraph.slice(cursor, range.start));
+    html += `<mark class="atomic-highlight kind-${range.kind}" data-note-id="${range.id}">${escapeHtml(paragraph.slice(range.start, range.end))}</mark>`;
+    cursor = range.end;
+  }
+  html += escapeHtml(paragraph.slice(cursor));
+  return html;
+}
+
+function renderArticle() {
+  const article = state.article;
+  elements.emptyState.hidden = Boolean(article);
+  elements.article.hidden = !article;
+  if (!article) return;
+
+  elements.hostLabel.textContent = article.host;
+  elements.paragraphCount.textContent = `${article.paragraphs.length} bloques`;
+  elements.articleTitle.textContent = article.title;
+  elements.articleBody.innerHTML = article.paragraphs
+    .map((paragraph, index) => `<p data-paragraph-index="${index}">${renderParagraph(paragraph, index)}</p>`)
+    .join("");
+}
+
+function kindLabel(kind) {
+  if (kind === "question") return "Pregunta";
+  if (kind === "key") return "Idea";
+  return "Highlight";
+}
+
+function renderNotes() {
+  elements.noteCount.textContent = `${state.notes.length} notas`;
+  elements.notes.innerHTML = state.notes.map((note) => `
+    <article class="note">
+      <div class="note-head">
+        <span class="note-kind ${note.kind}">${kindLabel(note.kind)}</span>
+        <time>${new Date(note.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</time>
+      </div>
+      ${note.selectedText ? `<blockquote>${escapeHtml(note.selectedText)}</blockquote>` : ""}
+      ${note.note ? `<p>${escapeHtml(note.note)}</p>` : ""}
+    </article>
+  `).join("");
+}
+
+function renderHistory() {
+  elements.historyCount.textContent = String(sessionHistory.length);
+  if (sessionHistory.length === 0) {
+    elements.historyList.innerHTML = `<p class="history-empty">Los articulos web que abras quedan aca en este navegador.</p>`;
+    return;
+  }
+
+  elements.historyList.innerHTML = sessionHistory.map((item) => `
+    <button class="history-item${state.article?.url === item.url ? " active" : ""}" type="button" data-history-url="${escapeHtml(item.url)}">
+      <span class="history-item-title">${escapeHtml(item.title)}</span>
+      <span class="history-item-meta">
+        <span>${escapeHtml(item.host)}</span>
+        <span>${item.noteCount || 0} notas</span>
+      </span>
+    </button>
+  `).join("");
+}
+
+function renderPending() {
+  elements.selectionCard.hidden = !pendingSelection;
+  if (!pendingSelection) return;
+  elements.selectionCard.dataset.activeKind = pendingKind;
+  elements.selectionText.textContent = pendingSelection.selectedText;
+  document.querySelectorAll(".kind-btn").forEach((button) => {
+    const active = button.dataset.kind === pendingKind;
+    button.classList.toggle("active", active);
+    button.setAttribute("aria-selected", active ? "true" : "false");
+  });
+}
+
+function render() {
+  renderArticle();
+  renderNotes();
+  renderHistory();
+  renderPending();
+}
+
+function setStatus(message) {
+  elements.status.textContent = message;
+  elements.status.classList.remove("flash");
+}
+
+function flashStatus(message) {
+  elements.status.textContent = message;
+  elements.status.classList.remove("flash");
+  void elements.status.offsetWidth;
+  elements.status.classList.add("flash");
+}
+
+function openSample() {
+  elements.urlInput.value = "";
+  restore(sampleArticle);
+  setStatus("Demo cargada.");
+}
+
+async function loadUrl(rawUrl) {
+  const url = normalizeArticleUrl(rawUrl);
+  if (!url) return;
+  elements.urlInput.value = url;
+
+  const saved = getSavedWorkspaceByUrl(url);
+  if (saved?.article) {
+    restore(saved.article);
+    flashStatus("Ya estaba guardado en este navegador. Lo recuperamos sin pedirlo al servidor.");
+    return;
+  }
+
+  setStatus("Cargando articulo...");
+  const response = await fetch(`/api/read?url=${encodeURIComponent(url)}`);
+  const payload = await response.json();
+  if (!response.ok) throw new Error(payload.error || "No se pudo cargar.");
+  restore(payload.article);
+  setStatus(payload.cache === "hit" ? "Articulo cargado desde cache del servidor." : "Articulo cargado.");
+}
+
+async function openHistoryUrl(url) {
+  const saved = getSavedWorkspaceByUrl(url);
+  if (saved?.article) {
+    elements.urlInput.value = saved.article.url.startsWith("demo://") ? "" : saved.article.url;
+    restore(saved.article);
+    flashStatus("Abierto desde el historial local.");
+    return;
+  }
+
+  await loadUrl(url);
+}
+
+function clearPending() {
+  pendingSelection = null;
+  delete elements.selectionCard.dataset.activeKind;
+  elements.selectionNote.value = "";
+  elements.selectionToolbar.classList.remove("visible");
+  window.getSelection()?.removeAllRanges();
+  renderPending();
+}
+
+function createNote(input) {
+  if (!state.article) return;
+  state.notes = [{
+    id: `note_${Date.now()}_${Math.random().toString(16).slice(2)}`,
+    kind: input.kind,
+    selectedText: input.selectedText || "",
+    paragraphIndex: input.paragraphIndex ?? null,
+    note: input.note || "",
+    sourceUrl: state.article.url,
+    sourceTitle: state.article.title,
+    createdAt: new Date().toISOString()
+  }, ...state.notes].slice(0, MAX_SESSION_NOTES);
+  persist();
+  render();
+}
+
+function savePending() {
+  if (!pendingSelection) return;
+  createNote({
+    ...pendingSelection,
+    kind: pendingKind,
+    note: elements.selectionNote.value.trim()
+  });
+  clearPending();
+  setStatus("Nota guardada.");
+}
+
+function setPendingKind(kind) {
+  if (!KIND_ORDER.includes(kind)) return;
+  pendingKind = kind;
+  renderPending();
+}
+
+function cyclePendingKind(direction) {
+  const currentIndex = KIND_ORDER.indexOf(pendingKind);
+  const nextIndex = (currentIndex + direction + KIND_ORDER.length) % KIND_ORDER.length;
+  setPendingKind(KIND_ORDER[nextIndex]);
+}
+
+function saveLooseNote() {
+  const note = elements.looseNote.value.trim();
+  if (!note) return;
+  createNote({ kind: "highlight", note });
+  elements.looseNote.value = "";
+  setStatus("Nota guardada.");
+}
+
+function stageSelection(kind) {
+  const selection = window.getSelection();
+  if (!selection || selection.isCollapsed || selection.rangeCount === 0) return;
+  const range = selection.getRangeAt(0);
+  if (!elements.articleBody.contains(range.commonAncestorContainer)) return;
+
+  const selectedText = selection.toString().trim().replace(/\s+/g, " ");
+  if (!selectedText) return;
+
+  const node = range.startContainer.nodeType === Node.TEXT_NODE ? range.startContainer.parentElement : range.startContainer;
+  const paragraph = node?.closest?.("[data-paragraph-index]");
+  pendingSelection = {
+    selectedText,
+    paragraphIndex: paragraph ? Number(paragraph.dataset.paragraphIndex) : null
+  };
+  setPendingKind(kind);
+  elements.selectionNote.value = "";
+  renderPending();
+  elements.selectionNote.focus();
+}
+
+function positionToolbar() {
+  const selection = window.getSelection();
+  if (!selection || selection.isCollapsed || selection.rangeCount === 0) {
+    elements.selectionToolbar.classList.remove("visible");
+    return;
+  }
+  const range = selection.getRangeAt(0);
+  if (!elements.articleBody.contains(range.commonAncestorContainer)) return;
+  const rect = range.getBoundingClientRect();
+  elements.selectionToolbar.style.left = `${window.scrollX + rect.left + rect.width / 2 - 112}px`;
+  elements.selectionToolbar.style.top = `${window.scrollY + rect.top - 46}px`;
+  elements.selectionToolbar.classList.add("visible");
+}
+
+elements.form.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  try { await loadUrl(elements.urlInput.value); }
+  catch (error) { setStatus(error instanceof Error ? error.message : "Error."); }
+});
+
+elements.sampleBtn.addEventListener("click", openSample);
+elements.emptySampleBtn.addEventListener("click", openSample);
+elements.saveSelectionBtn.addEventListener("click", savePending);
+elements.clearSelectionBtn.addEventListener("click", clearPending);
+elements.saveLooseBtn.addEventListener("click", saveLooseNote);
+elements.historyList.addEventListener("click", (event) => {
+  const button = event.target.closest("[data-history-url]");
+  if (!button) return;
+  void openHistoryUrl(button.dataset.historyUrl).catch((error) => {
+    setStatus(error instanceof Error ? error.message : "No se pudo abrir el historial.");
+  });
+});
+
+document.querySelectorAll(".kind-btn").forEach((button) => {
+  button.addEventListener("click", () => setPendingKind(button.dataset.kind));
+});
+
+document.querySelectorAll("[data-toolbar-kind]").forEach((button) => {
+  button.addEventListener("mousedown", (event) => event.preventDefault());
+  button.addEventListener("click", () => stageSelection(button.dataset.toolbarKind));
+});
+
+elements.articleBody.addEventListener("mouseup", () => {
+  window.setTimeout(positionToolbar, 0);
+});
+elements.articleBody.addEventListener("mousedown", (event) => {
+  if (!event.target.closest(".toolbar")) elements.selectionToolbar.classList.remove("visible");
+});
+document.addEventListener("keydown", (event) => {
+  if (pendingSelection && event.key === "Tab") {
+    event.preventDefault();
+    cyclePendingKind(event.shiftKey ? -1 : 1);
+    return;
+  }
+
+  if (event.key === "Enter" && (event.metaKey || event.ctrlKey)) {
+    event.preventDefault();
+    if (pendingSelection) {
+      savePending();
+      return;
+    }
+    if (document.activeElement === elements.looseNote) {
+      saveLooseNote();
+    }
+    return;
+  }
+
+  if (event.key === "Escape") clearPending();
+});
+
+sessionHistory = loadHistory();
+openSample();
+</script>
+</body>
+</html>

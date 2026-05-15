@@ -31,17 +31,39 @@ story.
   snapshots and answer submission.
 - Floating `NSPanel` study surface with collapsible mode and Graph + Code canvas
   rendered from runtime-owned snapshots.
+- Local article workspace prototype for URL-based reader extraction, atomic
+  highlight capture, and per-article notes stored in the browser.
+- Isolated `/web` deploy surface for the article workspace, with static HTML and
+  a self-contained Vercel `/api/read` function.
+- Vercel Web Analytics page-view tracking for the article workspace, limited to
+  aggregate page analytics.
 - First self-hosted freeform evaluator slice for artifact-boundary ownership
   answers, with CLI/report output for readiness, evidence, flow, false-confidence,
   and design-induced findings.
 
 ### Changed
 
-- Nothing yet.
+- Article workspace note capture now uses tab-style note kinds and supports
+  keyboard capture with Tab and Command/Control+Enter.
+- Article workspace URL reads now use server-side cache, public URL validation,
+  request limits, fetch timeouts, and bounded response size for public launch.
+- Article workspace now opens repeated article URLs from local browser state with a
+  visible saved-state flash before making another server request.
+- Article workspace now includes a local recent-reading drawer for reopening the
+  last articles and their saved notes.
+- Article workspace reader state is now browser-local for the public demo:
+  `localStorage` persistence, no export button, and a capped Learning Log.
+- Article workspace now opens with a clearer reader presentation around
+  evidence-first learning and atomic notes.
+- Article workspace demo files moved from `docs/demo` into root-level `/web`
+  so the public reader can deploy without the TypeScript runtime or sidecar.
 
 ### Fixed
 
-- Nothing yet.
+- Article workspace desktop layout now keeps the reader, session drawer, and
+  Learning Log as independent scroll areas.
+- Article workspace history now excludes local demo articles and prunes any
+  previously saved non-web entries.
 
 ### Docs
 
@@ -68,6 +90,11 @@ story.
   and explicit Graph + Code canvas behavior.
 - Updated the self-hosted evaluation contract with first freeform evaluator slice
   results, coverage status, and the next expansion target.
+- Documented article reader persistence sequencing: use browser-local notes
+  first, treat `localStorage` as a bridge, and wait for profiles before
+  durable cross-device note memory.
+- Added article reader analytics research covering Vercel Analytics, cookie
+  expectations, consent boundaries, and future observer events.
 
 ### Internal
 
