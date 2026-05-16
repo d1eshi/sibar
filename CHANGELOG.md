@@ -25,6 +25,30 @@ release yet.
 - Added `assertHiddenAnswerGated()` runtime check verifying no hidden solution
   content leaks into DOM or accessibility text before attempt submission.
 
+### Added - Reference Component Contracts, Accessibility, and Setup Flow
+
+- Implemented a 7-step first-run setup wizard (goal, boundary, evidence roles,
+  boundary confirmation, evidence inventory, concept slice, active operation)
+  that gates the main Workspace until the user confirms the loop boundaries.
+- Mapped all six major UI regions to `12_ui_reference_components.md` component
+  contracts via `data-component` attributes: Lab Shell, Source & Artifact Rail,
+  Code Workbench Artifact, Call/Data Diagram, Sibi Loop Rail, Evidence Strip.
+- Added keyboard accessibility: skip navigation links for all three regions,
+  `focus-visible` outline styles on all controls, `tabindex` and Enter/Space
+  handlers on code lines and evidence cards, ARIA labels on answer input,
+  confidence selector, and declared unknowns input.
+- Added code workbench line selection: clicking a code line highlights it,
+  updates evidence references, and logs the selection with related evidence ids.
+- Added small-laptop responsive layout for 1366x768 and below with compressed
+  grid columns, reduced padding/font sizes, and collapsible evidence rail.
+- Added runtime error monitoring: `window.onerror` and `unhandledrejection`
+  handlers with a visible error counter badge in the bottom-right corner.
+- Added `recordBlockedValidation()` for recording browser validation failures
+  with URL, tool, failure description, timestamp, affected assertions, and
+  next action as a blocked-validation record.
+- Added CSS classes for empty states and blocked states with amber-themed
+  dashed borders, icons, titles, reasons, and suggested actions.
+
 - Created the first deterministic Deep Ownership fixture (`sibi-pedagogy-loop.json`)
   describing one scoped loop over the Sibi pedagogy runtime: gap detection,
   practice generation, memory, and readiness.
