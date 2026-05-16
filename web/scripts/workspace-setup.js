@@ -61,6 +61,7 @@
   ];
 
   var setupStep = 0;
+  var setupFinished = false;
 
   function renderSetupStep() {
     var s = SETUP_STEPS[setupStep];
@@ -96,8 +97,15 @@
     if (prevBtn) prevBtn.addEventListener("click", function() { setupStep--; renderSetupStep(); });
     if (nextBtn) nextBtn.addEventListener("click", function() { setupStep++; renderSetupStep(); });
     if (finishBtn) finishBtn.addEventListener("click", function() {
-      el("setupOverlay").classList.add("setup-complete");
-      setTimeout(function() { el("setupOverlay").remove(); }, 400);
+      if (setupFinished) return;
+      var overlay = el("setupOverlay");
+      if (!overlay) return;
+      setupFinished = true;
+      overlay.classList.add("setup-complete");
+      setTimeout(function() {
+        var ov = el("setupOverlay");
+        if (ov) ov.remove();
+      }, 400);
       console.log("[First-Run Setup] Complete. Entering Workspace.");
     });
   }
