@@ -109,6 +109,9 @@ exist to make the public reader story reviewable before production promotion.
 
 ### Docs
 
+- Added the Sibi Lens and Sibi Lab UI iteration with minimalist surface
+  variations for command capture, artifact work, derivation, patch readiness,
+  and repo ownership overview.
 - Added the web reader source-ingestion iteration with focused-reader mockups
   and a functional coded prototype for first open, loading, reading, and saved
   states.
