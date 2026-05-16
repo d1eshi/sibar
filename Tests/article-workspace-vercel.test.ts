@@ -11,6 +11,7 @@ const changelogHtml = readFileSync(join(root, "web/changelog.html"), "utf8");
 const webApiClient = readFileSync(join(root, "web/scripts/api.js"), "utf8");
 const webApi = readFileSync(join(root, "web/api/read.mjs"), "utf8");
 const webDevServer = readFileSync(join(root, "scripts/web-dev.mjs"), "utf8");
+const earlyAccessApi = readFileSync(join(root, "web/api/early-access.mjs"), "utf8");
 const analyticsResearch = readFileSync(join(root, "web/ANALYTICS_RESEARCH.md"), "utf8");
 const vercelOwnershipSpec = readFileSync(join(root, "docs/specs/11_vercel_deploy_ownership.md"), "utf8");
 const rootVercelIgnore = readFileSync(join(root, ".vercelignore"), "utf8");
@@ -27,8 +28,9 @@ test("article workspace web deploy is rooted under /web", () => {
   assert.equal(vercelConfig.cleanUrls, true);
   assert.equal(vercelConfig.installCommand, "");
   assert.equal(vercelConfig.buildCommand, null);
-  assert.deepEqual(Object.keys(vercelConfig.functions), ["api/read.mjs"]);
+  assert.deepEqual(Object.keys(vercelConfig.functions), ["api/read.mjs", "api/early-access.mjs"]);
   assert.equal(vercelConfig.functions["api/read.mjs"].maxDuration, 10);
+  assert.equal(vercelConfig.functions["api/early-access.mjs"].maxDuration, 5);
   assert.doesNotMatch(JSON.stringify(vercelConfig), /article-workspace/);
 });
 
@@ -73,6 +75,14 @@ test("article workspace Vercel API is self-contained JavaScript", () => {
   assert.match(webApi, /Private network article URLs are not supported/);
   assert.match(webApi, /RATE_LIMIT_MAX_PER_MINUTE/);
   assert.match(webApi, /vercel-cdn-cache-control/);
+});
+
+test("early access Vercel API is server-side only and self-contained", () => {
+  assert.doesNotMatch(earlyAccessApi, /\.\.\/src|src\/article-workspace|typescript|experimental-strip-types/);
+  assert.match(earlyAccessApi, /export async function POST\(request\)/);
+  assert.match(earlyAccessApi, /process\.env\.SUPABASE_SERVICE_ROLE_KEY/);
+  assert.match(earlyAccessApi, /content-type/);
+  assert.doesNotMatch(webHtml, /SUPABASE_SERVICE_ROLE_KEY|service_role/i);
 });
 
 test("article workspace deploy excludes repository internals", () => {

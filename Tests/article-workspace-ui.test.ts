@@ -51,6 +51,24 @@ test("article workspace gates new public sources before server fetch", () => {
   assert.match(html, /Solicitar early access/);
 });
 
+test("article workspace early access form posts only email and optional X handle", () => {
+  assert.match(html, /<form class="early-access-form" id="earlyAccessForm">/);
+  assert.match(html, /id="earlyAccessEmail" name="email" type="email"/);
+  assert.match(html, /id="earlyAccessXHandle" name="x_handle" type="text"/);
+  assert.match(html, /id="earlyAccessStatus" aria-live="polite"/);
+  assert.match(api, /function requestEarlyAccess\(input\)/);
+  assert.match(api, /fetch\("\/api\/early-access"/);
+  assert.match(api, /method: "POST"/);
+  assert.match(api, /"content-type": "application\/json"/);
+  assert.match(api, /email: input\.email/);
+  assert.match(api, /x_handle: input\.xHandle \|\| null/);
+  assert.doesNotMatch(api, /SUPABASE|service_role|SERVICE_ROLE|localStorage|goal|source_url/i);
+  assert.match(app, /function submitEarlyAccess\(\)/);
+  assert.match(app, /requestEarlyAccess\(\{ email, xHandle \}\)/);
+  assert.match(app, /elements\.earlyAccessForm\.reset\(\)/);
+  assert.doesNotMatch(app, /SUPABASE|service_role|SERVICE_ROLE|localStorage\.setItem|goal|source_url/i);
+});
+
 test("article workspace renders local recent reading only when it exists", () => {
   assert.match(storage, /const HISTORY_KEY = "sibar\.reader\.history\.v1"/);
   assert.match(storage, /const LEGACY_HISTORY_KEY = "sibi\.article\.history\.v1"/);
