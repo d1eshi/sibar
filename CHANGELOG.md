@@ -16,6 +16,38 @@ describes. Skip this file only when the commit is purely mechanical and does not
 change product behavior, product docs, release readiness, or the public product
 story.
 
+### Product Presentation Releases
+
+These are preview-oriented product slices, not tagged SemVer releases yet. They
+exist to make the public reader story reviewable before production promotion.
+
+#### Presentation Slice 2 - Focused Reader Visual Iteration
+
+- Moved the chosen source-ingestion direction into the real `/web` product
+  surface instead of leaving it only in docs prototypes.
+- Made `/` the final product route, with `/article-workspace.html` kept only as a
+  compatibility redirect.
+- Split the deploy surface into static HTML, CSS, and modular browser JavaScript
+  so the reader can keep iterating without React, SSR, or a build step.
+- Reframed the demo copy as a Sibar manifesto for deep knowledge, source contact,
+  and resisting fully summarized consumption.
+- Added demo-only color marks for highlight, question, and idea so the first read
+  shows the capture language without creating saved notes.
+- Refined saved-note UX with a header count, temporary save toast, slide-out
+  drawer, click-outside dismissal, reader scroll lock, and shortcut hint.
+
+#### Presentation Slice 1 - Public Reader Foundation
+
+- Created the isolated `/web` deploy surface for the article reader, including
+  static HTML and the self-contained `/api/read` Vercel Function.
+- Added public URL extraction with validation, private-network blocking,
+  bounded fetch behavior, response limits, and short server cache controls.
+- Added browser-local reader persistence for notes and recent reading history
+  without login or profile-backed storage.
+- Added aggregate-only Vercel Web Analytics boundaries for the public reader.
+- Added regression coverage for the web deploy surface, reader UI contracts,
+  duplicate URL recovery, history filtering, analytics privacy, and API guards.
+
 ### Added
 
 - Spec-based versioning policy for deciding when Sibi moves between pre-1.0
@@ -57,6 +89,11 @@ story.
   evidence-first learning and atomic notes.
 - Article workspace demo files moved from `docs/demo` into root-level `/web`
   so the public reader can deploy without the TypeScript runtime or sidecar.
+- Web reader now serves from `/` in the deploy surface, with the public HTML,
+  styles, and browser behavior split across `web/index.html`, `web/styles`, and
+  `web/scripts` for product iteration.
+- Web reader now applies the focused source-ingestion visual direction to the
+  real `/web` product surface instead of leaving it only in docs prototypes.
 
 ### Fixed
 
@@ -69,6 +106,9 @@ story.
 
 ### Docs
 
+- Added the web reader source-ingestion iteration with focused-reader mockups
+  and a functional coded prototype for first open, loading, reading, and saved
+  states.
 - Added the self-hosted SDD loop, clarifying foundation specs, executable MVP
   specs, harness artifacts, living-spec sections, and the first freeform answer
   evaluator iteration target.

@@ -1,12 +1,15 @@
-# Article Workspace Web Deploy
+# Sibar Reader Web Deploy
 
 This directory is the isolated public deploy surface for the article reader.
 
 It contains only:
 
-1. `article-workspace.html` - static reader UI and client interactions
-2. `api/read.mjs` - minimal Vercel Function for URL fetching and article extraction
-3. `vercel.json` - Vercel routing and function config
+1. `index.html` - public product entrypoint served at `/`
+2. `styles/` - reader styling
+3. `scripts/` - client behavior split by API, storage, UI, and app orchestration
+4. `api/read.mjs` - minimal Vercel Function for URL fetching and article extraction
+5. `changelog.html` - direct URL product changelog for preview/release review
+6. `vercel.json` - Vercel function config
 
 It intentionally does not depend on the TypeScript runtime, Swift sidecar, local
 workspace server, or evaluator code.
@@ -34,7 +37,14 @@ Output Directory: empty
 The public route is:
 
 ```text
-/article-workspace
+/
+```
+
+The product changelog is intentionally not linked from the reader UI, but is
+available by direct URL:
+
+```text
+/changelog
 ```
 
 The reader calls:

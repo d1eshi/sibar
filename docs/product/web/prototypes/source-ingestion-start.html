@@ -1,0 +1,368 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sibi Reader - Source Ingestion Prototype</title>
+  <link rel="stylesheet" href="source-ingestion.css">
+</head>
+<body>
+  <main>
+    <section class="start-screen" id="startView">
+      <h1 class="start-mark">Sibi Reader</h1>
+      <p class="start-subtitle">Lee, selecciona y guarda lo importante.</p>
+
+      <form class="ingest-form" id="loadForm">
+        <label class="ingest-label" for="sourceUrl">Pega una fuente</label>
+        <div class="ingest-row">
+          <input class="source-input" id="sourceUrl" type="url" placeholder="https://..." autocomplete="url">
+          <button class="primary-btn" type="submit" id="loadBtn">Cargar</button>
+          <button class="secondary-btn" type="button" id="demoBtn">Demo</button>
+        </div>
+      </form>
+
+      <section class="source-examples" aria-label="Ejemplos de fuentes">
+        <button class="source-chip" type="button"><span>01</span> Articulo</button>
+        <button class="source-chip" type="button"><span>02</span> Paper</button>
+        <button class="source-chip" type="button"><span>03</span> Newsletter</button>
+        <button class="source-chip" type="button"><span>04</span> Post tecnico</button>
+      </section>
+
+      <section class="ghost-reader" aria-label="Vista de lectura futura">
+        <div class="ghost-line title"></div>
+        <div class="ghost-line mid"></div>
+        <div class="ghost-line mid"></div>
+        <div class="ghost-line"></div>
+        <div class="ghost-line short"></div>
+        <br>
+        <div class="ghost-line mid"></div>
+        <div class="ghost-line"></div>
+        <div class="ghost-line"></div>
+        <div class="ghost-line mid"></div>
+      </section>
+      <p class="screen-status" id="startStatus"></p>
+    </section>
+
+    <section class="loading-screen" id="loadingView" hidden>
+      <div class="loading-block">
+        <p class="loading-kicker">Cargando fuente</p>
+        <div class="loading-title"></div>
+        <div class="loading-line"></div>
+        <div class="loading-line wide"></div>
+        <div class="loading-line short"></div>
+      </div>
+    </section>
+
+    <section class="reader-view" id="readerView" hidden>
+      <header class="saved-header">
+        <div class="sibi-wordmark">sibi</div>
+        <button class="change-source" type="button" id="changeSourceBtn">Cambiar fuente</button>
+      </header>
+
+      <main class="article-shell">
+        <article class="article">
+          <div class="source-row">
+            <span id="hostLabel">sibi.local</span>
+            <span class="divider" aria-hidden="true"></span>
+            <button class="source-link" type="button" id="changeSourceInlineBtn">Cambiar fuente</button>
+          </div>
+
+          <h1 id="articleTitle"></h1>
+          <div class="article-rule"></div>
+          <div class="article-body" id="articleBody"></div>
+        </article>
+      </main>
+    </section>
+  </main>
+
+  <form class="save-popover floating" id="savePopover" hidden>
+    <textarea id="noteInput" placeholder="Nota breve..."></textarea>
+    <button class="primary-btn" type="submit">Guardar</button>
+  </form>
+
+  <button class="saved-chip" type="button" id="savedChip" hidden>0 guardadas</button>
+  <div class="saved-toast" id="savedToast" hidden><span class="check">✓</span> Guardado</div>
+
+  <script>
+    const STORAGE_KEY = "sibi.source.ingestion.prototype.v1";
+    const MAX_NOTES = 24;
+    const sampleArticle = {
+      url: "demo://sibi/source-ingestion",
+      title: "Deep knowledge improves what you build",
+      host: "sibi.local",
+      paragraphs: [
+        "Great products rarely come from surface-level understanding. The best builders take the time to go deep. They read widely, question assumptions, and connect ideas across domains. That depth shows up in the details.",
+        "When you understand the foundations, you make better decisions, ship with confidence, and create things that last. Depth is not just about knowing more, it is about seeing clearly.",
+        "It is tempting to chase shortcuts. But shortcuts create debt, technical, conceptual, and strategic. When you understand the why, you can adapt, simplify, and solve problems others cannot even see yet.",
+        "Deep knowledge compounds. Every article, conversation, and experiment adds to your ability to build with clarity and purpose."
+      ]
+    };
+
+    let state = loadState();
+    let pendingSelection = null;
+    let toastTimer = null;
+
+    const $ = (id) => document.getElementById(id);
+    const elements = {
+      startView: $("startView"),
+      loadingView: $("loadingView"),
+      readerView: $("readerView"),
+      loadForm: $("loadForm"),
+      sourceUrl: $("sourceUrl"),
+      loadBtn: $("loadBtn"),
+      demoBtn: $("demoBtn"),
+      startStatus: $("startStatus"),
+      hostLabel: $("hostLabel"),
+      articleTitle: $("articleTitle"),
+      articleBody: $("articleBody"),
+      savePopover: $("savePopover"),
+      noteInput: $("noteInput"),
+      savedChip: $("savedChip"),
+      savedToast: $("savedToast"),
+      changeSourceBtn: $("changeSourceBtn"),
+      changeSourceInlineBtn: $("changeSourceInlineBtn")
+    };
+
+    function loadState() {
+      try {
+        const stored = localStorage.getItem(STORAGE_KEY);
+        return stored ? JSON.parse(stored) : { article: null, notes: [] };
+      } catch {
+        return { article: null, notes: [] };
+      }
+    }
+
+    function persist() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      } catch {
+        setStatus("No se pudo guardar en este navegador.");
+      }
+    }
+
+    function setStatus(message) {
+      elements.startStatus.textContent = message;
+    }
+
+    function escapeHtml(value) {
+      return value.replace(/[&<>"']/g, (char) => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        "\"": "&quot;",
+        "'": "&#39;"
+      })[char]);
+    }
+
+    function normalizeUrl(rawUrl) {
+      const parsed = new URL(rawUrl.trim());
+      if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
+        throw new Error("Pega una URL http o https.");
+      }
+      parsed.hash = "";
+      return parsed.href;
+    }
+
+    function showStart() {
+      elements.startView.hidden = false;
+      elements.loadingView.hidden = true;
+      elements.readerView.hidden = true;
+      elements.savePopover.hidden = true;
+      window.getSelection()?.removeAllRanges();
+      elements.sourceUrl.focus();
+    }
+
+    function showLoading() {
+      elements.startView.hidden = true;
+      elements.loadingView.hidden = false;
+      elements.readerView.hidden = true;
+      elements.savePopover.hidden = true;
+    }
+
+    function showReader(article) {
+      state.article = article;
+      state.notes = Array.isArray(state.notes) ? state.notes : [];
+      persist();
+      renderArticle();
+      renderSavedChip();
+      elements.startView.hidden = true;
+      elements.loadingView.hidden = true;
+      elements.readerView.hidden = false;
+      elements.savePopover.hidden = true;
+      window.scrollTo({ top: 0 });
+    }
+
+    function rangesForParagraph(paragraph, index) {
+      const ranges = [];
+      const paragraphNotes = state.notes
+        .filter((note) => note.paragraphIndex === index && note.selectedText)
+        .sort((a, b) => b.selectedText.length - a.selectedText.length);
+
+      for (const note of paragraphNotes) {
+        const start = paragraph.indexOf(note.selectedText);
+        const end = start + note.selectedText.length;
+        if (start < 0 || ranges.some((range) => start < range.end && end > range.start)) continue;
+        ranges.push({ start, end });
+      }
+
+      return ranges.sort((a, b) => a.start - b.start);
+    }
+
+    function renderParagraph(paragraph, index) {
+      const ranges = rangesForParagraph(paragraph, index);
+      if (ranges.length === 0) return escapeHtml(paragraph);
+
+      let html = "";
+      let cursor = 0;
+      for (const range of ranges) {
+        html += escapeHtml(paragraph.slice(cursor, range.start));
+        html += `<mark class="selection saved-selection">${escapeHtml(paragraph.slice(range.start, range.end))}</mark>`;
+        cursor = range.end;
+      }
+      html += escapeHtml(paragraph.slice(cursor));
+      return html;
+    }
+
+    function renderArticle() {
+      if (!state.article) return;
+      elements.hostLabel.textContent = state.article.host;
+      elements.articleTitle.textContent = state.article.title;
+      elements.articleBody.innerHTML = state.article.paragraphs
+        .map((paragraph, index) => `<p data-paragraph-index="${index}">${renderParagraph(paragraph, index)}</p>`)
+        .join("");
+    }
+
+    function renderSavedChip() {
+      const count = state.notes.length;
+      elements.savedChip.hidden = count === 0;
+      elements.savedChip.textContent = `${count} ${count === 1 ? "guardada" : "guardadas"}`;
+    }
+
+    async function openDemo() {
+      showLoading();
+      await delay(450);
+      showReader(sampleArticle);
+      setStatus("");
+    }
+
+    async function loadUrl(rawUrl) {
+      const url = normalizeUrl(rawUrl);
+      elements.sourceUrl.value = url;
+      showLoading();
+
+      try {
+        const response = await fetch(`/api/read?url=${encodeURIComponent(url)}`);
+        const payload = await response.json();
+        if (!response.ok) throw new Error(payload.error || "No se pudo cargar.");
+        state.notes = [];
+        showReader(payload.article);
+      } catch {
+        await delay(450);
+        state.notes = [];
+        showReader({
+          ...sampleArticle,
+          url,
+          host: new URL(url).hostname.replace(/^www\./, "")
+        });
+      }
+    }
+
+    function stageSelection() {
+      const selection = window.getSelection();
+      if (!selection || selection.isCollapsed || selection.rangeCount === 0) {
+        elements.savePopover.hidden = true;
+        return;
+      }
+
+      const range = selection.getRangeAt(0);
+      if (!elements.articleBody.contains(range.commonAncestorContainer)) return;
+
+      const selectedText = selection.toString().trim().replace(/\s+/g, " ");
+      if (!selectedText) return;
+
+      const node = range.startContainer.nodeType === Node.TEXT_NODE ? range.startContainer.parentElement : range.startContainer;
+      const paragraph = node?.closest?.("[data-paragraph-index]");
+      pendingSelection = {
+        selectedText,
+        paragraphIndex: paragraph ? Number(paragraph.dataset.paragraphIndex) : null
+      };
+
+      const rect = range.getBoundingClientRect();
+      elements.savePopover.style.left = `${Math.min(window.innerWidth - 310, Math.max(16, rect.left + rect.width / 2 - 141))}px`;
+      elements.savePopover.style.top = `${window.scrollY + rect.bottom + 14}px`;
+      elements.noteInput.value = "";
+      elements.savePopover.hidden = false;
+      elements.noteInput.focus();
+    }
+
+    function savePending(event) {
+      event.preventDefault();
+      if (!pendingSelection || !state.article) return;
+
+      state.notes = [{
+        id: `note_${Date.now()}_${Math.random().toString(16).slice(2)}`,
+        kind: "highlight",
+        selectedText: pendingSelection.selectedText,
+        paragraphIndex: pendingSelection.paragraphIndex,
+        note: elements.noteInput.value.trim(),
+        sourceUrl: state.article.url,
+        sourceTitle: state.article.title,
+        createdAt: new Date().toISOString()
+      }, ...state.notes].slice(0, MAX_NOTES);
+
+      pendingSelection = null;
+      elements.savePopover.hidden = true;
+      window.getSelection()?.removeAllRanges();
+      persist();
+      renderArticle();
+      renderSavedChip();
+      showToast();
+    }
+
+    function showToast() {
+      window.clearTimeout(toastTimer);
+      elements.savedToast.hidden = false;
+      toastTimer = window.setTimeout(() => {
+        elements.savedToast.hidden = true;
+      }, 1700);
+    }
+
+    function delay(ms) {
+      return new Promise((resolve) => window.setTimeout(resolve, ms));
+    }
+
+    elements.loadForm.addEventListener("submit", (event) => {
+      event.preventDefault();
+      loadUrl(elements.sourceUrl.value).catch((error) => {
+        showStart();
+        setStatus(error instanceof Error ? error.message : "No se pudo cargar.");
+      });
+    });
+    elements.demoBtn.addEventListener("click", openDemo);
+    elements.changeSourceBtn.addEventListener("click", showStart);
+    elements.changeSourceInlineBtn.addEventListener("click", showStart);
+    elements.savePopover.addEventListener("submit", savePending);
+    elements.articleBody.addEventListener("mouseup", () => window.setTimeout(stageSelection, 0));
+    elements.articleBody.addEventListener("keyup", () => window.setTimeout(stageSelection, 0));
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") {
+        pendingSelection = null;
+        elements.savePopover.hidden = true;
+        window.getSelection()?.removeAllRanges();
+      }
+      if ((event.metaKey || event.ctrlKey) && event.key === "Enter" && !elements.savePopover.hidden) {
+        savePending(event);
+      }
+    });
+    document.querySelectorAll(".source-chip").forEach((button) => {
+      button.addEventListener("click", () => elements.sourceUrl.focus());
+    });
+
+    if (state.article) {
+      showReader(state.article);
+    } else {
+      showStart();
+    }
+  </script>
+</body>
+</html>
