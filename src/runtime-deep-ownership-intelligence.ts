@@ -1,4 +1,7 @@
-import { checkBoundaryEscape } from "./runtime-deep-ownership-boundary.ts";
+import {
+  checkBoundaryEscape,
+  isPathInBoundary,
+} from "./runtime-deep-ownership-boundary.ts";
 import type {
   ArtifactBoundary,
   ConceptSlice,
@@ -214,8 +217,12 @@ export function routeOutOfBoundEvidenceToBoundaryExpansion(
     input.root_path,
     input.boundary,
   );
+  const inBoundary = isPathInBoundary(input.candidate_path, {
+    ...input.boundary,
+    root_path: input.root_path,
+  });
 
-  if (!boundaryCheck.blocked) {
+  if (!boundaryCheck.blocked && inBoundary) {
     return {
       blocked: false,
       evidence_ref_used: false,
