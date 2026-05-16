@@ -5,6 +5,8 @@ export function getElements() {
   return {
     form: $("loadForm"),
     startView: $("startView"),
+    earlyAccessView: $("earlyAccessView"),
+    earlyAccessReason: $("earlyAccessReason"),
     loadingView: $("loadingView"),
     readerView: $("readerView"),
     recentSources: $("recentSources"),

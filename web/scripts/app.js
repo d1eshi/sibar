@@ -5,9 +5,12 @@ import {
   loadHistory,
   loadWorkspaceStore,
   nextHistory,
+  isSourceTrialBlocked,
+  recordSourceTrialUrl,
   saveJson,
   saveWorkspaceStore,
   HISTORY_KEY,
+  SOURCE_TRIAL_LIMIT,
   workspaceKey
 } from "./storage.js";
 import {
@@ -42,6 +45,7 @@ function render() {
 
 function showStart() {
   elements.startView.hidden = false;
+  if (elements.earlyAccessView) elements.earlyAccessView.hidden = true;
   elements.loadingView.hidden = true;
   elements.readerView.hidden = true;
   elements.selectionCard.hidden = true;
@@ -51,6 +55,7 @@ function showStart() {
 
 function showLoading() {
   elements.startView.hidden = true;
+  if (elements.earlyAccessView) elements.earlyAccessView.hidden = true;
   elements.loadingView.hidden = false;
   elements.readerView.hidden = true;
   elements.selectionCard.hidden = true;
@@ -59,11 +64,25 @@ function showLoading() {
 
 function showReader() {
   elements.startView.hidden = true;
+  if (elements.earlyAccessView) elements.earlyAccessView.hidden = true;
   elements.loadingView.hidden = true;
   elements.readerView.hidden = false;
   elements.selectionCard.hidden = true;
   elements.selectionToolbar.classList.remove("visible");
   window.scrollTo({ top: 0 });
+}
+
+function showEarlyAccess(url) {
+  elements.startView.hidden = true;
+  elements.loadingView.hidden = true;
+  elements.readerView.hidden = true;
+  if (elements.earlyAccessReason) {
+    elements.earlyAccessReason.textContent = `Ya probaste ${SOURCE_TRIAL_LIMIT} fuentes reales en este navegador. La demo sigue disponible sin consumir servidor.`;
+  }
+  if (elements.earlyAccessView) elements.earlyAccessView.hidden = false;
+  elements.selectionCard.hidden = true;
+  elements.selectionToolbar.classList.remove("visible");
+  setStatus(elements, `Limite alcanzado antes de cargar ${url}.`);
 }
 
 function persist() {
@@ -110,8 +129,14 @@ async function loadUrl(rawUrl) {
     return;
   }
 
+  if (isSourceTrialBlocked(url)) {
+    showEarlyAccess(url);
+    return;
+  }
+
   setStatus(elements, "Cargando articulo...");
   const payload = await fetchReadableArticle(url);
+  recordSourceTrialUrl(url);
   restore(payload.article);
   setStatus(elements, payload.cache === "hit" ? "Articulo cargado desde cache del servidor." : "Articulo cargado.");
 }
@@ -247,6 +272,7 @@ elements.form.addEventListener("submit", async (event) => {
   try {
     await loadUrl(elements.urlInput.value);
   } catch (error) {
+    showStart();
     setStatus(elements, error instanceof Error ? error.message : "Error.");
   }
 });
@@ -314,10 +340,6 @@ document.addEventListener("pointerdown", (event) => {
   if (elements.savedDrawer.hidden) return;
   if (elements.savedDrawer.contains(event.target) || elements.savedChip.contains(event.target)) return;
   closeSavedDrawer();
-});
-
-document.querySelectorAll(".source-chip").forEach((button) => {
-  button.addEventListener("click", () => elements.urlInput.focus());
 });
 
 render();
