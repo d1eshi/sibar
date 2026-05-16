@@ -622,7 +622,14 @@
       "Partial answers produce 'important' severity — stated but not justified from code evidence"
     ],
     "cited_evidence": [
-      { "evidence_id": "EV-001", "file_path": "src/runtime-gap-detection.ts", "start_line": 120, "end_line": 180 }
+      {
+        "evidence_id": "EV-001",
+        "file_path": "src/runtime-gap-detection.ts",
+        "start_line": 120,
+        "end_line": 180,
+        "excerpt": "detectLearningGapFromAnswer: maps AnswerQuality to gap severity, confidence, misconception, and repair action",
+        "role": "implementation"
+      }
     ],
     "artifact_counterevidence": [
       {
@@ -647,14 +654,16 @@
         "file_path": "src/runtime-gap-detection.ts",
         "start_line": 84,
         "end_line": 112,
-        "excerpt": "severityFor and confidenceFor helpers"
+        "excerpt": "severityFor and confidenceFor helpers",
+        "role": "implementation"
       },
       {
         "evidence_id": "EV-001",
         "file_path": "src/runtime-gap-detection.ts",
         "start_line": 140,
         "end_line": 180,
-        "excerpt": "detectLearningGapFromAnswer gap construction body"
+        "excerpt": "detectLearningGapFromAnswer gap construction body",
+        "role": "implementation"
       }
     ],
     "evidence": "The user identified which functions are involved but could not trace the exact branching logic that converts quality into severity, confidence, and misconception. The cited evidence shows severityFor returns 'critical' for gap_confirmed (not 'important' as the user guessed).",
@@ -673,6 +682,7 @@
         "file_path": "src/runtime-gap-detection.ts",
         "start_line": 84,
         "end_line": 112,
+        "excerpt": "severityFor and confidenceFor branching logic showing quality-to-severity/confidence mapping",
         "role": "implementation"
       },
       {
@@ -680,6 +690,7 @@
         "file_path": "src/runtime-gap-detection.ts",
         "start_line": 120,
         "end_line": 180,
+        "excerpt": "detectLearningGapFromAnswer: constructs LearningGap from severity, confidence, misconception, and repair action",
         "role": "implementation"
       }
     ],

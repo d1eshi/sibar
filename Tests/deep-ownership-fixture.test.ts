@@ -12,6 +12,7 @@ import {
   validateBoundaryEnforcement,
   validateReadinessClaim,
   validateThinkingArtifact,
+  validateEvidenceRef,
   checkBoundaryEscape,
   loadAndValidateFixture,
   type DeepOwnershipFixture,
@@ -637,6 +638,190 @@ describe("Sample Attempt", () => {
     // The fixture demonstrates a partial answer → partial check → shallow_trace gap
     assert.equal(fixture.evidence_check.result, "partial");
     assert.equal(fixture.detected_gap.kind, "shallow_trace");
+  });
+});
+
+// ── Nested Evidence Ref Contract Tests ──────────────────────────────
+
+describe("Nested Evidence Refs", () => {
+  test("evidence_check.cited_evidence entries conform to EvidenceRef contract", () => {
+    const fixture = loadFixture();
+    assert.ok(Array.isArray(fixture.evidence_check.cited_evidence), "cited_evidence must be an array");
+    for (let i = 0; i < fixture.evidence_check.cited_evidence.length; i++) {
+      const ref = fixture.evidence_check.cited_evidence[i];
+      assert.ok(typeof ref.evidence_id === "string" && ref.evidence_id.length > 0, `cited_evidence[${i}]: missing evidence_id`);
+      assert.ok(typeof ref.file_path === "string" && ref.file_path.length > 0, `cited_evidence[${i}]: missing file_path`);
+      assert.ok(typeof ref.start_line === "number" && ref.start_line >= 0, `cited_evidence[${i}]: missing or invalid start_line`);
+      assert.ok(typeof ref.end_line === "number" && ref.end_line > ref.start_line, `cited_evidence[${i}]: missing or invalid end_line`);
+      assert.ok(typeof ref.excerpt === "string" && ref.excerpt.trim().length > 0, `cited_evidence[${i}]: missing or empty excerpt`);
+      assert.ok(RECOGNIZED_EVIDENCE_ROLES.includes(ref.role), `cited_evidence[${i}]: unrecognized or missing role '${(ref as Record<string,unknown>).role}'`);
+    }
+  });
+
+  test("evidence_check.artifact_counterevidence entries conform to EvidenceRef contract", () => {
+    const fixture = loadFixture();
+    assert.ok(Array.isArray(fixture.evidence_check.artifact_counterevidence), "artifact_counterevidence must be an array");
+    for (let i = 0; i < fixture.evidence_check.artifact_counterevidence.length; i++) {
+      const ref = fixture.evidence_check.artifact_counterevidence[i];
+      assert.ok(typeof ref.evidence_id === "string" && ref.evidence_id.length > 0, `artifact_counterevidence[${i}]: missing evidence_id`);
+      assert.ok(typeof ref.file_path === "string" && ref.file_path.length > 0, `artifact_counterevidence[${i}]: missing file_path`);
+      assert.ok(typeof ref.start_line === "number" && ref.start_line >= 0, `artifact_counterevidence[${i}]: missing or invalid start_line`);
+      assert.ok(typeof ref.end_line === "number" && ref.end_line > ref.start_line, `artifact_counterevidence[${i}]: missing or invalid end_line`);
+      assert.ok(typeof ref.excerpt === "string" && ref.excerpt.trim().length > 0, `artifact_counterevidence[${i}]: missing or empty excerpt`);
+      assert.ok(RECOGNIZED_EVIDENCE_ROLES.includes(ref.role), `artifact_counterevidence[${i}]: unrecognized or missing role '${(ref as Record<string,unknown>).role}'`);
+    }
+  });
+
+  test("detected_gap.artifact_evidence_refs entries conform to EvidenceRef contract", () => {
+    const fixture = loadFixture();
+    assert.ok(Array.isArray(fixture.detected_gap.artifact_evidence_refs), "artifact_evidence_refs must be an array");
+    assert.ok(fixture.detected_gap.artifact_evidence_refs.length > 0, "artifact_evidence_refs must not be empty");
+    for (let i = 0; i < fixture.detected_gap.artifact_evidence_refs.length; i++) {
+      const ref = fixture.detected_gap.artifact_evidence_refs[i];
+      assert.ok(typeof ref.evidence_id === "string" && ref.evidence_id.length > 0, `artifact_evidence_refs[${i}]: missing evidence_id`);
+      assert.ok(typeof ref.file_path === "string" && ref.file_path.length > 0, `artifact_evidence_refs[${i}]: missing file_path`);
+      assert.ok(typeof ref.start_line === "number" && ref.start_line >= 0, `artifact_evidence_refs[${i}]: missing or invalid start_line`);
+      assert.ok(typeof ref.end_line === "number" && ref.end_line > ref.start_line, `artifact_evidence_refs[${i}]: missing or invalid end_line`);
+      assert.ok(typeof ref.excerpt === "string" && ref.excerpt.trim().length > 0, `artifact_evidence_refs[${i}]: missing or empty excerpt`);
+      assert.ok(RECOGNIZED_EVIDENCE_ROLES.includes(ref.role), `artifact_evidence_refs[${i}]: unrecognized or missing role '${(ref as Record<string,unknown>).role}'`);
+    }
+  });
+
+  test("repair_action.required_evidence entries conform to EvidenceRef contract", () => {
+    const fixture = loadFixture();
+    assert.ok(Array.isArray(fixture.repair_action.required_evidence), "required_evidence must be an array");
+    assert.ok(fixture.repair_action.required_evidence.length > 0, "required_evidence must not be empty");
+    for (let i = 0; i < fixture.repair_action.required_evidence.length; i++) {
+      const ref = fixture.repair_action.required_evidence[i];
+      assert.ok(typeof ref.evidence_id === "string" && ref.evidence_id.length > 0, `required_evidence[${i}]: missing evidence_id`);
+      assert.ok(typeof ref.file_path === "string" && ref.file_path.length > 0, `required_evidence[${i}]: missing file_path`);
+      assert.ok(typeof ref.start_line === "number" && ref.start_line >= 0, `required_evidence[${i}]: missing or invalid start_line`);
+      assert.ok(typeof ref.end_line === "number" && ref.end_line > ref.start_line, `required_evidence[${i}]: missing or invalid end_line`);
+      assert.ok(typeof ref.excerpt === "string" && ref.excerpt.trim().length > 0, `required_evidence[${i}]: missing or empty excerpt`);
+      assert.ok(RECOGNIZED_EVIDENCE_ROLES.includes(ref.role), `required_evidence[${i}]: unrecognized or missing role '${(ref as Record<string,unknown>).role}'`);
+    }
+  });
+
+  test("validateEvidenceRef rejects ref missing role and excerpt", () => {
+    const refMissingBoth = {
+      evidence_id: "EV-001",
+      file_path: "src/test.ts",
+      start_line: 10,
+      end_line: 20,
+    };
+    const issues = validateEvidenceRef(refMissingBoth, "test_ref");
+    assert.ok(issues.length >= 2, `Expected at least 2 issues for missing role and excerpt, got ${issues.length}`);
+    assert.ok(issues.some((i) => i.field.includes("excerpt")), "Should have excerpt issue");
+    assert.ok(issues.some((i) => i.field.includes("role")), "Should have role issue");
+  });
+
+  test("validateEvidenceRef rejects ref with invalid role", () => {
+    const refInvalidRole = {
+      evidence_id: "EV-001",
+      file_path: "src/test.ts",
+      start_line: 10,
+      end_line: 20,
+      excerpt: "some code",
+      role: "not_a_real_role",
+    };
+    const issues = validateEvidenceRef(refInvalidRole, "test_ref");
+    const roleIssue = issues.find((i) => i.field.includes("role"));
+    assert.ok(roleIssue, "Should have a role issue");
+    assert.ok(roleIssue.message.includes("not_a_real_role"), "Should mention the invalid role value");
+  });
+
+  test("validateEvidenceRef accepts a valid EvidenceRef", () => {
+    const validRef = {
+      evidence_id: "EV-001",
+      file_path: "src/test.ts",
+      start_line: 10,
+      end_line: 20,
+      excerpt: "some code",
+      role: "implementation",
+    };
+    const issues = validateEvidenceRef(validRef, "test_ref");
+    assert.deepEqual(issues, [], `Valid ref should produce no issues, got: ${JSON.stringify(issues)}`);
+  });
+
+  test("schema validation rejects fixture with nested evidence ref omitting role", () => {
+    const fixture = loadFixture();
+    const modified = {
+      ...fixture,
+      detected_gap: {
+        ...fixture.detected_gap,
+        artifact_evidence_refs: [
+          {
+            evidence_id: "EV-001",
+            file_path: "src/runtime-gap-detection.ts",
+            start_line: 84,
+            end_line: 112,
+            excerpt: "severityFor and confidenceFor helpers",
+            // role intentionally omitted
+          },
+        ],
+      },
+    };
+    const result = validateDeepOwnershipFixture(modified, ROOT);
+    assert.equal(result.valid, false, "Schema should reject evidence ref with missing role");
+    assert.ok(
+      result.issues.some((i) => i.field.includes("detected_gap.artifact_evidence_refs") && i.field.includes("role")),
+      "Should have a role issue on nested evidence ref",
+    );
+  });
+
+  test("schema validation rejects fixture with nested evidence ref omitting excerpt", () => {
+    const fixture = loadFixture();
+    const modified = {
+      ...fixture,
+      repair_action: {
+        ...fixture.repair_action,
+        required_evidence: [
+          {
+            evidence_id: "EV-001",
+            file_path: "src/runtime-gap-detection.ts",
+            start_line: 84,
+            end_line: 112,
+            role: "implementation",
+            // excerpt intentionally omitted
+          },
+        ],
+      },
+    };
+    const result = validateDeepOwnershipFixture(modified, ROOT);
+    assert.equal(result.valid, false, "Schema should reject evidence ref with missing excerpt");
+    assert.ok(
+      result.issues.some((i) => i.field.includes("repair_action.required_evidence") && i.field.includes("excerpt")),
+      "Should have an excerpt issue on nested evidence ref",
+    );
+  });
+
+  test("schema validation rejects fixture with nested evidence ref omitting both role and excerpt", () => {
+    const fixture = loadFixture();
+    const modified = {
+      ...fixture,
+      evidence_check: {
+        ...fixture.evidence_check,
+        cited_evidence: [
+          {
+            evidence_id: "EV-001",
+            file_path: "src/runtime-gap-detection.ts",
+            start_line: 120,
+            end_line: 180,
+            // role and excerpt intentionally omitted
+          },
+        ],
+      },
+    };
+    const result = validateDeepOwnershipFixture(modified, ROOT);
+    assert.equal(result.valid, false, "Schema should reject evidence ref with missing role and excerpt");
+    assert.ok(
+      result.issues.some((i) => i.field.includes("evidence_check.cited_evidence") && i.field.includes("excerpt")),
+      "Should have an excerpt issue on cited_evidence ref",
+    );
+    assert.ok(
+      result.issues.some((i) => i.field.includes("evidence_check.cited_evidence") && i.field.includes("role")),
+      "Should have a role issue on cited_evidence ref",
+    );
   });
 });
 
