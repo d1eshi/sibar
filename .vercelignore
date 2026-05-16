@@ -1,0 +1,15 @@
+*
+
+!vercel.json
+!web/
+!web/api/
+!web/api/**
+!web/scripts/
+!web/scripts/**
+!web/styles/
+!web/styles/**
+!web/index.html
+!web/article-workspace.html
+!web/changelog.html
+!web/vercel.json
+!web/package.json
