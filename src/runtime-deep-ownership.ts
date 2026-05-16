@@ -260,7 +260,13 @@ export type OwnershipGapKind =
   | "formula_misread"
   | "implementation_misread"
   | "behavior_misread"
-  | "transfer_failure";
+  | "transfer_failure"
+  | "test_oracle_misread"
+  | "vocabulary_only"
+  | "memorized_without_mechanism"
+  | "wrong_mechanism"
+  | "ignored_counterevidence"
+  | "passive_agreement";
 
 export type OwnershipGap = {
   id: string;
