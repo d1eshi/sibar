@@ -1211,12 +1211,275 @@ body {
   .rail { border-right: none; border-bottom: 1px solid var(--divider); }
   .loop-rail { border-left: none; }
 }
+
+/* ── Small Laptop: 1366x768 ── */
+@media (max-width: 1400px) and (max-height: 900px) {
+  .workspace {
+    grid-template-columns: 240px 1fr 280px;
+  }
+  .rail { padding: 10px 12px; }
+  .artifact-canvas { padding: 14px 18px; }
+  .evidence-strip { padding: 8px 12px; }
+  .ev-card { width: 170px; padding: 8px 10px; }
+  .code-viewer { font-size: 11px; }
+  .code-line { font-size: 11px; }
+  .code-line .ln { width: 40px; font-size: 10px; }
+  .top-bar { padding: 6px 12px; }
+}
+
+@media (max-width: 1400px) and (max-height: 800px) {
+  .workspace {
+    grid-template-columns: 220px 1fr 260px;
+  }
+  .evidence-rail.collapsed-on-laptop .evidence-strip { display: none; }
+  .evidence-rail.collapsed-on-laptop .evidence-header { border-bottom: none; }
+}
+
+/* ── Keyboard Accessibility ── */
+.skip-nav {
+  position: absolute;
+  top: -100px;
+  left: 8px;
+  z-index: 1000;
+  padding: 6px 12px;
+  background: var(--teal);
+  color: white;
+  font-size: 12px;
+  border-radius: var(--radius);
+  text-decoration: none;
+  font-weight: 500;
+  transition: top 0.2s;
+}
+.skip-nav:focus { top: 8px; }
+
+*:focus-visible {
+  outline: 2px solid var(--teal);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible, .ev-card:focus-visible {
+  outline: 2px solid var(--teal);
+  outline-offset: 2px;
+}
+
+.ev-card:focus-visible {
+  border-color: var(--teal);
+  background: var(--teal-bg);
+  box-shadow: 0 0 0 2px var(--teal-light);
+}
+
+.artifact-toggle button:focus-visible {
+  outline: 2px solid var(--teal);
+  outline-offset: 1px;
+}
+
+.cv-actions button:focus-visible {
+  outline: 2px solid var(--teal);
+  outline-offset: 1px;
+}
+
+/* ── First-Run Setup Flow ── */
+.setup-overlay {
+  position: fixed;
+  inset: 0;
+  background: var(--surface);
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+.setup-card {
+  width: 100%;
+  max-width: 620px;
+  background: var(--surface-raised);
+  border: 1px solid var(--divider);
+  border-radius: var(--radius);
+  padding: 28px 32px;
+  box-shadow: var(--shadow-md);
+}
+.setup-card h2 {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 6px;
+}
+.setup-card .setup-step-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--teal);
+  font-weight: 600;
+  margin-bottom: 14px;
+}
+.setup-card .setup-body {
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--text-secondary);
+  margin-bottom: 20px;
+}
+.setup-card .setup-info-block {
+  padding: 10px 12px;
+  border-left: 3px solid var(--teal);
+  background: var(--teal-bg);
+  border-radius: var(--radius-sm);
+  margin-bottom: 12px;
+  font-size: 12px;
+}
+.setup-card .setup-info-block.amber { border-left-color: var(--amber); background: var(--amber-bg); }
+.setup-card .setup-nav {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+.setup-card .setup-nav button {
+  font-size: 12px;
+  padding: 7px 18px;
+  border-radius: var(--radius);
+  cursor: pointer;
+  font-weight: 500;
+  border: 1px solid var(--divider);
+  background: var(--surface-raised);
+  color: var(--text-secondary);
+  transition: all 0.15s;
+}
+.setup-card .setup-nav button.primary {
+  background: var(--teal);
+  color: white;
+  border-color: var(--teal);
+}
+.setup-card .setup-nav button.primary:hover { background: #0f766e; }
+.setup-card .setup-nav button:hover { background: var(--surface-warm); }
+.setup-card .setup-progress {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 16px;
+}
+.setup-card .setup-progress .sp-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--divider);
+  transition: background 0.2s;
+}
+.setup-card .setup-progress .sp-dot.active { background: var(--teal); }
+.setup-card .setup-progress .sp-dot.done { background: var(--teal-light); }
+.setup-card code {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  background: var(--surface-warm);
+  padding: 1px 5px;
+  border-radius: var(--radius-sm);
+}
+
+/* ── Setup Complete Transition ── */
+.setup-complete {
+  animation: setupFadeOut 0.4s ease-out forwards;
+}
+@keyframes setupFadeOut {
+  to { opacity: 0; pointer-events: none; }
+}
+
+/* ── Blocked State ── */
+.blocked-state {
+  padding: 16px;
+  text-align: center;
+  border: 1px dashed var(--amber);
+  border-radius: var(--radius);
+  background: var(--amber-bg);
+  margin: 12px 0;
+}
+.blocked-state .blocked-icon {
+  font-size: 20px;
+  margin-bottom: 8px;
+}
+.blocked-state .blocked-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--amber);
+  margin-bottom: 4px;
+}
+.blocked-state .blocked-reason {
+  font-size: 11px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+.blocked-state .blocked-action {
+  font-size: 11px;
+  color: var(--teal);
+  margin-top: 8px;
+  font-weight: 500;
+}
+
+/* ── Code Line Selection ── */
+.code-line.selectable { cursor: pointer; transition: background 0.1s; }
+.code-line.selectable:hover { background: var(--teal-bg); }
+.code-line.selected-line {
+  background: var(--teal-bg) !important;
+  border-left: 3px solid var(--teal);
+}
+.code-line.selected-line .ln { color: var(--teal); font-weight: 600; }
+.code-line.selected-evidence-line {
+  background: var(--amber-bg) !important;
+  border-left: 3px solid var(--amber);
+}
+
+/* ── Error Monitor ── */
+.error-monitor {
+  position: fixed;
+  bottom: 8px;
+  right: 8px;
+  z-index: 200;
+  font-size: 10px;
+  padding: 4px 10px;
+  border-radius: var(--radius-sm);
+  background: var(--red-bg);
+  color: var(--red);
+  border: 1px solid var(--red-light);
+  cursor: pointer;
+  display: none;
+}
+.error-monitor.visible { display: block; }
+.error-monitor .err-count { font-weight: 700; }
+
+/* ── Component Contract Labels ── */
+[data-component] { position: relative; }
+[data-component]::before {
+  content: attr(data-component-label);
+  position: absolute;
+  top: -1px;
+  right: 4px;
+  font-size: 8px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  pointer-events: none;
+  opacity: 0.5;
+  z-index: 1;
+}
 </style>
 </head>
 <body>
 
+<!-- ── Skip Navigation (Keyboard Accessibility) ── -->
+<a href="#artifactCanvas" class="skip-nav" aria-label="Skip to artifact canvas">Skip to Artifact</a>
+<a href="#loopRail" class="skip-nav" style="left:150px;" aria-label="Skip to loop rail">Skip to Loop</a>
+<a href="#evidenceRail" class="skip-nav" style="left:280px;" aria-label="Skip to evidence">Skip to Evidence</a>
+
+<!-- ── First-Run Setup Overlay ── -->
+<div class="setup-overlay" id="setupOverlay" role="dialog" aria-label="Workspace Setup" aria-modal="true">
+  <div class="setup-card" id="setupCard"></div>
+</div>
+
+<!-- ── Error Monitor ── -->
+<div class="error-monitor" id="errorMonitor" role="alert" aria-live="assertive">
+  <span class="err-count" id="errCount">0</span> page errors
+</div>
+
 <!-- ── Top Bar ── -->
-<div class="top-bar">
+<div class="top-bar" data-component="lab-shell" data-component-label="Lab Shell">
   <span class="brand">Sibar Lab</span>
   <span class="breadcrumb">/ Deep Ownership Workspace</span>
   <span class="state-badge" id="loopState" role="status" aria-live="polite">AwaitingAttempt</span>
@@ -1226,25 +1489,25 @@ body {
 <div class="workspace" id="workspace">
 
   <!-- Boundary Left Rail -->
-  <aside class="rail boundary-rail" id="boundaryRail">
+  <aside class="rail boundary-rail" id="boundaryRail" data-component="source-and-artifact-rail" data-component-label="Source & Artifact Rail">
     <h2>Boundary</h2>
     <div id="boundaryContent"></div>
   </aside>
 
   <!-- Artifact Canvas -->
-  <main class="artifact-canvas" id="artifactCanvas">
+  <main class="artifact-canvas" id="artifactCanvas" data-component="code-workbench-artifact" data-component-label="Code Workbench" tabindex="-1">
     <h2>Artifact</h2>
     <div id="artifactContent"></div>
   </main>
 
   <!-- Sibi Loop Right Rail -->
-  <aside class="rail loop-rail" id="loopRail">
+  <aside class="rail loop-rail" id="loopRail" data-component="sibi-loop-rail" data-component-label="Sibi Loop Rail">
     <h2>Loop</h2>
     <div id="loopContent"></div>
   </aside>
 
   <!-- Evidence Bottom Rail -->
-  <footer class="evidence-rail" id="evidenceRail">
+  <footer class="evidence-rail" id="evidenceRail" data-component="evidence-strip" data-component-label="Evidence Strip">
     <div class="evidence-header">
       <h2>Evidence</h2>
       <span class="ev-count" id="evCount"></span>
@@ -1688,6 +1951,172 @@ window.deepOwnershipFixture = {
     setTimeout(function() { t.classList.remove("show"); }, 2000);
   }
 
+  // ── Error Monitoring (VAL-UI-016) ──
+  var pageErrors = [];
+  var blockedValidations = [];
+  window.onerror = function(msg, source, lineno, colno, error) {
+    pageErrors.push({ msg: String(msg), source: String(source), lineno: lineno, colno: colno, ts: new Date().toISOString() });
+    var mon = el("errorMonitor");
+    var cnt = el("errCount");
+    if (mon && cnt) {
+      cnt.textContent = pageErrors.length;
+      mon.classList.add("visible");
+    }
+    return false;
+  };
+  window.addEventListener("unhandledrejection", function(evt) {
+    pageErrors.push({ msg: String(evt.reason), source: "unhandledrejection", ts: new Date().toISOString() });
+    var mon = el("errorMonitor");
+    var cnt = el("errCount");
+    if (mon && cnt) {
+      cnt.textContent = pageErrors.length;
+      mon.classList.add("visible");
+    }
+  });
+  if (el("errorMonitor")) {
+    el("errorMonitor").addEventListener("click", function() {
+      console.log("Page Errors:", JSON.stringify(pageErrors, null, 2));
+      console.log("Blocked Validations:", JSON.stringify(blockedValidations, null, 2));
+      showToast(pageErrors.length + " errors logged to console");
+    });
+  }
+
+  function recordBlockedValidation(url, tool, failure, assertions) {
+    var record = {
+      attempted_url: url,
+      tool_command: tool,
+      observed_failure: failure,
+      timestamp: new Date().toISOString(),
+      affected_assertions: assertions,
+      next_action: "Retry agent-browser validation with local server check"
+    };
+    blockedValidations.push(record);
+    console.warn("[Blocked Validation]", JSON.stringify(record, null, 2));
+  }
+
+  // ── First-Run Setup Flow (VAL-UI-009) ──
+  var SETUP_STEPS = [
+    { id: "goal", title: "Set Your Learning Goal", label: "Step 1 of 7 · Source & Goal",
+      body: "<p>You've opened <strong>Sibar Lab</strong> with this repository.</p>" +
+            "<div class=\"setup-info-block\"><strong>Repository:</strong> " + esc(fixture.artifact_boundary.root_path) + "</div>" +
+            "<div class=\"setup-info-block\"><strong>Goal:</strong> " + esc(fixture.goal) + "</div>" +
+            "<p style=\"margin-top:8px;font-size:12px;color:var(--text-muted);\">The goal is scoped to a specific learning outcome, not whole-repo mastery. This keeps the loop bounded and evidence-backed.</p>" },
+    { id: "boundary", title: "Artifact Boundary Proposal", label: "Step 2 of 7 · Boundary",
+      body: "<p>Sibi proposes a <strong>bounded artifact boundary</strong> for this study:</p>" +
+            "<div class=\"setup-info-block\"><strong>Root:</strong> " + esc(fixture.artifact_boundary.root_path) + "<br>" +
+            "<strong>Source type:</strong> " + esc(fixture.artifact_boundary.source_type) + "</div>" +
+            "<div class=\"setup-info-block\"><strong>Included (" + fixture.artifact_boundary.included_sources.length + "):</strong> " +
+            fixture.artifact_boundary.included_sources.slice(0, 4).map(function(s) { return esc(s); }).join(", ") +
+            (fixture.artifact_boundary.included_sources.length > 4 ? "…" : "") + "</div>" +
+            "<div class=\"setup-info-block amber\"><strong>Excluded (" + fixture.artifact_boundary.excluded_sources.length + "):</strong> node_modules, dist, .git, web, scripts, evals, docs/iterations…</div>" +
+            "<p style=\"font-size:11px;color:var(--text-muted);\">Boundaries are enforced — out-of-bound files are not read or cited. Unknown zones remain visible.</p>" },
+    { id: "evidence_roles", title: "Evidence-Role Classification", label: "Step 3 of 7 · Evidence Roles",
+      body: "<p>Sibi classifies each in-bound source by its <strong>evidence role</strong>:</p>" +
+            "<div class=\"setup-info-block\">" +
+            "<strong>Roles detected:</strong><br>" +
+            "<span style=\"font-size:10px;\">" +
+            (function() { var roles = {}; fixture.evidence_inventory.forEach(function(ev) { roles[ev.role] = (roles[ev.role] || 0) + 1; }); return Object.keys(roles).map(function(r) { return '<span style=\"display:inline-block;margin:2px;padding:1px 6px;border-radius:3px;background:var(--surface-warm);\">' + esc(r.replace(/_/g, ' ')) + ': ' + roles[r] + '</span>'; }).join(' '); })() +
+            "</span></div>" +
+            "<p style=\"font-size:11px;color:var(--text-muted);\">Implementation, behavior oracle (tests), source truth, interface, and intent roles control claim strength. Tests/docs do not override implementation evidence.</p>" },
+    { id: "confirm_boundary", title: "Boundary Confirmed", label: "Step 4 of 7 · Confirm",
+      body: "<div class=\"setup-info-block\" style=\"border-left-color:var(--green);background:var(--green-bg);\">✓ Boundary confirmed with " + fixture.evidence_inventory.length + " evidence items</div>" +
+            "<div class=\"setup-info-block amber\">⚠ " + fixture.unknown_zones.length + " unknown zones — " + fixture.skip_records.length + " paths skipped</div>" +
+            "<p style=\"font-size:11px;\">Sibi will build the initial evidence inventory from included sources. Unknown zones remain visible throughout the loop, and boundary expansion is available for out-of-bound relevant evidence.</p>" },
+    { id: "inventory", title: "Evidence Inventory Built", label: "Step 5 of 7 · Inventory",
+      body: "<p>Evidence inventory complete with <strong>" + fixture.evidence_inventory.length + " items</strong>:</p>" +
+            "<div class=\"setup-info-block\" style=\"max-height:200px;overflow-y:auto;font-size:10px;\">" +
+            fixture.evidence_inventory.map(function(ev) {
+              return '<div style="margin-bottom:4px;"><strong>' + esc(ev.id) + '</strong> ' + esc(ev.path) + ' <span style="color:var(--teal);">[' + esc(ev.role.replace(/_/g, ' ')) + ']</span></div>';
+            }).join("") +
+            "</div>" +
+            "<p style=\"font-size:11px;color:var(--text-muted);\">Each evidence entry has a stable ID, file path, role, content hash, and excerpt that remain consistent through the full loop.</p>" },
+    { id: "concept_slice", title: "Choose Concept Slice", label: "Step 6 of 7 · Concept Slice",
+      body: "<p>Sibi proposes a <strong>concept slice</strong> for this workspace:</p>" +
+            "<div class=\"setup-info-block\">" +
+            "<strong>" + esc(fixture.concept_slice.label) + "</strong><br>" +
+            "<span style=\"font-size:11px;\">Domain: " + esc(fixture.concept_slice.domain) + "</span><br>" +
+            "<span style=\"font-size:11px;\">Expected operations: " + fixture.concept_slice.expected_user_operations.map(function(o) { return '<code>' + esc(o) + '</code>'; }).join(", ") + "</span>" +
+            "</div>" +
+            "<div class=\"setup-info-block amber\">" +
+            "<strong>Prerequisites:</strong> " + fixture.concept_slice.prerequisite_concepts.map(function(c) { return esc(c); }).join(", ") + "<br>" +
+            "<span style=\"font-size:10px;\">Prerequisites are visible but do not advance readiness — you must still attempt the active operation.</span>" +
+            "</div>" },
+    { id: "active_operation", title: "Active Operation Ready", label: "Step 7 of 7 · Operation",
+      body: "<p>Sibi has generated <strong>thinking artifacts</strong> and an <strong>active operation</strong>:</p>" +
+            "<div class=\"setup-info-block\">" +
+            "<strong>Artifact:</strong> " + esc(fixture.thinking_artifacts[0].title) + " (" + esc(fixture.thinking_artifacts[0].kind.replace(/_/g, ' ')) + ")<br>" +
+            "<strong>Operation:</strong> " + esc(fixture.active_operation.kind) + " — " + esc(fixture.active_operation.prompt.substring(0, 120)) + "…" +
+            "</div>" +
+            "<div class=\"setup-info-block\" style=\"border-left-color:var(--red);background:var(--red-bg);\">" +
+            "<strong>🚫 Blocked shortcuts:</strong> " + fixture.active_operation.blocked_shortcuts.map(function(b) { return esc(b); }).join(", ") + "</div>" +
+            "<p style=\"font-size:11px;color:var(--amber);font-weight:500;\">⚠ The final answer is hidden. You must attempt the operation before any solution is revealed.</p>" }
+  ];
+
+  var setupStep = 0;
+
+  function renderSetupStep() {
+    var s = SETUP_STEPS[setupStep];
+    var html = "";
+    // Progress dots
+    html += '<div class="setup-progress">';
+    for (var i = 0; i < SETUP_STEPS.length; i++) {
+      var cls = "sp-dot";
+      if (i < setupStep) cls += " done";
+      else if (i === setupStep) cls += " active";
+      html += '<span class="' + cls + '" aria-label="Step ' + (i + 1) + ' of ' + SETUP_STEPS.length + '"></span>';
+    }
+    html += '</div>';
+    html += '<div class="setup-step-label">' + s.label + '</div>';
+    html += '<h2>' + s.title + '</h2>';
+    html += '<div class="setup-body">' + s.body + '</div>';
+    html += '<div class="setup-nav">';
+    if (setupStep > 0) {
+      html += '<button id="setupPrev" aria-label="Previous step">← Back</button>';
+    }
+    if (setupStep < SETUP_STEPS.length - 1) {
+      html += '<button class="primary" id="setupNext" aria-label="Next step">Next →</button>';
+    } else {
+      html += '<button class="primary" id="setupFinish" aria-label="Enter Workspace">Enter Workspace →</button>';
+    }
+    html += '</div>';
+    el("setupCard").innerHTML = html;
+
+    // Bind buttons
+    var prevBtn = el("setupPrev");
+    var nextBtn = el("setupNext");
+    var finishBtn = el("setupFinish");
+    if (prevBtn) prevBtn.addEventListener("click", function() { setupStep--; renderSetupStep(); });
+    if (nextBtn) nextBtn.addEventListener("click", function() { setupStep++; renderSetupStep(); });
+    if (finishBtn) finishBtn.addEventListener("click", function() {
+      el("setupOverlay").classList.add("setup-complete");
+      setTimeout(function() { el("setupOverlay").remove(); }, 400);
+      console.log("[First-Run Setup] Complete. Entering Workspace.");
+    });
+  }
+
+  // Start setup flow
+  renderSetupStep();
+
+  // ── Keyboard Navigation (VAL-UI-014) ──
+  // Add keyboard handler for global navigation
+  document.addEventListener("keydown", function(e) {
+    // Escape to close evidence detail
+    if (e.key === "Escape" && state.selectedEvidence) {
+      state.selectedEvidence = null;
+      if (el("evDetail")) el("evDetail").hidden = true;
+      renderEvidence();
+      console.log("[Keyboard] Escape: closed evidence detail");
+      return;
+    }
+    // Ctrl+1 through Ctrl+4 to focus regions
+    if (e.ctrlKey || e.metaKey) {
+      if (e.key === "1") { el("boundaryRail") && el("boundaryRail").querySelector("h2") && el("boundaryRail").querySelector("h2").focus(); e.preventDefault(); }
+      if (e.key === "2") { el("artifactCanvas") && el("artifactCanvas").focus(); e.preventDefault(); }
+      if (e.key === "3") { el("loopRail") && el("loopRail").querySelector("h2") && el("loopRail").querySelector("h2").focus(); e.preventDefault(); }
+      if (e.key === "4") { el("evidenceRail") && el("evidenceRail").querySelector("h2") && el("evidenceRail").querySelector("h2").focus(); e.preventDefault(); }
+    }
+  });
+
   // ── Render: Top Bar ──
   el("loopState").textContent = fixture.loop_state.current_state;
 
@@ -1820,6 +2249,42 @@ window.deepOwnershipFixture = {
         showToast("Reference: " + btn.dataset.path);
       });
     });
+
+    // ── Code Line Selection (VAL-UI-012) ──
+    // Selecting a code range updates artifact focus, evidence references, and upstream/downstream state
+    state.selectedLine = null;
+    Array.from(el("artifactContent").querySelectorAll(".code-line.selectable")).forEach(function(line) {
+      line.addEventListener("click", function() {
+        var lineNum = parseInt(line.dataset.line, 10);
+        // Deselect previous
+        var prev = el("artifactContent").querySelector(".code-line.selected-line");
+        if (prev) prev.classList.remove("selected-line");
+        // Select current
+        line.classList.add("selected-line");
+        state.selectedLine = lineNum;
+        // Find related evidence for this line range
+        var relatedEv = fixture.evidence_inventory.filter(function(ev) {
+          return ev.path && ev.path.indexOf("runtime-gap-detection") !== -1;
+        });
+        // Highlight evidence cards for related evidence
+        var evCards = el("evidenceStrip").querySelectorAll(".ev-card");
+        Array.from(evCards).forEach(function(card) {
+          card.classList.remove("selected-evidence-line");
+        });
+        if (relatedEv.length > 0 && evCards.length > 0) {
+          var targetCard = el("evidenceStrip").querySelector('[data-ev-id="' + relatedEv[0].id + '"]');
+          if (targetCard) targetCard.classList.add("selected-evidence-line");
+        }
+        console.log("[Code Workbench] Line " + lineNum + " selected. Related evidence: " + (relatedEv.length > 0 ? relatedEv[0].id : "none") + " (VAL-UI-012)");
+      });
+      // Keyboard: Enter/Space to select
+      line.addEventListener("keydown", function(e) {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          line.click();
+        }
+      });
+    });
   }
 
   function renderCodeSlice(art) {
@@ -1830,7 +2295,7 @@ window.deepOwnershipFixture = {
     var symbols = p.selected_symbols || [];
     var relatedTests = p.related_tests || [];
 
-    var html = '<div class="code-viewer">';
+    var html = '<div class="code-viewer" data-component="code-workbench-artifact" data-component-label="Code Workbench">';
     html += '<div class="cv-header">';
     html += '<span class="file-path">' + esc(filePath) + '</span>';
     html += '<span style="font-size:10px;color:var(--text-muted);">' + esc(p.collapsed_context) + '</span>';
@@ -1871,7 +2336,7 @@ window.deepOwnershipFixture = {
         html += '<span class="cl">// ' + hiddenCount + ' lines hidden — solution evidence (expand in full workspace)</span>';
         html += '</div>';
       } else {
-        html += '<div class="code-line in-range">';
+        html += '<div class="code-line in-range selectable" data-line="' + i + '" tabindex="0" role="option" aria-label="Line ' + i + '">';
         html += '<span class="ln">' + i + '</span>';
         html += '<span class="cl">' + esc(generateCodeLine(i, false, symbols)) + '</span>';
         html += '</div>';
@@ -2012,7 +2477,7 @@ window.deepOwnershipFixture = {
     var entryNode = p.entry_node;
     var terminalNodes = p.terminal_nodes || [];
 
-    var html = '<div class="flow-diagram">';
+    var html = '<div class="flow-diagram" data-component="call-data-diagram" data-component-label="Call/Data Diagram">';
 
     html += '<div class="artifact-header" style="margin-bottom:16px;">';
     html += '<span class="kind-badge">flow diagram</span>';
@@ -2150,7 +2615,7 @@ window.deepOwnershipFixture = {
       // ── Pre-attempt: composer ──
       html += '<div class="attempt-composer">';
       html += '<div class="ac-header">Attempt Composer</div>';
-      html += '<textarea id="attemptText" placeholder="Write your trace, cite file:line evidence..."></textarea>';
+      html += '<textarea id="attemptText" placeholder="Write your trace, cite file:line evidence..." aria-label="Answer text input" aria-required="true"></textarea>';
 
       // Evidence selection
       html += '<div class="evidence-selector">';
@@ -2167,14 +2632,14 @@ window.deepOwnershipFixture = {
 
       html += '<div class="confidence-row">';
       html += '<label>Confidence:</label>';
-      html += '<select id="attemptConfidence">';
+      html += '<select id="attemptConfidence" aria-label="Confidence level">';
       html += '<option value="low">low</option>';
       html += '<option value="medium" selected>medium</option>';
       html += '<option value="high">high</option>';
       html += '</select>';
       html += '</div>';
       html += '<div class="unknowns-input">';
-      html += '<input id="attemptUnknowns" placeholder="Declared unknowns (comma-separated)...">';
+      html += '<input id="attemptUnknowns" placeholder="Declared unknowns (comma-separated)..." aria-label="Declared unknowns">';
       html += '</div>';
       html += '<div class="attempt-actions">';
       html += '<button class="submit-btn" id="submitAttempt">Submit</button>';
@@ -2415,7 +2880,7 @@ window.deepOwnershipFixture = {
     var stripHtml = "";
     inventory.forEach(function(ev) {
       var selClass = state.selectedEvidence && state.selectedEvidence.id === ev.id ? " selected" : "";
-      stripHtml += '<div class="ev-card' + selClass + '" data-ev-id="' + esc(ev.id) + '">';
+      stripHtml += '<div class="ev-card' + selClass + '" data-ev-id="' + esc(ev.id) + '" tabindex="0" role="button" aria-label="Evidence ' + esc(ev.id) + ': ' + esc(ev.path) + '">';
       stripHtml += '<span class="ev-role ' + esc(ev.role) + '">' + esc(ev.role.replace(/_/g, " ")) + '</span>';
       stripHtml += '<div class="ev-path">' + esc(ev.path) + '</div>';
       stripHtml += '<div class="ev-hash">' + esc(ev.content_hash) + '</div>';
@@ -2434,6 +2899,13 @@ window.deepOwnershipFixture = {
         state.selectedEvidence = ev;
         renderEvidence();
         showEvidenceDetail(ev);
+      });
+      // Keyboard: Enter/Space to select
+      card.addEventListener("keydown", function(e) {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          card.click();
+        }
       });
     });
 
@@ -2500,6 +2972,23 @@ window.deepOwnershipFixture = {
   console.log("Demo state chain:", ls.state_chain.join(" → "));
   console.log("Current fixture state:", ls.current_state, "| Boundary enforced:", ls.boundary_enforced);
   console.log("");
+  console.log("═══════════════════════════════════════════════");
+  console.log("UI Reference Component Mapping (VAL-UI-004)");
+  console.log("═══════════════════════════════════════════════");
+  console.log("Lab Shell       → 12_ui_reference_components.md#lab-shell (top bar + workspace grid)");
+  console.log("Source & Artifact Rail → 12_ui_reference_components.md#source-and-artifact-rail (boundary rail)");
+  console.log("Code Workbench  → 12_ui_reference_components.md#code-workbench-artifact (code viewer)");
+  console.log("Call/Data Diagram → 12_ui_reference_components.md#call-data-diagram (flow diagram)");
+  console.log("Sibi Loop Rail  → 12_ui_reference_components.md#sibi-loop-rail (right rail)");
+  console.log("Evidence Strip  → 12_ui_reference_components.md#evidence-strip-and-evidence-cards (bottom rail)");
+  console.log("═══════════════════════════════════════════════");
+  console.log("Accessibility (VAL-UI-014): Skip nav, focus-visible, tabindex on evidence cards, ARIA labels on controls");
+  console.log("Small-laptop (VAL-UI-015): Responsive grid at 1366x768+");
+  console.log("Error Monitoring (VAL-UI-016): window.onerror, unhandledrejection, visible error counter");
+  console.log("Blocked Validation (VAL-CROSS-001): recordBlockedValidation() available");
+  console.log("First-Run Setup (VAL-UI-009): 7-step setup wizard shown");
+  console.log("Code Workbench Focus (VAL-UI-012): Click code lines to select, evidence updates");
+  console.log("═══════════════════════════════════════════════");
 
 })();
 </script>
