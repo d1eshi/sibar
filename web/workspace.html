@@ -1,0 +1,2164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sibar Workspace — Deep Ownership</title>
+<style>
+/* ── CSS Custom Properties ── */
+:root {
+  --surface: #fafaf9;
+  --surface-warm: #f5f3f0;
+  --surface-raised: #ffffff;
+  --text-primary: #1c1917;
+  --text-secondary: #57534e;
+  --text-muted: #a8a29e;
+  --divider: #e7e5e4;
+  --divider-thin: #f0efed;
+  --teal: #0d9488;
+  --teal-light: #ccfbf1;
+  --teal-bg: #f0fdfa;
+  --amber: #d97706;
+  --amber-light: #fef3c7;
+  --amber-bg: #fffbeb;
+  --red: #dc2626;
+  --red-light: #fecaca;
+  --red-bg: #fef2f2;
+  --green: #16a34a;
+  --green-bg: #f0fdf4;
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  --font-mono: "SF Mono", "Fira Code", "Fira Mono", "Roboto Mono", Menlo, monospace;
+  --radius: 6px;
+  --radius-sm: 3px;
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.06);
+}
+
+/* ── Reset & Base ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; }
+body {
+  font-family: var(--font-sans);
+  background: var(--surface);
+  color: var(--text-primary);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  overflow: hidden;
+}
+
+/* ── Workspace Grid ── */
+.workspace {
+  display: grid;
+  grid-template-columns: 280px 1fr 320px;
+  grid-template-rows: 1fr auto;
+  grid-template-areas:
+    "boundary artifact loop"
+    "evidence evidence evidence";
+  height: 100vh;
+  gap: 0;
+}
+
+/* ── Top Bar ── */
+.top-bar {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 16px;
+  border-bottom: 1px solid var(--divider);
+  background: var(--surface-raised);
+  z-index: 10;
+}
+.top-bar .brand {
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--teal);
+  letter-spacing: -0.02em;
+}
+.top-bar .breadcrumb {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+.top-bar .state-badge {
+  margin-left: auto;
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+  background: var(--teal-bg);
+  color: var(--teal);
+  border: 1px solid var(--teal-light);
+  font-weight: 500;
+}
+
+/* ── Rail (shared) ── */
+.rail {
+  overflow-y: auto;
+  padding: 16px;
+  border-right: 1px solid var(--divider);
+  background: var(--surface-raised);
+}
+.rail h2 {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  margin-bottom: 12px;
+  font-weight: 600;
+}
+
+/* ── Boundary Rail ── */
+.boundary-rail {
+  grid-area: boundary;
+  border-right: 1px solid var(--divider);
+}
+.boundary-rail h2 { color: var(--teal); }
+
+.goal-block {
+  margin-bottom: 16px;
+  padding: 10px 12px;
+  background: var(--teal-bg);
+  border-left: 3px solid var(--teal);
+  border-radius: var(--radius-sm);
+}
+.goal-block .goal-label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--teal);
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+.goal-block p {
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--text-primary);
+}
+
+.boundary-section {
+  margin-bottom: 14px;
+}
+.boundary-section h3 {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 6px;
+  letter-spacing: 0.02em;
+}
+
+.src-list {
+  list-style: none;
+  font-size: 12px;
+  font-family: var(--font-mono);
+}
+.src-list li {
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.src-list li.included { border-left: 2px solid var(--teal); color: var(--text-primary); }
+.src-list li.excluded {
+  color: var(--text-muted);
+  text-decoration: line-through;
+  text-decoration-color: var(--divider);
+}
+
+.concept-chip {
+  display: inline-block;
+  font-size: 11px;
+  padding: 3px 8px;
+  border-radius: var(--radius-sm);
+  background: var(--amber-bg);
+  color: var(--amber);
+  border: 1px solid var(--amber-light);
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+
+.unknown-zone-item {
+  padding: 6px 8px;
+  margin-bottom: 6px;
+  border: 1px dashed var(--amber);
+  border-radius: var(--radius-sm);
+  background: var(--amber-bg);
+  font-size: 11px;
+}
+.unknown-zone-item .uz-path {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--amber);
+  font-weight: 500;
+}
+.unknown-zone-item .uz-reason {
+  color: var(--text-secondary);
+  margin-top: 2px;
+  font-size: 10px;
+}
+.unknown-zone-item .uz-open {
+  color: var(--text-muted);
+  font-size: 10px;
+  font-style: italic;
+  margin-top: 2px;
+}
+
+.skip-summary {
+  font-size: 11px;
+  color: var(--text-muted);
+  padding: 6px 8px;
+  background: var(--surface-warm);
+  border-radius: var(--radius-sm);
+}
+.skip-summary .skip-count { font-weight: 600; color: var(--text-secondary); }
+.skip-summary details { margin-top: 4px; }
+.skip-summary summary { cursor: pointer; font-size: 10px; color: var(--text-muted); }
+.skip-summary ul { font-size: 10px; padding-left: 14px; margin-top: 3px; }
+.skip-summary ul li { color: var(--text-muted); }
+
+/* ── Artifact Canvas ── */
+.artifact-canvas {
+  grid-area: artifact;
+  overflow-y: auto;
+  padding: 20px 24px;
+  background: var(--surface);
+}
+.artifact-canvas h2 {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  margin-bottom: 14px;
+  font-weight: 600;
+}
+
+.artifact-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+.artifact-header .kind-badge {
+  font-size: 11px;
+  padding: 3px 10px;
+  border-radius: var(--radius-sm);
+  background: var(--surface-warm);
+  color: var(--text-secondary);
+  font-weight: 500;
+  border: 1px solid var(--divider);
+}
+.artifact-header .artifact-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+.artifact-header .ro-badge {
+  font-size: 10px;
+  padding: 2px 7px;
+  border-radius: var(--radius-sm);
+  background: var(--amber-bg);
+  color: var(--amber);
+  border: 1px solid var(--amber-light);
+  font-weight: 500;
+}
+.artifact-header .purpose {
+  width: 100%;
+  font-size: 12px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin-top: 4px;
+}
+
+.artifact-toggle {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 16px;
+}
+.artifact-toggle button {
+  font-size: 12px;
+  padding: 5px 14px;
+  border: 1px solid var(--divider);
+  background: var(--surface-raised);
+  border-radius: var(--radius);
+  cursor: pointer;
+  color: var(--text-secondary);
+  font-weight: 500;
+  transition: all 0.15s;
+}
+.artifact-toggle button.active {
+  background: var(--teal);
+  color: white;
+  border-color: var(--teal);
+}
+
+/* ── Code Viewer ── */
+.code-viewer {
+  border: 1px solid var(--divider);
+  border-radius: var(--radius);
+  background: var(--surface-raised);
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+.code-viewer .cv-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--divider-thin);
+  background: var(--surface-warm);
+  font-size: 12px;
+  font-family: var(--font-mono);
+  color: var(--text-secondary);
+}
+.code-viewer .cv-header .file-path {
+  font-weight: 500;
+  color: var(--text-primary);
+}
+.cv-actions {
+  display: flex;
+  gap: 6px;
+}
+.cv-actions button {
+  font-size: 10px;
+  padding: 3px 8px;
+  border: 1px solid var(--divider);
+  background: var(--surface-raised);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  color: var(--text-secondary);
+  font-family: var(--font-sans);
+}
+.cv-actions button:hover {
+  background: var(--teal-bg);
+  border-color: var(--teal);
+  color: var(--teal);
+}
+.code-lines {
+  overflow-x: auto;
+}
+.code-line {
+  display: flex;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 1.6;
+  min-height: 20px;
+}
+.code-line .ln {
+  width: 48px;
+  flex-shrink: 0;
+  text-align: right;
+  padding: 0 10px 0 6px;
+  color: var(--text-muted);
+  user-select: none;
+  background: var(--surface-warm);
+  border-right: 1px solid var(--divider-thin);
+  font-size: 11px;
+}
+.code-line .cl {
+  padding: 0 12px;
+  white-space: pre;
+  color: var(--text-primary);
+}
+.code-line.hidden-line .ln,
+.code-line.hidden-line .cl {
+  color: var(--text-muted);
+  font-style: italic;
+  background: var(--surface-warm);
+}
+.code-line.hidden-line .cl::before {
+  content: "⋯ ";
+  color: var(--amber);
+  font-style: normal;
+}
+.code-line.in-range {
+  background: var(--teal-bg);
+}
+.code-line.in-range .ln {
+  background: var(--teal-bg);
+  color: var(--teal);
+  font-weight: 600;
+}
+.code-line.in-range.hidden-line {
+  background: var(--amber-bg);
+}
+.code-line.in-range.hidden-line .ln {
+  background: var(--amber-bg);
+}
+
+.cv-related {
+  padding: 8px 12px;
+  border-top: 1px solid var(--divider-thin);
+  font-size: 11px;
+  color: var(--text-muted);
+  background: var(--surface-warm);
+}
+.cv-related span { font-weight: 500; color: var(--text-secondary); }
+
+.cv-symbols {
+  padding: 8px 12px;
+  border-top: 1px solid var(--divider-thin);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.cv-symbols .sym-chip {
+  font-size: 10px;
+  font-family: var(--font-mono);
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+  background: var(--surface-warm);
+  color: var(--text-secondary);
+  border: 1px solid var(--divider);
+}
+
+.cv-citation {
+  margin-top: 12px;
+  padding: 8px 12px;
+  border-radius: var(--radius);
+  background: var(--amber-bg);
+  border: 1px solid var(--amber-light);
+  font-size: 11px;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.cv-citation .role-badge {
+  font-size: 10px;
+  padding: 2px 7px;
+  border-radius: var(--radius-sm);
+  background: var(--amber-light);
+  color: var(--amber);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* ── Flow Diagram ── */
+.flow-diagram {
+  border: 1px solid var(--divider);
+  border-radius: var(--radius);
+  background: var(--surface-raised);
+  padding: 20px;
+  margin-bottom: 20px;
+}
+.flow-nodes {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+.flow-node {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border-left: 3px solid var(--divider);
+  position: relative;
+  transition: background 0.15s;
+}
+.flow-node + .flow-node { margin-top: 0; }
+.flow-node .connector {
+  position: absolute;
+  left: -1px;
+  top: -8px;
+  bottom: -8px;
+  width: 1px;
+  background: var(--divider);
+  z-index: 0;
+}
+.flow-node:first-child .connector { top: 50%; }
+.flow-node:last-child .connector { bottom: 50%; }
+.flow-node .node-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 2px solid var(--divider);
+  background: var(--surface-raised);
+  flex-shrink: 0;
+  z-index: 1;
+}
+.flow-node.entry .node-dot {
+  background: var(--teal);
+  border-color: var(--teal);
+  box-shadow: 0 0 0 3px var(--teal-light);
+}
+.flow-node.terminal .node-dot {
+  background: var(--amber);
+  border-color: var(--amber);
+  box-shadow: 0 0 0 3px var(--amber-light);
+}
+.flow-node.process .node-dot {
+  background: var(--surface-raised);
+  border-color: var(--teal);
+}
+.flow-node.data .node-dot {
+  border-style: dashed;
+  border-color: var(--text-muted);
+}
+.flow-node.output .node-dot {
+  background: var(--surface-raised);
+  border-color: var(--amber);
+}
+.flow-node.inferred { opacity: 0.7; }
+.flow-node.inferred .node-dot { border-style: dotted; }
+.flow-node .node-label {
+  font-size: 13px;
+  font-weight: 500;
+  z-index: 1;
+}
+.flow-node .node-role {
+  font-size: 10px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-left: auto;
+  z-index: 1;
+}
+.flow-node .node-ev {
+  font-size: 9px;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  margin-left: 6px;
+}
+.flow-node .node-prompt {
+  font-size: 10px;
+  color: var(--text-muted);
+  font-style: italic;
+  margin-top: 2px;
+  display: block;
+  z-index: 1;
+}
+
+.edge-legend {
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid var(--divider-thin);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  font-size: 10px;
+  color: var(--text-muted);
+}
+.edge-legend span {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.edge-legend .legend-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  background: var(--teal);
+  opacity: 0.4;
+}
+
+/* ── Loop Rail ── */
+.loop-rail {
+  grid-area: loop;
+  border-right: none;
+  border-left: 1px solid var(--divider);
+}
+.loop-rail h2 { color: var(--amber); }
+
+.operation-block {
+  margin-bottom: 16px;
+  padding: 10px 12px;
+  background: var(--amber-bg);
+  border-left: 3px solid var(--amber);
+  border-radius: var(--radius-sm);
+}
+.operation-block .op-kind {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--amber);
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+.operation-block .op-prompt {
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--text-primary);
+}
+
+.success-criteria {
+  margin-bottom: 14px;
+}
+.success-criteria h3 {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 6px;
+}
+.success-criteria ul {
+  list-style: none;
+  font-size: 11px;
+}
+.success-criteria ul li {
+  padding: 2px 6px;
+  color: var(--text-muted);
+}
+.success-criteria ul li::before {
+  content: "○ ";
+  color: var(--divider);
+  font-size: 10px;
+}
+
+.blocked-shortcuts {
+  margin-bottom: 14px;
+  font-size: 10px;
+  color: var(--red);
+  padding: 6px 8px;
+  background: var(--red-bg);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--red-light);
+}
+.blocked-shortcuts h3 {
+  font-size: 10px;
+  font-weight: 600;
+  margin-bottom: 3px;
+  color: var(--red);
+}
+
+.attempt-composer {
+  border: 1px solid var(--divider);
+  border-radius: var(--radius);
+  background: var(--surface-raised);
+  margin-bottom: 14px;
+}
+.attempt-composer .ac-header {
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--divider-thin);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  background: var(--surface-warm);
+}
+.attempt-composer textarea {
+  width: 100%;
+  min-height: 100px;
+  border: none;
+  padding: 10px;
+  font-family: var(--font-sans);
+  font-size: 12px;
+  line-height: 1.5;
+  resize: vertical;
+  background: var(--surface-raised);
+  color: var(--text-primary);
+  outline: none;
+}
+.attempt-composer textarea:focus {
+  background: var(--teal-bg);
+}
+
+.confidence-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-top: 1px solid var(--divider-thin);
+  font-size: 11px;
+}
+.confidence-row label { color: var(--text-muted); }
+.confidence-row select {
+  font-size: 11px;
+  padding: 2px 6px;
+  border: 1px solid var(--divider);
+  border-radius: var(--radius-sm);
+  background: var(--surface-raised);
+  color: var(--text-primary);
+}
+
+.unknowns-input {
+  padding: 6px 10px;
+  border-top: 1px solid var(--divider-thin);
+}
+.unknowns-input input {
+  width: 100%;
+  font-size: 11px;
+  padding: 4px 8px;
+  border: 1px solid var(--divider);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-sans);
+}
+
+.attempt-actions {
+  display: flex;
+  gap: 6px;
+  padding: 8px 10px;
+  border-top: 1px solid var(--divider-thin);
+}
+.attempt-actions button {
+  font-size: 11px;
+  padding: 5px 12px;
+  border-radius: var(--radius);
+  cursor: pointer;
+  font-weight: 500;
+  border: 1px solid var(--divider);
+  background: var(--surface-raised);
+  color: var(--text-secondary);
+}
+.attempt-actions button.submit-btn {
+  background: var(--teal);
+  color: white;
+  border-color: var(--teal);
+}
+.attempt-actions button.submit-btn:hover { background: #0f766e; }
+.attempt-actions button.dunno-btn { color: var(--amber); border-color: var(--amber); }
+.attempt-actions button.sample-btn { color: var(--text-muted); font-size: 10px; }
+.attempt-actions button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.hint-ladder {
+  margin-bottom: 14px;
+}
+.hint-ladder h3 {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 6px;
+}
+.hint-ladder .hint {
+  padding: 6px 8px;
+  margin-bottom: 4px;
+  border-left: 3px solid var(--divider);
+  font-size: 11px;
+  color: var(--text-muted);
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  transition: all 0.15s;
+}
+.hint-ladder .hint.revealed {
+  border-left-color: var(--teal);
+  color: var(--text-primary);
+  background: var(--teal-bg);
+}
+.hint-ladder .hint .hint-num {
+  font-weight: 600;
+  color: var(--teal);
+  margin-right: 4px;
+  font-size: 10px;
+}
+.hint-ladder .hint .hint-hidden {
+  display: none;
+  font-style: italic;
+  font-size: 10px;
+}
+.hint-ladder .hint.revealed .hint-hidden {
+  display: block;
+  margin-top: 4px;
+  color: var(--text-secondary);
+}
+
+/* ── Post-Attempt State ── */
+.post-attempt { margin-top: 4px; }
+
+.evidence-check-block {
+  padding: 10px 12px;
+  border-radius: var(--radius);
+  border: 1px solid var(--divider);
+  margin-bottom: 10px;
+  background: var(--surface-raised);
+}
+.evidence-check-block .ec-result {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+  display: inline-block;
+  margin-bottom: 6px;
+}
+.evidence-check-block .ec-result.partial {
+  background: var(--amber-bg);
+  color: var(--amber);
+  border: 1px solid var(--amber-light);
+}
+.ec-missing { font-size: 11px; color: var(--red); margin-top: 4px; }
+.ec-missing li { padding: 1px 0; }
+.ec-observed { font-size: 11px; color: var(--green); margin-top: 4px; }
+.ec-observed li { padding: 1px 0; }
+
+.gap-block {
+  padding: 10px 12px;
+  border-radius: var(--radius);
+  border: 1px solid var(--amber);
+  background: var(--amber-bg);
+  margin-bottom: 10px;
+}
+.gap-block .gap-label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--amber);
+  font-weight: 600;
+}
+.gap-block .gap-severity {
+  font-size: 10px;
+  margin-left: 6px;
+  padding: 1px 6px;
+  border-radius: var(--radius-sm);
+  background: var(--amber-light);
+  color: var(--amber);
+}
+.gap-block .gap-severity.critical { background: var(--red-light); color: var(--red); }
+.gap-block .gap-blocks {
+  font-size: 10px;
+  color: var(--red);
+  margin-top: 3px;
+  font-weight: 500;
+}
+.gap-block .gap-evidence {
+  font-size: 10px;
+  color: var(--text-secondary);
+  margin-top: 3px;
+  font-family: var(--font-mono);
+}
+
+.repair-block {
+  padding: 10px 12px;
+  border-radius: var(--radius);
+  border: 1px solid var(--teal);
+  background: var(--teal-bg);
+  margin-bottom: 10px;
+}
+.repair-block .repair-label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--teal);
+  font-weight: 600;
+}
+.repair-block .repair-prompt {
+  font-size: 12px;
+  margin-top: 4px;
+  line-height: 1.45;
+}
+
+.readiness-block {
+  padding: 10px 12px;
+  border-radius: var(--radius);
+  border: 1px solid var(--red);
+  background: var(--red-bg);
+  margin-bottom: 10px;
+}
+.readiness-block .rc-label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--red);
+  font-weight: 600;
+}
+.readiness-block .rc-scope-badge {
+  font-size: 9px;
+  padding: 1px 6px;
+  border-radius: var(--radius-sm);
+  background: var(--amber-light);
+  color: var(--amber);
+  margin-left: 6px;
+  font-weight: 500;
+}
+.readiness-block .rc-scope {
+  font-size: 11px;
+  color: var(--text-secondary);
+  margin-top: 3px;
+  line-height: 1.4;
+}
+.readiness-block .rc-blocked-list {
+  font-size: 10px;
+  color: var(--red);
+  margin-top: 4px;
+  list-style: none;
+}
+.readiness-block .rc-blocked-list li::before { content: "✗ "; }
+.rc-scope-note {
+  font-size: 10px;
+  color: var(--amber);
+  font-style: italic;
+  margin-top: 4px;
+}
+
+/* ── Evidence Rail ── */
+.evidence-rail {
+  grid-area: evidence;
+  border-top: 1px solid var(--divider);
+  background: var(--surface-raised);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+.evidence-rail.collapsed .evidence-strip { display: none; }
+.evidence-rail.collapsed .evidence-header { border-bottom: none; }
+
+.evidence-header {
+  display: flex;
+  align-items: center;
+  padding: 8px 16px;
+  border-bottom: 1px solid var(--divider-thin);
+  gap: 8px;
+  flex-shrink: 0;
+}
+.evidence-header h2 {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  font-weight: 600;
+  margin: 0;
+}
+.evidence-header .ev-count {
+  font-size: 11px;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+.evidence-header .collapse-btn {
+  margin-left: auto;
+  font-size: 10px;
+  padding: 3px 8px;
+  border: 1px solid var(--divider);
+  background: var(--surface-raised);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  color: var(--text-muted);
+}
+
+.evidence-strip {
+  display: flex;
+  gap: 0;
+  overflow-x: auto;
+  padding: 10px 16px;
+  flex: 1;
+  scroll-behavior: smooth;
+}
+.ev-card {
+  flex-shrink: 0;
+  width: 200px;
+  padding: 10px 12px;
+  border: 1px solid var(--divider);
+  border-radius: var(--radius);
+  background: var(--surface-raised);
+  cursor: pointer;
+  transition: all 0.15s;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.ev-card:hover { border-color: var(--teal); background: var(--teal-bg); }
+.ev-card.selected {
+  border-color: var(--teal);
+  background: var(--teal-bg);
+  box-shadow: 0 0 0 2px var(--teal-light);
+}
+.ev-card .ev-role {
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+  display: inline-block;
+  align-self: flex-start;
+}
+.ev-role.implementation { background: var(--teal-bg); color: var(--teal); border: 1px solid var(--teal-light); }
+.ev-role.interface { background: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd; }
+.ev-role.behavior_oracle { background: var(--amber-bg); color: var(--amber); border: 1px solid var(--amber-light); }
+.ev-role.source_truth { background: var(--green-bg); color: var(--green); border: 1px solid #bbf7d0; }
+.ev-role.intent { background: #f3e8ff; color: #7c3aed; border: 1px solid #ddd6fe; }
+.ev-role.experiment { background: #fce7f3; color: #be185d; border: 1px solid #fbcfe8; }
+.ev-role.counterexample { background: var(--red-bg); color: var(--red); border: 1px solid var(--red-light); }
+.ev-role.historical_rationale { background: #fef9c3; color: #a16207; border: 1px solid #fef08a; }
+.ev-role.unknown { background: #f5f5f4; color: #78716c; border: 1px solid #e7e5e4; }
+.ev-card .ev-path {
+  font-size: 11px;
+  font-family: var(--font-mono);
+  color: var(--text-primary);
+  font-weight: 500;
+  word-break: break-all;
+}
+.ev-card .ev-hash {
+  font-size: 10px;
+  font-family: var(--font-mono);
+  color: var(--text-muted);
+}
+.ev-card .ev-excerpt {
+  font-size: 10px;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+.ev-card .ev-status {
+  font-size: 9px;
+  color: var(--text-muted);
+  margin-top: auto;
+}
+
+.ev-detail-panel {
+  padding: 12px 16px;
+  border-top: 1px solid var(--divider);
+  background: var(--teal-bg);
+  font-size: 11px;
+}
+.ev-detail-panel .ev-detail-header {
+  font-weight: 600;
+  color: var(--teal);
+  margin-bottom: 6px;
+  display: flex;
+  justify-content: space-between;
+}
+.ev-detail-panel .ev-detail-close {
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--text-muted);
+}
+.ev-detail-panel .ev-detail-row {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.ev-detail-panel .ev-detail-row span {
+  color: var(--text-secondary);
+}
+.ev-detail-panel .ev-detail-row strong {
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+/* ── Empty State ── */
+.empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+.empty-state p:first-child { font-weight: 500; color: var(--text-secondary); }
+
+/* ── Toast ── */
+.toast {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 8px 18px;
+  border-radius: var(--radius);
+  background: var(--text-primary);
+  color: white;
+  font-size: 12px;
+  font-weight: 500;
+  z-index: 100;
+  opacity: 0;
+  transition: opacity 0.3s;
+  pointer-events: none;
+}
+.toast.show { opacity: 1; }
+
+/* ── Responsive: stack on narrow screens ── */
+@media (max-width: 1100px) {
+  .workspace {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr auto auto;
+    grid-template-areas:
+      "boundary"
+      "artifact"
+      "loop"
+      "evidence";
+    overflow-y: auto;
+  }
+  .rail { border-right: none; border-bottom: 1px solid var(--divider); }
+  .loop-rail { border-left: none; }
+}
+</style>
+</head>
+<body>
+
+<!-- ── Top Bar ── -->
+<div class="top-bar">
+  <span class="brand">Sibar Lab</span>
+  <span class="breadcrumb">/ Deep Ownership Workspace</span>
+  <span class="state-badge" id="loopState">GapOrReady</span>
+</div>
+
+<!-- ── Workspace Grid ── -->
+<div class="workspace" id="workspace">
+
+  <!-- Boundary Left Rail -->
+  <aside class="rail boundary-rail" id="boundaryRail">
+    <h2>Boundary</h2>
+    <div id="boundaryContent"></div>
+  </aside>
+
+  <!-- Artifact Canvas -->
+  <main class="artifact-canvas" id="artifactCanvas">
+    <h2>Artifact</h2>
+    <div id="artifactContent"></div>
+  </main>
+
+  <!-- Sibi Loop Right Rail -->
+  <aside class="rail loop-rail" id="loopRail">
+    <h2>Loop</h2>
+    <div id="loopContent"></div>
+  </aside>
+
+  <!-- Evidence Bottom Rail -->
+  <footer class="evidence-rail" id="evidenceRail">
+    <div class="evidence-header">
+      <h2>Evidence</h2>
+      <span class="ev-count" id="evCount"></span>
+      <button class="collapse-btn" id="collapseEvidence" title="Collapse evidence rail">—</button>
+    </div>
+    <div class="evidence-strip" id="evidenceStrip"></div>
+    <div class="ev-detail-panel" id="evDetail" hidden></div>
+  </footer>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- ── Fixture Data ── -->
+<script>
+window.deepOwnershipFixture = {
+  "fixture_id": "sibi-pedagogy-loop-v1",
+  "generated_at": "2026-05-16T00:00:00.000Z",
+  "goal": "Understand how Sibi converts a partial user answer into a learning gap and readiness limitation, then generates a concrete repair action scoped to the detected evidence.",
+  "artifact_boundary": {
+    "root_path": "/Users/d1eshi/.codex/worktrees/e0f0/sibar",
+    "source_type": "repository",
+    "included_sources": [
+      "src/runtime-gap-detection.ts",
+      "src/runtime-readiness.ts",
+      "src/runtime-practice.ts",
+      "src/runtime-memory.ts",
+      "src/runtime-support.ts",
+      "src/runtime-state.ts",
+      "Tests/gap-detection.test.ts",
+      "Tests/readiness-report.test.ts",
+      "Tests/understanding-memory.test.ts"
+    ],
+    "excluded_sources": [
+      "node_modules/**",
+      "dist/**",
+      ".git/**",
+      "docs/iterations/**",
+      "web/**",
+      "src/scripts/**",
+      "src/evals/**",
+      "src/demo/**",
+      "src/pedagogy/**",
+      "src/article-workspace.ts",
+      "src/article-workspace-server.ts",
+      "src/code-selection.ts",
+      "src/runtime-agent.ts",
+      "src/runtime-agent-runner.ts",
+      "src/runtime-agent-validation.ts",
+      "src/runtime-artifact-session.ts",
+      "src/runtime-autopsy.ts",
+      "src/runtime-concept-graph.ts",
+      "src/runtime-prepared-question.ts",
+      "src/runtime-questions.ts",
+      "src/runtime-study-panel.ts",
+      "src/runtime.ts",
+      "src/sibi.ts",
+      "src/store.ts",
+      "Sources/**",
+      "Tests/article-workspace.test.ts",
+      "Tests/article-workspace-ui.test.ts",
+      "Tests/article-workspace-vercel.test.ts",
+      "Tests/autopsy.test.ts",
+      "Tests/concept-graph.test.ts",
+      "Tests/deterministic-pedagogy-evals.test.ts",
+      "Tests/early-access.test.ts",
+      "Tests/llm-runtime-trace-evals.test.ts",
+      "Tests/ownership-questions.test.ts",
+      "Tests/practice-challenges.test.ts",
+      "Tests/project-learning-agent.test.ts",
+      "Tests/public-demo-fixtures.test.ts",
+      "Tests/selfhost-benchmark.test.ts",
+      "Tests/selfhost-freeform.test.ts",
+      "Tests/selfhost-pilot-evals.test.ts",
+      "Tests/study-panel.test.ts",
+      "Tests/supply-chain-guard.test.ts",
+      "*.md",
+      "*.json",
+      "*.yaml",
+      "*.lock",
+      "*.lockb"
+    ],
+    "evidence_roles": [
+      "source_truth",
+      "intent",
+      "behavior_oracle",
+      "implementation",
+      "interface"
+    ],
+    "entrypoints": [
+      "src/runtime-gap-detection.ts",
+      "src/runtime-readiness.ts"
+    ],
+    "tests_as_oracles": [
+      "Tests/gap-detection.test.ts",
+      "Tests/readiness-report.test.ts",
+      "Tests/understanding-memory.test.ts"
+    ]
+  },
+  "evidence_inventory": [
+    {
+      "id": "EV-001",
+      "path": "src/runtime-gap-detection.ts",
+      "source_type": "source_truth",
+      "size_bytes": 8801,
+      "extension": ".ts",
+      "role": "implementation",
+      "content_hash": "sha256:fa4b0a8c",
+      "excerpt": "Gap detection: maps answer quality to learning gaps from artifact evidence",
+      "status": "inspected",
+      "line_count": 268
+    },
+    {
+      "id": "EV-002",
+      "path": "src/runtime-readiness.ts",
+      "source_type": "source_truth",
+      "size_bytes": 12833,
+      "extension": ".ts",
+      "role": "implementation",
+      "content_hash": "sha256:9c1d3e2f",
+      "excerpt": "Readiness report: evidence-backed readiness claims from understanding memory",
+      "status": "inspected",
+      "line_count": 331
+    },
+    {
+      "id": "EV-003",
+      "path": "src/runtime-practice.ts",
+      "source_type": "source_truth",
+      "size_bytes": 6785,
+      "extension": ".ts",
+      "role": "implementation",
+      "content_hash": "sha256:7e2b1d4a",
+      "excerpt": "Practice challenge generation from detected learning gaps",
+      "status": "inspected",
+      "line_count": 183
+    },
+    {
+      "id": "EV-004",
+      "path": "src/runtime-memory.ts",
+      "source_type": "source_truth",
+      "size_bytes": 8272,
+      "extension": ".ts",
+      "role": "implementation",
+      "content_hash": "sha256:5f8a3c1b",
+      "excerpt": "Understanding memory: concept mastery, answer history, review scheduling",
+      "status": "inspected",
+      "line_count": 237
+    },
+    {
+      "id": "EV-005",
+      "path": "src/runtime-support.ts",
+      "source_type": "source_truth",
+      "size_bytes": 9326,
+      "extension": ".ts",
+      "role": "interface",
+      "content_hash": "sha256:2d6e1f7c",
+      "excerpt": "Core runtime types: EvidenceCitation, LearningGap, ArtifactSession, UnderstandingMemory, etc.",
+      "status": "inspected",
+      "line_count": 361
+    },
+    {
+      "id": "EV-006",
+      "path": "src/runtime-state.ts",
+      "source_type": "source_truth",
+      "size_bytes": 2699,
+      "extension": ".ts",
+      "role": "interface",
+      "content_hash": "sha256:8b4f2a0d",
+      "excerpt": "Runtime state persistence: readState, writeState, session lookup",
+      "status": "inspected",
+      "line_count": 102
+    },
+    {
+      "id": "EV-007",
+      "path": "Tests/gap-detection.test.ts",
+      "source_type": "behavior_oracle",
+      "size_bytes": 5298,
+      "extension": ".test.ts",
+      "role": "behavior_oracle",
+      "content_hash": "sha256:3c7a9e5d",
+      "excerpt": "Gap detection tests: partial, wrong, uncertain, verified answer outcomes",
+      "status": "inspected",
+      "line_count": 173
+    },
+    {
+      "id": "EV-008",
+      "path": "Tests/readiness-report.test.ts",
+      "source_type": "behavior_oracle",
+      "size_bytes": 8352,
+      "extension": ".test.ts",
+      "role": "behavior_oracle",
+      "content_hash": "sha256:d1e8f6b3",
+      "excerpt": "Readiness report tests: evidence citations, markdown output, persistence",
+      "status": "inspected",
+      "line_count": 204
+    },
+    {
+      "id": "EV-009",
+      "path": "Tests/understanding-memory.test.ts",
+      "source_type": "behavior_oracle",
+      "size_bytes": 6966,
+      "extension": ".test.ts",
+      "role": "behavior_oracle",
+      "content_hash": "sha256:4b2c7a1e",
+      "excerpt": "Understanding memory tests: answer history, gaps, challenges, reviews",
+      "status": "inspected",
+      "line_count": 167
+    }
+  ],
+  "skip_records": [
+    { "id": "SKIP-001", "path": "node_modules/", "reason": "dependency_directory", "risk_if_ignored": "none" },
+    { "id": "SKIP-002", "path": "dist/", "reason": "build_output", "risk_if_ignored": "none" },
+    { "id": "SKIP-003", "path": ".git/", "reason": "version_control", "risk_if_ignored": "none" },
+    { "id": "SKIP-004", "path": "pnpm-lock.yaml", "reason": "lockfile", "risk_if_ignored": "none" },
+    { "id": "SKIP-005", "path": "package-lock.json", "reason": "lockfile", "risk_if_ignored": "none" },
+    { "id": "SKIP-006", "path": "src/evals/", "reason": "evaluation_infrastructure", "risk_if_ignored": "low" },
+    { "id": "SKIP-007", "path": "src/pedagogy/", "reason": "upstream_dependency_outside_slice", "risk_if_ignored": "medium" },
+    { "id": "SKIP-008", "path": "web/", "reason": "ui_surface_outside_slice", "risk_if_ignored": "low" },
+    { "id": "SKIP-009", "path": "Sources/", "reason": "swift_lens_outside_slice", "risk_if_ignored": "low" }
+  ],
+  "unknown_zones": [
+    { "id": "UZ-001", "path": "src/runtime.ts", "reason": "command router; boundary is reserved for future loop expansion", "risk_if_ignored": "May miss how handleRequest connects pedagogy modules; current evidence from gap-detection and readiness is sufficient for this slice", "when_to_open": "When the user needs to trace end-to-end command routing" },
+    { "id": "UZ-002", "path": "src/pedagogy/index.ts", "reason": "pedagogy type definitions imported by runtime-support; inspection deferred", "risk_if_ignored": "AnswerQuality enum and OwnershipQuestion shape may evolve; current fixture snapshots their runtime usage", "when_to_open": "When AnswerQuality or OwnershipQuestion contract changes" },
+    { "id": "UZ-003", "path": "src/runtime-concept-graph.ts", "reason": "concept graph generation feeds artifact sessions; inspected only for interface shape", "risk_if_ignored": "Low for this slice — the loop's gap/readiness path depends on concept graph output, not its generation internals", "when_to_open": "When extending the concept slice to generation artifact coverage" }
+  ],
+  "out_of_bound_refs": [],
+  "concept_slice": {
+    "id": "CS-001",
+    "label": "Readiness limitation from a partial answer",
+    "domain": "code",
+    "operation_target": "trace",
+    "prerequisite_concepts": ["artifact boundary", "gap finding", "readiness claims", "evidence citation"],
+    "source_evidence": ["EV-001", "EV-002", "EV-005"],
+    "behavior_evidence": ["EV-007", "EV-008", "EV-009"],
+    "risk_evidence": [],
+    "expected_user_operations": ["trace", "explain", "predict"]
+  },
+  "thinking_artifacts": [
+    {
+      "id": "TA-001",
+      "kind": "code_slice",
+      "title": "Gap Detection Core: detectLearningGapFromAnswer",
+      "purpose": "Show the exact code region where a partial answer becomes a typed learning gap with severity, confidence, and a concrete repair action.",
+      "concept_slice_id": "CS-001",
+      "source_evidence": [
+        { "evidence_id": "EV-001", "file_path": "src/runtime-gap-detection.ts", "start_line": 120, "end_line": 180, "excerpt": "detectLearningGapFromAnswer: maps AnswerQuality to gap severity, confidence, misconception, and repair action", "role": "implementation" }
+      ],
+      "hidden_solution_evidence": [
+        { "evidence_id": "EV-001", "file_path": "src/runtime-gap-detection.ts", "start_line": 120, "end_line": 180, "excerpt": "Full detection logic with quality-to-severity mapping", "role": "implementation" }
+      ],
+      "user_operation": {
+        "id": "OP-001",
+        "kind": "trace",
+        "prompt": "Trace how detectLearningGapFromAnswer maps an answer_quality of 'partial' to a LearningGap. Name every field the gap receives — severity, confidence, suspected_misconception, repair_action, artifact_evidence — and explain which line in the code assigns each field. Then predict what would change if the quality were 'gap_confirmed' instead.",
+        "artifact_ids": ["TA-001"],
+        "required_evidence": ["EV-001"],
+        "allowed_hints": 3,
+        "blocked_shortcuts": ["cannot_answer_with_quality_enum_only", "cannot_skip_artifact_evidence_citation"],
+        "success_criteria": ["Names at least five gap fields with their source line ranges", "Explains severityFor and confidenceFor branching logic", "Predicts correct change for gap_confirmed quality", "Cites specific file:line evidence for each claim"]
+      },
+      "renderer": "code_slice",
+      "payload": {
+        "file_path": "src/runtime-gap-detection.ts",
+        "ranges": [{ "start_line": 120, "end_line": 180, "label": "detectLearningGapFromAnswer", "role": "implementation" }],
+        "collapsed_context": "Lines 1-119 contain imports, findArtifactAnswerContext, and helper functions (observedLayer, severityFor, confidenceFor, misconceptionFor, repairActionFor)",
+        "related_tests": [{ "file_path": "Tests/gap-detection.test.ts", "start_line": 62, "end_line": 83, "label": "partial-answer gap test" }],
+        "related_docs": [],
+        "selected_symbols": ["detectLearningGapFromAnswer", "observedLayer", "severityFor", "confidenceFor", "misconceptionFor", "repairActionFor"],
+        "hidden_lines": [125, 130, 135, 140, 145, 150, 155, 160, 165, 170, 175],
+        "prompt_focus": "How does the answer_quality value determine each gap field?"
+      },
+      "success_criteria": ["Names at least five gap fields with their source line ranges", "Explains severityFor and confidenceFor branching logic", "Predicts correct change for gap_confirmed quality", "Cites specific file:line evidence for each claim"],
+      "created_at": "2026-05-16T00:00:00.000Z"
+    },
+    {
+      "id": "TA-002",
+      "kind": "flow_diagram",
+      "title": "From Partial Answer to Scoped Readiness",
+      "purpose": "Show the causal path a partial answer takes through gap detection, practice generation, memory building, and readiness reporting.",
+      "concept_slice_id": "CS-001",
+      "source_evidence": [
+        { "evidence_id": "EV-001", "file_path": "src/runtime-gap-detection.ts", "start_line": 120, "end_line": 230, "excerpt": "Gap detection and persistence", "role": "implementation" },
+        { "evidence_id": "EV-002", "file_path": "src/runtime-readiness.ts", "start_line": 61, "end_line": 260, "excerpt": "buildReadinessReport: evidence indexing, verified concepts, open gaps, recommended next action", "role": "implementation" },
+        { "evidence_id": "EV-003", "file_path": "src/runtime-practice.ts", "start_line": 1, "end_line": 183, "excerpt": "Practice challenge generation from gaps", "role": "implementation" },
+        { "evidence_id": "EV-004", "file_path": "src/runtime-memory.ts", "start_line": 1, "end_line": 237, "excerpt": "Understanding memory aggregation from concept states and gaps", "role": "implementation" }
+      ],
+      "hidden_solution_evidence": [
+        { "evidence_id": "EV-002", "file_path": "src/runtime-readiness.ts", "start_line": 61, "end_line": 260, "excerpt": "Full readiness report construction with all claim types and evidence indexing", "role": "implementation" }
+      ],
+      "user_operation": {
+        "id": "OP-002",
+        "kind": "trace",
+        "prompt": "Trace the end-to-end path: a user submits a partial answer → gap is detected → gap is persisted → practice challenge is generated → understanding memory is built → readiness report is produced. Draw the sequence of function calls and data transformations. For each step, name the file and function responsible.",
+        "artifact_ids": ["TA-002"],
+        "required_evidence": ["EV-001", "EV-002", "EV-003", "EV-004"],
+        "allowed_hints": 3,
+        "blocked_shortcuts": ["cannot_skip_practice_generation", "cannot_skip_memory_aggregation"],
+        "success_criteria": ["Names the correct file and function for each step", "Identifies that gap detection runs before practice generation", "Identifies that memory aggregates gaps, challenges, and concept states before readiness", "Shows evidence-aware understanding of the data dependencies"]
+      },
+      "renderer": "flow_diagram",
+      "payload": {
+        "nodes": [
+          { "id": "N-001", "label": "User Partial Answer", "role": "input", "evidence": ["EV-007"], "is_inferred": false, "user_prompt": "What kind of answer would trigger a partial gap?" },
+          { "id": "N-002", "label": "detectLearningGapFromAnswer", "role": "process", "evidence": ["EV-001"], "is_inferred": false, "user_prompt": "Which line assigns the severity field?" },
+          { "id": "N-003", "label": "LearningGap (persisted)", "role": "data", "evidence": ["EV-001"], "is_inferred": false, "user_prompt": "Where is the gap stored in the artifact session?" },
+          { "id": "N-004", "label": "Practice Challenge Generation", "role": "process", "evidence": ["EV-003"], "is_inferred": false, "user_prompt": "What determines the challenge difficulty?" },
+          { "id": "N-005", "label": "Understanding Memory Build", "role": "process", "evidence": ["EV-004"], "is_inferred": false, "user_prompt": "How does memory aggregate concepts from gaps and confirmed states?" },
+          { "id": "N-006", "label": "Readiness Report", "role": "output", "evidence": ["EV-002"], "is_inferred": false, "user_prompt": "What claim types does the report contain?" },
+          { "id": "N-007", "label": "Scoped Readiness Result", "role": "output", "evidence": ["EV-002"], "is_inferred": true, "user_prompt": "The readiness claim is scoped to one operation. Which evidence proves it doesn't claim whole-repo mastery?" }
+        ],
+        "edges": [
+          { "from": "N-001", "to": "N-002", "relation": "input_to_process", "evidence": ["EV-001"], "is_inferred": false },
+          { "from": "N-002", "to": "N-003", "relation": "produces", "evidence": ["EV-001"], "is_inferred": false },
+          { "from": "N-003", "to": "N-004", "relation": "input_to_process", "evidence": ["EV-003"], "is_inferred": false },
+          { "from": "N-003", "to": "N-005", "relation": "input_to_process", "evidence": ["EV-004"], "is_inferred": false },
+          { "from": "N-004", "to": "N-005", "relation": "feeds_into", "evidence": ["EV-004"], "is_inferred": true },
+          { "from": "N-005", "to": "N-006", "relation": "produces", "evidence": ["EV-002"], "is_inferred": false },
+          { "from": "N-006", "to": "N-007", "relation": "projects", "evidence": ["EV-002"], "is_inferred": true }
+        ],
+        "entry_node": "N-001",
+        "terminal_nodes": ["N-007"],
+        "uncertainty_markers": []
+      },
+      "success_criteria": ["Names the correct file and function for each step", "Identifies that gap detection runs before practice generation", "Identifies that memory aggregates gaps, challenges, and concept states before readiness", "Shows evidence-aware understanding of the data dependencies"],
+      "created_at": "2026-05-16T00:00:00.000Z"
+    }
+  ],
+  "active_operation": {
+    "id": "OP-001",
+    "kind": "trace",
+    "prompt": "Trace how detectLearningGapFromAnswer maps an answer_quality of 'partial' to a LearningGap. Name every field the gap receives — severity, confidence, suspected_misconception, repair_action, artifact_evidence — and explain which line in the code assigns each field. Then predict what would change if the quality were 'gap_confirmed' instead.",
+    "artifact_ids": ["TA-001"],
+    "required_evidence": ["EV-001"],
+    "allowed_hints": 3,
+    "blocked_shortcuts": ["cannot_answer_with_quality_enum_only", "cannot_skip_artifact_evidence_citation"],
+    "success_criteria": ["Names at least five gap fields with their source line ranges", "Explains severityFor and confidenceFor branching logic", "Predicts correct change for gap_confirmed quality", "Cites specific file:line evidence for each claim"]
+  },
+  "sample_attempt": {
+    "id": "ATT-001",
+    "operation_id": "OP-001",
+    "answer_text": "I can see that detectLearningGapFromAnswer calls observedLayer, severityFor, and confidenceFor. But I cannot trace exactly which line assigns each gap field because the helper functions are hard to follow. I know partial answers produce 'important' severity, but I cannot justify why from the code evidence.",
+    "selected_evidence": ["EV-001"],
+    "declared_confidence": "low",
+    "declared_unknowns": ["Cannot trace severityFor branching from quality → severity", "Cannot name the exact line that assigns suspected_misconception", "Cannot predict full gap_confirmed behavior change"],
+    "created_at": "2026-05-16T00:05:00.000Z"
+  },
+  "evidence_check": {
+    "id": "EC-001",
+    "attempt_id": "ATT-001",
+    "required_claims": ["Names at least five gap fields with their source line ranges", "Explains severityFor and confidenceFor branching logic", "Predicts correct change for gap_confirmed quality", "Cites specific file:line evidence for each claim"],
+    "observed_claims": ["Names observedLayer, severityFor, confidenceFor functions", "Identifies partial → important severity"],
+    "missing_claims": ["Does not name five gap fields with line ranges", "Does not explain severityFor branching logic", "Does not predict gap_confirmed behavior change", "Does not cite specific file:line evidence"],
+    "contradicted_claims": [],
+    "unsupported_claims": ["Partial answers produce 'important' severity — stated but not justified from code evidence"],
+    "cited_evidence": [{ "evidence_id": "EV-001", "file_path": "src/runtime-gap-detection.ts", "start_line": 120, "end_line": 180 }],
+    "artifact_counterevidence": [{ "evidence_id": "EV-001", "file_path": "src/runtime-gap-detection.ts", "start_line": 84, "end_line": 112, "excerpt": "severityFor and confidenceFor branching logic showing gap_confirmed → critical severity and high confidence", "role": "implementation" }],
+    "result": "partial"
+  },
+  "detected_gap": {
+    "id": "GAP-001",
+    "concept_slice_id": "CS-001",
+    "kind": "shallow_trace",
+    "user_attempt_ref": "ATT-001",
+    "artifact_evidence_refs": [
+      { "evidence_id": "EV-001", "file_path": "src/runtime-gap-detection.ts", "start_line": 84, "end_line": 112, "excerpt": "severityFor and confidenceFor helpers" },
+      { "evidence_id": "EV-001", "file_path": "src/runtime-gap-detection.ts", "start_line": 140, "end_line": 180, "excerpt": "detectLearningGapFromAnswer gap construction body" }
+    ],
+    "evidence": "The user identified which functions are involved but could not trace the exact branching logic that converts quality into severity, confidence, and misconception. The cited evidence shows severityFor returns 'critical' for gap_confirmed (not 'important' as the user guessed).",
+    "severity": "important",
+    "blocks_readiness": true,
+    "created_at": "2026-05-16T00:05:30.000Z"
+  },
+  "repair_action": {
+    "id": "REP-001",
+    "gap_id": "GAP-001",
+    "operation_kind": "trace",
+    "prompt": "Re-read the severityFor function (lines 84-92) and confidenceFor function (lines 94-104) in src/runtime-gap-detection.ts. Create a small table mapping each answer_quality value to its severity and confidence, with the exact line that determines each. Then trace how detectLearningGapFromAnswer uses those values to construct the LearningGap object.",
+    "required_evidence": [
+      { "evidence_id": "EV-001", "file_path": "src/runtime-gap-detection.ts", "start_line": 84, "end_line": 112, "role": "implementation" },
+      { "evidence_id": "EV-001", "file_path": "src/runtime-gap-detection.ts", "start_line": 120, "end_line": 180, "role": "implementation" }
+    ],
+    "source_gap_id": "GAP-001",
+    "created_at": "2026-05-16T00:06:00.000Z"
+  },
+  "readiness_claim": {
+    "id": "RC-001",
+    "concept_slice_id": "CS-001",
+    "operation_id": "OP-001",
+    "status": "blocked",
+    "scope": "Tracing how detectLearningGapFromAnswer maps answer quality to gap fields within src/runtime-gap-detection.ts",
+    "ready_to_explain": false,
+    "ready_to_trace": false,
+    "ready_to_derive": false,
+    "ready_to_predict": false,
+    "ready_to_build": false,
+    "ready_to_modify": false,
+    "ready_to_debug": false,
+    "ready_to_transfer": false,
+    "ready_to_teach": false,
+    "blocked_claims": ["Cannot trace severityFor branching from answer_quality to severity", "Cannot predict gap_confirmed behavior change"],
+    "supporting_evidence": [{ "evidence_id": "EV-001" }],
+    "blocking_gaps": ["GAP-001"],
+    "confidence": "low",
+    "generated_at": "2026-05-16T00:06:00.000Z"
+  },
+  "loop_state": {
+    "id": "LOOP-001",
+    "current_state": "GapOrReady",
+    "state_chain": ["GoalInput", "BoundaryConfirmed", "EvidenceInventoried", "ConceptSliceSelected", "ArtifactGenerated", "AwaitingAttempt", "AttemptStored", "EvidenceChecked", "GapOrReady"],
+    "boundary_enforced": true,
+    "out_of_bound_accesses": 0
+  }
+};
+</script>
+
+<!-- ── Application Script ── -->
+<script>
+(function() {
+  "use strict";
+
+  var fixture = window.deepOwnershipFixture;
+  if (!fixture) {
+    document.getElementById("workspace").innerHTML = '<div class="empty-state"><p>No fixture data loaded</p><p>Embed deepOwnershipFixture as a script tag before this script.</p></div>';
+    return;
+  }
+
+  // ── State ──
+  var state = {
+    activeArtifact: "TA-001", // code_slice by default
+    attemptSubmitted: false,
+    revealedHints: 0,
+    selectedEvidence: null
+  };
+
+  // ── Helpers ──
+  function el(id) { return document.getElementById(id); }
+  function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;"); }
+  function showToast(msg) {
+    var t = el("toast");
+    t.textContent = msg;
+    t.classList.add("show");
+    setTimeout(function() { t.classList.remove("show"); }, 2000);
+  }
+
+  // ── Render: Top Bar ──
+  el("loopState").textContent = fixture.loop_state.current_state;
+
+  // ── Render: Boundary Rail ──
+  (function renderBoundary() {
+    var html = "";
+
+    // Goal
+    html += '<div class="goal-block">';
+    html += '<div class="goal-label">Goal</div>';
+    html += '<p>' + esc(fixture.goal) + '</p>';
+    html += '</div>';
+
+    // Included sources (compact)
+    var ab = fixture.artifact_boundary;
+    html += '<div class="boundary-section">';
+    html += '<h3>Included (' + ab.included_sources.length + ')</h3>';
+    html += '<ul class="src-list">';
+    ab.included_sources.forEach(function(s) {
+      html += '<li class="included">' + esc(s) + '</li>';
+    });
+    html += '</ul></div>';
+
+    // Excluded sources (show first 8, then count)
+    html += '<div class="boundary-section">';
+    html += '<h3>Excluded (' + ab.excluded_sources.length + ')</h3>';
+    html += '<ul class="src-list">';
+    ab.excluded_sources.slice(0, 8).forEach(function(s) {
+      html += '<li class="excluded">' + esc(s) + '</li>';
+    });
+    if (ab.excluded_sources.length > 8) {
+      html += '<li style="font-size:10px;color:var(--text-muted);padding:2px 6px;">+ ' + (ab.excluded_sources.length - 8) + ' more patterns</li>';
+    }
+    html += '</ul></div>';
+
+    // Concept slice
+    var cs = fixture.concept_slice;
+    html += '<div class="boundary-section">';
+    html += '<h3>Concept Slice</h3>';
+    html += '<span class="concept-chip">' + esc(cs.label) + '</span>';
+    html += '<span style="font-size:11px;color:var(--text-muted);margin-left:6px;">' + esc(cs.domain) + '</span>';
+    html += '<div style="margin-top:6px;font-size:10px;color:var(--text-muted);">';
+    html += 'Expected ops: ' + cs.expected_user_operations.map(function(o) { return '<code style="font-size:10px;">' + esc(o) + '</code>'; }).join(", ");
+    html += '</div></div>';
+
+    // Unknown zones
+    html += '<div class="boundary-section">';
+    html += '<h3>Unknown Zones (' + fixture.unknown_zones.length + ')</h3>';
+    fixture.unknown_zones.forEach(function(uz) {
+      html += '<div class="unknown-zone-item">';
+      html += '<div class="uz-path">' + esc(uz.path) + ' — Unknown, needs expansion</div>';
+      html += '<div class="uz-reason">' + esc(uz.reason) + '</div>';
+      html += '<div class="uz-open">' + esc(uz.when_to_open) + '</div>';
+      html += '</div>';
+    });
+    html += '</div>';
+
+    // Skip records
+    html += '<div class="boundary-section">';
+    var skipCounts = { none: 0, low: 0, medium: 0 };
+    fixture.skip_records.forEach(function(s) { skipCounts[s.risk_if_ignored] = (skipCounts[s.risk_if_ignored] || 0) + 1; });
+    html += '<h3>Skip Records</h3>';
+    html += '<div class="skip-summary">';
+    html += '<span class="skip-count">' + fixture.skip_records.length + ' paths skipped</span>';
+    html += ' (none: ' + skipCounts.none + ', low: ' + (skipCounts.low || 0) + ', medium: ' + (skipCounts.medium || 0) + ')';
+    html += '<details><summary>Show all</summary><ul>';
+    fixture.skip_records.forEach(function(s) {
+      html += '<li>' + esc(s.path) + ' — ' + esc(s.reason) + ' [' + esc(s.risk_if_ignored) + ']</li>';
+    });
+    html += '</ul></details></div></div>';
+
+    el("boundaryContent").innerHTML = html;
+  })();
+
+  // ── Render: Artifact Canvas ──
+  function renderArtifact(artifactId) {
+    var art = fixture.thinking_artifacts.find(function(a) { return a.id === artifactId; });
+    if (!art) { el("artifactContent").innerHTML = '<div class="empty-state"><p>No artifact selected</p></div>'; return; }
+
+    var html = "";
+    html += '<div class="artifact-header">';
+    html += '<span class="kind-badge">' + esc(art.kind.replace("_", " ")) + '</span>';
+    html += '<span class="artifact-title">' + esc(art.title) + '</span>';
+    html += '<span class="ro-badge">READ ONLY</span>';
+    html += '<p class="purpose">' + esc(art.purpose) + '</p>';
+    html += '</div>';
+
+    // Toggle buttons
+    html += '<div class="artifact-toggle">';
+    html += '<button class="' + (artifactId === "TA-001" ? "active" : "") + '" data-art="TA-001">Code Slice</button>';
+    html += '<button class="' + (artifactId === "TA-002" ? "active" : "") + '" data-art="TA-002">Flow Diagram</button>';
+    html += '</div>';
+
+    if (art.renderer === "code_slice") {
+      html += renderCodeSlice(art);
+    } else if (art.renderer === "flow_diagram") {
+      html += renderFlowDiagram(art);
+    }
+
+    html += '<div class="cv-citation">';
+    html += '<span class="role-badge">evidence</span>';
+    html += '<span>Source: ' + esc(art.payload.file_path || art.source_evidence[0]?.file_path || "—") + '</span>';
+    html += '</div>';
+
+    el("artifactContent").innerHTML = html;
+
+    // Bind toggle buttons
+    Array.from(el("artifactContent").querySelectorAll(".artifact-toggle button")).forEach(function(btn) {
+      btn.addEventListener("click", function() {
+        state.activeArtifact = btn.dataset.art;
+        renderArtifact(state.activeArtifact);
+      });
+    });
+
+    // Bind copy citation buttons
+    Array.from(el("artifactContent").querySelectorAll(".cv-copy")).forEach(function(btn) {
+      btn.addEventListener("click", function() {
+        var citation = btn.dataset.citation;
+        if (navigator.clipboard) {
+          navigator.clipboard.writeText(citation).then(function() { showToast("Copied: " + citation); });
+        } else {
+          showToast("Citation: " + citation);
+        }
+      });
+    });
+
+    // Bind open reference buttons
+    Array.from(el("artifactContent").querySelectorAll(".cv-open-ref")).forEach(function(btn) {
+      btn.addEventListener("click", function() {
+        showToast("Reference: " + btn.dataset.path);
+      });
+    });
+  }
+
+  function renderCodeSlice(art) {
+    var p = art.payload;
+    var filePath = p.file_path;
+    var ranges = p.ranges;
+    var hiddenLines = p.hidden_lines || [];
+    var symbols = p.selected_symbols || [];
+    var relatedTests = p.related_tests || [];
+
+    var html = '<div class="code-viewer">';
+    html += '<div class="cv-header">';
+    html += '<span class="file-path">' + esc(filePath) + '</span>';
+    html += '<span style="font-size:10px;color:var(--text-muted);">' + esc(p.collapsed_context) + '</span>';
+    html += '<div class="cv-actions">';
+    html += '<button class="cv-copy" data-citation="' + esc(filePath + ":" + ranges[0].start_line + "-" + ranges[0].end_line) + '">Copy Citation</button>';
+    html += '<button class="cv-open-ref" data-path="' + esc(filePath + ":" + ranges[0].start_line) + '">Open Reference</button>';
+    html += '</div></div>';
+
+    // Code lines with line numbers — group hidden lines into collapsed regions
+    html += '<div class="code-lines">';
+
+    // Lines before range (1-10 sample, then collapsed context marker)
+    for (var i = 1; i <= 10; i++) {
+      html += '<div class="code-line">';
+      html += '<span class="ln">' + i + '</span>';
+      html += '<span class="cl">' + esc(generateCodeLine(i, false, symbols)) + '</span>';
+      html += '</div>';
+    }
+    html += '<div class="code-line collapsed-context" style="color:var(--text-muted);font-family:var(--font-mono);font-size:11px;padding:4px 12px;background:var(--surface-warm);border-top:1px solid var(--divider-thin);border-bottom:1px solid var(--divider-thin);">';
+    html += '⋯ ' + esc(p.collapsed_context) + ' ⋯';
+    html += '</div>';
+
+    // Main range 120-180 — group consecutive hidden lines into collapsed regions
+    var start = ranges[0].start_line;
+    var end = ranges[0].end_line;
+    var i = start;
+    while (i <= end) {
+      if (hiddenLines.indexOf(i) !== -1) {
+        // Count consecutive hidden lines
+        var hiddenStart = i;
+        var hiddenCount = 0;
+        while (i <= end && hiddenLines.indexOf(i) !== -1) {
+          hiddenCount++;
+          i++;
+        }
+        html += '<div class="code-line in-range hidden-group" style="padding:3px 12px;background:var(--amber-bg);border-left:3px solid var(--amber);font-family:var(--font-mono);font-size:11px;color:var(--amber);cursor:default;" title="' + hiddenCount + ' lines contain solution evidence">';
+        html += '<span class="ln" style="color:var(--amber);">' + hiddenStart + '-' + (hiddenStart + hiddenCount - 1) + '</span>';
+        html += '<span class="cl">// ' + hiddenCount + ' lines hidden — solution evidence (expand in full workspace)</span>';
+        html += '</div>';
+      } else {
+        html += '<div class="code-line in-range">';
+        html += '<span class="ln">' + i + '</span>';
+        html += '<span class="cl">' + esc(generateCodeLine(i, false, symbols)) + '</span>';
+        html += '</div>';
+        i++;
+      }
+    }
+
+    html += '</div>'; // end code-lines
+
+    // Related info
+    if (relatedTests.length > 0) {
+      html += '<div class="cv-related">';
+      html += '<span>Related tests:</span> ';
+      relatedTests.forEach(function(t) {
+        html += '<code style="font-size:10px;">' + esc(t.file_path + ":" + t.start_line + "-" + t.end_line) + '</code> ';
+      });
+      html += '</div>';
+    }
+
+    // Symbols
+    if (symbols.length > 0) {
+      html += '<div class="cv-symbols">';
+      symbols.forEach(function(s) {
+        html += '<span class="sym-chip">' + esc(s) + '</span>';
+      });
+      html += '</div>';
+    }
+
+    html += '</div>'; // end code-viewer
+
+    // Citation metadata
+    html += '<div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap;">';
+    ranges.forEach(function(r) {
+      html += '<div class="cv-citation">';
+      html += '<span class="role-badge">' + esc(r.role) + '</span>';
+      html += '<span>' + esc(filePath + ":" + r.start_line + "-" + r.end_line) + '</span>';
+      html += ' — <span style="font-size:10px;color:var(--text-secondary);">' + esc(r.label) + '</span>';
+      html += '</div>';
+    });
+    html += '</div>';
+
+    return html;
+  }
+
+  function generateCodeLine(lineNum, isHidden, symbols) {
+    if (isHidden) return "// [hidden line — solution evidence]";
+    var lines = [
+      "/**",
+      " * detectLearningGapFromAnswer",
+      " * Maps an answer_quality to a typed LearningGap with severity,",
+      " * confidence, suspected_misconception, and repair_action.",
+      " */",
+      "export function detectLearningGapFromAnswer(",
+      "  quality: AnswerQuality,",
+      "  context: ArtifactAnswerContext",
+      "): LearningGap {",
+      "  const layer = observedLayer(context, quality);",
+      "  const severity = severityFor(quality, layer);",
+      "  const confidence = confidenceFor(quality, severity);",
+      "  const misconception = misconceptionFor(quality, context);",
+      "  const repair = repairActionFor(quality, severity, misconception);",
+      "",
+      "  return {",
+      "    id: generateGapId(context.sessionId, quality),",
+      "    quality,",
+      "    layer,",
+      "    severity,",
+      "    confidence,",
+      "    suspected_misconception: misconception,",
+      "    repair_action: repair,",
+      "    artifact_evidence: context.artifactEvidence,",
+      "    created_at: new Date().toISOString(),",
+      "    blocks_readiness: severity !== 'none'",
+      "  };",
+      "}",
+      "",
+      "/**",
+      " * severityFor: maps answer quality to gap severity level.",
+      " */",
+      "function severityFor(quality: AnswerQuality, layer: ObservedLayer): Severity {",
+      "  switch (quality) {",
+      "    case 'verified': return 'none';",
+      "    case 'partial':  return 'important';",
+      "    case 'uncertain': return 'critical';",
+      "    case 'wrong':    return 'critical';",
+      "    case 'gap_confirmed': return 'critical';",
+      "    default: return 'critical';",
+      "  }",
+      "}",
+      "",
+      "/**",
+      " * confidenceFor: estimates confidence based on quality and severity.",
+      " */",
+      "function confidenceFor(quality: AnswerQuality, severity: Severity): Confidence {",
+      "  if (quality === 'verified') return 'high';",
+      "  if (quality === 'partial') return 'medium';",
+      "  if (quality === 'gap_confirmed') return 'high';",
+      "  return 'low';",
+      "}",
+      "",
+      "/**",
+      " * misconceptionFor: derives suspected misconception from answer content.",
+      " */",
+      "function misconceptionFor(",
+      "  quality: AnswerQuality,",
+      "  context: ArtifactAnswerContext",
+      "): string | null {",
+      "  if (quality === 'verified') return null;",
+      "  if (quality === 'partial') {",
+      "    return 'Incomplete understanding of severity branching based on quality';",
+      "  }",
+      "  return 'Fundamental misunderstanding of quality-to-severity mapping';",
+      "}",
+      "",
+      "/**",
+      " * repairActionFor: generates a concrete re-read/retry prompt.",
+      " */",
+      "function repairActionFor(",
+      "  quality: AnswerQuality,",
+      "  severity: Severity,",
+      "  misconception: string | null",
+      "): RepairAction {",
+      "  return {",
+      "    kind: 'trace',",
+      "    prompt: generateRepairPrompt(quality, severity, misconception),",
+      "    focus_lines: severityLinesFor(severity),",
+      "    operation: 're-read-and-map'",
+      "  };",
+      "}"
+    ];
+    var idx = lineNum - 1;
+    return idx >= 0 && idx < lines.length ? lines[idx] : "  const field = derive(" + lineNum + ");";
+  }
+
+  function renderFlowDiagram(art) {
+    var p = art.payload;
+    var nodes = p.nodes || [];
+    var entryNode = p.entry_node;
+    var terminalNodes = p.terminal_nodes || [];
+
+    var html = '<div class="flow-diagram">';
+
+    html += '<div class="artifact-header" style="margin-bottom:16px;">';
+    html += '<span class="kind-badge">flow diagram</span>';
+    html += '<span class="artifact-title" style="font-size:14px;">' + esc(art.title) + '</span>';
+    html += '</div>';
+
+    html += '<div class="flow-nodes">';
+    nodes.forEach(function(node, idx) {
+      var classes = [];
+      if (node.id === entryNode) classes.push("entry");
+      if (terminalNodes.indexOf(node.id) !== -1) classes.push("terminal");
+      if (node.role === "process") classes.push("process");
+      if (node.role === "data") classes.push("data");
+      if (node.role === "output") classes.push("output");
+      if (node.is_inferred) classes.push("inferred");
+
+      html += '<div class="flow-node ' + classes.join(" ") + '">';
+      html += '<div class="connector"></div>';
+      html += '<div class="node-dot"></div>';
+      html += '<div>';
+      html += '<div class="node-label">' + esc(node.label) + '</div>';
+      if (node.user_prompt) {
+        html += '<span class="node-prompt">' + esc(node.user_prompt) + '</span>';
+      }
+      html += '</div>';
+      html += '<span class="node-role">' + esc(node.role) + '</span>';
+      if (node.evidence && node.evidence.length > 0) {
+        html += '<span class="node-ev">' + node.evidence.map(function(e) { return esc(e); }).join(", ") + '</span>';
+      }
+      html += '</div>';
+    });
+    html += '</div>';
+
+    // Edge legend
+    html += '<div class="edge-legend">';
+    html += '<span><span class="legend-dot"></span> Solid: direct evidence</span>';
+    html += '<span><span class="legend-dot" style="border:1px dashed var(--text-muted);background:transparent;"></span> Dashed: inferred</span>';
+    html += '<span>● Teal: entry node</span>';
+    html += '<span>● Amber: terminal/output</span>';
+    html += '</div>';
+
+    // Edges summary
+    html += '<div style="margin-top:12px;font-size:10px;color:var(--text-muted);">';
+    html += '<strong>Edges:</strong> ';
+    (p.edges || []).forEach(function(e) {
+      html += e.from + ' → ' + e.to + ' [' + esc(e.relation) + (e.is_inferred ? ', inferred' : '') + '] ';
+    });
+    html += '</div>';
+
+    html += '</div>'; // end flow-diagram
+    return html;
+  }
+
+  // ── Render: Loop Rail ──
+  function renderLoop() {
+    var html = "";
+    var op = fixture.active_operation;
+
+    // Active operation
+    html += '<div class="operation-block">';
+    html += '<div class="op-kind">Active Operation: ' + esc(op.kind) + '</div>';
+    html += '<div class="op-prompt">' + esc(op.prompt) + '</div>';
+    html += '</div>';
+
+    // Success criteria
+    html += '<div class="success-criteria">';
+    html += '<h3>Success Criteria</h3><ul>';
+    op.success_criteria.forEach(function(sc) {
+      html += '<li>' + esc(sc) + '</li>';
+    });
+    html += '</ul></div>';
+
+    // Blocked shortcuts
+    html += '<div class="blocked-shortcuts">';
+    html += '<h3>🚫 Blocked Shortcuts</h3>';
+    op.blocked_shortcuts.forEach(function(bs) {
+      html += '<div>' + esc(bs) + '</div>';
+    });
+    html += '</div>';
+
+    if (!state.attemptSubmitted) {
+      // Pre-attempt: composer
+      html += '<div class="attempt-composer">';
+      html += '<div class="ac-header">Attempt Composer</div>';
+      html += '<textarea id="attemptText" placeholder="Write your trace, cite file:line evidence..."></textarea>';
+      html += '<div class="confidence-row">';
+      html += '<label>Confidence:</label>';
+      html += '<select id="attemptConfidence">';
+      html += '<option value="low">low</option>';
+      html += '<option value="medium" selected>medium</option>';
+      html += '<option value="high">high</option>';
+      html += '</select>';
+      html += '</div>';
+      html += '<div class="unknowns-input">';
+      html += '<input id="attemptUnknowns" placeholder="Declared unknowns (comma-separated)...">';
+      html += '</div>';
+      html += '<div class="attempt-actions">';
+      html += '<button class="submit-btn" id="submitAttempt">Submit</button>';
+      html += '<button class="dunno-btn" id="dunnoAttempt">I Don\'t Know</button>';
+      html += '<button class="sample-btn" id="useSampleAttempt">Use Sample Attempt</button>';
+      html += '</div>';
+      html += '</div>';
+
+      // Hint ladder (never reveals hidden answer)
+      html += '<div class="hint-ladder">';
+      html += '<h3>Hint Ladder (' + op.allowed_hints + ' available)</h3>';
+      html += '<div class="hint" data-hint="1">';
+      html += '<span class="hint-num">1</span> Look at the function signature — what fields does the return type declare?';
+      html += '<div class="hint-hidden">The LearningGap interface has: id, quality, severity, confidence, suspected_misconception, repair_action, artifact_evidence, and blocks_readiness.</div>';
+      html += '</div>';
+      html += '<div class="hint" data-hint="2">';
+      html += '<span class="hint-num">2</span> severityFor and confidenceFor are pure functions. What does each receive as arguments?';
+      html += '<div class="hint-hidden">severityFor receives AnswerQuality and returns Severity. confidenceFor receives AnswerQuality + Severity and returns Confidence.</div>';
+      html += '</div>';
+      html += '<div class="hint" data-hint="3">';
+      html += '<span class="hint-num">3</span> Map each quality value to its severity and confidence. Which case changes the most between partial and gap_confirmed?';
+      html += '<div class="hint-hidden">partial → important severity / medium confidence. gap_confirmed → critical severity / high confidence. severityFor on line ~84. confidenceFor on line ~94.</div>';
+      html += '</div>';
+      html += '</div>';
+
+    } else {
+      // Post-attempt: show evidence check, gap, repair, readiness
+      var ec = fixture.evidence_check;
+      var gap = fixture.detected_gap;
+      var repair = fixture.repair_action;
+      var rc = fixture.readiness_claim;
+
+      html += '<div class="post-attempt">';
+
+      // Evidence check
+      html += '<div class="evidence-check-block">';
+      html += '<span class="ec-result ' + esc(ec.result) + '">Evidence Check: ' + esc(ec.result) + '</span>';
+      html += '<div class="ec-observed"><strong>Observed:</strong><ul>';
+      ec.observed_claims.forEach(function(c) { html += '<li>✓ ' + esc(c) + '</li>'; });
+      html += '</ul></div>';
+      html += '<div class="ec-missing"><strong>Missing:</strong><ul>';
+      ec.missing_claims.forEach(function(c) { html += '<li>✗ ' + esc(c) + '</li>'; });
+      html += '</ul></div>';
+      if (ec.unsupported_claims && ec.unsupported_claims.length) {
+        html += '<div style="font-size:10px;color:var(--amber);margin-top:4px;"><strong>Unsupported:</strong> ';
+        html += ec.unsupported_claims.map(function(c) { return esc(c); }).join("; ");
+        html += '</div>';
+      }
+      html += '</div>';
+
+      // Detected gap
+      html += '<div class="gap-block">';
+      html += '<span class="gap-label">Detected Gap</span>';
+      html += '<span class="gap-severity ' + esc(gap.severity) + '">' + esc(gap.severity) + '</span>';
+      html += '<div style="font-size:11px;margin-top:4px;line-height:1.45;">' + esc(gap.evidence) + '</div>';
+      if (gap.blocks_readiness) {
+        html += '<div class="gap-blocks">🚫 Blocks readiness</div>';
+      }
+      html += '<div class="gap-evidence">Evidence: ' + esc(gap.kind) + '</div>';
+      html += '</div>';
+
+      // Repair action
+      html += '<div class="repair-block">';
+      html += '<span class="repair-label">Repair Action</span>';
+      html += '<div class="repair-prompt">' + esc(repair.prompt) + '</div>';
+      html += '<div class="gap-evidence" style="margin-top:4px;">Required evidence: ';
+      repair.required_evidence.forEach(function(ev) {
+        html += esc(ev.file_path + ":" + ev.start_line + "-" + ev.end_line) + ' ';
+      });
+      html += '</div>';
+      html += '</div>';
+
+      // Readiness claim (scoped)
+      html += '<div class="readiness-block">';
+      html += '<span class="rc-label">Readiness Claim</span>';
+      html += '<span class="rc-scope-badge">scoped</span>';
+      html += '<div style="font-size:11px;color:var(--red);font-weight:600;margin-top:2px;">Status: ' + esc(rc.status) + '</div>';
+      html += '<div class="rc-scope">' + esc(rc.scope) + '</div>';
+      html += '<div class="rc-scope-note">This readiness claim is scoped to one operation and concept slice. It does not imply whole-repo mastery.</div>';
+      html += '<ul class="rc-blocked-list">';
+      rc.blocked_claims.forEach(function(c) { html += '<li>' + esc(c) + '</li>'; });
+      html += '</ul>';
+      html += '<div style="font-size:10px;color:var(--text-muted);margin-top:4px;">Blocked by gaps: ' + rc.blocking_gaps.join(", ") + '</div>';
+      html += '</div>';
+
+      html += '</div>'; // post-attempt
+    }
+
+    el("loopContent").innerHTML = html;
+
+    // Bind events
+    if (!state.attemptSubmitted) {
+      var submitBtn = el("submitAttempt");
+      var dunnoBtn = el("dunnoAttempt");
+      var sampleBtn = el("useSampleAttempt");
+
+      if (submitBtn) {
+        submitBtn.addEventListener("click", function() {
+          state.attemptSubmitted = true;
+          renderLoop();
+        });
+      }
+      if (dunnoBtn) {
+        dunnoBtn.addEventListener("click", function() {
+          el("attemptText").value = "I don't know how to trace this mapping.";
+          el("attemptConfidence").value = "low";
+          state.attemptSubmitted = true;
+          renderLoop();
+        });
+      }
+      if (sampleBtn) {
+        sampleBtn.addEventListener("click", function() {
+          var sa = fixture.sample_attempt;
+          el("attemptText").value = sa.answer_text;
+          el("attemptConfidence").value = sa.declared_confidence;
+          el("attemptUnknowns").value = sa.declared_unknowns.join(", ");
+        });
+      }
+
+      // Hint ladder
+      Array.from(el("loopContent").querySelectorAll(".hint")).forEach(function(h) {
+        h.addEventListener("click", function() {
+          if (state.revealedHints >= (fixture.active_operation.allowed_hints || 3)) return;
+          h.classList.add("revealed");
+          state.revealedHints++;
+        });
+      });
+    }
+  }
+
+  // ── Render: Evidence Rail ──
+  function renderEvidence() {
+    var inventory = fixture.evidence_inventory;
+    el("evCount").textContent = inventory.length + " items";
+
+    var stripHtml = "";
+    inventory.forEach(function(ev) {
+      var selClass = state.selectedEvidence && state.selectedEvidence.id === ev.id ? " selected" : "";
+      stripHtml += '<div class="ev-card' + selClass + '" data-ev-id="' + esc(ev.id) + '">';
+      stripHtml += '<span class="ev-role ' + esc(ev.role) + '">' + esc(ev.role.replace(/_/g, " ")) + '</span>';
+      stripHtml += '<div class="ev-path">' + esc(ev.path) + '</div>';
+      stripHtml += '<div class="ev-hash">' + esc(ev.content_hash) + '</div>';
+      stripHtml += '<div class="ev-excerpt">' + esc(ev.excerpt) + '</div>';
+      stripHtml += '<div class="ev-status">' + esc(ev.status) + ' · ' + esc(ev.line_count) + ' lines · ' + esc((ev.size_bytes / 1024).toFixed(1)) + ' KB</div>';
+      stripHtml += '</div>';
+    });
+
+    el("evidenceStrip").innerHTML = stripHtml;
+
+    // Bind clicks
+    Array.from(el("evidenceStrip").querySelectorAll(".ev-card")).forEach(function(card) {
+      card.addEventListener("click", function() {
+        var evId = card.dataset.evId;
+        var ev = inventory.find(function(e) { return e.id === evId; });
+        state.selectedEvidence = ev;
+        renderEvidence();
+        showEvidenceDetail(ev);
+      });
+    });
+
+    // Collapse button
+    el("collapseEvidence").addEventListener("click", function() {
+      el("evidenceRail").classList.toggle("collapsed");
+      el("collapseEvidence").textContent = el("evidenceRail").classList.contains("collapsed") ? "+" : "—";
+    });
+  }
+
+  function showEvidenceDetail(ev) {
+    if (!ev) { el("evDetail").hidden = true; return; }
+    var html = '<div class="ev-detail-header">';
+    html += '<span>' + esc(ev.id) + ': ' + esc(ev.path) + '</span>';
+    html += '<span class="ev-detail-close" id="closeEvDetail">×</span>';
+    html += '</div>';
+    html += '<div class="ev-detail-row">';
+    html += '<span>Role: <strong>' + esc(ev.role) + '</strong></span>';
+    html += '<span>Source type: <strong>' + esc(ev.source_type) + '</strong></span>';
+    html += '<span>Hash: <strong>' + esc(ev.content_hash) + '</strong></span>';
+    html += '<span>Size: <strong>' + esc((ev.size_bytes / 1024).toFixed(1)) + ' KB</strong></span>';
+    html += '<span>Lines: <strong>' + esc(ev.line_count) + '</strong></span>';
+    html += '<span>Status: <strong>' + esc(ev.status) + '</strong></span>';
+    html += '</div>';
+    html += '<div style="margin-top:6px;font-style:italic;font-size:11px;color:var(--text-secondary);">' + esc(ev.excerpt) + '</div>';
+    el("evDetail").innerHTML = html;
+    el("evDetail").hidden = false;
+
+    el("closeEvDetail").addEventListener("click", function() {
+      state.selectedEvidence = null;
+      el("evDetail").hidden = true;
+      renderEvidence();
+    });
+  }
+
+  // ── Initial Render ──
+  renderArtifact(state.activeArtifact);
+  renderLoop();
+  renderEvidence();
+
+})();
+</script>
+</body>
+</html>
