@@ -17,14 +17,21 @@
 
     // Toggle buttons
     html += '<div class="artifact-toggle">';
-    html += '<button class="' + (artifactId === "TA-001" ? "active" : "") + '" data-art="TA-001">Code Slice</button>';
-    html += '<button class="' + (artifactId === "TA-002" ? "active" : "") + '" data-art="TA-002">Flow Diagram</button>';
+    fixture.thinking_artifacts.forEach(function(toggleArtifact) {
+      html += '<button class="' + (artifactId === toggleArtifact.id ? "active" : "") + '" data-art="' + esc(toggleArtifact.id) + '">';
+      html += esc(artifactToggleLabel(toggleArtifact));
+      html += '</button>';
+    });
     html += '</div>';
 
     if (art.renderer === "code_slice") {
       html += renderCodeSlice(art);
     } else if (art.renderer === "flow_diagram") {
       html += renderFlowDiagram(art);
+    } else if (art.renderer === "patch_preview") {
+      html += renderPatchReadinessArtifact(art);
+    } else {
+      html += '<div class="blocked-state"><div class="blocked-title">Unsupported artifact renderer</div></div>';
     }
 
     html += '<div class="cv-citation">';
@@ -58,6 +65,13 @@
     Array.from(el("artifactContent").querySelectorAll(".cv-open-ref")).forEach(function(btn) {
       btn.addEventListener("click", function() {
         showToast("Reference: " + btn.dataset.path);
+      });
+    });
+
+    // Guarded apply action for patch readiness view (no product mutation in prototype)
+    Array.from(el("artifactContent").querySelectorAll(".apply-patch-btn[data-guarded='true']")).forEach(function(btn) {
+      btn.addEventListener("click", function() {
+        showToast("Apply is guard-railed in this prototype. No product mutation performed.");
       });
     });
 
@@ -96,6 +110,14 @@
         }
       });
     });
+  }
+
+  function artifactToggleLabel(artifact) {
+    if (!artifact || !artifact.renderer) return "Artifact";
+    if (artifact.renderer === "code_slice") return "Code Slice";
+    if (artifact.renderer === "flow_diagram") return "Flow Diagram";
+    if (artifact.renderer === "patch_preview") return "Patch Readiness";
+    return artifact.title || "Artifact";
   }
 
   function renderCodeSlice(art) {

@@ -312,6 +312,53 @@ window.deepOwnershipFixture = {
       },
       "success_criteria": ["Names the correct file and function for each step", "Identifies that gap detection runs before practice generation", "Identifies that memory aggregates gaps, challenges, and concept states before readiness", "Shows evidence-aware understanding of the data dependencies"],
       "created_at": "2026-05-16T00:00:00.000Z"
+    },
+    {
+      "id": "TA-003",
+      "kind": "patch_preview",
+      "title": "Patch Readiness Gate: readiness copy update",
+      "purpose": "Preview a generated product patch while enforcing mutation guardrails from readiness, evidence, and explicit user intent.",
+      "concept_slice_id": "CS-001",
+      "source_evidence": [
+        { "evidence_id": "EV-001", "file_path": "src/runtime-gap-detection.ts", "start_line": 84, "end_line": 112, "excerpt": "severity and confidence branching rules used by readiness decisions", "role": "implementation" },
+        { "evidence_id": "EV-002", "file_path": "src/runtime-readiness.ts", "start_line": 61, "end_line": 260, "excerpt": "readiness claim construction and blocking claim projection", "role": "implementation" },
+        { "evidence_id": "EV-008", "file_path": "Tests/readiness-report.test.ts", "start_line": 1, "end_line": 204, "excerpt": "behavior oracle for readiness reporting assertions", "role": "behavior_oracle" }
+      ],
+      "hidden_solution_evidence": [],
+      "user_operation": {
+        "id": "OP-003",
+        "kind": "modify",
+        "prompt": "Review the generated patch preview and explain exactly why apply is blocked. Cite the missing evidence and name the verification command required before any guarded mutation can be considered.",
+        "artifact_ids": ["TA-003"],
+        "required_evidence": ["EV-001", "EV-002", "EV-008"],
+        "allowed_hints": 2,
+        "blocked_shortcuts": ["cannot_apply_without_explicit_user_request", "cannot_skip_verification_command", "cannot_ignore_missing_evidence"],
+        "success_criteria": ["Identifies user-request gate as blocked", "Lists missing evidence items", "Names the required verification command", "Explains that patch preview is read-only until gate criteria pass"]
+      },
+      "renderer": "patch_preview",
+      "payload": {
+        "original_read_only_pane": {
+          "file_path": "src/runtime-deep-ownership-mutation-editor.ts",
+          "content": [
+            "function resolveAllowedAction(input) {",
+            "  if (!input.explicitUserRequest && !input.explicitOverride) {",
+            "    return {",
+            "      allowedAction: \"explicit_override_required\",",
+            "      blockedReason: \"Product mutation requires explicit user request or override.\",",
+            "    };",
+            "  }",
+            "}"
+          ]
+        },
+        "readiness_gate_checks": [
+          { "label": "Readiness scope", "status": "blocked", "detail": "Current readiness is limited and does not satisfy required mutation readiness." },
+          { "label": "Explicit user request", "status": "blocked", "detail": "No explicit user request or override is present for product mutation." },
+          { "label": "Evidence completeness", "status": "blocked", "detail": "Missing behavior-oracle evidence for the proposed patch impact." },
+          { "label": "Verification command", "status": "pending", "detail": "Run the required verification command before any guarded apply." }
+        ]
+      },
+      "success_criteria": ["Identifies user-request gate as blocked", "Lists missing evidence items", "Names the required verification command", "Explains that patch preview is read-only until gate criteria pass"],
+      "created_at": "2026-05-16T00:00:00.000Z"
     }
   ],
   "active_operation": {
@@ -392,6 +439,60 @@ window.deepOwnershipFixture = {
     "confidence": "low",
     "generated_at": "2026-05-16T00:06:00.000Z"
   },
+  "product_mutation_gate": {
+    "id": "MUT-GATE-001",
+    "proposed_change": "Update mutation gate rail copy in readiness projection to clarify missing evidence + verification requirements.",
+    "affected_files": ["src/runtime-deep-ownership-mutation-editor.ts", "Tests/deep-ownership-mutation-editor-bridge.test.ts"],
+    "required_readiness": "ready to modify mutation gate behavior for bounded workspace patch previews",
+    "current_readiness": {
+      "status": "limited",
+      "scope": "Can trace readiness projection behavior but not yet ready to mutate runtime files."
+    },
+    "missing_evidence": [
+      "Behavior-oracle evidence confirming this patch does not weaken guardrails is missing.",
+      "No explicit user request to apply a product mutation has been recorded."
+    ],
+    "explicit_user_request": false,
+    "explicit_override": false,
+    "patch_preview": "diff --git a/src/runtime-deep-ownership-mutation-editor.ts b/src/runtime-deep-ownership-mutation-editor.ts\n@@ -58,7 +58,11 @@ function resolveAllowedAction(input) {\n-      blockedReason: \"Readiness evidence is incomplete and no patch preview is available.\",\n+      blockedReason: \"Readiness evidence is incomplete. Provide missing evidence and run verification before guarded apply.\",\n     };\n   }\n+\n+  // Clarify blocked apply requirements in UI payload projection.\n+  const requiredVerification = input.verification_command;\n+  const missingEvidence = input.missing_evidence;",
+    "patch_preview_feasible": true,
+    "patch_preview_available": true,
+    "verification_command": "pnpm test -- Tests/deep-ownership-mutation-editor-bridge.test.ts",
+    "allowed_action": "explicit_override_required",
+    "blocked": true,
+    "blocked_reason": "Product mutation requires explicit user request or override.",
+    "created_at": "2026-05-16T00:08:00.000Z"
+  },
+  "command_output_strip": [
+    {
+      "id": "CMD-EVIDENCE-001",
+      "command": "pnpm test -- Tests/deep-ownership-mutation-editor-bridge.test.ts",
+      "cwd": "/Users/d1eshi/.codex/worktrees/e0f0/sibar",
+      "timestamp": "2026-05-16T00:08:10.000Z",
+      "exit_status": 1,
+      "stdout_summary": "3 assertions passed before guardrail apply checks failed.",
+      "stderr_summary": "Expected explicit user request evidence for apply path; gate remains blocked.",
+      "output_refs": [
+        {
+          "id": "CMD-OUT-001",
+          "stream": "stdout",
+          "excerpt": "✔ mutation gate includes affected files and verification command",
+          "byte_length": 71,
+          "content_hash": "sha256:45cd2b1f"
+        },
+        {
+          "id": "CMD-OUT-002",
+          "stream": "stderr",
+          "excerpt": "✖ expected explicit user request evidence for guarded apply",
+          "byte_length": 62,
+          "content_hash": "sha256:ee81acb2"
+        }
+      ],
+      "evidence_role": "behavior_oracle",
+      "accepted_as_read_only_evidence": true,
+      "safety_violation_reason": null
+    }
+  ],
   "loop_state": {
     "id": "LOOP-001",
     "current_state": "GapOrReady",
