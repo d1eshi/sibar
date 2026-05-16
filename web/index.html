@@ -56,6 +56,20 @@ if (location.protocol !== "file:" && location.hostname !== "localhost" && locati
       <li class="source-chip"><span>Post tecnico</span><small>Decisiones, tradeoffs o guia</small></li>
     </ul>
 
+    <section class="early-access-card" aria-label="Early access">
+      <div>
+        <p class="early-access-kicker">Early access</p>
+        <h2>Workspace completo por cohortes</h2>
+        <p>Deja tu correo y, si queres, tu handle de X. Te contacto cuando abramos la siguiente tanda.</p>
+      </div>
+      <form class="early-access-form" id="earlyAccessForm">
+        <input id="earlyAccessEmail" name="email" type="email" placeholder="tu@email.com" autocomplete="email" required>
+        <input id="earlyAccessXHandle" name="x_handle" type="text" placeholder="@x_handle opcional" autocomplete="off" inputmode="text">
+        <button class="secondary-btn small" type="submit">Pedir acceso</button>
+        <p class="early-access-status" id="earlyAccessStatus" aria-live="polite"></p>
+      </form>
+    </section>
+
     <section class="recent-sources" id="recentSources" aria-label="Lecturas recientes" hidden>
       <div class="recent-header">
         <span>Recientes</span>

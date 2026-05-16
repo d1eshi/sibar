@@ -1,4 +1,4 @@
-import { fetchReadableArticle, normalizeArticleUrl } from "./api.js";
+import { fetchReadableArticle, normalizeArticleUrl, requestEarlyAccess } from "./api.js";
 import { sampleArticle } from "./sample-article.js";
 import {
   getSavedWorkspaceByUrl,
@@ -153,6 +153,15 @@ async function openHistoryUrl(url) {
   await loadUrl(url);
 }
 
+async function submitEarlyAccess() {
+  const email = elements.earlyAccessEmail.value.trim();
+  const xHandle = elements.earlyAccessXHandle.value.trim();
+  elements.earlyAccessStatus.textContent = "Enviando...";
+  await requestEarlyAccess({ email, xHandle });
+  elements.earlyAccessForm.reset();
+  elements.earlyAccessStatus.textContent = "Listo. Te contacto cuando abramos la siguiente tanda.";
+}
+
 function clearPending() {
   pendingSelection = null;
   delete elements.selectionCard.dataset.activeKind;
@@ -276,6 +285,17 @@ elements.form.addEventListener("submit", async (event) => {
     setStatus(elements, error instanceof Error ? error.message : "Error.");
   }
 });
+
+if (elements.earlyAccessForm) {
+  elements.earlyAccessForm.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    try {
+      await submitEarlyAccess();
+    } catch (error) {
+      elements.earlyAccessStatus.textContent = error instanceof Error ? error.message : "No se pudo pedir acceso.";
+    }
+  });
+}
 
 elements.sampleBtn.addEventListener("click", openSample);
 if (elements.emptySampleBtn) elements.emptySampleBtn.addEventListener("click", openSample);
