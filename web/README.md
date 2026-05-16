@@ -56,6 +56,23 @@ The reader calls:
 /api/read?url=...
 ```
 
+The early access form calls:
+
+```text
+POST /api/early-access
+```
+
+Configure the required Supabase secrets in Vercel project environment variables,
+not in source code:
+
+```text
+SUPABASE_URL
+SUPABASE_SERVICE_ROLE_KEY
+```
+
+See `../docs/specs/12_early_access_waitlist.md` before changing this endpoint,
+schema, logging, or client behavior.
+
 ## CLI Deploy
 
 From the repository root:
