@@ -6,6 +6,7 @@
  */
 
 export * from "./runtime-deep-ownership-evidence-types.ts";
+export * from "./runtime-deep-ownership-intelligence-types.ts";
 export * from "./runtime-deep-ownership-loop-types.ts";
 
 export {
@@ -39,3 +40,12 @@ export {
   projectWorkspaceSnapshot,
   projectWorkspaceSnapshotFromFixture,
 } from "./runtime-deep-ownership-snapshot.ts";
+
+export {
+  summarizeProgressiveInventory,
+  createResearchToConstructionBridge,
+  validateResearchToConstructionBridge,
+  storeWorkspaceSignal,
+  evaluateSignalOwnershipStrength,
+  routeOutOfBoundEvidenceToBoundaryExpansion,
+} from "./runtime-deep-ownership-intelligence.ts";

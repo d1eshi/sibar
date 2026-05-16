@@ -9,6 +9,12 @@ import type {
   UserOperation,
   UserOperationKind,
 } from "./runtime-deep-ownership-evidence-types.ts";
+import type {
+  BoundaryExpansionRoute,
+  OutOfScopeEvidenceRecord,
+  ResearchToConstructionBridge,
+  WorkspaceSignal,
+} from "./runtime-deep-ownership-intelligence-types.ts";
 
 // ── Attempt & Evidence Check ──────────────────────────────────────────
 
@@ -155,6 +161,10 @@ export type DeepOwnershipLoop = {
   evidence_inventory: EvidenceInventoryEntry[];
   skip_records: SkipRecord[];
   unknown_zones: UnknownZone[];
+  research_bridges?: ResearchToConstructionBridge[];
+  workspace_signals?: WorkspaceSignal[];
+  out_of_scope_evidence?: OutOfScopeEvidenceRecord[];
+  boundary_expansion_routes?: BoundaryExpansionRoute[];
   sample_attempt: UserAttempt | null;
   evidence_check: EvidenceCheck | null;
   detected_gap: OwnershipGap | null;
@@ -178,6 +188,9 @@ export type WorkspaceSnapshot = {
   active_operation: UserOperation | null;
   evidence_visible: EvidenceInventoryEntry[];
   unknown_zones: UnknownZone[];
+  workspace_signals: WorkspaceSignal[];
+  out_of_scope_evidence: OutOfScopeEvidenceRecord[];
+  boundary_expansion_routes: BoundaryExpansionRoute[];
   attempt_stored: boolean;
   attempt_result: {
     answer_text: string;
@@ -216,6 +229,10 @@ export type DeepOwnershipFixture = {
   evidence_inventory: EvidenceInventoryEntry[];
   skip_records: SkipRecord[];
   unknown_zones: UnknownZone[];
+  research_bridges?: ResearchToConstructionBridge[];
+  workspace_signals?: WorkspaceSignal[];
+  out_of_scope_evidence?: OutOfScopeEvidenceRecord[];
+  boundary_expansion_routes?: BoundaryExpansionRoute[];
   out_of_bound_refs: EvidenceRef[];
   concept_slice: ConceptSlice;
   thinking_artifacts: ThinkingArtifact[];
