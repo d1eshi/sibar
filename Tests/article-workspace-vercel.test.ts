@@ -5,18 +5,42 @@ import { pathToFileURL } from "node:url";
 import test from "node:test";
 
 const root = process.cwd();
-const webHtml = readFileSync(join(root, "web/article-workspace.html"), "utf8");
+const webHtml = readFileSync(join(root, "web/index.html"), "utf8");
+const legacyHtml = readFileSync(join(root, "web/article-workspace.html"), "utf8");
+const changelogHtml = readFileSync(join(root, "web/changelog.html"), "utf8");
+const webApiClient = readFileSync(join(root, "web/scripts/api.js"), "utf8");
 const webApi = readFileSync(join(root, "web/api/read.mjs"), "utf8");
 const analyticsResearch = readFileSync(join(root, "web/ANALYTICS_RESEARCH.md"), "utf8");
+const rootVercelIgnore = readFileSync(join(root, ".vercelignore"), "utf8");
+const webVercelIgnore = readFileSync(join(root, "web/.vercelignore"), "utf8");
+const rootVercelConfig = JSON.parse(readFileSync(join(root, "vercel.json"), "utf8"));
 const vercelConfig = JSON.parse(readFileSync(join(root, "web/vercel.json"), "utf8"));
 
 test("article workspace web deploy is rooted under /web", () => {
-  assert.match(webHtml, /Sibi Article Workspace/);
-  assert.match(webHtml, /fetch\(`\/api\/read\?url=\$\{encodeURIComponent\(url\)\}`\)/);
+  assert.match(webHtml, /Sibar Reader/);
+  assert.match(webHtml, /<link rel="stylesheet" href="\/styles\/reader\.css">/);
+  assert.match(webHtml, /<script type="module" src="\/scripts\/app\.js"><\/script>/);
+  assert.match(webApiClient, /fetch\(`\/api\/read\?url=\$\{encodeURIComponent\(url\)\}`\)/);
   assert.equal(vercelConfig.framework, null);
   assert.equal(vercelConfig.cleanUrls, true);
   assert.equal(vercelConfig.installCommand, "");
   assert.equal(vercelConfig.buildCommand, null);
+  assert.doesNotMatch(JSON.stringify(vercelConfig), /article-workspace/);
+});
+
+test("legacy article workspace path redirects to the root reader", () => {
+  assert.match(legacyHtml, /location\.replace\('\/' \+ location\.search \+ location\.hash\)/);
+  assert.match(legacyHtml, /<link rel="canonical" href="\/">/);
+});
+
+test("web changelog is a direct URL page and not linked from the reader", () => {
+  assert.match(changelogHtml, /Sibar Changelog/);
+  assert.match(changelogHtml, /Reader enfocado/);
+  assert.match(changelogHtml, /Primer reader publico/);
+  assert.match(changelogHtml, /Analitica limitada a visitas agregadas/);
+  assert.doesNotMatch(changelogHtml, /\/api|localStorage|deploy surface|SSR|build step|Tests cubren/);
+  assert.match(changelogHtml, /href="\/styles\/changelog\.css"/);
+  assert.doesNotMatch(webHtml, /href="\/changelog"|href="\/changelog\.html"/);
 });
 
 test("article workspace Vercel API is self-contained JavaScript", () => {
@@ -25,6 +49,17 @@ test("article workspace Vercel API is self-contained JavaScript", () => {
   assert.match(webApi, /Private network article URLs are not supported/);
   assert.match(webApi, /RATE_LIMIT_MAX_PER_MINUTE/);
   assert.match(webApi, /vercel-cdn-cache-control/);
+});
+
+test("article workspace deploy excludes repository internals", () => {
+  assert.equal(rootVercelConfig.outputDirectory, "web");
+  assert.match(rootVercelIgnore, /^\*$/m);
+  assert.match(rootVercelIgnore, /^!web\/index\.html$/m);
+  assert.match(rootVercelIgnore, /^!web\/api\/\*\*$/m);
+  assert.match(webVercelIgnore, /^\.vercel$/m);
+  assert.match(webVercelIgnore, /^ANALYTICS_RESEARCH\.md$/m);
+  assert.doesNotMatch(rootVercelIgnore, /^!docs\//m);
+  assert.doesNotMatch(rootVercelIgnore, /^!AGENTS\.md$/m);
 });
 
 test("article workspace Vercel API rejects invalid URLs before fetching", async () => {
