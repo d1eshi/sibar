@@ -49,3 +49,10 @@ export {
   evaluateSignalOwnershipStrength,
   routeOutOfBoundEvidenceToBoundaryExpansion,
 } from "./runtime-deep-ownership-intelligence.ts";
+
+export {
+  previewWorkspaceCommand,
+  assessReadOnlyCommandMutation,
+  createReadOnlyCommandEvidence,
+  writeStudyArtifact,
+} from "./runtime-deep-ownership-command-safety.ts";

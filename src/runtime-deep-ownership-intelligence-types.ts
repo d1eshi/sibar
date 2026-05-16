@@ -45,6 +45,80 @@ export type WorkspaceSignal = {
   created_at: string;
 };
 
+export type WorkspaceCommandSafetyLevel =
+  | "read_only"
+  | "study_write"
+  | "product_write"
+  | "destructive";
+
+export type WorkspaceCommandWriteScope =
+  | "none"
+  | "study_artifacts_only"
+  | "product_workspace"
+  | "unknown";
+
+export type WorkspaceCommandBoundaryStatus = "in_scope" | "out_of_scope";
+
+export type WorkspaceCommandPreview = {
+  id: string;
+  command: string;
+  cwd: string;
+  safety_level: WorkspaceCommandSafetyLevel;
+  expected_outputs: string[];
+  write_scope: WorkspaceCommandWriteScope;
+  requires_confirmation: boolean;
+  boundary_status: WorkspaceCommandBoundaryStatus;
+  blocked: boolean;
+  blocked_reason: string | null;
+  created_at: string;
+};
+
+export type CommandOutputRef = {
+  id: string;
+  stream: "stdout" | "stderr";
+  excerpt: string;
+  byte_length: number;
+  content_hash: string;
+};
+
+export type ReadOnlyCommandMutationAssessment = {
+  violated: boolean;
+  blocked: boolean;
+  mutated_paths: string[];
+  reason: string | null;
+};
+
+export type ReadOnlyCommandEvidenceRecord = {
+  id: string;
+  command: string;
+  cwd: string;
+  timestamp: string;
+  exit_status: number;
+  stdout_summary: string;
+  stderr_summary: string;
+  output_refs: CommandOutputRef[];
+  evidence_role: EvidenceRole;
+  accepted_as_read_only_evidence: boolean;
+  safety_violation_reason: string | null;
+};
+
+export type StudyArtifactRecord = {
+  id: string;
+  relative_path: string;
+  canonical_path: string;
+  study_directory: string;
+  study_only: true;
+  source_evidence: EvidenceRef[];
+  cited_evidence_ids: string[];
+  created_at: string;
+};
+
+export type StudyArtifactWriteResult = {
+  blocked: boolean;
+  violation_reason: string | null;
+  record: StudyArtifactRecord | null;
+};
+
 export type OutOfScopeEvidenceRecord = {
   id: string;
   path_or_source: string;
