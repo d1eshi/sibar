@@ -1,6 +1,9 @@
 # Sibar Reader Web Deploy
 
 This directory is the isolated public deploy surface for the article reader.
+Deploy-shape changes are governed by
+`../docs/specs/11_vercel_deploy_ownership.md`; read that spec before changing
+`vercel.json`, functions, SSR, framework, build, install, or routing behavior.
 
 It contains only:
 

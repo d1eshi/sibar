@@ -3,6 +3,8 @@ export const LEGACY_STORAGE_KEY = "sibi.article.workspace.v1";
 export const HISTORY_KEY = "sibar.reader.history.v1";
 export const LEGACY_HISTORY_KEY = "sibi.article.history.v1";
 export const HISTORY_LIMIT = 20;
+export const SOURCE_TRIAL_KEY = "sibar.reader.sourceTrial.v1";
+export const SOURCE_TRIAL_LIMIT = 3;
 
 export function loadJson(key, fallback) {
   try {
@@ -70,4 +72,26 @@ export function nextHistory(history, article, noteCount) {
   return [nextItem, ...history.filter((item) => item.url !== article.url)]
     .filter((item) => item && isHistoryUrl(item.url))
     .slice(0, HISTORY_LIMIT);
+}
+
+export function loadSourceTrial() {
+  const trial = loadJson(SOURCE_TRIAL_KEY, { urls: [] });
+  const urls = Array.isArray(trial?.urls)
+    ? trial.urls.filter(isHistoryUrl).slice(0, SOURCE_TRIAL_LIMIT)
+    : [];
+  return { urls };
+}
+
+export function isSourceTrialBlocked(url) {
+  const trial = loadSourceTrial();
+  return !trial.urls.includes(url) && trial.urls.length >= SOURCE_TRIAL_LIMIT;
+}
+
+export function recordSourceTrialUrl(url) {
+  if (!isHistoryUrl(url)) return loadSourceTrial();
+  const trial = loadSourceTrial();
+  if (trial.urls.includes(url)) return trial;
+  const next = { urls: [...trial.urls, url].slice(0, SOURCE_TRIAL_LIMIT) };
+  saveJson(SOURCE_TRIAL_KEY, next);
+  return next;
 }
