@@ -3,6 +3,8 @@
 // Must be loaded after workspace-helpers.js
 "use strict";
 
+  var _evidenceCollapseBound = false;
+
   function renderEvidence() {
     var inventory = fixture.evidence_inventory;
     el("evCount").textContent = inventory.length + " items";
@@ -39,18 +41,24 @@
       });
     });
 
-    // Collapse button
-    el("collapseEvidence").addEventListener("click", function() {
-      el("evidenceRail").classList.toggle("collapsed");
-      el("collapseEvidence").textContent = el("evidenceRail").classList.contains("collapsed") ? "+" : "—";
-    });
+    // Collapse button — bind once to prevent listener accumulation
+    if (!_evidenceCollapseBound) {
+      _evidenceCollapseBound = true;
+      el("collapseEvidence").addEventListener("click", function() {
+        el("evidenceRail").classList.toggle("collapsed");
+        var collapsed = el("evidenceRail").classList.contains("collapsed");
+        el("collapseEvidence").setAttribute("aria-expanded", String(collapsed));
+        el("collapseEvidence").setAttribute("aria-label", collapsed ? "Expand evidence" : "Collapse evidence");
+        el("collapseEvidence").textContent = collapsed ? "+" : "—";
+      });
+    }
   }
 
   function showEvidenceDetail(ev) {
     if (!ev) { el("evDetail").hidden = true; return; }
     var html = '<div class="ev-detail-header">';
     html += '<span>' + esc(ev.id) + ': ' + esc(ev.path) + '</span>';
-    html += '<span class="ev-detail-close" id="closeEvDetail">×</span>';
+    html += '<button class="ev-detail-close" id="closeEvDetail" aria-label="Close evidence detail">×</button>';
     html += '</div>';
     html += '<div class="ev-detail-row">';
     html += '<span>Role: <strong>' + esc(ev.role) + '</strong></span>';
