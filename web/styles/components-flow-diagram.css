@@ -1,0 +1,117 @@
+/* ── Flow Diagram ── */
+.flow-diagram {
+  border: 1px solid var(--divider);
+  border-radius: var(--radius);
+  background: var(--surface-raised);
+  padding: 20px;
+  margin-bottom: 20px;
+}
+.flow-nodes {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+.flow-node {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border-left: 3px solid var(--divider);
+  position: relative;
+  transition: background 0.15s;
+}
+.flow-node + .flow-node { margin-top: 0; }
+.flow-node .connector {
+  position: absolute;
+  left: -1px;
+  top: -8px;
+  bottom: -8px;
+  width: 1px;
+  background: var(--divider);
+  z-index: 0;
+}
+.flow-node:first-child .connector { top: 50%; }
+.flow-node:last-child .connector { bottom: 50%; }
+.flow-node .node-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 2px solid var(--divider);
+  background: var(--surface-raised);
+  flex-shrink: 0;
+  z-index: 1;
+}
+.flow-node.entry .node-dot {
+  background: var(--teal);
+  border-color: var(--teal);
+  box-shadow: 0 0 0 3px var(--teal-light);
+}
+.flow-node.terminal .node-dot {
+  background: var(--amber);
+  border-color: var(--amber);
+  box-shadow: 0 0 0 3px var(--amber-light);
+}
+.flow-node.process .node-dot {
+  background: var(--surface-raised);
+  border-color: var(--teal);
+}
+.flow-node.data .node-dot {
+  border-style: dashed;
+  border-color: var(--text-muted);
+}
+.flow-node.output .node-dot {
+  background: var(--surface-raised);
+  border-color: var(--amber);
+}
+.flow-node.inferred { opacity: 0.7; }
+.flow-node.inferred .node-dot { border-style: dotted; }
+.flow-node .node-label {
+  font-size: 13px;
+  font-weight: 500;
+  z-index: 1;
+}
+.flow-node .node-role {
+  font-size: 10px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-left: auto;
+  z-index: 1;
+}
+.flow-node .node-ev {
+  font-size: 9px;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  margin-left: 6px;
+}
+.flow-node .node-prompt {
+  font-size: 10px;
+  color: var(--text-muted);
+  font-style: italic;
+  margin-top: 2px;
+  display: block;
+  z-index: 1;
+}
+
+.edge-legend {
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid var(--divider-thin);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  font-size: 10px;
+  color: var(--text-muted);
+}
+.edge-legend span {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.edge-legend .legend-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  background: var(--teal);
+  opacity: 0.4;
+}

@@ -1,0 +1,109 @@
+/* ── Boundary Rail ── */
+.boundary-rail {
+  grid-area: boundary;
+  border-right: 1px solid var(--divider);
+}
+.boundary-rail h2 { color: var(--teal); }
+
+.goal-block {
+  margin-bottom: 16px;
+  padding: 10px 12px;
+  background: var(--teal-bg);
+  border-left: 3px solid var(--teal);
+  border-radius: var(--radius-sm);
+}
+.goal-block .goal-label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--teal);
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+.goal-block p {
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--text-primary);
+}
+
+.boundary-section {
+  margin-bottom: 14px;
+}
+.boundary-section h3 {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 6px;
+  letter-spacing: 0.02em;
+}
+
+.src-list {
+  list-style: none;
+  font-size: 12px;
+  font-family: var(--font-mono);
+}
+.src-list li {
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.src-list li.included { border-left: 2px solid var(--teal); color: var(--text-primary); }
+.src-list li.excluded {
+  color: var(--text-muted);
+  text-decoration: line-through;
+  text-decoration-color: var(--divider);
+}
+
+.concept-chip {
+  display: inline-block;
+  font-size: 11px;
+  padding: 3px 8px;
+  border-radius: var(--radius-sm);
+  background: var(--amber-bg);
+  color: var(--amber);
+  border: 1px solid var(--amber-light);
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+
+.unknown-zone-item {
+  padding: 6px 8px;
+  margin-bottom: 6px;
+  border: 1px dashed var(--amber);
+  border-radius: var(--radius-sm);
+  background: var(--amber-bg);
+  font-size: 11px;
+}
+.unknown-zone-item .uz-path {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--amber);
+  font-weight: 500;
+}
+.unknown-zone-item .uz-reason {
+  color: var(--text-secondary);
+  margin-top: 2px;
+  font-size: 10px;
+}
+.unknown-zone-item .uz-open {
+  color: var(--text-muted);
+  font-size: 10px;
+  font-style: italic;
+  margin-top: 2px;
+}
+
+.skip-summary {
+  font-size: 11px;
+  color: var(--text-muted);
+  padding: 6px 8px;
+  background: var(--surface-warm);
+  border-radius: var(--radius-sm);
+}
+.skip-summary .skip-count { font-weight: 600; color: var(--text-secondary); }
+.skip-summary details { margin-top: 4px; }
+.skip-summary summary { cursor: pointer; font-size: 10px; color: var(--text-muted); }
+.skip-summary ul { font-size: 10px; padding-left: 14px; margin-top: 3px; }
+.skip-summary ul li { color: var(--text-muted); }

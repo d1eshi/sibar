@@ -1,0 +1,155 @@
+/* ── Code Viewer ── */
+.code-viewer {
+  border: 1px solid var(--divider);
+  border-radius: var(--radius);
+  background: var(--surface-raised);
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+.code-viewer .cv-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--divider-thin);
+  background: var(--surface-warm);
+  font-size: 12px;
+  font-family: var(--font-mono);
+  color: var(--text-secondary);
+}
+.code-viewer .cv-header .file-path {
+  font-weight: 500;
+  color: var(--text-primary);
+}
+.cv-actions {
+  display: flex;
+  gap: 6px;
+}
+.cv-actions button {
+  font-size: 10px;
+  padding: 3px 8px;
+  border: 1px solid var(--divider);
+  background: var(--surface-raised);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  color: var(--text-secondary);
+  font-family: var(--font-sans);
+}
+.cv-actions button:hover {
+  background: var(--teal-bg);
+  border-color: var(--teal);
+  color: var(--teal);
+}
+.code-lines {
+  overflow-x: auto;
+}
+.code-line {
+  display: flex;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 1.6;
+  min-height: 20px;
+}
+.code-line .ln {
+  width: 48px;
+  flex-shrink: 0;
+  text-align: right;
+  padding: 0 10px 0 6px;
+  color: var(--text-muted);
+  user-select: none;
+  background: var(--surface-warm);
+  border-right: 1px solid var(--divider-thin);
+  font-size: 11px;
+}
+.code-line .cl {
+  padding: 0 12px;
+  white-space: pre;
+  color: var(--text-primary);
+}
+.code-line.hidden-line .ln,
+.code-line.hidden-line .cl {
+  color: var(--text-muted);
+  font-style: italic;
+  background: var(--surface-warm);
+}
+.code-line.hidden-line .cl::before {
+  content: "⋯ ";
+  color: var(--amber);
+  font-style: normal;
+}
+.code-line.in-range {
+  background: var(--teal-bg);
+}
+.code-line.in-range .ln {
+  background: var(--teal-bg);
+  color: var(--teal);
+  font-weight: 600;
+}
+.code-line.in-range.hidden-line {
+  background: var(--amber-bg);
+}
+.code-line.in-range.hidden-line .ln {
+  background: var(--amber-bg);
+}
+
+.cv-related {
+  padding: 8px 12px;
+  border-top: 1px solid var(--divider-thin);
+  font-size: 11px;
+  color: var(--text-muted);
+  background: var(--surface-warm);
+}
+.cv-related span { font-weight: 500; color: var(--text-secondary); }
+
+.cv-symbols {
+  padding: 8px 12px;
+  border-top: 1px solid var(--divider-thin);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.cv-symbols .sym-chip {
+  font-size: 10px;
+  font-family: var(--font-mono);
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+  background: var(--surface-warm);
+  color: var(--text-secondary);
+  border: 1px solid var(--divider);
+}
+
+.cv-citation {
+  margin-top: 12px;
+  padding: 8px 12px;
+  border-radius: var(--radius);
+  background: var(--amber-bg);
+  border: 1px solid var(--amber-light);
+  font-size: 11px;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.cv-citation .role-badge {
+  font-size: 10px;
+  padding: 2px 7px;
+  border-radius: var(--radius-sm);
+  background: var(--amber-light);
+  color: var(--amber);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* ── Code Line Selection ── */
+.code-line.selectable { cursor: pointer; transition: background 0.1s; }
+.code-line.selectable:hover { background: var(--teal-bg); }
+.code-line.selected-line {
+  background: var(--teal-bg) !important;
+  border-left: 3px solid var(--teal);
+}
+.code-line.selected-line .ln { color: var(--teal); font-weight: 600; }
+.code-line.selected-evidence-line {
+  background: var(--amber-bg) !important;
+  border-left: 3px solid var(--amber);
+}

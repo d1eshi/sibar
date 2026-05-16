@@ -1,0 +1,102 @@
+/* ── First-Run Setup Flow ── */
+.setup-overlay {
+  position: fixed;
+  inset: 0;
+  background: var(--surface);
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+.setup-card {
+  width: 100%;
+  max-width: 620px;
+  background: var(--surface-raised);
+  border: 1px solid var(--divider);
+  border-radius: var(--radius);
+  padding: 28px 32px;
+  box-shadow: var(--shadow-md);
+}
+.setup-card h2 {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 6px;
+}
+.setup-card .setup-step-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--teal);
+  font-weight: 600;
+  margin-bottom: 14px;
+}
+.setup-card .setup-body {
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--text-secondary);
+  margin-bottom: 20px;
+}
+.setup-card .setup-info-block {
+  padding: 10px 12px;
+  border-left: 3px solid var(--teal);
+  background: var(--teal-bg);
+  border-radius: var(--radius-sm);
+  margin-bottom: 12px;
+  font-size: 12px;
+}
+.setup-card .setup-info-block.amber { border-left-color: var(--amber); background: var(--amber-bg); }
+.setup-card .setup-nav {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+.setup-card .setup-nav button {
+  font-size: 12px;
+  padding: 7px 18px;
+  border-radius: var(--radius);
+  cursor: pointer;
+  font-weight: 500;
+  border: 1px solid var(--divider);
+  background: var(--surface-raised);
+  color: var(--text-secondary);
+  transition: all 0.15s;
+}
+.setup-card .setup-nav button.primary {
+  background: var(--teal);
+  color: white;
+  border-color: var(--teal);
+}
+.setup-card .setup-nav button.primary:hover { background: #0f766e; }
+.setup-card .setup-nav button:hover { background: var(--surface-warm); }
+.setup-card .setup-progress {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 16px;
+}
+.setup-card .setup-progress .sp-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--divider);
+  transition: background 0.2s;
+}
+.setup-card .setup-progress .sp-dot.active { background: var(--teal); }
+.setup-card .setup-progress .sp-dot.done { background: var(--teal-light); }
+.setup-card code {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  background: var(--surface-warm);
+  padding: 1px 5px;
+  border-radius: var(--radius-sm);
+}
+
+/* ── Setup Complete Transition ── */
+.setup-complete {
+  animation: setupFadeOut 0.4s ease-out forwards;
+}
+@keyframes setupFadeOut {
+  to { opacity: 0; pointer-events: none; }
+}
