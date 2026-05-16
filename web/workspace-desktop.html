@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sibar Workspace — Deep Ownership Desktop Shell</title>
+<link rel="stylesheet" href="styles/tokens.css">
+<link rel="stylesheet" href="styles/base.css">
+<link rel="stylesheet" href="styles/layout.css">
+<link rel="stylesheet" href="styles/components-boundary.css">
+<link rel="stylesheet" href="styles/components-artifact.css">
+<link rel="stylesheet" href="styles/components-patch-readiness.css">
+<link rel="stylesheet" href="styles/components-code-viewer.css">
+<link rel="stylesheet" href="styles/components-flow-diagram.css">
+<link rel="stylesheet" href="styles/components-loop.css">
+<link rel="stylesheet" href="styles/components-attempt.css">
+<link rel="stylesheet" href="styles/components-post-attempt.css">
+<link rel="stylesheet" href="styles/components-evidence.css">
+<link rel="stylesheet" href="styles/setup.css">
+</head>
+<body data-shell-path="dow-desktop-shell-path">
+
+<!-- ── Skip Navigation (Keyboard Accessibility) ── -->
+<a href="#artifactCanvas" class="skip-nav" aria-label="Skip to artifact canvas">Skip to Artifact</a>
+<a href="#loopRail" class="skip-nav" style="left:150px;" aria-label="Skip to loop rail">Skip to Loop</a>
+<a href="#evidenceRail" class="skip-nav" style="left:280px;" aria-label="Skip to evidence">Skip to Evidence</a>
+
+<!-- ── First-Run Setup Overlay ── -->
+<div class="setup-overlay" id="setupOverlay" role="dialog" aria-label="Workspace Setup" aria-modal="true">
+  <div class="setup-card" id="setupCard"></div>
+</div>
+
+<!-- ── Error Monitor ── -->
+<div class="error-monitor" id="errorMonitor" role="alert" aria-live="assertive">
+  <span class="err-count" id="errCount">0</span> page errors
+</div>
+
+<!-- ── Top Bar ── -->
+<div class="top-bar" data-component="lab-shell" data-component-label="Lab Shell">
+  <span class="brand">Sibar Lab</span>
+  <span class="breadcrumb">/ Deep Ownership Workspace</span>
+  <span class="state-badge" id="loopState" role="status" aria-live="polite">AwaitingAttempt</span>
+</div>
+
+<!-- ── Workspace Grid ── -->
+<div class="workspace" id="workspace">
+
+  <!-- Boundary Left Rail -->
+  <aside class="rail boundary-rail" id="boundaryRail" data-component="source-and-artifact-rail" data-component-label="Source & Artifact Rail">
+    <h2>Boundary</h2>
+    <div id="boundaryContent"></div>
+  </aside>
+
+  <!-- Artifact Canvas -->
+  <main class="artifact-canvas" id="artifactCanvas" data-component="code-workbench-artifact" data-component-label="Code Workbench" tabindex="-1">
+    <h2>Artifact</h2>
+    <div id="artifactContent"></div>
+  </main>
+
+  <!-- Sibi Loop Right Rail -->
+  <aside class="rail loop-rail" id="loopRail" data-component="sibi-loop-rail" data-component-label="Sibi Loop Rail">
+    <h2>Loop</h2>
+    <div id="loopContent"></div>
+  </aside>
+
+  <!-- Evidence Bottom Rail -->
+  <footer class="evidence-rail" id="evidenceRail" data-component="evidence-strip" data-component-label="Evidence Strip">
+    <div class="evidence-header">
+      <h2>Evidence</h2>
+      <span class="ev-count" id="evCount"></span>
+      <button class="collapse-btn" id="collapseEvidence" aria-expanded="true" aria-label="Collapse evidence">—</button>
+    </div>
+    <div class="evidence-strip" id="evidenceStrip"></div>
+    <div class="ev-detail-panel" id="evDetail" hidden></div>
+  </footer>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- ── Fixture Data ── -->
+<script src="scripts/workspace-fixture.js"></script>
+<script src="scripts/workspace-desktop-shell.js"></script>
+
+<!-- ── Application Scripts (load order matters) ── -->
+<script src="scripts/workspace-helpers.js"></script>
+<script src="scripts/workspace-setup.js"></script>
+<script src="scripts/workspace-render-boundary.js"></script>
+<script src="scripts/workspace-render-evidence.js"></script>
+<script src="scripts/workspace-render-patch-readiness.js"></script>
+<script src="scripts/workspace-render-artifact.js"></script>
+<script src="scripts/workspace-render-loop-composer.js"></script>
+<script src="scripts/workspace-render-loop-results.js"></script>
+<script src="scripts/workspace-render-loop.js"></script>
+<script src="scripts/workspace-app.js"></script>
+
+</body>
+</html>
