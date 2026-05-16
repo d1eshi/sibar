@@ -14,3 +14,12 @@ export {
 export type {
   StudyArtifactWriteInput,
 } from "./runtime-deep-ownership-study-artifacts.ts";
+
+export {
+  createProductMutationGate,
+  createOpenInEditorCitationPayload,
+} from "./runtime-deep-ownership-mutation-editor.ts";
+export type {
+  ProductMutationGateInput,
+  OpenInEditorCitationPayloadInput,
+} from "./runtime-deep-ownership-mutation-editor.ts";

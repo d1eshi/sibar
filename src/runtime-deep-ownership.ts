@@ -55,4 +55,6 @@ export {
   assessReadOnlyCommandMutation,
   createReadOnlyCommandEvidence,
   writeStudyArtifact,
+  createProductMutationGate,
+  createOpenInEditorCitationPayload,
 } from "./runtime-deep-ownership-command-safety.ts";

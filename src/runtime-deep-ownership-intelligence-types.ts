@@ -138,3 +138,49 @@ export type BoundaryExpansionRoute = {
   status: BoundaryExpansionRouteStatus;
   created_at: string;
 };
+
+export type MutationAllowedAction =
+  | "study_only"
+  | "preview_patch"
+  | "apply_with_guardrails"
+  | "blocked_until_repair"
+  | "explicit_override_required";
+
+export type MutationGateReadiness = {
+  status: "ready" | "limited" | "blocked" | "unknown";
+  scope: string;
+};
+
+export type ProductMutationGate = {
+  id: string;
+  proposed_change: string;
+  affected_files: string[];
+  required_readiness: string;
+  current_readiness: MutationGateReadiness;
+  missing_evidence: string[];
+  explicit_user_request: boolean;
+  explicit_override: boolean;
+  patch_preview: string | null;
+  patch_preview_feasible: boolean;
+  patch_preview_available: boolean;
+  verification_command: string;
+  allowed_action: MutationAllowedAction;
+  blocked: boolean;
+  blocked_reason: string | null;
+  created_at: string;
+};
+
+export type OpenInEditorCitationPayload = {
+  repo_root: string;
+  path: string;
+  line_start: number;
+  line_end: number;
+  evidence_id: string;
+  evidence_role: EvidenceRole;
+  source_hash: string | null;
+  content_hash: string | null;
+  citation_label: string;
+  editor_plugin_required: false;
+  mutates_files: false;
+  created_at: string;
+};
