@@ -26,11 +26,29 @@ test("article workspace wires keyboard shortcuts for pending note capture", () =
   assert.match(app, /savePending\(\)/);
 });
 
+test("article workspace leaves loading state after failed source loads", () => {
+  assert.match(app, /elements\.form\.addEventListener\("submit", async \(event\) => \{/);
+  assert.match(app, /catch \(error\) \{[\s\S]*showStart\(\);[\s\S]*setStatus\(elements, error instanceof Error \? error\.message : "Error\."\);[\s\S]*\}/);
+});
+
 test("article workspace opens duplicate URLs from local browser state before fetching", () => {
   assert.match(api, /function normalizeArticleUrl\(rawUrl\)/);
   assert.match(storage, /function getSavedWorkspaceByUrl\(url\)/);
   assert.match(app, /Ya estaba guardado en este navegador\. Lo recuperamos sin pedirlo al servidor\./);
   assert.match(api, /fetch\(`\/api\/read\?url=\$\{encodeURIComponent\(url\)\}`\)/);
+});
+
+test("article workspace gates new public sources before server fetch", () => {
+  assert.match(storage, /const SOURCE_TRIAL_KEY = "sibar\.reader\.sourceTrial\.v1"/);
+  assert.match(storage, /const SOURCE_TRIAL_LIMIT = 3/);
+  assert.match(storage, /function isSourceTrialBlocked\(url\)/);
+  assert.match(storage, /function recordSourceTrialUrl\(url\)/);
+  assert.match(app, /if \(isSourceTrialBlocked\(url\)\) \{/);
+  assert.match(app, /showEarlyAccess\(url\)/);
+  assert.match(app, /const payload = await fetchReadableArticle\(url\);/);
+  assert.match(app, /recordSourceTrialUrl\(url\);/);
+  assert.match(html, /Ya probaste las fuentes reales incluidas en esta prueba publica\./);
+  assert.match(html, /Solicitar early access/);
 });
 
 test("article workspace renders local recent reading only when it exists", () => {
@@ -71,15 +89,33 @@ test("article workspace enables only aggregate Vercel page analytics", () => {
 });
 
 test("article workspace presents the reader as evidence-first learning", () => {
-  assert.match(html, /<p class="brand-mark">Sibar<\/p>/);
-  assert.match(html, /<h1 class="start-mark">Reader<\/h1>/);
-  assert.match(html, /Lee, selecciona y guarda lo importante\./);
-  assert.match(html, /Pega una fuente/);
+  assert.match(html, /class="brand-lockup"/);
+  assert.match(html, /<span class="brand-letter primary">S<\/span>/);
+  assert.match(html, /<span class="brand-letter">i<\/span>/);
+  assert.match(html, /<span class="brand-letter">b<\/span>/);
+  assert.match(html, /<span class="brand-letter">a<\/span>/);
+  assert.match(html, /<span class="brand-letter">r<\/span>/);
+  assert.doesNotMatch(html, /class="brand-name"/);
+  assert.match(html, /<p class="brand-mark">Build-to-Learn<\/p>/);
+  assert.match(html, /Estudia una fuente tecnica con evidencia\./);
+  assert.match(html, /Lee, marca lo importante y guarda dudas o ideas/);
+  assert.match(html, /Pega una URL para empezar/);
+  assert.match(html, />Estudiar<\/button>/);
+  assert.match(html, /El workspace completo abre por early access/);
+  assert.doesNotMatch(html, /Prueba publica: 3 fuentes reales por navegador/);
+});
+
+test("article workspace source examples are contextual labels, not inert buttons", () => {
+  assert.match(html, /<ul class="source-examples" aria-label="Tipos de fuente">/);
+  assert.match(html, /<li class="source-chip"><span>Articulo<\/span><small>Argumento o ensayo tecnico<\/small><\/li>/);
+  assert.match(html, /<li class="source-chip"><span>Paper<\/span><small>Abstract, metodo o conclusion<\/small><\/li>/);
+  assert.match(html, /<li class="source-chip"><span>Docs<\/span><small>API, framework o arquitectura<\/small><\/li>/);
+  assert.doesNotMatch(app, /document\.querySelectorAll\("\\.source-chip"\)/);
 });
 
 test("article workspace uses the focused source-ingestion visual shell", () => {
   assert.match(css, /\.start-screen \{[\s\S]*min-height: 100vh;/);
-  assert.match(css, /\.ingest-row \{[\s\S]*grid-template-columns: minmax\(0, 1fr\) 128px 108px;/);
+  assert.match(css, /\.ingest-row \{[\s\S]*grid-template-columns: minmax\(0, 1fr\) 132px 124px;/);
   assert.match(css, /\.ghost-reader \{[\s\S]*border-left: 1px dashed var\(--line\);/);
   assert.match(css, /\.article-shell \{[\s\S]*padding: 56px 24px 72px;/);
   assert.match(css, /\.saved-drawer \{[\s\S]*position: fixed;/);
