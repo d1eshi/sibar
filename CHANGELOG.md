@@ -11,6 +11,19 @@ accepted specs and iterations, not by raw commit count.
 Use this section for changes that have landed but are not part of a tagged
 release yet.
 
+### Added - Deep Ownership Workspace Deterministic Fixture
+
+- Created the first deterministic Deep Ownership fixture (`sibi-pedagogy-loop.json`)
+  describing one scoped loop over the Sibi pedagogy runtime: gap detection,
+  practice generation, memory, and readiness.
+- Added runtime type contracts and schema validation (`src/runtime-deep-ownership.ts`)
+  for evidence identity, role classification, boundary enforcement, unknown zones,
+  skip records, thinking artifacts, and scoped readiness claims.
+- Added focused fixture/schema tests (`Tests/deep-ownership-fixture.test.ts`)
+  verifying evidence ID stability, role classification of source/tests/docs,
+  unknown zone presence, boundary enforcement against out-of-bound paths,
+  and readiness scope without whole-repo ownership claims.
+
 Each changelog-worthy change should be updated in the same commit as the work it
 describes. Skip this file only when the commit is purely mechanical and does not
 change product behavior, product docs, release readiness, or the public product
