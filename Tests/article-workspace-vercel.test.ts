@@ -11,6 +11,9 @@ const changelogHtml = readFileSync(join(root, "web/changelog.html"), "utf8");
 const webApiClient = readFileSync(join(root, "web/scripts/api.js"), "utf8");
 const webApi = readFileSync(join(root, "web/api/read.mjs"), "utf8");
 const analyticsResearch = readFileSync(join(root, "web/ANALYTICS_RESEARCH.md"), "utf8");
+const rootVercelIgnore = readFileSync(join(root, ".vercelignore"), "utf8");
+const webVercelIgnore = readFileSync(join(root, "web/.vercelignore"), "utf8");
+const rootVercelConfig = JSON.parse(readFileSync(join(root, "vercel.json"), "utf8"));
 const vercelConfig = JSON.parse(readFileSync(join(root, "web/vercel.json"), "utf8"));
 
 test("article workspace web deploy is rooted under /web", () => {
@@ -46,6 +49,17 @@ test("article workspace Vercel API is self-contained JavaScript", () => {
   assert.match(webApi, /Private network article URLs are not supported/);
   assert.match(webApi, /RATE_LIMIT_MAX_PER_MINUTE/);
   assert.match(webApi, /vercel-cdn-cache-control/);
+});
+
+test("article workspace deploy excludes repository internals", () => {
+  assert.equal(rootVercelConfig.outputDirectory, "web");
+  assert.match(rootVercelIgnore, /^\*$/m);
+  assert.match(rootVercelIgnore, /^!web\/index\.html$/m);
+  assert.match(rootVercelIgnore, /^!web\/api\/\*\*$/m);
+  assert.match(webVercelIgnore, /^\.vercel$/m);
+  assert.match(webVercelIgnore, /^ANALYTICS_RESEARCH\.md$/m);
+  assert.doesNotMatch(rootVercelIgnore, /^!docs\//m);
+  assert.doesNotMatch(rootVercelIgnore, /^!AGENTS\.md$/m);
 });
 
 test("article workspace Vercel API rejects invalid URLs before fetching", async () => {
