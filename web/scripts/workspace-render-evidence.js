@@ -47,7 +47,7 @@
       el("collapseEvidence").addEventListener("click", function() {
         el("evidenceRail").classList.toggle("collapsed");
         var collapsed = el("evidenceRail").classList.contains("collapsed");
-        el("collapseEvidence").setAttribute("aria-expanded", String(collapsed));
+        el("collapseEvidence").setAttribute("aria-expanded", String(!collapsed));
         el("collapseEvidence").setAttribute("aria-label", collapsed ? "Expand evidence" : "Collapse evidence");
         el("collapseEvidence").textContent = collapsed ? "+" : "—";
       });
