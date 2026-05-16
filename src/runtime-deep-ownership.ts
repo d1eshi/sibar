@@ -354,6 +354,39 @@ export type DeepOwnershipFixture = {
   loop_state: LoopEntry;
 };
 
+/**
+ * Validate that an EvidenceRef has all required fields: evidence_id, file_path,
+ * start_line, end_line, excerpt, and a recognized role.
+ */
+export function validateEvidenceRef(ref: unknown, context: string): ValidationIssue[] {
+  const issues: ValidationIssue[] = [];
+  if (!ref || typeof ref !== "object") {
+    issues.push(issue(context, "Evidence ref is not an object"));
+    return issues;
+  }
+  const r = ref as Record<string, unknown>;
+
+  if (!r.evidence_id || typeof r.evidence_id !== "string") {
+    issues.push(issue(`${context}.evidence_id`, "Missing or invalid evidence_id"));
+  }
+  if (!r.file_path || typeof r.file_path !== "string") {
+    issues.push(issue(`${context}.file_path`, "Missing or invalid file_path"));
+  }
+  if (typeof r.start_line !== "number" || (r.start_line as number) < 0) {
+    issues.push(issue(`${context}.start_line`, "Missing or invalid start_line"));
+  }
+  if (typeof r.end_line !== "number" || (r.end_line as number) < (r.start_line as number)) {
+    issues.push(issue(`${context}.end_line`, "Missing or invalid end_line"));
+  }
+  if (!r.excerpt || typeof r.excerpt !== "string" || r.excerpt.trim().length === 0) {
+    issues.push(issue(`${context}.excerpt`, "Missing or empty excerpt"));
+  }
+  if (!r.role || !RECOGNIZED_EVIDENCE_ROLES.includes(r.role as EvidenceRole)) {
+    issues.push(issue(`${context}.role`, `Unrecognized or missing role '${r.role}'`));
+  }
+  return issues;
+}
+
 // ── Validation ──────────────────────────────────────────────────────
 
 type ValidationIssue = {
@@ -794,6 +827,18 @@ export function validateDeepOwnershipFixture(
   } else {
     for (let i = 0; i < f.thinking_artifacts.length; i++) {
       issues.push(...validateThinkingArtifact(f.thinking_artifacts[i], i));
+      // Validate source evidence refs
+      const artifact = f.thinking_artifacts[i];
+      if (Array.isArray(artifact.source_evidence)) {
+        for (let j = 0; j < artifact.source_evidence.length; j++) {
+          issues.push(...validateEvidenceRef(artifact.source_evidence[j], `thinking_artifacts[${i}].source_evidence[${j}]`));
+        }
+      }
+      if (Array.isArray(artifact.hidden_solution_evidence)) {
+        for (let j = 0; j < artifact.hidden_solution_evidence.length; j++) {
+          issues.push(...validateEvidenceRef(artifact.hidden_solution_evidence[j], `thinking_artifacts[${i}].hidden_solution_evidence[${j}]`));
+        }
+      }
     }
     // Check at least one artifact is operation-bearing
     const hasOperation = f.thinking_artifacts.some(
@@ -826,6 +871,19 @@ export function validateDeepOwnershipFixture(
   // Evidence check
   if (!f.evidence_check) {
     issues.push(issue("evidence_check", "Missing evidence check"));
+  } else {
+    // Validate nested evidence refs in evidence_check
+    const ec = f.evidence_check;
+    if (Array.isArray(ec.cited_evidence)) {
+      for (let i = 0; i < ec.cited_evidence.length; i++) {
+        issues.push(...validateEvidenceRef(ec.cited_evidence[i], `evidence_check.cited_evidence[${i}]`));
+      }
+    }
+    if (Array.isArray(ec.artifact_counterevidence)) {
+      for (let i = 0; i < ec.artifact_counterevidence.length; i++) {
+        issues.push(...validateEvidenceRef(ec.artifact_counterevidence[i], `evidence_check.artifact_counterevidence[${i}]`));
+      }
+    }
   }
 
   // Detected gap
@@ -834,10 +892,20 @@ export function validateDeepOwnershipFixture(
   } else if (f.detected_gap.severity && !["critical", "important", "later"].includes(f.detected_gap.severity)) {
     issues.push(issue("detected_gap.severity", `Invalid severity '${f.detected_gap.severity}'`));
   }
+  if (f.detected_gap && Array.isArray(f.detected_gap.artifact_evidence_refs)) {
+    for (let i = 0; i < f.detected_gap.artifact_evidence_refs.length; i++) {
+      issues.push(...validateEvidenceRef(f.detected_gap.artifact_evidence_refs[i], `detected_gap.artifact_evidence_refs[${i}]`));
+    }
+  }
 
   // Repair action
   if (!f.repair_action) {
     issues.push(issue("repair_action", "Missing repair action"));
+  }
+  if (f.repair_action && Array.isArray(f.repair_action.required_evidence)) {
+    for (let i = 0; i < f.repair_action.required_evidence.length; i++) {
+      issues.push(...validateEvidenceRef(f.repair_action.required_evidence[i], `repair_action.required_evidence[${i}]`));
+    }
   }
 
   // Readiness claim
@@ -850,6 +918,13 @@ export function validateDeepOwnershipFixture(
   // Boundary enforcement
   if (f.artifact_boundary) {
     issues.push(...validateBoundaryEnforcement(f, rootPath));
+  }
+
+  // Validate out_of_bound_refs as EvidenceRefs
+  if (Array.isArray(f.out_of_bound_refs)) {
+    for (let i = 0; i < f.out_of_bound_refs.length; i++) {
+      issues.push(...validateEvidenceRef(f.out_of_bound_refs[i], `out_of_bound_refs[${i}]`));
+    }
   }
 
   // Loop state
