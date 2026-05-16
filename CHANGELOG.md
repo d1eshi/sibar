@@ -50,6 +50,9 @@ exist to make the public reader story reviewable before production promotion.
 
 ### Added
 
+- Browser early access signup for the public reader, backed by a server-side
+  waitlist endpoint that collects only email plus optional X handle without
+  exposing Supabase secrets to the client.
 - Spec-based versioning policy for deciding when Sibi moves between pre-1.0
   versions.
 - Changelog source of truth for future web-facing product progress updates.
