@@ -43,7 +43,7 @@
   console.log("2. Boundary:", fixture.artifact_boundary.root_path, "|", fixture.artifact_boundary.included_sources.length, "included,", fixture.artifact_boundary.excluded_sources.length, "excluded");
   console.log("3. Evidence Inventory:", fixture.evidence_inventory.length, "items");
   console.log("4. Concept Slice:", fixture.concept_slice.label);
-  console.log("5. Thinking Artifacts:", fixture.thinking_artifacts.length, "artifacts (TA-001 code_slice, TA-002 flow_diagram)");
+  console.log("5. Thinking Artifacts:", fixture.thinking_artifacts.length, "artifacts (Code Slice, Flow Diagram, Patch Readiness)");
   console.log("6. Active Operation:", fixture.active_operation.kind, "—", fixture.active_operation.prompt.substring(0, 80) + "…");
   console.log("7. Attempt Gate: Hidden answer gated. Submit your attempt to continue.");
   console.log("8. Evidence Check: Awaiting attempt submission.");
