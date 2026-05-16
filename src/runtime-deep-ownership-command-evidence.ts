@@ -1,4 +1,4 @@
-import { createHash } from "node:crypto";
+import { createHash, randomUUID } from "node:crypto";
 
 import { checkBoundaryEscape } from "./runtime-deep-ownership-boundary.ts";
 import type { ArtifactBoundary } from "./runtime-deep-ownership-evidence-types.ts";
@@ -72,6 +72,28 @@ function nextId(prefix: string, count: number): string {
   return `${prefix}-${String(count + 1).padStart(3, "0")}`;
 }
 
+function createUniqueDefaultId(prefix: string): string {
+  return `${prefix}-${randomUUID().slice(0, 8)}`;
+}
+
+function resolveReadOnlyEvidenceViolation(
+  input: Pick<ReadOnlyCommandEvidenceInput, "preview" | "mutation_assessment">,
+): string | null {
+  if (input.preview.safety_level !== "read_only") {
+    return `Read-only command evidence requires preview.safety_level='read_only' (received '${input.preview.safety_level}').`;
+  }
+
+  if (input.preview.write_scope !== "none") {
+    return `Read-only command evidence requires preview.write_scope='none' (received '${input.preview.write_scope}').`;
+  }
+
+  if (input.preview.blocked) {
+    return input.preview.blocked_reason ?? "Blocked command previews cannot be accepted as read-only evidence.";
+  }
+
+  return input.mutation_assessment?.reason ?? null;
+}
+
 export function previewWorkspaceCommand(input: WorkspaceCommandPreviewInput): WorkspaceCommandPreview {
   let blockedReason: string | null = null;
   let boundaryStatus: WorkspaceCommandPreview["boundary_status"] = "in_scope";
@@ -108,7 +130,7 @@ export function previewWorkspaceCommand(input: WorkspaceCommandPreviewInput): Wo
   }
 
   return {
-    id: input.id ?? "CMD-PREVIEW-001",
+    id: input.id ?? createUniqueDefaultId("CMD-PREVIEW"),
     command: input.command,
     cwd: input.cwd,
     safety_level: input.safety_level,
@@ -153,12 +175,10 @@ export function createReadOnlyCommandEvidence(input: ReadOnlyCommandEvidenceInpu
       content_hash: `sha256:${hashText(entry.value)}`,
     }));
 
-  const violationReason = input.preview.blocked_reason
-    ?? input.mutation_assessment?.reason
-    ?? null;
+  const violationReason = resolveReadOnlyEvidenceViolation(input);
 
   return {
-    id: input.id ?? "CMD-EVIDENCE-001",
+    id: input.id ?? createUniqueDefaultId("CMD-EVIDENCE"),
     command: input.preview.command,
     cwd: input.preview.cwd,
     timestamp: input.created_at ?? new Date().toISOString(),

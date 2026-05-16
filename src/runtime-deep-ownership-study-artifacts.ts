@@ -1,4 +1,5 @@
 import { dirname, isAbsolute, relative, resolve } from "node:path";
+import { randomUUID } from "node:crypto";
 import {
   existsSync,
   lstatSync,
@@ -28,6 +29,10 @@ type StudyPathResolution = {
   relative_path: string | null;
   canonical_study_directory: string | null;
 };
+
+function createUniqueDefaultId(prefix: string): string {
+  return `${prefix}-${randomUUID().slice(0, 8)}`;
+}
 
 function hasRawParentTraversal(candidatePath: string): boolean {
   return candidatePath
@@ -178,7 +183,7 @@ export function writeStudyArtifact(input: StudyArtifactWriteInput): StudyArtifac
     blocked: false,
     violation_reason: null,
     record: {
-      id: input.id ?? "STUDY-ARTIFACT-001",
+      id: input.id ?? createUniqueDefaultId("STUDY-ARTIFACT"),
       relative_path: resolved.relative_path!,
       canonical_path: canonicalPath,
       study_directory: canonicalStudyDirectory,
