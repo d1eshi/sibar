@@ -108,16 +108,40 @@
         });
       }
 
-      // Hint ladder (progressive, no answer leakage)
+      // Hint ladder (progressive, no answer leakage — VAL-LOOP-002, VAL-LOOP-014, VAL-UI-010)
+      // Content injected dynamically from HINT_REVEAL_CONTENT; never in pre-attempt DOM.
       Array.from(el("loopContent").querySelectorAll(".hint")).forEach(function(h) {
-        h.addEventListener("click", function() {
-          if (state.revealedHints >= (fixture.active_operation.allowed_hints || 3)) {
+        /** Shared reveal logic: click or keyboard */
+        function revealHint() {
+          // Already revealed — skip
+          if (h.classList.contains("revealed")) return;
+          // Check remaining hints
+          var limit = fixture.active_operation.allowed_hints || 3;
+          if (state.revealedHints >= limit) {
             showToast("All hints revealed. Submit your attempt to continue.");
             return;
           }
           h.classList.add("revealed");
+          h.setAttribute("aria-expanded", "true");
           state.revealedHints++;
+          // Dynamically inject solution content — was never in the pre-attempt DOM
+          var content = HINT_REVEAL_CONTENT[h.dataset.hint];
+          if (content) {
+            var hiddenDiv = document.createElement("div");
+            hiddenDiv.className = "hint-hidden";
+            hiddenDiv.textContent = content;
+            h.appendChild(hiddenDiv);
+          }
           console.log("[Hint Ladder] Hint " + h.dataset.hint + " revealed. No hidden solution content leaked (VAL-LOOP-014).");
+        }
+
+        h.addEventListener("click", revealHint);
+
+        h.addEventListener("keydown", function(e) {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            revealHint();
+          }
         });
       });
     } else {
