@@ -216,7 +216,48 @@ describe("VAL-TRUST-003: Boundary expansion is explicit", () => {
     assert.equal(decision.boundary_expansion_route?.requested_path, "../private/incident-log.md");
   });
 
-  test("in-bound candidate path does not create an expansion route", () => {
+  test("inside-root path outside included_sources creates a boundary expansion route", () => {
+    const decision = routeOutOfBoundEvidenceToBoundaryExpansion({
+      candidate_path: "src/non-included-module.ts",
+      relevance_reason: "Referenced in stack trace but not in current included_sources boundary.",
+      related_operation_id: "OP-INTEL-005",
+      root_path: "/repo",
+      boundary: makeBoundary(),
+      created_at: "2026-05-16T00:31:00.000Z",
+      existing_out_of_scope_count: 1,
+      existing_route_count: 1,
+    });
+
+    assert.equal(decision.blocked, true, "non-included sources must be treated as out-of-bound");
+    assert.ok(decision.out_of_scope_record);
+    assert.ok(decision.boundary_expansion_route);
+    assert.equal(decision.boundary_expansion_route?.requested_path, "src/non-included-module.ts");
+  });
+
+  test("inside-root sibling subtree outside included_sources creates a boundary expansion route", () => {
+    const siblingBoundary: ArtifactBoundary = {
+      ...makeBoundary(),
+      included_sources: ["src/runtime/"],
+    };
+
+    const decision = routeOutOfBoundEvidenceToBoundaryExpansion({
+      candidate_path: "src/experimental/runtime-prototype.ts",
+      relevance_reason: "Potentially relevant sibling subtree not in included_sources.",
+      related_operation_id: "OP-INTEL-006",
+      root_path: "/repo",
+      boundary: siblingBoundary,
+      created_at: "2026-05-16T00:32:00.000Z",
+      existing_out_of_scope_count: 2,
+      existing_route_count: 2,
+    });
+
+    assert.equal(decision.blocked, true, "inside-root sibling subtree must route to boundary expansion");
+    assert.ok(decision.out_of_scope_record);
+    assert.ok(decision.boundary_expansion_route);
+    assert.equal(decision.boundary_expansion_route?.requested_path, "src/experimental/runtime-prototype.ts");
+  });
+
+  test("included_sources path remains in scope and does not create an expansion route", () => {
     const decision = routeOutOfBoundEvidenceToBoundaryExpansion({
       candidate_path: "src/runtime-core.ts",
       relevance_reason: "Inside boundary and directly inspectable.",
