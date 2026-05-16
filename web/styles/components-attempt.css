@@ -1,0 +1,207 @@
+/* ── Attempt Composer ── */
+.attempt-composer {
+  border: 1px solid var(--divider);
+  border-radius: var(--radius);
+  background: var(--surface-raised);
+  margin-bottom: 14px;
+}
+.attempt-composer .ac-header {
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--divider-thin);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  background: var(--surface-warm);
+}
+.attempt-composer textarea {
+  width: 100%;
+  min-height: 100px;
+  border: none;
+  padding: 10px;
+  font-family: var(--font-sans);
+  font-size: 12px;
+  line-height: 1.5;
+  resize: vertical;
+  background: var(--surface-raised);
+  color: var(--text-primary);
+  outline: none;
+}
+.attempt-composer textarea:focus {
+  background: var(--teal-bg);
+}
+
+.confidence-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-top: 1px solid var(--divider-thin);
+  font-size: 11px;
+}
+.confidence-row label { color: var(--text-muted); }
+.confidence-row select {
+  font-size: 11px;
+  padding: 2px 6px;
+  border: 1px solid var(--divider);
+  border-radius: var(--radius-sm);
+  background: var(--surface-raised);
+  color: var(--text-primary);
+}
+
+.unknowns-input {
+  padding: 6px 10px;
+  border-top: 1px solid var(--divider-thin);
+}
+.unknowns-input input {
+  width: 100%;
+  font-size: 11px;
+  padding: 4px 8px;
+  border: 1px solid var(--divider);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-sans);
+}
+
+.attempt-actions {
+  display: flex;
+  gap: 6px;
+  padding: 8px 10px;
+  border-top: 1px solid var(--divider-thin);
+}
+.attempt-actions button {
+  font-size: 11px;
+  padding: 5px 12px;
+  border-radius: var(--radius);
+  cursor: pointer;
+  font-weight: 500;
+  border: 1px solid var(--divider);
+  background: var(--surface-raised);
+  color: var(--text-secondary);
+}
+.attempt-actions button.submit-btn {
+  background: var(--teal);
+  color: white;
+  border-color: var(--teal);
+}
+.attempt-actions button.submit-btn:hover { background: #0f766e; }
+.attempt-actions button.dunno-btn { color: var(--amber); border-color: var(--amber); }
+.attempt-actions button.sample-btn { color: var(--text-muted); font-size: 10px; }
+.attempt-actions button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* ── Pre-Attempt State: Evidence Selection ── */
+.evidence-selector {
+  border-top: 1px solid var(--divider-thin);
+  padding: 6px 10px;
+  max-height: 160px;
+  overflow-y: auto;
+}
+.evidence-selector label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 10px;
+  font-family: var(--font-mono);
+  color: var(--text-secondary);
+  padding: 2px 0;
+  cursor: pointer;
+}
+.evidence-selector label:hover { color: var(--text-primary); }
+.evidence-selector input[type="checkbox"] {
+  width: 13px;
+  height: 13px;
+  accent-color: var(--teal);
+  cursor: pointer;
+}
+.evidence-selector .ev-sel-role {
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--teal);
+  margin-left: auto;
+}
+
+/* ── Hint Ladder ── */
+.hint-ladder {
+  margin-bottom: 14px;
+}
+.hint-ladder h3 {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 6px;
+}
+.hint-ladder .hint {
+  padding: 6px 8px;
+  margin-bottom: 4px;
+  border-left: 3px solid var(--divider);
+  font-size: 11px;
+  color: var(--text-muted);
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  transition: all 0.15s;
+}
+.hint-ladder .hint.revealed {
+  border-left-color: var(--teal);
+  color: var(--text-primary);
+  background: var(--teal-bg);
+}
+.hint-ladder .hint .hint-num {
+  font-weight: 600;
+  color: var(--teal);
+  margin-right: 4px;
+  font-size: 10px;
+}
+.hint-ladder .hint .hint-hidden {
+  display: none;
+  font-style: italic;
+  font-size: 10px;
+}
+.hint-ladder .hint.revealed .hint-hidden {
+  display: block;
+  margin-top: 4px;
+  color: var(--text-secondary);
+}
+
+/* ── Retry Controls ── */
+.retry-controls {
+  margin-top: 12px;
+  padding: 10px 12px;
+  border: 1px solid var(--divider);
+  border-radius: var(--radius);
+  background: var(--surface-warm);
+}
+.retry-controls h3 {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.retry-controls .retry-actions {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.retry-controls button {
+  font-size: 11px;
+  padding: 5px 12px;
+  border-radius: var(--radius);
+  cursor: pointer;
+  font-weight: 500;
+  border: 1px solid var(--divider);
+  background: var(--surface-raised);
+  color: var(--text-secondary);
+  transition: all 0.15s;
+}
+.retry-controls button.retry-btn {
+  background: var(--teal);
+  color: white;
+  border-color: var(--teal);
+}
+.retry-controls button.retry-btn:hover { background: #0f766e; }
+.retry-controls button.repair-btn {
+  background: var(--amber-bg);
+  color: var(--amber);
+  border-color: var(--amber);
+}
+.retry-controls button.repair-btn:hover { background: var(--amber-light); }
