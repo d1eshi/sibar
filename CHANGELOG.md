@@ -11,7 +11,19 @@ accepted specs and iterations, not by raw commit count.
 Use this section for changes that have landed but are not part of a tagged
 release yet.
 
-### Added - Deep Ownership Workspace Deterministic Fixture
+### Added - Deep Ownership Workspace Attempt-First UI Flow
+
+- Implemented the attempt-first UI flow in the static Workspace prototype with
+  hidden answer gating (`aria-hidden`), evidence selection checkboxes, confidence
+  controls, declared unknowns input, progressive hint ladder (no solution leakage),
+  prerequisite route display, retry/repair controls, and full demo chain observability
+  via console logs and state chain progress indicator.
+- Post-attempt state shows evidence check (observed/missing/unsupported claims with
+  counterevidence), detected gap with user and artifact evidence refs, concrete
+  repair action with required evidence, and scoped readiness claim that explicitly
+  rejects whole-repo mastery.
+- Added `assertHiddenAnswerGated()` runtime check verifying no hidden solution
+  content leaks into DOM or accessibility text before attempt submission.
 
 - Created the first deterministic Deep Ownership fixture (`sibi-pedagogy-loop.json`)
   describing one scoped loop over the Sibi pedagogy runtime: gap detection,
