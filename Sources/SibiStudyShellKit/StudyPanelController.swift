@@ -26,13 +26,25 @@ public final class StudyPanelController {
     private(set) var isCollapsed = false
     private var keyMonitor: Any?
     private let model: StudyPanelLiveModel
+    private let openURL: @MainActor (URL) -> Void
 
     public convenience init() {
-        self.init(model: StudyPanelLiveModel())
+        self.init(
+            model: StudyPanelLiveModel(),
+            openURL: { url in
+                NSWorkspace.shared.open(url)
+            }
+        )
     }
 
-    init(model: StudyPanelLiveModel) {
+    init(
+        model: StudyPanelLiveModel,
+        openURL: @escaping @MainActor (URL) -> Void = { url in
+            NSWorkspace.shared.open(url)
+        }
+    ) {
         self.model = model
+        self.openURL = openURL
     }
 
     deinit {
@@ -178,8 +190,16 @@ public final class StudyPanelController {
         StudyPanelRootView(
             model: model,
             onToggleCollapsed: { [weak self] in self?.toggleCollapsed() },
-            onOpenCanvas: { [weak self] in self?.showCanvas() }
+            onOpenCanvas: { [weak self] in self?.showCanvas() },
+            onOpenWorkspace: { [weak self] action in
+                self?.openWorkspace(action: action)
+            }
         )
+    }
+
+    func openWorkspace(action: RuntimeOpenWorkspaceAction) {
+        guard let url = URL(string: action.target_url) else { return }
+        openURL(url)
     }
 
     private func installKeyMonitorIfNeeded() {

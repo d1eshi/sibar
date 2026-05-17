@@ -181,6 +181,10 @@ public final class RuntimeClient: Sendable {
         try send(command: "get_study_panel_state", payload: payload)
     }
 
+    public func getWorkspaceSnapshot(_ payload: WorkspaceSnapshotPayload = .init()) throws -> RuntimeWorkspaceLensState {
+        try send(command: "get_workspace_snapshot", payload: payload)
+    }
+
     func send<Response: Decodable, Payload: Encodable>(command: String, payload: Payload) throws -> Response {
         let encoder = JSONEncoder()
         encoder.outputFormatting = [.sortedKeys]

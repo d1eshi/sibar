@@ -29,6 +29,7 @@ import { generateQuestionsCommand } from "./runtime-questions.ts";
 import { readinessReportCommand } from "./runtime-readiness.ts";
 import { getSession, readState, toSummary, writeState } from "./runtime-state.ts";
 import { getStudyPanelStateCommand } from "./runtime-study-panel.ts";
+import { getWorkspaceSnapshotCommand } from "./runtime-workspace-snapshot.ts";
 import {
   RuntimeError,
   excerptPrefix,
@@ -333,6 +334,8 @@ export function handleRequest(request: RuntimeRequest): RuntimeResponse<unknown>
         return readinessReportCommand(request.payload);
       case "get_study_panel_state":
         return getStudyPanelStateCommand(request.payload);
+      case "get_workspace_snapshot":
+        return getWorkspaceSnapshotCommand(request.payload);
       case "generate_practice_challenges":
         return generatePracticeChallengesCommand(request.payload);
       case "run_project_learning_agent":
