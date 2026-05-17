@@ -5,6 +5,7 @@ struct StudyPanelRootView: View {
     @ObservedObject var model: StudyPanelLiveModel
     let onToggleCollapsed: () -> Void
     let onOpenCanvas: () -> Void
+    let onOpenWorkspace: (RuntimeOpenWorkspaceAction) -> Void
 
     var body: some View {
         VStack(spacing: 0) {
@@ -74,6 +75,13 @@ struct StudyPanelRootView: View {
                 ProgressView()
                     .controlSize(.small)
                     .padding(.top, 8)
+            }
+
+            if let lensModel = model.workspaceLensModel {
+                WorkspaceLensSummaryView(model: lensModel, onOpenWorkspace: onOpenWorkspace)
+                    .padding(.horizontal, 20)
+                    .padding(.top, 8)
+                    .padding(.bottom, 4)
             }
 
             if let snapshot = model.snapshot {

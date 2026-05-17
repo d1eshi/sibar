@@ -3,13 +3,18 @@ import SwiftUI
 
 public struct StudyPanelRuntimeActions: Sendable {
     public let loadSnapshot: @Sendable (StudyPanelStatePayload) throws -> StudyPanelSnapshot
+    public let loadWorkspaceSnapshot: @Sendable (WorkspaceSnapshotPayload) throws -> RuntimeWorkspaceLensState
     public let answerQuestion: @Sendable (AnswerQuestionPayload) throws -> AnswerQuestionResult
 
     public init(
         loadSnapshot: @escaping @Sendable (StudyPanelStatePayload) throws -> StudyPanelSnapshot,
+        loadWorkspaceSnapshot: @escaping @Sendable (WorkspaceSnapshotPayload) throws -> RuntimeWorkspaceLensState = { _ in
+            throw RuntimeClientError.processFailure("Workspace snapshot unavailable.")
+        },
         answerQuestion: @escaping @Sendable (AnswerQuestionPayload) throws -> AnswerQuestionResult
     ) {
         self.loadSnapshot = loadSnapshot
+        self.loadWorkspaceSnapshot = loadWorkspaceSnapshot
         self.answerQuestion = answerQuestion
     }
 
@@ -17,6 +22,9 @@ public struct StudyPanelRuntimeActions: Sendable {
         StudyPanelRuntimeActions(
             loadSnapshot: { payload in
                 try client.getStudyPanelState(payload)
+            },
+            loadWorkspaceSnapshot: { payload in
+                try client.getWorkspaceSnapshot(payload)
             },
             answerQuestion: { payload in
                 try client.answerQuestion(payload)
@@ -29,6 +37,7 @@ public struct StudyPanelRuntimeActions: Sendable {
 public final class StudyPanelLiveModel: ObservableObject {
     @Published public var artifactSessionID: String
     @Published public private(set) var snapshot: StudyPanelSnapshot?
+    @Published public private(set) var workspaceLensState: RuntimeWorkspaceLensState?
     @Published public private(set) var statusText: String
     @Published public private(set) var lastError: String
     @Published public private(set) var isRefreshing: Bool
@@ -44,6 +53,7 @@ public final class StudyPanelLiveModel: ObservableObject {
         self.artifactSessionID = artifactSessionID
         self.actions = actions
         self.snapshot = nil
+        self.workspaceLensState = nil
         self.statusText = "No study snapshot loaded."
         self.lastError = ""
         self.isRefreshing = false
@@ -61,12 +71,17 @@ public final class StudyPanelLiveModel: ObservableObject {
 
         let actions = actions
         let payload = StudyPanelStatePayload(artifact_session_id: normalizedArtifactSessionID)
+        let workspacePayload = WorkspaceSnapshotPayload()
 
         do {
             let loadedSnapshot = try await Task.detached(priority: .userInitiated) {
                 try actions.loadSnapshot(payload)
             }.value
+            let loadedLensState = try? await Task.detached(priority: .userInitiated) {
+                try actions.loadWorkspaceSnapshot(workspacePayload)
+            }.value
             snapshot = loadedSnapshot
+            workspaceLensState = loadedLensState
             lastError = ""
             statusText = snapshot?.operation_state.message ?? "Study snapshot loaded."
         } catch is CancellationError {
@@ -75,6 +90,11 @@ public final class StudyPanelLiveModel: ObservableObject {
             lastError = error.localizedDescription
             statusText = "Study snapshot unavailable."
         }
+    }
+
+    public var workspaceLensModel: WorkspaceLensRenderModel? {
+        guard let workspaceLensState else { return nil }
+        return WorkspaceLensRenderModel(lensState: workspaceLensState)
     }
 
     public func submitAnswer(question: RuntimeQuestion, answer: String) async {

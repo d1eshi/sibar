@@ -61,6 +61,37 @@ final class StudyPanelTests: XCTestCase {
                     recorder.recordSnapshotPayload(payload)
                     return snapshot
                 },
+                loadWorkspaceSnapshot: { _ in
+                    RuntimeWorkspaceLensState(
+                        snapshot: RuntimeWorkspaceSnapshot(
+                            snapshot_id: "SNAP-loop-1",
+                            loop_id: "loop-1",
+                            goal: "Trace runtime gap detection to readiness limits.",
+                            active_operation: RuntimeWorkspaceOperation(
+                                id: "op-1",
+                                kind: "trace",
+                                prompt: "Trace the attempt through evidence check."
+                            ),
+                            readiness: RuntimeWorkspaceReadiness(
+                                status: "limited",
+                                scope: "trace operation for runtime gap slice",
+                                blocked_claims: ["Cannot claim modify readiness yet."]
+                            ),
+                            detected_gap: RuntimeWorkspaceGap(
+                                kind: "shallow_trace",
+                                severity: "important",
+                                blocks_readiness: true
+                            )
+                        ),
+                        open_workspace: RuntimeOpenWorkspaceAction(
+                            label: "Open Workspace",
+                            target_url: "http://127.0.0.1:4180/workspace.html"
+                        ),
+                        operation_state: RuntimeOperationState(
+                            message: "Workspace snapshot projected from runtime-owned state."
+                        )
+                    )
+                },
                 answerQuestion: { _ in
                     throw RuntimeClientError.processFailure("unexpected answer")
                 }
@@ -71,6 +102,8 @@ final class StudyPanelTests: XCTestCase {
 
         XCTAssertEqual(recorder.snapshotPayload?.artifact_session_id, "a1")
         XCTAssertEqual(model.snapshot?.artifact_session.artifact_session_id, "a1")
+        XCTAssertEqual(model.workspaceLensState?.snapshot.goal, "Trace runtime gap detection to readiness limits.")
+        XCTAssertEqual(model.workspaceLensModel?.statusChipText, "Gap · shallow_trace · important")
         XCTAssertEqual(model.statusText, "Study panel snapshot projected from runtime-owned state.")
         XCTAssertEqual(model.lastError, "")
     }

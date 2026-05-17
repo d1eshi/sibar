@@ -76,6 +76,23 @@ final class StudyPanelControllerTests: XCTestCase {
         XCTAssertEqual(panel.title, "Sibi Graph + Code")
         XCTAssertEqual(panel.contentView?.frame.size.width ?? 0, StudyPanelController.canvasSize.width, accuracy: 0.5)
     }
+
+    func testOpenWorkspaceActionOpensProvidedURL() {
+        var openedURLs: [URL] = []
+        let controller = StudyPanelController(
+            model: makeModel(),
+            openURL: { url in
+                openedURLs.append(url)
+            }
+        )
+
+        controller.openWorkspace(action: .init(
+            label: "Open Workspace",
+            target_url: "http://127.0.0.1:4180/workspace.html"
+        ))
+
+        XCTAssertEqual(openedURLs, [URL(string: "http://127.0.0.1:4180/workspace.html")!])
+    }
 }
 
 @MainActor
