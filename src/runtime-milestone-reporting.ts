@@ -1,6 +1,6 @@
 import { execFileSync } from "node:child_process";
 import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
-import { basename, join, relative } from "node:path";
+import { basename, join, relative, sep } from "node:path";
 
 type JsonRecord = Record<string, unknown>;
 
@@ -24,7 +24,11 @@ export type MilestoneHandoffReport = {
   milestone: string;
   generated_from: string;
   feature_reports: MilestoneFeatureReport[];
+  declared_assertion_ids: string[];
+  proven_assertion_ids: string[];
   satisfied_assertion_ids: string[];
+  assertion_semantics: string;
+  validation_state_present: boolean;
   commands: MilestoneFeatureReport["commands"];
   browser_manual_evidence: string[];
   screenshot_paths: string[];
@@ -45,13 +49,16 @@ export function buildMissionMilestoneReports(missionDir: string, generatedAt = n
   const handoffs = readJsonFiles(join(missionDir, "handoffs"));
   const validationPaths = listJsonFiles(join(missionDir, "validation"));
   const evidencePaths = listFiles(join(missionDir, "evidence"));
-  const completedMilestones = [...new Set(features.filter((feature) => feature.status === "completed").map((feature) => String(feature.milestone)))].sort();
+  const screenshotManifest = readEvidenceManifest(missionDir);
+  const completedMilestones = [
+    ...new Set(features.filter((feature) => feature.status === "completed").map((feature) => normalizeFeatureMilestone(feature))),
+  ].sort();
 
   return {
     report_id: `milestone-handoff-${generatedAt}`,
     mission_dir: missionDir,
     milestones: completedMilestones.map((milestone) =>
-      buildMilestoneReport(missionDir, milestone, features, validationState, handoffs, validationPaths, evidencePaths, generatedAt)
+      buildMilestoneReport(missionDir, milestone, features, validationState, handoffs, validationPaths, evidencePaths, screenshotManifest, generatedAt)
     ),
   };
 }
@@ -64,16 +71,19 @@ function buildMilestoneReport(
   handoffs: Array<{ path: string; data: JsonRecord }>,
   validationPaths: string[],
   evidencePaths: string[],
+  screenshotManifest: Map<string, Set<string>>,
   generatedAt: string,
 ): MilestoneHandoffReport {
-  const milestoneFeatures = features.filter((feature) => feature.milestone === milestone);
+  const milestoneFeatures = features.filter((feature) => normalizeFeatureMilestone(feature) === milestone);
   const reportPaths = validationPaths.filter((path) => path.includes(`/validation/${milestone}/`));
   const screenshotPaths = evidencePaths.filter((path) => path.includes(`/evidence/${milestone}/`) && /\.(png|jpe?g)$/i.test(path));
   const openDecisions = reportPaths.flatMap((path) => extractOpenDecisions(path, missionDir));
   const featureReports = milestoneFeatures.map((feature) =>
-    buildFeatureReport(missionDir, feature, validationState, handoffs, reportPaths, screenshotPaths)
+    buildFeatureReport(missionDir, feature, validationState, handoffs, reportPaths, screenshotPaths, screenshotManifest)
   );
   const completedReports = featureReports.filter((report) => report.status === "completed");
+  const declaredAssertionIds = unique(completedReports.flatMap((report) => report.declared_assertion_ids));
+  const provenAssertionIds = unique(completedReports.flatMap((report) => report.proven_assertion_ids));
   const unresolved = [
     ...featureReports.flatMap((report) => report.unresolved_work),
     ...milestoneFeatures
@@ -85,7 +95,12 @@ function buildMilestoneReport(
     milestone,
     generated_from: generatedAt,
     feature_reports: featureReports,
-    satisfied_assertion_ids: unique(completedReports.flatMap((report) => report.proven_assertion_ids)),
+    declared_assertion_ids: declaredAssertionIds,
+    proven_assertion_ids: provenAssertionIds,
+    satisfied_assertion_ids: provenAssertionIds,
+    assertion_semantics:
+      "declared_assertion_ids come from features[].fulfills; proven_assertion_ids/satisfied_assertion_ids require passed validation-state.json assertions.",
+    validation_state_present: Object.keys(validationState).length > 0,
     commands: completedReports.flatMap((report) => report.commands),
     browser_manual_evidence: unique(completedReports.flatMap((report) => report.browser_manual_evidence)),
     screenshot_paths: screenshotPaths.map((path) => relative(missionDir, path)),
@@ -102,12 +117,13 @@ function buildFeatureReport(
   handoffs: Array<{ path: string; data: JsonRecord }>,
   validationPaths: string[],
   screenshotPaths: string[],
+  screenshotManifest: Map<string, Set<string>>,
 ): MilestoneFeatureReport {
   const featureId = String(feature.id);
   const declaredAssertions = Array.isArray(feature.fulfills) ? feature.fulfills.map(String) : [];
   const assertionStatuses = declaredAssertions.map((assertionId) => assertionStatus(assertionId, validationState));
   const provenAssertions = assertionStatuses
-    .filter((entry) => entry.status === "passed" && (!entry.validatedAtMilestone || entry.validatedAtMilestone === feature.milestone))
+    .filter((entry) => entry.status === "passed" && (!entry.validatedAtMilestone || entry.validatedAtMilestone === normalizeFeatureMilestone(feature)))
     .map((entry) => entry.assertion_id);
   const featureHandoffs = handoffs.filter(({ data }) => data.featureId === featureId);
   const commands = featureHandoffs.flatMap(({ data }) => {
@@ -148,7 +164,9 @@ function buildFeatureReport(
     changed_files: unique(featureHandoffs.flatMap(({ data }) => changedFilesForHandoff(data))),
     commands,
     browser_manual_evidence: unique([...manualEvidence, ...browserCommands]),
-    screenshot_paths: screenshotPaths.filter((path) => screenshotBelongsToFeature(path, featureId)).map((path) => relative(missionDir, path)),
+    screenshot_paths: screenshotPaths
+      .filter((path) => screenshotBelongsToFeature(path, featureId, missionDir, screenshotManifest))
+      .map((path) => relative(missionDir, path)),
     unresolved_work: featureHandoffs.flatMap(({ data }) => unresolvedForHandoff(featureId, data)),
   };
 }
@@ -191,6 +209,13 @@ function readOptionalValidationState(missionDir: string): JsonRecord {
   return existsSync(path) ? readJson(path) : {};
 }
 
+function normalizeFeatureMilestone(feature: JsonRecord): string {
+  const value = feature.milestone;
+  if (typeof value === "string" && value.length > 0) return value;
+  if (typeof value === "number" && Number.isFinite(value)) return String(value);
+  throw new Error(`Invalid milestone value for feature ${String(feature.id ?? "(unknown)")}: expected non-empty string or finite number.`);
+}
+
 function assertionStatus(assertionId: string, validationState: JsonRecord): MilestoneFeatureReport["assertion_statuses"][number] {
   const assertions = validationState.assertions as JsonRecord | undefined;
   const record = assertions?.[assertionId] as JsonRecord | undefined;
@@ -230,8 +255,32 @@ function fileIncludes(path: string, text: string): boolean {
   }
 }
 
-function screenshotBelongsToFeature(path: string, featureId: string): boolean {
-  return basename(path).includes(featureId);
+function readEvidenceManifest(missionDir: string): Map<string, Set<string>> {
+  const manifestPath = join(missionDir, "evidence", "manifest.json");
+  const ownership = new Map<string, Set<string>>();
+  if (!existsSync(manifestPath)) return ownership;
+  const data = readJson(manifestPath);
+  const screenshots = Array.isArray(data.screenshots) ? data.screenshots : [];
+  for (const entry of screenshots) {
+    const record = entry as JsonRecord;
+    if (typeof record.feature_id !== "string" || typeof record.path !== "string") continue;
+    const paths = ownership.get(record.feature_id) ?? new Set<string>();
+    paths.add(normalizeRelativePath(record.path));
+    ownership.set(record.feature_id, paths);
+  }
+  return ownership;
+}
+
+function screenshotBelongsToFeature(path: string, featureId: string, missionDir: string, manifest: Map<string, Set<string>>): boolean {
+  const relativePath = normalizeRelativePath(relative(missionDir, path));
+  const manifestPaths = manifest.get(featureId);
+  if (manifestPaths?.has(relativePath)) return true;
+  if (manifestPaths && manifestPaths.size > 0) return false;
+  return basename(path).startsWith(`${featureId}-`);
+}
+
+function normalizeRelativePath(path: string): string {
+  return path.split(sep).join("/");
 }
 
 function unique(values: string[]): string[] {

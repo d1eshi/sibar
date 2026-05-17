@@ -129,3 +129,92 @@ test("VAL-CROSS-008 current-style mission reports are retrievable for completed 
   assert.ok(morning.screenshot_paths.some((path) => path.endsWith(".png")));
   assert.ok(morning.validation_report_paths.some((path) => path.includes("validation/morning-prototype")));
 });
+
+test("milestone reports attribute screenshots by exact feature filename convention without substring collisions", () => {
+  const dir = mkdtempSync(join(tmpdir(), "sibi-screenshot-attribution-"));
+  mkdirSync(join(dir, "handoffs"), { recursive: true });
+  mkdirSync(join(dir, "evidence", "mission-reporting", "browser"), { recursive: true });
+  writeFileSync(join(dir, "evidence", "mission-reporting", "browser", "feature-a-before.png"), Buffer.from([0x89, 0x50]));
+  writeFileSync(join(dir, "evidence", "mission-reporting", "browser", "feature-audit-before.png"), Buffer.from([0x89, 0x50]));
+
+  writeJson(join(dir, "features.json"), {
+    features: [
+      { id: "feature-a", milestone: "mission-reporting", status: "completed", fulfills: [] },
+      { id: "feature-audit", milestone: "mission-reporting", status: "completed", fulfills: [] },
+    ],
+  });
+  writeJson(join(dir, "handoffs", "feature-a.json"), { featureId: "feature-a", handoff: { verification: { commandsRun: [] } } });
+  writeJson(join(dir, "handoffs", "feature-audit.json"), { featureId: "feature-audit", handoff: { verification: { commandsRun: [] } } });
+
+  const report = buildMissionMilestoneReports(dir, "2026-05-17T00:00:00.000Z");
+  const milestone = report.milestones.find((entry) => entry.milestone === "mission-reporting");
+  assert.ok(milestone);
+  assert.deepEqual(milestone.feature_reports.find((entry) => entry.feature_id === "feature-a")?.screenshot_paths, [
+    "evidence/mission-reporting/browser/feature-a-before.png",
+  ]);
+  assert.deepEqual(milestone.feature_reports.find((entry) => entry.feature_id === "feature-audit")?.screenshot_paths, [
+    "evidence/mission-reporting/browser/feature-audit-before.png",
+  ]);
+});
+
+test("milestone reports use explicit evidence manifest screenshot ownership when present", () => {
+  const dir = mkdtempSync(join(tmpdir(), "sibi-screenshot-manifest-"));
+  mkdirSync(join(dir, "handoffs"), { recursive: true });
+  mkdirSync(join(dir, "evidence", "mission-reporting", "browser"), { recursive: true });
+  writeFileSync(join(dir, "evidence", "mission-reporting", "browser", "before.png"), Buffer.from([0x89, 0x50]));
+
+  writeJson(join(dir, "features.json"), {
+    features: [{ id: "feature-with-manifest", milestone: "mission-reporting", status: "completed", fulfills: [] }],
+  });
+  writeJson(join(dir, "handoffs", "feature-with-manifest.json"), {
+    featureId: "feature-with-manifest",
+    handoff: { verification: { commandsRun: [] } },
+  });
+  writeJson(join(dir, "evidence", "manifest.json"), {
+    screenshots: [{ feature_id: "feature-with-manifest", path: "evidence/mission-reporting/browser/before.png" }],
+  });
+
+  const report = buildMissionMilestoneReports(dir, "2026-05-17T00:00:00.000Z");
+  const milestone = report.milestones.find((entry) => entry.milestone === "mission-reporting");
+  assert.ok(milestone);
+  assert.deepEqual(milestone.feature_reports[0].screenshot_paths, ["evidence/mission-reporting/browser/before.png"]);
+});
+
+test("milestone reports normalize primitive milestone values and reject invalid metadata", () => {
+  const dir = mkdtempSync(join(tmpdir(), "sibi-milestone-normalize-"));
+  mkdirSync(join(dir, "handoffs"), { recursive: true });
+  writeJson(join(dir, "features.json"), {
+    features: [{ id: "numeric-feature", milestone: 7, status: "completed", fulfills: [] }],
+  });
+  writeJson(join(dir, "handoffs", "numeric-feature.json"), { featureId: "numeric-feature", handoff: { verification: { commandsRun: [] } } });
+
+  const report = buildMissionMilestoneReports(dir, "2026-05-17T00:00:00.000Z");
+  assert.ok(report.milestones.some((entry) => entry.milestone === "7" && entry.feature_reports[0].feature_id === "numeric-feature"));
+
+  writeJson(join(dir, "features.json"), {
+    features: [{ id: "bad-feature", milestone: { name: "bad" }, status: "completed", fulfills: [] }],
+  });
+  assert.throws(() => buildMissionMilestoneReports(dir), /Invalid milestone value for feature bad-feature/);
+});
+
+test("milestone reports expose declared and proven assertion semantics when validation state is absent", () => {
+  const dir = mkdtempSync(join(tmpdir(), "sibi-assertion-semantics-"));
+  mkdirSync(join(dir, "handoffs"), { recursive: true });
+  writeJson(join(dir, "features.json"), {
+    features: [{ id: "feature-assertions", milestone: "mission-reporting", status: "completed", fulfills: ["VAL-CROSS-008"] }],
+  });
+  writeJson(join(dir, "handoffs", "feature-assertions.json"), {
+    featureId: "feature-assertions",
+    handoff: { verification: { commandsRun: [] }, discoveredIssues: [] },
+  });
+
+  const report = buildMissionMilestoneReports(dir, "2026-05-17T00:00:00.000Z");
+  const milestone = report.milestones.find((entry) => entry.milestone === "mission-reporting");
+  assert.ok(milestone);
+  assert.deepEqual(milestone.declared_assertion_ids, ["VAL-CROSS-008"]);
+  assert.deepEqual(milestone.proven_assertion_ids, []);
+  assert.deepEqual(milestone.satisfied_assertion_ids, []);
+  assert.equal(milestone.validation_state_present, false);
+  assert.equal(milestone.assertion_semantics, "declared_assertion_ids come from features[].fulfills; proven_assertion_ids/satisfied_assertion_ids require passed validation-state.json assertions.");
+  assert.deepEqual(milestone.feature_reports[0].assertion_statuses, [{ assertion_id: "VAL-CROSS-008", status: "declared_unvalidated" }]);
+});
