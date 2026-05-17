@@ -14,7 +14,7 @@ test("VAL-CROSS-008 milestone reports map features, assertions, files, commands,
   mkdirSync(join(dir, "handoffs"), { recursive: true });
   mkdirSync(join(dir, "validation", "ui-milestone", "user-testing"), { recursive: true });
   mkdirSync(join(dir, "evidence", "ui-milestone", "flow"), { recursive: true });
-  writeFileSync(join(dir, "evidence", "ui-milestone", "flow", "VAL-UI-001-before.png"), "png");
+  writeFileSync(join(dir, "evidence", "ui-milestone", "flow", "feat-ui-before.png"), Buffer.from([0x89, 0x50, 0x4e, 0x47, 0xff]));
 
   writeJson(join(dir, "features.json"), {
     features: [
@@ -22,6 +22,13 @@ test("VAL-CROSS-008 milestone reports map features, assertions, files, commands,
       { id: "feat-runtime", milestone: "ui-milestone", status: "completed", fulfills: ["VAL-PED-001"] },
       { id: "feat-open", milestone: "ui-milestone", status: "pending", fulfills: ["VAL-OPEN"] },
     ],
+  });
+  writeJson(join(dir, "validation-state.json"), {
+    assertions: {
+      "VAL-UI-001": { status: "passed", validatedAtMilestone: "ui-milestone", validatedAt: "2026-05-17T00:00:00.000Z" },
+      "VAL-CROSS-008": { status: "pending" },
+      "VAL-PED-001": { status: "passed", validatedAtMilestone: "other-milestone", validatedAt: "2026-05-17T00:00:00.000Z" },
+    },
   });
   writeJson(join(dir, "handoffs", "feat-ui.json"), {
     featureId: "feat-ui",
@@ -55,21 +62,64 @@ test("VAL-CROSS-008 milestone reports map features, assertions, files, commands,
   const report = buildMissionMilestoneReports(dir, "2026-05-17T00:00:00.000Z");
   const milestone = report.milestones.find((entry) => entry.milestone === "ui-milestone");
   assert.ok(milestone);
-  assert.deepEqual(milestone.satisfied_assertion_ids, ["VAL-CROSS-008", "VAL-PED-001", "VAL-UI-001"]);
+  assert.deepEqual(milestone.satisfied_assertion_ids, ["VAL-UI-001"]);
+  const uiReport = milestone.feature_reports.find((entry) => entry.feature_id === "feat-ui");
+  assert.ok(uiReport);
+  assert.deepEqual(uiReport.declared_assertion_ids, ["VAL-UI-001", "VAL-CROSS-008"]);
+  assert.deepEqual(uiReport.proven_assertion_ids, ["VAL-UI-001"]);
+  assert.deepEqual(uiReport.assertion_statuses.map((entry) => [entry.assertion_id, entry.status]), [
+    ["VAL-UI-001", "passed"],
+    ["VAL-CROSS-008", "pending"],
+  ]);
   assert.deepEqual(milestone.feature_reports.find((entry) => entry.feature_id === "feat-ui")?.changed_files, [
     "web/scripts/ui.js",
     "web/workspace.html",
   ]);
   assert.ok(milestone.commands.some((entry) => entry.command === "pnpm run typecheck"));
   assert.ok(milestone.browser_manual_evidence.some((entry) => entry.includes("Clicked Submit")));
-  assert.ok(milestone.screenshot_paths.includes("evidence/ui-milestone/flow/VAL-UI-001-before.png"));
+  assert.ok(milestone.screenshot_paths.includes("evidence/ui-milestone/flow/feat-ui-before.png"));
+  assert.deepEqual(uiReport.screenshot_paths, ["evidence/ui-milestone/flow/feat-ui-before.png"]);
   assert.ok(milestone.unresolved_work.some((entry) => entry.includes("feat-runtime")));
   assert.ok(milestone.unresolved_work.some((entry) => entry.includes("feat-open")));
   assert.ok(milestone.open_decisions.some((entry) => entry.includes("screenshots are required")));
 });
 
-test("VAL-CROSS-008 current mission reports are retrievable for completed milestones", () => {
-  const report = buildMissionMilestoneReports("/Users/d1eshi/.factory/missions/b742080c-f488-4442-b610-88bb53767f2a", "2026-05-17T00:00:00.000Z");
+test("VAL-CROSS-008 current-style mission reports are retrievable for completed milestones", () => {
+  const dir = mkdtempSync(join(tmpdir(), "sibi-current-style-report-"));
+  mkdirSync(join(dir, "handoffs"), { recursive: true });
+  mkdirSync(join(dir, "validation", "morning-prototype", "scrutiny"), { recursive: true });
+  mkdirSync(join(dir, "evidence", "morning-prototype", "browser"), { recursive: true });
+  writeFileSync(join(dir, "evidence", "morning-prototype", "browser", "dow-static-workspace-shell-screenshot.png"), Buffer.from([0x89, 0x50, 0x4e, 0x47]));
+  writeJson(join(dir, "features.json"), {
+    features: [
+      {
+        id: "dow-static-workspace-shell",
+        milestone: "morning-prototype",
+        status: "completed",
+        fulfills: ["VAL-UI-001"],
+      },
+    ],
+  });
+  writeJson(join(dir, "validation-state.json"), {
+    assertions: {
+      "VAL-UI-001": { status: "passed", validatedAtMilestone: "morning-prototype", validatedAt: "2026-05-17T00:00:00.000Z" },
+    },
+  });
+  writeJson(join(dir, "handoffs", "dow-static-workspace-shell.json"), {
+    featureId: "dow-static-workspace-shell",
+    handoff: {
+      verification: {
+        commandsRun: [{ command: "pnpm run typecheck", exitCode: 0, observation: "No TypeScript errors." }],
+        interactiveChecks: [{ action: "Opened Workspace", observed: "Browser evidence rail was visible." }],
+      },
+      discoveredIssues: [],
+    },
+  });
+  writeJson(join(dir, "validation", "morning-prototype", "scrutiny", "synthesis.json"), {
+    blockingIssues: [],
+  });
+
+  const report = buildMissionMilestoneReports(dir, "2026-05-17T00:00:00.000Z");
   const morning = report.milestones.find((entry) => entry.milestone === "morning-prototype");
   assert.ok(morning);
   assert.ok(morning.feature_reports.some((entry) => entry.feature_id === "dow-static-workspace-shell"));
