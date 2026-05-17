@@ -77,12 +77,20 @@ public final class StudyPanelLiveModel: ObservableObject {
             let loadedSnapshot = try await Task.detached(priority: .userInitiated) {
                 try actions.loadSnapshot(payload)
             }.value
-            let loadedLensState = try? await Task.detached(priority: .userInitiated) {
-                try actions.loadWorkspaceSnapshot(workspacePayload)
-            }.value
+            let loadedLensState: RuntimeWorkspaceLensState?
+            do {
+                loadedLensState = try await Task.detached(priority: .userInitiated) {
+                    try actions.loadWorkspaceSnapshot(workspacePayload)
+                }.value
+            } catch {
+                loadedLensState = nil
+                lastError = "Workspace snapshot unavailable: \(error.localizedDescription)"
+            }
             snapshot = loadedSnapshot
             workspaceLensState = loadedLensState
-            lastError = ""
+            if loadedLensState != nil {
+                lastError = ""
+            }
             statusText = snapshot?.operation_state.message ?? "Study snapshot loaded."
         } catch is CancellationError {
             statusText = "Study refresh cancelled."
