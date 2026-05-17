@@ -255,7 +255,45 @@ final class RuntimeClientTests: XCTestCase {
         XCTAssertEqual(path, runtime)
     }
 
+    func testWorkspaceSnapshotPayloadUsesAbsoluteFixturePathFromRuntimeRoot() throws {
+        let runner = StubRunner(result: .init(
+            status: 0,
+            stdout: workspaceSnapshotEnvelopeJSON,
+            stderr: ""
+        ))
+        let runtimePath = "/tmp/sibi/src/runtime.ts"
+        let client = RuntimeClient(runner: runner, arguments: ["node", runtimePath], runtimePath: runtimePath)
+
+        _ = try client.getWorkspaceSnapshot(.init())
+
+        XCTAssertTrue(runner.standardInput.contains(#""command":"get_workspace_snapshot""#), runner.standardInput)
+        XCTAssertTrue(runner.standardInput.contains(#""fixture_path""#) && runner.standardInput.contains(#"sibi-pedagogy-loop.json"#), runner.standardInput)
+    }
+
+    func testWorkspaceSnapshotLoadsWhenLaunchedOutsideRepoRoot() throws {
+        let fileManager = FileManager.default
+        let originalDirectory = fileManager.currentDirectoryPath
+        let tempRoot = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent("sibi-swift-non-repo-cwd-\(UUID().uuidString)", isDirectory: true)
+        try fileManager.createDirectory(at: tempRoot, withIntermediateDirectories: true)
+        defer {
+            fileManager.changeCurrentDirectoryPath(originalDirectory)
+            try? fileManager.removeItem(at: tempRoot)
+        }
+
+        let runtimePath = URL(fileURLWithPath: originalDirectory).appendingPathComponent("src/runtime.ts").path
+
+        XCTAssertTrue(fileManager.changeCurrentDirectoryPath(tempRoot.path))
+        let client = RuntimeClient(runtimePath: runtimePath)
+        let lensState = try client.getWorkspaceSnapshot()
+
+        XCTAssertFalse(lensState.snapshot.snapshot_id.isEmpty)
+        XCTAssertFalse(lensState.snapshot.goal.isEmpty)
+        XCTAssertEqual(lensState.open_workspace.label, "Open Workspace")
+    }
+
     private func sendStub(_ client: RuntimeClient) throws -> StubResponse {
         try client.send(command: "stub", payload: StubPayload(value: "x"))
     }
 }
+
+private let workspaceSnapshotEnvelopeJSON = #"{"ok":true,"data":{"snapshot":{"snapshot_id":"SNAP-loop-1","loop_id":"loop-1","goal":"Trace runtime gap detection to readiness limits.","active_operation":null,"readiness":{"status":"ready","scope":"trace operation for runtime gap slice","blocked_claims":[]},"detected_gap":null},"open_workspace":{"label":"Open Workspace","target_url":"http://127.0.0.1:4180/workspace.html"},"operation_state":{"message":"Workspace snapshot projected from runtime-owned state."}}}"#

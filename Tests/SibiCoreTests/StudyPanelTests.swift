@@ -109,6 +109,29 @@ final class StudyPanelTests: XCTestCase {
     }
 
     @MainActor
+    func testLiveModelSurfacesWorkspaceSnapshotLoadFailure() async throws {
+        let snapshot = try decodeStudyPanelSnapshot()
+        let model = StudyPanelLiveModel(
+            actions: .init(
+                loadSnapshot: { _ in snapshot },
+                loadWorkspaceSnapshot: { _ in
+                    throw RuntimeClientError.processFailure("Fixture file missing")
+                },
+                answerQuestion: { _ in
+                    throw RuntimeClientError.processFailure("unexpected answer")
+                }
+            )
+        )
+
+        await model.refreshNow()
+
+        XCTAssertEqual(model.snapshot?.artifact_session.artifact_session_id, "a1")
+        XCTAssertNil(model.workspaceLensState)
+        XCTAssertEqual(model.lastError, "Workspace snapshot unavailable: Fixture file missing")
+        XCTAssertEqual(model.statusText, "Study panel snapshot projected from runtime-owned state.")
+    }
+
+    @MainActor
     func testLiveModelSubmitAnswerCallsRuntimeAndRefreshesSnapshot() async throws {
         let snapshot = try decodeStudyPanelSnapshot()
         let question = try XCTUnwrap(snapshot.current_questions.first)
@@ -133,7 +156,7 @@ final class StudyPanelTests: XCTestCase {
         XCTAssertEqual(recorder.answerPayload?.answer, "Swift renders runtime state only.")
         XCTAssertEqual(recorder.refreshCount, 1)
         XCTAssertEqual(model.snapshot?.artifact_session.artifact_session_id, "a1")
-        XCTAssertEqual(model.lastError, "")
+        XCTAssertEqual(model.lastError, "Workspace snapshot unavailable: Workspace snapshot unavailable.")
     }
 }
 
