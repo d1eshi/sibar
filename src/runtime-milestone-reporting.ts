@@ -1,12 +1,15 @@
 import { execFileSync } from "node:child_process";
 import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
-import { join, relative } from "node:path";
+import { basename, join, relative } from "node:path";
 
 type JsonRecord = Record<string, unknown>;
 
 export type MilestoneFeatureReport = {
   feature_id: string;
   status: string;
+  declared_assertion_ids: string[];
+  proven_assertion_ids: string[];
+  assertion_statuses: Array<{ assertion_id: string; status: string; validatedAtMilestone?: string; validatedAt?: string }>;
   assertions: string[];
   handoff_paths: string[];
   validation_report_paths: string[];
@@ -38,6 +41,7 @@ export type MissionMilestoneReporting = {
 
 export function buildMissionMilestoneReports(missionDir: string, generatedAt = new Date().toISOString()): MissionMilestoneReporting {
   const features = readJson(join(missionDir, "features.json")).features as JsonRecord[];
+  const validationState = readOptionalValidationState(missionDir);
   const handoffs = readJsonFiles(join(missionDir, "handoffs"));
   const validationPaths = listJsonFiles(join(missionDir, "validation"));
   const evidencePaths = listFiles(join(missionDir, "evidence"));
@@ -47,7 +51,7 @@ export function buildMissionMilestoneReports(missionDir: string, generatedAt = n
     report_id: `milestone-handoff-${generatedAt}`,
     mission_dir: missionDir,
     milestones: completedMilestones.map((milestone) =>
-      buildMilestoneReport(missionDir, milestone, features, handoffs, validationPaths, evidencePaths, generatedAt)
+      buildMilestoneReport(missionDir, milestone, features, validationState, handoffs, validationPaths, evidencePaths, generatedAt)
     ),
   };
 }
@@ -56,6 +60,7 @@ function buildMilestoneReport(
   missionDir: string,
   milestone: string,
   features: JsonRecord[],
+  validationState: JsonRecord,
   handoffs: Array<{ path: string; data: JsonRecord }>,
   validationPaths: string[],
   evidencePaths: string[],
@@ -66,7 +71,7 @@ function buildMilestoneReport(
   const screenshotPaths = evidencePaths.filter((path) => path.includes(`/evidence/${milestone}/`) && /\.(png|jpe?g)$/i.test(path));
   const openDecisions = reportPaths.flatMap((path) => extractOpenDecisions(path, missionDir));
   const featureReports = milestoneFeatures.map((feature) =>
-    buildFeatureReport(missionDir, feature, handoffs, reportPaths, screenshotPaths)
+    buildFeatureReport(missionDir, feature, validationState, handoffs, reportPaths, screenshotPaths)
   );
   const completedReports = featureReports.filter((report) => report.status === "completed");
   const unresolved = [
@@ -80,7 +85,7 @@ function buildMilestoneReport(
     milestone,
     generated_from: generatedAt,
     feature_reports: featureReports,
-    satisfied_assertion_ids: unique(completedReports.flatMap((report) => report.assertions)),
+    satisfied_assertion_ids: unique(completedReports.flatMap((report) => report.proven_assertion_ids)),
     commands: completedReports.flatMap((report) => report.commands),
     browser_manual_evidence: unique(completedReports.flatMap((report) => report.browser_manual_evidence)),
     screenshot_paths: screenshotPaths.map((path) => relative(missionDir, path)),
@@ -93,11 +98,17 @@ function buildMilestoneReport(
 function buildFeatureReport(
   missionDir: string,
   feature: JsonRecord,
+  validationState: JsonRecord,
   handoffs: Array<{ path: string; data: JsonRecord }>,
   validationPaths: string[],
   screenshotPaths: string[],
 ): MilestoneFeatureReport {
   const featureId = String(feature.id);
+  const declaredAssertions = Array.isArray(feature.fulfills) ? feature.fulfills.map(String) : [];
+  const assertionStatuses = declaredAssertions.map((assertionId) => assertionStatus(assertionId, validationState));
+  const provenAssertions = assertionStatuses
+    .filter((entry) => entry.status === "passed" && (!entry.validatedAtMilestone || entry.validatedAtMilestone === feature.milestone))
+    .map((entry) => entry.assertion_id);
   const featureHandoffs = handoffs.filter(({ data }) => data.featureId === featureId);
   const commands = featureHandoffs.flatMap(({ data }) => {
     const handoff = data.handoff as JsonRecord | undefined;
@@ -128,13 +139,16 @@ function buildFeatureReport(
   return {
     feature_id: featureId,
     status: String(feature.status ?? "unknown"),
-    assertions: Array.isArray(feature.fulfills) ? feature.fulfills.map(String) : [],
+    declared_assertion_ids: declaredAssertions,
+    proven_assertion_ids: provenAssertions,
+    assertion_statuses: assertionStatuses,
+    assertions: declaredAssertions,
     handoff_paths: featureHandoffs.map(({ path }) => relative(missionDir, path)),
     validation_report_paths: validationPaths.filter((path) => fileIncludes(path, featureId)).map((path) => relative(missionDir, path)),
     changed_files: unique(featureHandoffs.flatMap(({ data }) => changedFilesForHandoff(data))),
     commands,
     browser_manual_evidence: unique([...manualEvidence, ...browserCommands]),
-    screenshot_paths: screenshotPaths.filter((path) => fileIncludes(path, featureId)).map((path) => relative(missionDir, path)),
+    screenshot_paths: screenshotPaths.filter((path) => screenshotBelongsToFeature(path, featureId)).map((path) => relative(missionDir, path)),
     unresolved_work: featureHandoffs.flatMap(({ data }) => unresolvedForHandoff(featureId, data)),
   };
 }
@@ -172,6 +186,22 @@ function extractOpenDecisions(path: string, missionDir: string): string[] {
   return decisions.map((decision) => `${relative(missionDir, path)}: ${JSON.stringify(decision)}`);
 }
 
+function readOptionalValidationState(missionDir: string): JsonRecord {
+  const path = join(missionDir, "validation-state.json");
+  return existsSync(path) ? readJson(path) : {};
+}
+
+function assertionStatus(assertionId: string, validationState: JsonRecord): MilestoneFeatureReport["assertion_statuses"][number] {
+  const assertions = validationState.assertions as JsonRecord | undefined;
+  const record = assertions?.[assertionId] as JsonRecord | undefined;
+  return {
+    assertion_id: assertionId,
+    status: String(record?.status ?? "declared_unvalidated"),
+    ...(typeof record?.validatedAtMilestone === "string" ? { validatedAtMilestone: record.validatedAtMilestone } : {}),
+    ...(typeof record?.validatedAt === "string" ? { validatedAt: record.validatedAt } : {}),
+  };
+}
+
 function readJson(path: string): JsonRecord {
   return JSON.parse(readFileSync(path, "utf8")) as JsonRecord;
 }
@@ -198,6 +228,10 @@ function fileIncludes(path: string, text: string): boolean {
   } catch {
     return path.includes(text);
   }
+}
+
+function screenshotBelongsToFeature(path: string, featureId: string): boolean {
+  return basename(path).includes(featureId);
 }
 
 function unique(values: string[]): string[] {
