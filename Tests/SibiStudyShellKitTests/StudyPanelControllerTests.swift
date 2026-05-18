@@ -19,8 +19,8 @@ final class StudyPanelControllerTests: XCTestCase {
         XCTAssertTrue(panel.collectionBehavior.contains(.fullScreenAuxiliary))
         XCTAssertEqual(panel.titleVisibility, .hidden)
         XCTAssertTrue(panel.titlebarAppearsTransparent)
-        XCTAssertEqual(panel.backgroundColor, .clear)
-        XCTAssertFalse(panel.isOpaque)
+        XCTAssertEqual(panel.backgroundColor, .windowBackgroundColor)
+        XCTAssertTrue(panel.isOpaque)
         XCTAssertTrue(panel.standardWindowButton(.closeButton)?.isHidden ?? false)
         XCTAssertTrue(panel.standardWindowButton(.miniaturizeButton)?.isHidden ?? false)
         XCTAssertTrue(panel.standardWindowButton(.zoomButton)?.isHidden ?? false)
@@ -77,22 +77,6 @@ final class StudyPanelControllerTests: XCTestCase {
         XCTAssertEqual(panel.contentView?.frame.size.width ?? 0, StudyPanelController.canvasSize.width, accuracy: 0.5)
     }
 
-    func testOpenWorkspaceActionOpensProvidedURL() {
-        var openedURLs: [URL] = []
-        let controller = StudyPanelController(
-            model: makeModel(),
-            openURL: { url in
-                openedURLs.append(url)
-            }
-        )
-
-        controller.openWorkspace(action: .init(
-            label: "Open Workspace",
-            target_url: "http://127.0.0.1:4180/workspace.html"
-        ))
-
-        XCTAssertEqual(openedURLs, [URL(string: "http://127.0.0.1:4180/workspace.html")!])
-    }
 }
 
 @MainActor

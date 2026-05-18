@@ -18,21 +18,17 @@ import {
   buildWorkspaceLoop,
   makeReadinessClaim,
   resolveDefaultExcludedPaths,
-  resolveWorkspaceURL,
 } from "./runtime-workspace-session-logic.ts";
 import { fail, now, toOperationState, type RuntimeSuccess, type RuntimeWorkspaceSession } from "./runtime-support.ts";
 import { runProjectLearningAgentCommand as runAgent } from "./runtime-agent.ts";
 import {
   DEFAULT_EXCLUDED_PATHS,
   MAX_GOAL_LABEL_LENGTH,
-  WORKSPACE_OPEN_LABEL,
-  WORKSPACE_URL_DEFAULT,
 } from "./runtime-workspace-session-constants.ts";
 
 type WorkspaceSessionResponse = {
   workspace_session: RuntimeWorkspaceSession;
   snapshot: WorkspaceSnapshot;
-  open_workspace: { label: typeof WORKSPACE_OPEN_LABEL; target_url: string };
   operation_state: { message: string };
 };
 
@@ -109,10 +105,6 @@ export function startWorkspaceSessionCommand(
     data: {
       workspace_session: workspaceSession,
       snapshot: projectWorkspaceSnapshot(loop),
-      open_workspace: {
-        label: WORKSPACE_OPEN_LABEL,
-        target_url: resolveWorkspaceURL(payload, WORKSPACE_URL_DEFAULT),
-      },
       operation_state: toOperationState("Workspace session started from runtime boundary and LLM runner contract."),
     },
   };
@@ -179,10 +171,6 @@ export function submitWorkspaceAttemptCommand(
     data: {
       workspace_session: workspaceSession,
       snapshot: projectWorkspaceSnapshot(loop),
-      open_workspace: {
-        label: WORKSPACE_OPEN_LABEL,
-        target_url: resolveWorkspaceURL(payload, WORKSPACE_URL_DEFAULT),
-      },
       operation_state: toOperationState("Workspace attempt evaluated by deterministic evidence checks."),
     },
   };

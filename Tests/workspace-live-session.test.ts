@@ -254,8 +254,6 @@ test("start-workspace-session CLI starts a live workspace session and outputs JS
       "Explain this project A-Z",
       "--root",
       root,
-      "--workspace-url",
-      "http://127.0.0.1:5180/workspace.html",
     ],
     {
       encoding: "utf8",
@@ -274,13 +272,11 @@ test("start-workspace-session CLI starts a live workspace session and outputs JS
     runner_status: string;
     runner: { status: "completed" | "blocked" };
     snapshot: { loop_state: string };
-    open_workspace: { target_url: string };
   };
   assert.ok(response.workspace_session_id.length > 10);
   assert.equal(response.runner.status, "completed");
   assert.equal(response.runner_status, "completed");
   assert.equal(response.snapshot.loop_state, "AwaitingAttempt");
-  assert.equal(response.open_workspace.target_url, "http://127.0.0.1:5180/workspace.html");
 });
 
 test("explain CLI starts a live workspace session from a positional goal", () => {

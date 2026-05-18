@@ -29,7 +29,6 @@ import { generateQuestionsCommand } from "./runtime-questions.ts";
 import { readinessReportCommand } from "./runtime-readiness.ts";
 import { getSession, readState, toSummary, writeState } from "./runtime-state.ts";
 import { getStudyPanelStateCommand } from "./runtime-study-panel.ts";
-import { getWorkspaceSnapshotCommand } from "./runtime-workspace-snapshot.ts";
 import {
   startWorkspaceSessionCommand,
   submitWorkspaceAttemptCommand,
@@ -338,8 +337,6 @@ export function handleRequest(request: RuntimeRequest): RuntimeResponse<unknown>
         return readinessReportCommand(request.payload);
       case "get_study_panel_state":
         return getStudyPanelStateCommand(request.payload);
-      case "get_workspace_snapshot":
-        return getWorkspaceSnapshotCommand(request.payload);
       case "start_workspace_session":
         return startWorkspaceSessionCommand(request.payload);
       case "submit_workspace_attempt":

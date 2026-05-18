@@ -8,14 +8,13 @@ function printUsage(): void {
   console.log("  node --experimental-strip-types src/sibi.ts explain \"Explain this project A-Z\" [--root /path/to/project]");
   console.log("  node --experimental-strip-types src/sibi.ts start-workspace-session \\");
   console.log("    --goal \"Explain this project A-Z\" --root /path/to/project \\");
-  console.log("    [--codex-command auto] [--workspace-url http://127.0.0.1:4180/workspace.html]");
+  console.log("    [--codex-command auto]");
 }
 
 type WorkspaceSessionCLIArgs = {
   goal: string;
   rootPath: string;
   codexCommand?: string;
-  workspaceUrl?: string;
 };
 
 type WorkspaceSessionResult = {
@@ -30,10 +29,6 @@ type WorkspaceSessionResult = {
   snapshot: {
     loop_state: string;
   };
-  open_workspace: {
-    label: "Open Workspace";
-    target_url: string;
-  };
 };
 
 function printJSONError(message: string): never {
@@ -45,7 +40,6 @@ function parseStartWorkspaceSessionArgs(argv: string[]): WorkspaceSessionCLIArgs
   let goal = "";
   let rootPath = process.cwd();
   let codexCommand: string | undefined;
-  let workspaceUrl: string | undefined;
 
   for (let index = 0; index < argv.length; index += 1) {
     const arg = argv[index];
@@ -72,13 +66,6 @@ function parseStartWorkspaceSessionArgs(argv: string[]): WorkspaceSessionCLIArgs
       continue;
     }
 
-    if (arg === "--workspace-url") {
-      if (!value) printJSONError("--workspace-url requires a value.");
-      workspaceUrl = value;
-      index += 1;
-      continue;
-    }
-
     printJSONError(`Unknown argument: ${arg}`);
   }
 
@@ -90,7 +77,6 @@ function parseStartWorkspaceSessionArgs(argv: string[]): WorkspaceSessionCLIArgs
     goal: goal.trim(),
     rootPath,
     codexCommand,
-    workspaceUrl,
   };
 }
 
@@ -102,7 +88,6 @@ function runWorkspaceSessionCommand(rawArgs: string[]): void {
       goal: args.goal,
       root_path: args.rootPath,
       codex_command: args.codexCommand ?? "auto",
-      workspace_url: args.workspaceUrl,
     },
   };
 
@@ -114,7 +99,6 @@ function runWorkspaceSessionCommand(rawArgs: string[]): void {
     snapshot: {
       loop_state: string;
     };
-    open_workspace: WorkspaceSessionResult["open_workspace"];
   }>;
 
   if (!response.ok) {
@@ -128,7 +112,6 @@ function runWorkspaceSessionCommand(rawArgs: string[]): void {
     snapshot: {
       loop_state: response.data.snapshot.loop_state,
     },
-    open_workspace: response.data.open_workspace,
   };
 
   console.log(JSON.stringify(output));

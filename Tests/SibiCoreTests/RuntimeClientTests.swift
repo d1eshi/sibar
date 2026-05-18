@@ -255,42 +255,6 @@ final class RuntimeClientTests: XCTestCase {
         XCTAssertEqual(path, runtime)
     }
 
-    func testWorkspaceSnapshotPayloadUsesAbsoluteFixturePathFromRuntimeRoot() throws {
-        let runner = StubRunner(result: .init(
-            status: 0,
-            stdout: workspaceSnapshotEnvelopeJSON,
-            stderr: ""
-        ))
-        let runtimePath = "/tmp/sibi/src/runtime.ts"
-        let client = RuntimeClient(runner: runner, arguments: ["node", runtimePath], runtimePath: runtimePath)
-
-        _ = try client.getWorkspaceSnapshot(.init())
-
-        XCTAssertTrue(runner.standardInput.contains(#""command":"get_workspace_snapshot""#), runner.standardInput)
-        XCTAssertTrue(runner.standardInput.contains(#""fixture_path""#) && runner.standardInput.contains(#"sibi-pedagogy-loop.json"#), runner.standardInput)
-    }
-
-    func testWorkspaceSnapshotLoadsWhenLaunchedOutsideRepoRoot() throws {
-        let fileManager = FileManager.default
-        let originalDirectory = fileManager.currentDirectoryPath
-        let tempRoot = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent("sibi-swift-non-repo-cwd-\(UUID().uuidString)", isDirectory: true)
-        try fileManager.createDirectory(at: tempRoot, withIntermediateDirectories: true)
-        defer {
-            fileManager.changeCurrentDirectoryPath(originalDirectory)
-            try? fileManager.removeItem(at: tempRoot)
-        }
-
-        let runtimePath = URL(fileURLWithPath: originalDirectory).appendingPathComponent("src/runtime.ts").path
-
-        XCTAssertTrue(fileManager.changeCurrentDirectoryPath(tempRoot.path))
-        let client = RuntimeClient(runtimePath: runtimePath)
-        let lensState = try client.getWorkspaceSnapshot()
-
-        XCTAssertFalse(lensState.snapshot.snapshot_id.isEmpty)
-        XCTAssertFalse(lensState.snapshot.goal.isEmpty)
-        XCTAssertEqual(lensState.open_workspace.label, "Open Workspace")
-    }
-
     func testSendsStartWorkspaceSessionCommand() throws {
         let runner = StubRunner(result: .init(
             status: 0,
@@ -302,8 +266,7 @@ final class RuntimeClientTests: XCTestCase {
         let result = try client.startWorkspaceSession(.init(
             goal: "Explain project ownership boundaries.",
             root: "/tmp/sibi",
-            codex_command: "auto",
-            workspace_url: "http://127.0.0.1:4180/workspace.html"
+            codex_command: "auto"
         ))
 
         XCTAssertEqual(result.workspace_session.workspace_session_id, "ws-1")
@@ -318,7 +281,6 @@ final class RuntimeClientTests: XCTestCase {
         XCTAssertEqual(payload["root"] as? String, "/tmp/sibi")
         XCTAssertEqual(payload["root_path"] as? String, "/tmp/sibi")
         XCTAssertEqual(payload["codex_command"] as? String, "auto")
-        XCTAssertEqual(payload["workspace_url"] as? String, "http://127.0.0.1:4180/workspace.html")
     }
 
     private func sendStub(_ client: RuntimeClient) throws -> StubResponse {
@@ -326,5 +288,4 @@ final class RuntimeClientTests: XCTestCase {
     }
 }
 
-private let workspaceSnapshotEnvelopeJSON = #"{"ok":true,"data":{"snapshot":{"snapshot_id":"SNAP-loop-1","loop_id":"loop-1","goal":"Trace runtime gap detection to readiness limits.","active_operation":null,"readiness":{"status":"ready","scope":"trace operation for runtime gap slice","blocked_claims":[]},"detected_gap":null},"open_workspace":{"label":"Open Workspace","target_url":"http://127.0.0.1:4180/workspace.html"},"operation_state":{"message":"Workspace snapshot projected from runtime-owned state."}}}"#
 private let startWorkspaceSessionEnvelopeJSON = #"{"ok":true,"data":{"workspace_session":{"workspace_session_id":"ws-1","artifact_session_id":"as-1","runner":{"status":"completed","accepted_signal_count":1,"rejected_signal_count":0}}}}"#

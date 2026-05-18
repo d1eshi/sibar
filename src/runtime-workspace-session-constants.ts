@@ -1,7 +1,3 @@
-export const WORKSPACE_OPEN_LABEL = "Open Workspace" as const;
-
-export const WORKSPACE_URL_DEFAULT = "http://127.0.0.1:4180/workspace.html";
-
 export const DEFAULT_EXCLUDED_PATHS = [
   ".git",
   ".build",
