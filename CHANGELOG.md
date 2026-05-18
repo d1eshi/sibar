@@ -11,6 +11,17 @@ accepted specs and iterations, not by raw commit count.
 Use this section for changes that have landed but are not part of a tagged
 release yet.
 
+### Fixed - Live Workspace Preview and Evidence Ranges
+
+- Updated live workspace contract generation so `artifact_previews` render text from
+  `payload.lines` when `excerpt` is not provided, while preserving preview
+  `line_start` and `line_end`.
+- Updated `evidence` contract `line_range` to use cited `start_line`/`end_line`
+  from `source_evidence` when available, with payload line metadata as fallback.
+- Updated artifact type inference for PDF/paper handling, including `.pdf` path
+  detection and clearer `preview_fallback_reason` messages when no renderable
+  snippet exists for non-text previews.
+
 ### Added - Native Explain A-Z Attempt Bridge
 
 - Added the native Swift live-loop attempt bridge for `Explain this project A-Z`:
