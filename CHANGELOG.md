@@ -20,6 +20,16 @@ release yet.
   deterministic evidence-check results, detected gaps, repair actions, and
   scoped readiness without opening a browser workspace.
 
+### Added - Native Live Workspace Repro Path
+
+- Extended `StartWorkspaceSessionPayload` with optional
+  `fixture_model_response_path`, encoded as `fixture_model_response_path` only
+  when provided.
+- Updated native live workspace startup to read
+  `SIBI_WORKSPACE_FIXTURE_MODEL_RESPONSE_PATH` and pass it through to the
+  `start_workspace_session` payload, with a lightweight injectable environment
+  hook for tests.
+
 ### Added - Live Workspace Evaluation Visibility
 
 - Extended `LiveWorkspaceRenderModel` with explicit evidence/evaluation fields:

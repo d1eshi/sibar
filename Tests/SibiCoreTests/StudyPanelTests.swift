@@ -206,6 +206,98 @@ final class StudyPanelTests: XCTestCase {
     }
 
     @MainActor
+    func testLiveModelStartsWorkspaceSessionUsingFixturePathFromEnvironment() async throws {
+        let recorder = StudyPanelActionRecorder()
+        let model = StudyPanelLiveModel(
+            actions: .init(
+                loadSnapshot: { _ in try decodeStudyPanelSnapshot() },
+                startWorkspaceSession: { payload in
+                    recorder.recordStartWorkspacePayload(payload)
+                    return try decodeStartWorkspaceSessionResult()
+                },
+                answerQuestion: { _ in
+                    throw RuntimeClientError.processFailure("unexpected answer")
+                }
+            ),
+            environment: ["SIBI_WORKSPACE_FIXTURE_MODEL_RESPONSE_PATH": "docs/specs/deep-ownership-workspace/fixtures/live-workspace-session.json"]
+        )
+
+        await model.startLiveWorkspace(goal: "Explain this project A-Z", rootPath: "/tmp/sibi")
+
+        XCTAssertEqual(
+            recorder.startWorkspacePayload?.fixture_model_response_path,
+            "docs/specs/deep-ownership-workspace/fixtures/live-workspace-session.json"
+        )
+        XCTAssertEqual(model.liveWorkspaceSession?.workspace_session.workspace_session_id, "ws-1")
+        XCTAssertEqual(model.statusText, "Live workspace session started.")
+        XCTAssertEqual(model.lastError, "")
+    }
+
+    @MainActor
+    func testLiveModelStartsWorkspaceSessionUsesExplicitFixturePathOverEnvironment() async throws {
+        let recorder = StudyPanelActionRecorder()
+        let model = StudyPanelLiveModel(
+            actions: .init(
+                loadSnapshot: { _ in try decodeStudyPanelSnapshot() },
+                startWorkspaceSession: { payload in
+                    recorder.recordStartWorkspacePayload(payload)
+                    return try decodeStartWorkspaceSessionResult()
+                },
+                answerQuestion: { _ in
+                    throw RuntimeClientError.processFailure("unexpected answer")
+                }
+            ),
+            environment: ["SIBI_WORKSPACE_FIXTURE_MODEL_RESPONSE_PATH": "docs/specs/deep-ownership-workspace/fixtures/live-workspace-session.json"]
+        )
+
+        await model.startLiveWorkspace(
+            goal: "Explain this project A-Z",
+            rootPath: "/tmp/sibi",
+            fixtureModelResponsePath: "fixtures/explicit-live-workspace-session.json"
+        )
+
+        XCTAssertEqual(
+            recorder.startWorkspacePayload?.fixture_model_response_path,
+            "fixtures/explicit-live-workspace-session.json"
+        )
+        XCTAssertEqual(model.liveWorkspaceSession?.workspace_session.workspace_session_id, "ws-1")
+        XCTAssertEqual(model.statusText, "Live workspace session started.")
+        XCTAssertEqual(model.lastError, "")
+    }
+
+    @MainActor
+    func testLiveModelStartsWorkspaceSessionWithBlankFixturePathFallsBackToEnvironment() async throws {
+        let recorder = StudyPanelActionRecorder()
+        let model = StudyPanelLiveModel(
+            actions: .init(
+                loadSnapshot: { _ in try decodeStudyPanelSnapshot() },
+                startWorkspaceSession: { payload in
+                    recorder.recordStartWorkspacePayload(payload)
+                    return try decodeStartWorkspaceSessionResult()
+                },
+                answerQuestion: { _ in
+                    throw RuntimeClientError.processFailure("unexpected answer")
+                }
+            ),
+            environment: ["SIBI_WORKSPACE_FIXTURE_MODEL_RESPONSE_PATH": "docs/specs/deep-ownership-workspace/fixtures/live-workspace-session.json"]
+        )
+
+        await model.startLiveWorkspace(
+            goal: "Explain this project A-Z",
+            rootPath: "/tmp/sibi",
+            fixtureModelResponsePath: ""
+        )
+
+        XCTAssertEqual(
+            recorder.startWorkspacePayload?.fixture_model_response_path,
+            "docs/specs/deep-ownership-workspace/fixtures/live-workspace-session.json"
+        )
+        XCTAssertEqual(model.liveWorkspaceSession?.workspace_session.workspace_session_id, "ws-1")
+        XCTAssertEqual(model.statusText, "Live workspace session started.")
+        XCTAssertEqual(model.lastError, "")
+    }
+
+    @MainActor
     func testLiveModelSubmitWorkspaceAttemptCallsRuntimeAndReplacesLiveSession() async throws {
         let initialSession = try decodeStartWorkspaceSessionResult()
         let updatedSession = try decodeSubmitWorkspaceAttemptResult()
