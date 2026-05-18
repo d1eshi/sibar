@@ -135,7 +135,8 @@ public final class StudyPanelLiveModel: ObservableObject {
         answerText: String,
         selectedEvidence: [String],
         confidence: String,
-        declaredUnknowns: [String]
+        declaredUnknowns: [String],
+        action: SubmitWorkspaceAttemptAction = .submit
     ) async {
         guard !isSubmittingWorkspaceAttempt else { return }
         guard let workspaceSession = liveWorkspaceSession?.workspace_session else {
@@ -154,7 +155,8 @@ public final class StudyPanelLiveModel: ObservableObject {
             answer_text: answerText.trimmingCharacters(in: .whitespacesAndNewlines),
             selected_evidence: selectedEvidence,
             declared_confidence: normalizedConfidence.isEmpty ? "medium" : normalizedConfidence,
-            declared_unknowns: declaredUnknowns
+            declared_unknowns: declaredUnknowns,
+            action: action
         )
         let actions = actions
 

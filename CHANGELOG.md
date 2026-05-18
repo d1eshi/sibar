@@ -76,6 +76,13 @@ release yet.
   unknown zone presence, boundary enforcement against out-of-bound paths,
   and readiness scope without whole-repo ownership claims.
 
+### Fixed - Live Workspace Submission Action
+
+- Routed submit action from the live workspace attempt composer to `SubmitWorkspaceAttemptPayload`,
+  so normal submit uses `.submit` and the "I do not know" button sends `.i_do_not_know`.
+- Updated `StudyPanelLiveModel.submitWorkspaceAttempt` to accept an optional action
+  argument (defaulting to `.submit`) and forward it unchanged to runtime payloads.
+
 Each changelog-worthy change should be updated in the same commit as the work it
 describes. Skip this file only when the commit is purely mechanical and does not
 change product behavior, product docs, release readiness, or the public product
