@@ -32,8 +32,6 @@
       html += renderCodeSlice(art);
     } else if (art.renderer === "flow_diagram") {
       html += renderFlowDiagram(art);
-    } else if (art.renderer === "patch_preview") {
-      html += renderPatchReadinessArtifact(art);
     } else {
       html += '<div class="blocked-state"><div class="blocked-title">Unsupported artifact renderer</div></div>';
     }
@@ -124,7 +122,6 @@
     if (!artifact || !artifact.renderer) return "Artifact";
     if (artifact.renderer === "code_slice") return "Code Slice";
     if (artifact.renderer === "flow_diagram") return "Flow Diagram";
-    if (artifact.renderer === "patch_preview") return "Patch Readiness";
     return artifact.title || "Artifact";
   }
 
