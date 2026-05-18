@@ -7,6 +7,7 @@ import type {
   TaskType,
 } from "./pedagogy/index.ts";
 import type { RuntimeCodeSelection } from "./code-selection.ts";
+import type { DeepOwnershipLoop } from "./runtime-deep-ownership-loop-types.ts";
 
 export type RuntimeCommand =
   | "create_artifact_session"
@@ -17,6 +18,8 @@ export type RuntimeCommand =
   | "readiness_report"
   | "get_study_panel_state"
   | "get_workspace_snapshot"
+  | "start_workspace_session"
+  | "submit_workspace_attempt"
   | "generate_practice_challenges"
   | "run_project_learning_agent"
   | "declare_intent"
@@ -341,10 +344,37 @@ export type RuntimeState = {
   current_artifact_session_id?: string;
   sessions: Record<string, RuntimeSession>;
   artifact_sessions?: Record<string, ArtifactSession>;
+  workspace_sessions?: Record<string, RuntimeWorkspaceSession>;
 };
 
 export type RuntimeSessionSummary = AgentWorkSessionSummary & {
   code_selection?: RuntimeCodeSelection;
+};
+
+export type RuntimeWorkspaceSession = {
+  workspace_session_id: string;
+  artifact_session_id: string;
+  loop: DeepOwnershipLoop;
+  runner: {
+    status: "completed" | "blocked";
+    blocked_reason?: string;
+    model_runner?: string;
+    model_name?: string;
+    reasoning_effort?: string;
+    accepted_signal_count: number;
+    rejected_signal_count: number;
+  };
+  source_control: {
+    available: boolean;
+    branch: string | null;
+    head: string | null;
+    status_short: string;
+    recent_log: string;
+    diff_stat: string;
+    diff_name_status: string;
+  };
+  created_at: string;
+  updated_at: string;
 };
 
 export class RuntimeError extends Error {
