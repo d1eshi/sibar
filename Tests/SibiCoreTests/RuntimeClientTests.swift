@@ -281,6 +281,30 @@ final class RuntimeClientTests: XCTestCase {
         XCTAssertEqual(payload["root"] as? String, "/tmp/sibi")
         XCTAssertEqual(payload["root_path"] as? String, "/tmp/sibi")
         XCTAssertEqual(payload["codex_command"] as? String, "auto")
+        XCTAssertNil(payload["fixture_model_response_path"])
+    }
+
+    func testSendsStartWorkspaceSessionCommandWithFixtureModelResponsePath() throws {
+        let runner = StubRunner(result: .init(
+            status: 0,
+            stdout: startWorkspaceSessionEnvelopeJSON,
+            stderr: ""
+        ))
+        let client = RuntimeClient(runner: runner, arguments: ["node", "runtime.js"])
+
+        _ = try client.startWorkspaceSession(.init(
+            goal: "Explain project ownership boundaries.",
+            root: "/tmp/sibi",
+            codex_command: "auto",
+            fixture_model_response_path: "docs/specs/deep-ownership-workspace/fixtures/live-workspace-session.json"
+        ))
+
+        let requestData = try XCTUnwrap(runner.standardInput.data(using: .utf8))
+        let requestObject = try JSONSerialization.jsonObject(with: requestData) as? [String: Any]
+        let payload = try XCTUnwrap(requestObject?["payload"] as? [String: Any])
+
+        XCTAssertEqual(requestObject?["command"] as? String, "start_workspace_session")
+        XCTAssertEqual(payload["fixture_model_response_path"] as? String, "docs/specs/deep-ownership-workspace/fixtures/live-workspace-session.json")
     }
 
     func testSendsSubmitWorkspaceAttemptCommand() throws {

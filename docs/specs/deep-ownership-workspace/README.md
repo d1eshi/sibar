@@ -146,17 +146,21 @@ use the committed fixture:
 
 - `docs/specs/deep-ownership-workspace/fixtures/live-workspace-session.json`
 
-Runtime/CLI:
+Native app:
+
+Run:
+
+- `cd /path/to/repo`
+- `SIBI_WORKSPACE_FIXTURE_MODEL_RESPONSE_PATH=docs/specs/deep-ownership-workspace/fixtures/live-workspace-session.json swift run SibiStudyApp`
+
+`Start` uses the current working directory as the repo root.
+
+and click `Start`.
+
+For direct CLI checks:
 
 - `node --experimental-strip-types src/sibi.ts start-workspace-session --goal "Explain this project A-Z" --root /path/to/repo --fixture-model-response-path docs/specs/deep-ownership-workspace/fixtures/live-workspace-session.json`
 - `node --experimental-strip-types src/sibi.ts explain "Explain this project A-Z" --root /path/to/repo --fixture-model-response-path docs/specs/deep-ownership-workspace/fixtures/live-workspace-session.json`
-
-From the native app:
-
-- `swift run SibiStudyApp`
-- Open SibiStudyApp, click `Start`, and choose the repo path.
-- In-app start/submit still uses the local TypeScript runtime; fixture mode is for
-  deterministic CLI/dev checks, not for end-user runtime defaults.
 
 ## Relationship To Existing Specs
 

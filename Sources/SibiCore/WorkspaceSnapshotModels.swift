@@ -4,11 +4,18 @@ public struct StartWorkspaceSessionPayload: Codable, Sendable {
     public let goal: String
     public let root: String
     public let codex_command: String
+    public let fixture_model_response_path: String?
 
-    public init(goal: String, root: String, codex_command: String = "auto") {
+    public init(
+        goal: String,
+        root: String,
+        codex_command: String = "auto",
+        fixture_model_response_path: String? = nil
+    ) {
         self.goal = goal
         self.root = root
         self.codex_command = codex_command
+        self.fixture_model_response_path = fixture_model_response_path
     }
 
     private enum CodingKeys: String, CodingKey {
@@ -16,6 +23,7 @@ public struct StartWorkspaceSessionPayload: Codable, Sendable {
         case root
         case root_path
         case codex_command
+        case fixture_model_response_path
     }
 
     public init(from decoder: Decoder) throws {
@@ -24,6 +32,7 @@ public struct StartWorkspaceSessionPayload: Codable, Sendable {
         root = try container.decodeIfPresent(String.self, forKey: .root)
             ?? container.decode(String.self, forKey: .root_path)
         codex_command = try container.decodeIfPresent(String.self, forKey: .codex_command) ?? "auto"
+        fixture_model_response_path = try container.decodeIfPresent(String.self, forKey: .fixture_model_response_path)
     }
 
     public func encode(to encoder: Encoder) throws {
@@ -32,6 +41,9 @@ public struct StartWorkspaceSessionPayload: Codable, Sendable {
         try container.encode(root, forKey: .root)
         try container.encode(root, forKey: .root_path)
         try container.encode(codex_command, forKey: .codex_command)
+        if let fixture_model_response_path {
+            try container.encode(fixture_model_response_path, forKey: .fixture_model_response_path)
+        }
     }
 }
 
