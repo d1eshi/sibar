@@ -129,15 +129,13 @@
         });
       }
 
-      // Hint ladder (progressive, no answer leakage — VAL-LOOP-002, VAL-LOOP-014, VAL-UI-010)
-      // Content injected dynamically from HINT_REVEAL_CONTENT; never in pre-attempt DOM.
       Array.from(el("loopContent").querySelectorAll(".hint")).forEach(function(h) {
         /** Shared reveal logic: click or keyboard */
         function revealHint() {
           // Already revealed — skip
           if (h.classList.contains("revealed")) return;
           // Check remaining hints
-          var limit = fixture.active_operation.allowed_hints || 3;
+          var limit = fixture.active_operation.hints ? fixture.active_operation.hints.length : 0;
           if (state.revealedHints >= limit) {
             showToast("All hints revealed. Submit your attempt to continue.");
             return;
@@ -146,7 +144,7 @@
           h.setAttribute("aria-expanded", "true");
           state.revealedHints++;
           // Dynamically inject solution content — was never in the pre-attempt DOM
-          var content = HINT_REVEAL_CONTENT[h.dataset.hint];
+          var content = h.dataset.content;
           if (content) {
             var hiddenDiv = document.createElement("div");
             hiddenDiv.className = "hint-hidden";

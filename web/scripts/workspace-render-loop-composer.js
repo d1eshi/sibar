@@ -4,16 +4,6 @@
 // Must be loaded after workspace-helpers.js
 "use strict";
 
-// ── Hint Reveal Content ──
-// Solution-bearing content stored OUTSIDE the DOM. Injected dynamically
-// only when a hint is revealed, preventing pre-attempt DOM/accessibility leak
-// (VAL-LOOP-002, VAL-LOOP-014, VAL-UI-010).
-  var HINT_REVEAL_CONTENT = {
-    1: "The LearningGap interface has: id, quality, severity, confidence, suspected_misconception, repair_action, artifact_evidence, and blocks_readiness.",
-    2: "severityFor receives AnswerQuality and returns Severity. confidenceFor receives AnswerQuality + Severity and returns Confidence.",
-    3: "partial → important severity / medium confidence. gap_confirmed → critical severity / high confidence. severityFor on line ~84. confidenceFor on line ~94."
-  };
-
   function renderLoopComposer() {
     var html = "";
     var op = fixture.active_operation;
@@ -117,22 +107,16 @@
     html += '</div>';
     html += '</div>';
 
-    // Hint ladder (never reveals hidden answer — VAL-LOOP-014)
-    // Hint content is stored in HINT_REVEAL_CONTENT and injected dynamically on reveal.
-    // No solution-bearing text is embedded in the pre-attempt DOM or accessibility tree.
-    if ((op.allowed_hints || 0) > 0) {
+    // Hint ladder is runtime-provided only. The browser does not synthesize
+    // project-specific hint text.
+    if (Array.isArray(op.hints) && op.hints.length > 0) {
       html += '<div class="hint-ladder">';
-      html += '<h3>Hint Ladder (' + op.allowed_hints + ' available)</h3>';
-      html += '<div class="hint" data-hint="1" role="button" tabindex="0" aria-label="Reveal hint 1" aria-expanded="false">';
-      html += '<span class="hint-num">1</span> Look at the function signature — what fields does the return type declare?';
-      html += '</div>';
-      html += '<div class="hint" data-hint="2" role="button" tabindex="0" aria-label="Reveal hint 2" aria-expanded="false">';
-      html += '<span class="hint-num">2</span> severityFor and confidenceFor are pure functions. What does each receive as arguments?';
-      html += '</div>';
-      html += '<div class="hint" data-hint="3" role="button" tabindex="0" aria-label="Reveal hint 3" aria-expanded="false">';
-      html += '<span class="hint-num">3</span> Map each quality value to its severity and confidence. Which case changes the most between partial and gap_confirmed?';
-      html += '</div>';
-      html += '<div style="font-size:9px;color:var(--text-muted);margin-top:4px;">Hints orient attention and name evidence — they never reveal the hidden solution content before attempt (VAL-LOOP-014).</div>';
+      html += '<h3>Hint Ladder (' + op.hints.length + ' available)</h3>';
+      op.hints.forEach(function(hint, idx) {
+        html += '<div class="hint" data-hint="' + idx + '" data-content="' + esc(hint.content || "") + '" role="button" tabindex="0" aria-label="Reveal hint ' + (idx + 1) + '" aria-expanded="false">';
+        html += '<span class="hint-num">' + (idx + 1) + '</span> ' + esc(hint.label || "Runtime hint");
+        html += '</div>';
+      });
       html += '</div>';
     }
 
