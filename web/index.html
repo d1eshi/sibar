@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sibar Reader</title>
+<title>Sibar Early Access</title>
 <script>
 window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
 window.va("beforeSend", (event) => {
@@ -16,36 +16,58 @@ window.va("beforeSend", (event) => {
   }
   return event;
 });
-if (location.hostname !== "localhost" && location.hostname !== "127.0.0.1") {
+if (location.protocol !== "file:" && location.hostname !== "localhost" && location.hostname !== "127.0.0.1") {
   const analyticsScript = document.createElement("script");
   analyticsScript.defer = true;
   analyticsScript.src = "/_vercel/insights/script.js";
   document.head.appendChild(analyticsScript);
 }
 </script>
-<link rel="stylesheet" href="/styles/reader.css">
+<link rel="stylesheet" href="styles/reader.css">
 </head>
 <body>
 <main>
   <section class="start-screen" id="startView">
-    <p class="brand-mark">Sibar</p>
-    <h1 class="start-mark">Reader</h1>
-    <p class="start-subtitle">Lee, selecciona y guarda lo importante.</p>
+    <div class="brand-lockup" aria-label="Sibar">
+      <span class="brand-letter primary">S</span>
+      <span class="brand-letter">i</span>
+      <span class="brand-letter">b</span>
+      <span class="brand-letter">a</span>
+      <span class="brand-letter">r</span>
+    </div>
+    <p class="brand-mark">Build-to-Learn</p>
+    <h1 class="start-mark">Estudia una fuente tecnica con evidencia.</h1>
+    <p class="start-subtitle">Lee, marca lo importante y guarda dudas o ideas para volver con mas claridad.</p>
 
     <form class="ingest-form" id="loadForm">
-      <label class="ingest-label" for="urlInput">Pega una fuente</label>
+      <label class="ingest-label" for="urlInput">Pega una URL para empezar</label>
       <div class="ingest-row">
         <input class="source-input" id="urlInput" type="url" placeholder="https://..." autocomplete="url">
-        <button class="primary-btn" type="submit">Cargar</button>
-        <button class="secondary-btn" type="button" id="sampleBtn">Demo</button>
+        <button class="primary-btn" type="submit">Estudiar</button>
+        <button class="secondary-btn" type="button" id="sampleBtn">Ver demo</button>
       </div>
+      <p class="trial-note">La prueba guarda tus notas en este navegador. El workspace completo abre por early access.</p>
     </form>
 
-    <section class="source-examples" aria-label="Ejemplos de fuentes">
-      <button class="source-chip" type="button"><span>01</span> Articulo</button>
-      <button class="source-chip" type="button"><span>02</span> Paper</button>
-      <button class="source-chip" type="button"><span>03</span> Newsletter</button>
-      <button class="source-chip" type="button"><span>04</span> Post tecnico</button>
+    <ul class="source-examples" aria-label="Tipos de fuente">
+      <li class="source-chip"><span>Articulo</span><small>Argumento o ensayo tecnico</small></li>
+      <li class="source-chip"><span>Paper</span><small>Abstract, metodo o conclusion</small></li>
+      <li class="source-chip"><span>Docs</span><small>API, framework o arquitectura</small></li>
+      <li class="source-chip"><span>Post tecnico</span><small>Decisiones, tradeoffs o guia</small></li>
+    </ul>
+
+    <section class="early-access-card" aria-label="Early access">
+      <div>
+        <p class="early-access-kicker">Early access</p>
+        <h2>Workspace completo por cohortes</h2>
+        <p>Deja tu correo y, si queres, tu handle de X. Te contacto cuando abramos la siguiente tanda.</p>
+      </div>
+      <form class="early-access-form" id="earlyAccessForm">
+        <input id="earlyAccessEmail" name="email" type="email" placeholder="tu@email.com" autocomplete="email" required>
+        <input id="earlyAccessXHandle" name="x_handle" type="text" placeholder="@x_handle opcional" autocomplete="off" inputmode="text">
+        <button class="secondary-btn small" type="submit">Pedir acceso</button>
+        <p class="early-access-status" id="earlyAccessStatus" aria-live="polite"></p>
+      </form>
     </section>
 
     <section class="recent-sources" id="recentSources" aria-label="Lecturas recientes" hidden>
@@ -69,6 +91,17 @@ if (location.hostname !== "localhost" && location.hostname !== "127.0.0.1") {
       <div class="ghost-line mid"></div>
     </section>
     <p class="screen-status" id="status"></p>
+  </section>
+
+  <section class="early-access-screen" id="earlyAccessView" hidden>
+    <p class="brand-mark">Sibar early access</p>
+    <h1 class="access-title">El reader es solo la entrada.</h1>
+    <p class="access-copy" id="earlyAccessReason">Ya probaste las fuentes reales incluidas en esta prueba publica.</p>
+    <p class="access-copy">Estamos abriendo el workspace completo por cohortes: artefactos reales, preguntas de ownership, deteccion de gaps, practica y readiness.</p>
+    <div class="access-actions">
+      <a class="primary-btn access-link" href="mailto:hello@sibar.app?subject=Early%20access%20Sibar&body=Quiero%20early%20access%20a%20Sibar.%0A%0AQuiero%20entender%20mejor:%20">Solicitar early access</a>
+      <button class="secondary-btn" type="button" id="emptySampleBtn">Ver demo</button>
+    </div>
   </section>
 
   <section class="loading-screen" id="loadingView" hidden>
@@ -136,6 +169,6 @@ if (location.hostname !== "localhost" && location.hostname !== "127.0.0.1") {
   <button type="button" data-toolbar-kind="key">Idea</button>
 </div>
 
-<script type="module" src="/scripts/app.js"></script>
+<script type="module" src="scripts/app.js"></script>
 </body>
 </html>

@@ -30,6 +30,10 @@ import { readinessReportCommand } from "./runtime-readiness.ts";
 import { getSession, readState, toSummary, writeState } from "./runtime-state.ts";
 import { getStudyPanelStateCommand } from "./runtime-study-panel.ts";
 import {
+  startWorkspaceSessionCommand,
+  submitWorkspaceAttemptCommand,
+} from "./runtime-workspace-session.ts";
+import {
   RuntimeError,
   excerptPrefix,
   fail,
@@ -333,6 +337,10 @@ export function handleRequest(request: RuntimeRequest): RuntimeResponse<unknown>
         return readinessReportCommand(request.payload);
       case "get_study_panel_state":
         return getStudyPanelStateCommand(request.payload);
+      case "start_workspace_session":
+        return startWorkspaceSessionCommand(request.payload);
+      case "submit_workspace_attempt":
+        return submitWorkspaceAttemptCommand(request.payload);
       case "generate_practice_challenges":
         return generatePracticeChallengesCommand(request.payload);
       case "run_project_learning_agent":

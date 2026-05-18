@@ -4,7 +4,13 @@ export function getElements() {
   const $ = (id) => document.getElementById(id);
   return {
     form: $("loadForm"),
+    earlyAccessForm: $("earlyAccessForm"),
+    earlyAccessEmail: $("earlyAccessEmail"),
+    earlyAccessXHandle: $("earlyAccessXHandle"),
+    earlyAccessStatus: $("earlyAccessStatus"),
     startView: $("startView"),
+    earlyAccessView: $("earlyAccessView"),
+    earlyAccessReason: $("earlyAccessReason"),
     loadingView: $("loadingView"),
     readerView: $("readerView"),
     recentSources: $("recentSources"),

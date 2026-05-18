@@ -102,12 +102,117 @@ final class StudyPanelTests: XCTestCase {
         XCTAssertEqual(model.snapshot?.artifact_session.artifact_session_id, "a1")
         XCTAssertEqual(model.lastError, "")
     }
+
+    @MainActor
+    func testLiveModelStartsWorkspaceSessionForLocalJudgement() async throws {
+        let recorder = StudyPanelActionRecorder()
+        let model = StudyPanelLiveModel(
+            actions: .init(
+                loadSnapshot: { _ in try decodeStudyPanelSnapshot() },
+                startWorkspaceSession: { payload in
+                    recorder.recordStartWorkspacePayload(payload)
+                    return try decodeStartWorkspaceSessionResult()
+                },
+                answerQuestion: { _ in
+                    throw RuntimeClientError.processFailure("unexpected answer")
+                }
+            )
+        )
+
+        await model.startLiveWorkspace(goal: " Explain this project A-Z ", rootPath: "/tmp/sibi")
+
+        XCTAssertEqual(recorder.startWorkspacePayload?.goal, "Explain this project A-Z")
+        XCTAssertEqual(recorder.startWorkspacePayload?.root, "/tmp/sibi")
+        XCTAssertEqual(recorder.startWorkspacePayload?.codex_command, "auto")
+        XCTAssertEqual(model.liveWorkspaceSession?.workspace_session.workspace_session_id, "ws-1")
+        XCTAssertEqual(model.liveWorkspaceSession?.workspace_session.loop?.active_operation?.prompt, "Explain the runtime dispatcher.")
+        XCTAssertEqual(model.artifactSessionID, "as-1")
+        XCTAssertEqual(model.statusText, "Live workspace session started.")
+        XCTAssertEqual(model.lastError, "")
+    }
+
+    @MainActor
+    func testLiveModelSubmitWorkspaceAttemptCallsRuntimeAndReplacesLiveSession() async throws {
+        let initialSession = try decodeStartWorkspaceSessionResult()
+        let updatedSession = try decodeSubmitWorkspaceAttemptResult()
+        let recorder = StudyPanelActionRecorder()
+        let model = StudyPanelLiveModel(
+            artifactSessionID: "",
+            actions: .init(
+                loadSnapshot: { _ in try decodeStudyPanelSnapshot() },
+                startWorkspaceSession: { _ in
+                    return initialSession
+                },
+                submitWorkspaceAttempt: { payload in
+                    recorder.recordSubmitWorkspaceAttemptPayload(payload)
+                    return updatedSession
+                },
+                answerQuestion: { _ in
+                    throw RuntimeClientError.processFailure("unexpected answer")
+                }
+            )
+        )
+        await model.startLiveWorkspace(goal: "Explain this project A-Z", rootPath: "/tmp/sibi")
+
+        await model.submitWorkspaceAttempt(
+            answerText: "The runtime dispatches the request by command field.",
+            selectedEvidence: ["EV-LIVE-1"],
+            confidence: "high",
+            declaredUnknowns: ["I am not sure about every fallback path."]
+        )
+
+        XCTAssertEqual(recorder.submitWorkspaceAttemptPayload?.workspace_session_id, "ws-1")
+        XCTAssertEqual(recorder.submitWorkspaceAttemptPayload?.answer_text, "The runtime dispatches the request by command field.")
+        XCTAssertEqual(recorder.submitWorkspaceAttemptPayload?.selected_evidence, ["EV-LIVE-1"])
+        XCTAssertEqual(recorder.submitWorkspaceAttemptPayload?.declared_confidence, "high")
+        XCTAssertEqual(recorder.submitWorkspaceAttemptPayload?.declared_unknowns, ["I am not sure about every fallback path."])
+        XCTAssertEqual(model.liveWorkspaceSession?.workspace_session.workspace_session_id, "ws-2")
+        XCTAssertEqual(model.liveWorkspaceSession?.workspace_session.loop?.evidence_check?.result, "confirmed")
+        XCTAssertEqual(model.statusText, "Workspace attempt evaluated.")
+        XCTAssertEqual(model.lastError, "")
+    }
+
+    @MainActor
+    func testLiveModelSubmitWorkspaceAttemptRequiresRunningSession() async throws {
+        let recorder = StudyPanelActionRecorder()
+        let model = StudyPanelLiveModel(
+            artifactSessionID: "a1",
+            actions: .init(
+                loadSnapshot: { _ in
+                    throw RuntimeClientError.processFailure("should not run loadSnapshot")
+                },
+                submitWorkspaceAttempt: { payload in
+                    recorder.recordSubmitWorkspaceAttemptPayload(payload)
+                    return try decodeSubmitWorkspaceAttemptResult()
+                },
+                answerQuestion: { _ in
+                    throw RuntimeClientError.processFailure("should not run answerQuestion")
+                },
+            )
+        )
+
+        await model.submitWorkspaceAttempt(
+            answerText: "Attempt text",
+            selectedEvidence: ["EV-LIVE-1"],
+            confidence: "medium",
+            declaredUnknowns: []
+        )
+
+        XCTAssertNil(recorder.submitWorkspaceAttemptPayload)
+        XCTAssertEqual(recorder.submitWorkspaceAttemptCallCount, 0)
+        XCTAssertNil(model.liveWorkspaceSession)
+        XCTAssertEqual(model.statusText, "Start a live workspace session first.")
+        XCTAssertEqual(model.lastError, "Start a live workspace session first.")
+    }
 }
 
 private final class StudyPanelActionRecorder: @unchecked Sendable {
     private let lock = NSLock()
     private var storedSnapshotPayload: StudyPanelStatePayload?
     private var storedAnswerPayload: AnswerQuestionPayload?
+    private var storedStartWorkspacePayload: StartWorkspaceSessionPayload?
+    private var storedSubmitWorkspaceAttemptPayload: SubmitWorkspaceAttemptPayload?
+    private var storedSubmitWorkspaceAttemptCallCount = 0
     private var storedRefreshCount = 0
 
     var snapshotPayload: StudyPanelStatePayload? {
@@ -116,6 +221,18 @@ private final class StudyPanelActionRecorder: @unchecked Sendable {
 
     var answerPayload: AnswerQuestionPayload? {
         withLock { storedAnswerPayload }
+    }
+
+    var startWorkspacePayload: StartWorkspaceSessionPayload? {
+        withLock { storedStartWorkspacePayload }
+    }
+
+    var submitWorkspaceAttemptPayload: SubmitWorkspaceAttemptPayload? {
+        withLock { storedSubmitWorkspaceAttemptPayload }
+    }
+
+    var submitWorkspaceAttemptCallCount: Int {
+        withLock { storedSubmitWorkspaceAttemptCallCount }
     }
 
     var refreshCount: Int {
@@ -131,6 +248,19 @@ private final class StudyPanelActionRecorder: @unchecked Sendable {
     func recordAnswerPayload(_ payload: AnswerQuestionPayload) {
         withLock {
             storedAnswerPayload = payload
+        }
+    }
+
+    func recordStartWorkspacePayload(_ payload: StartWorkspaceSessionPayload) {
+        withLock {
+            storedStartWorkspacePayload = payload
+        }
+    }
+
+    func recordSubmitWorkspaceAttemptPayload(_ payload: SubmitWorkspaceAttemptPayload) {
+        withLock {
+            storedSubmitWorkspaceAttemptCallCount += 1
+            storedSubmitWorkspaceAttemptPayload = payload
         }
     }
 
@@ -173,6 +303,22 @@ private func decodeAnswerQuestionResult() throws -> AnswerQuestionResult {
     let envelope = try JSONDecoder().decode(
         RuntimeEnvelope<AnswerQuestionResult>.self,
         from: Data(answerQuestionEnvelopeJSON.utf8)
+    )
+    return try XCTUnwrap(envelope.data)
+}
+
+private func decodeStartWorkspaceSessionResult() throws -> StartWorkspaceSessionResult {
+    let envelope = try JSONDecoder().decode(
+        RuntimeEnvelope<StartWorkspaceSessionResult>.self,
+        from: Data(startWorkspaceSessionEnvelopeJSON.utf8)
+    )
+    return try XCTUnwrap(envelope.data)
+}
+
+private func decodeSubmitWorkspaceAttemptResult() throws -> StartWorkspaceSessionResult {
+    let envelope = try JSONDecoder().decode(
+        RuntimeEnvelope<StartWorkspaceSessionResult>.self,
+        from: Data(submitWorkspaceAttemptEnvelopeJSON.utf8)
     )
     return try XCTUnwrap(envelope.data)
 }
@@ -458,6 +604,165 @@ private let answerQuestionEnvelopeJSON = #"""
     },
     "operation_state": {
       "message": "Saved."
+    }
+  }
+}
+"""#
+
+private let startWorkspaceSessionEnvelopeJSON = #"""
+{
+  "ok": true,
+  "data": {
+    "workspace_session": {
+      "workspace_session_id": "ws-1",
+      "artifact_session_id": "as-1",
+      "runner": {
+        "status": "completed",
+        "accepted_signal_count": 1,
+        "rejected_signal_count": 0
+      },
+      "loop": {
+        "goal": "Explain this project A-Z",
+        "evidence_inventory": [{
+          "id": "EV-LIVE-1",
+          "path": "src/runtime.ts",
+          "role": "implementation",
+          "excerpt": "Runtime dispatcher",
+          "content_hash": "sha256:abc"
+        }],
+        "concept_slice": {
+          "label": "Runtime dispatcher",
+          "domain": "code"
+        },
+        "thinking_artifacts": [{
+          "id": "TA-LIVE-1",
+          "kind": "code_slice",
+          "title": "Runtime dispatcher",
+          "purpose": "Show the command boundary.",
+          "source_evidence": [{
+            "evidence_id": "EV-LIVE-1",
+            "file_path": "src/runtime.ts",
+            "start_line": 1,
+            "end_line": 3,
+            "excerpt": "handleRequest",
+            "role": "implementation"
+          }],
+          "payload": {
+            "file_path": "src/runtime.ts",
+            "lines": [
+              { "line": 1, "text": "export function handleRequest(request) {" },
+              { "line": 2, "text": "  return request.command;" }
+            ]
+          }
+        }],
+        "active_operation": {
+          "id": "OP-LIVE-1",
+          "kind": "explain",
+          "prompt": "Explain the runtime dispatcher.",
+          "required_evidence": ["EV-LIVE-1"],
+          "success_criteria": ["Cites the dispatcher lines."]
+        }
+      }
+    },
+    "snapshot": {
+      "loop_state": "AwaitingAttempt"
+    }
+  }
+}
+"""#
+
+private let submitWorkspaceAttemptEnvelopeJSON = #"""
+{
+  "ok": true,
+  "data": {
+    "workspace_session": {
+      "workspace_session_id": "ws-2",
+      "artifact_session_id": "as-1",
+      "runner": {
+        "status": "completed",
+        "accepted_signal_count": 1,
+        "rejected_signal_count": 0
+      },
+      "loop": {
+        "goal": "Explain this project A-Z",
+        "evidence_inventory": [{
+          "id": "EV-LIVE-1",
+          "path": "src/runtime.ts",
+          "role": "implementation",
+          "excerpt": "Runtime dispatcher",
+          "content_hash": "sha256:abc"
+        }],
+        "concept_slice": {
+          "label": "Runtime dispatcher",
+          "domain": "code"
+        },
+        "thinking_artifacts": [{
+          "id": "TA-LIVE-1",
+          "kind": "code_slice",
+          "title": "Runtime dispatcher",
+          "purpose": "Show the command boundary.",
+          "source_evidence": [{
+            "evidence_id": "EV-LIVE-1",
+            "file_path": "src/runtime.ts",
+            "start_line": 1,
+            "end_line": 3,
+            "excerpt": "handleRequest",
+            "role": "implementation"
+          }],
+          "payload": {
+            "file_path": "src/runtime.ts",
+            "lines": [
+              { "line": 1, "text": "export function handleRequest(request) {" },
+              { "line": 2, "text": "  return request.command;" }
+            ]
+          }
+        }],
+        "active_operation": {
+          "id": "OP-LIVE-1",
+          "kind": "explain",
+          "prompt": "Explain the runtime dispatcher.",
+          "required_evidence": ["EV-LIVE-1"],
+          "success_criteria": ["Cites the dispatcher lines."]
+        },
+        "sample_attempt": {
+          "id": "AT-2",
+          "operation_id": "OP-LIVE-1",
+          "answer_text": "The runtime dispatches the request by command field.",
+          "selected_evidence": ["EV-LIVE-1"],
+          "declared_confidence": "high",
+          "declared_unknowns": ["I am not sure about every fallback path."]
+        },
+        "evidence_check": {
+          "id": "EC-2",
+          "attempt_id": "AT-2",
+          "required_claims": [
+            "The runtime dispatches requests."
+          ],
+          "observed_claims": [
+            "The runtime dispatches requests."
+          ],
+          "missing_claims": [],
+          "contradicted_claims": [],
+          "unsupported_claims": [],
+          "cited_evidence": [{
+            "evidence_id": "EV-LIVE-1",
+            "file_path": "src/runtime.ts",
+            "start_line": 1,
+            "end_line": 2,
+            "excerpt": "handleRequest",
+            "role": "implementation"
+          }],
+          "artifact_counterevidence": [],
+          "result": "confirmed"
+        },
+        "detected_gap": null,
+        "repair_action": null,
+        "readiness_claim": {
+          "status": "ready",
+          "scope": "Confirmed for this slice.",
+          "blocked_claims": []
+        }
+      }
     }
   }
 }

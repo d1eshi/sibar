@@ -7,6 +7,9 @@
   "functions": {
     "api/read.mjs": {
       "maxDuration": 10
+    },
+    "api/early-access.mjs": {
+      "maxDuration": 5
     }
   }
 }

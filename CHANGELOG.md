@@ -11,6 +11,64 @@ accepted specs and iterations, not by raw commit count.
 Use this section for changes that have landed but are not part of a tagged
 release yet.
 
+### Added - Native Explain A-Z Attempt Bridge
+
+- Added the native Swift live-loop attempt bridge for `Explain this project A-Z`:
+  the study panel can now submit workspace attempts to `submit_workspace_attempt`
+  with selected evidence, declared confidence, and unknowns.
+- The Swift panel now renders the attempt composer, locked required evidence,
+  deterministic evidence-check results, detected gaps, repair actions, and
+  scoped readiness without opening a browser workspace.
+
+### Added - Deep Ownership Workspace Attempt-First UI Flow
+
+- Implemented the attempt-first UI flow in the static Workspace prototype with
+  hidden answer gating (`aria-hidden`), evidence selection checkboxes, confidence
+  controls, declared unknowns input, progressive hint ladder (no solution leakage),
+  prerequisite route display, retry/repair controls, and full demo chain observability
+  via console logs and state chain progress indicator.
+- Post-attempt state shows evidence check (observed/missing/unsupported claims with
+  counterevidence), detected gap with user and artifact evidence refs, concrete
+  repair action with required evidence, and scoped readiness claim that explicitly
+  rejects whole-repo mastery.
+- Added `assertHiddenAnswerGated()` runtime check verifying no hidden solution
+  content leaks into DOM or accessibility text before attempt submission.
+
+### Added - Reference Component Contracts, Accessibility, and Setup Flow
+
+- Implemented a 7-step first-run setup wizard (goal, boundary, evidence roles,
+  boundary confirmation, evidence inventory, concept slice, active operation)
+  that gates the main Workspace until the user confirms the loop boundaries.
+- Mapped all six major UI regions to `12_ui_reference_components.md` component
+  contracts via `data-component` attributes: Lab Shell, Source & Artifact Rail,
+  Code Workbench Artifact, Call/Data Diagram, Sibi Loop Rail, Evidence Strip.
+- Added keyboard accessibility: skip navigation links for all three regions,
+  `focus-visible` outline styles on all controls, `tabindex` and Enter/Space
+  handlers on code lines and evidence cards, ARIA labels on answer input,
+  confidence selector, and declared unknowns input.
+- Added code workbench line selection: clicking a code line highlights it,
+  updates evidence references, and logs the selection with related evidence ids.
+- Added small-laptop responsive layout for 1366x768 and below with compressed
+  grid columns, reduced padding/font sizes, and collapsible evidence rail.
+- Added runtime error monitoring: `window.onerror` and `unhandledrejection`
+  handlers with a visible error counter badge in the bottom-right corner.
+- Added `recordBlockedValidation()` for recording browser validation failures
+  with URL, tool, failure description, timestamp, affected assertions, and
+  next action as a blocked-validation record.
+- Added CSS classes for empty states and blocked states with amber-themed
+  dashed borders, icons, titles, reasons, and suggested actions.
+
+- Created the first deterministic Deep Ownership fixture (`sibi-pedagogy-loop.json`)
+  describing one scoped loop over the Sibi pedagogy runtime: gap detection,
+  practice generation, memory, and readiness.
+- Added runtime type contracts and schema validation (`src/runtime-deep-ownership.ts`)
+  for evidence identity, role classification, boundary enforcement, unknown zones,
+  skip records, thinking artifacts, and scoped readiness claims.
+- Added focused fixture/schema tests (`Tests/deep-ownership-fixture.test.ts`)
+  verifying evidence ID stability, role classification of source/tests/docs,
+  unknown zone presence, boundary enforcement against out-of-bound paths,
+  and readiness scope without whole-repo ownership claims.
+
 Each changelog-worthy change should be updated in the same commit as the work it
 describes. Skip this file only when the commit is purely mechanical and does not
 change product behavior, product docs, release readiness, or the public product
@@ -50,6 +108,16 @@ exist to make the public reader story reviewable before production promotion.
 
 ### Added
 
+- Live Deep Ownership Workspace sessions that inventory repo evidence, include
+  source-control context, run the project-learning agent through Codex CLI
+  `auto`, and expose a `sibi explain` command for starting the A-Z project
+  explanation flow.
+- Local workspace sidecar endpoints and UI controls for starting a live session,
+  rendering LLM-cited concepts/artifacts, and submitting attempts back to the
+  runtime instead of hardcoded browser fixtures.
+- Browser early access signup for the public reader, backed by a server-side
+  waitlist endpoint that collects only email plus optional X handle without
+  exposing Supabase secrets to the client.
 - Spec-based versioning policy for deciding when Sibi moves between pre-1.0
   versions.
 - Changelog source of truth for future web-facing product progress updates.
@@ -103,9 +171,18 @@ exist to make the public reader story reviewable before production promotion.
   Learning Log as independent scroll areas.
 - Article workspace history now excludes local demo articles and prunes any
   previously saved non-web entries.
+- StudyShell now treats an active live workspace session as the exclusive panel
+  surface so `StudyPanelView` and the “No Study Session” fallback do not render
+  underneath it.
 
 ### Docs
 
+- Added the Deep Ownership Workspace spec pack, including UI component
+  references for Sibi Lens, Sibi Lab, code workbench, derivation, patch
+  readiness, and repo overview artifacts.
+- Added the Sibi Lens and Sibi Lab UI iteration with minimalist surface
+  variations for command capture, artifact work, derivation, patch readiness,
+  and repo ownership overview.
 - Added the web reader source-ingestion iteration with focused-reader mockups
   and a functional coded prototype for first open, loading, reading, and saved
   states.

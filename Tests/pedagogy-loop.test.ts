@@ -1,0 +1,12 @@
+import "./pedagogy-loop/ped-001-gap.suite.ts";
+import "./pedagogy-loop/ped-002-repair.suite.ts";
+import "./pedagogy-loop/ped-003-readiness.suite.ts";
+import "./pedagogy-loop/ped-007-reevaluation-readiness.suite.ts";
+import "./pedagogy-loop/loop-012-reevaluation.suite.ts";
+import "./pedagogy-loop/loop-015-prerequisite-route.suite.ts";
+import "./pedagogy-loop/ped-008-memory.suite.ts";
+import "./pedagogy-loop/ped-009-misconception.suite.ts";
+import "./pedagogy-loop/cross-006-pipeline.suite.ts";
+import "./pedagogy-loop/cross-009-evidence-identity.suite.ts";
+import "./pedagogy-loop/sequence.suite.ts";
+import "./pedagogy-loop/edge-cases.suite.ts";

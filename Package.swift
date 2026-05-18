@@ -16,6 +16,7 @@ let package = Package(
             sources: [
                 "RuntimeModels.swift",
                 "RuntimeClient.swift",
+                "WorkspaceSnapshotModels.swift",
                 "StudyPanelModels.swift",
                 "StudyPanelLiveModel.swift",
                 "StudyPanelView.swift",
@@ -56,6 +57,7 @@ let package = Package(
             sources: [
                 "StudyGraphCodeCanvasTests.swift",
                 "StudyPanelControllerTests.swift",
+                "StudyPanelRootViewTests.swift",
             ]
         ),
     ]
