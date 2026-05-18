@@ -34,6 +34,13 @@ release yet.
 - Added `assertHiddenAnswerGated()` runtime check verifying no hidden solution
   content leaks into DOM or accessibility text before attempt submission.
 
+### Added - Live Workspace Render Model for 3-Panel Shell
+
+- Added `LiveWorkspaceRenderModel` for `LiveWorkspaceSessionView` as a deterministic
+  source of left/center/right panel data from `StartWorkspaceSessionResult`, and
+  added `StudyPanelTests` coverage for start/submit fixtures (requested artifact,
+  evidence, next action, excluded/unknown scope, and readiness when available).
+
 ### Added - Reference Component Contracts, Accessibility, and Setup Flow
 
 - Implemented a 7-step first-run setup wizard (goal, boundary, evidence roles,
