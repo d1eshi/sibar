@@ -8,6 +8,10 @@ import { delimiter, join, resolve } from "node:path";
 import { handleRequest } from "../src/runtime.ts";
 import { resolveModelRunnerConfig } from "../src/runtime-agent-runner.ts";
 import type { RuntimeWorkspaceSession } from "../src/runtime-support.ts";
+import type {
+  AttemptEvaluationContract,
+  WorkspaceSessionContract,
+} from "../src/runtime-workspace-session-contracts.ts";
 
 type Success<T> = { ok: true; data: T };
 
@@ -166,6 +170,191 @@ test("submit_workspace_attempt evaluates attempts against runtime evidence", () 
   assert.equal(submitted.data.snapshot.attempt_stored, true);
   assert.ok(submitted.data.snapshot.evidence_check_result);
   assert.equal(submitted.data.workspace_session.loop.loop_entry.current_state, "GapOrReady");
+});
+
+test("submit_workspace_attempt default action is submit even with declared_unknowns", () => {
+  withTempHome();
+  const root = createRepoFixture();
+  const started = expectSuccess<{ workspace_session: RuntimeWorkspaceSession }>(handleRequest({
+    command: "start_workspace_session",
+    payload: {
+      root_path: root,
+      goal: "Explain this project A-Z",
+      fixture_model_response: {
+        candidate_signals: [{
+          signal_type: "concept",
+          claim: "The runtime command is read from the request object.",
+          confidence: "medium",
+          citations: [{ path: "src/runtime.ts", range: "1-2" }],
+          rationale: "The function accesses request.command.",
+        }],
+      },
+    },
+  }));
+  const requiredEvidence = started.data.workspace_session.loop.active_operation?.required_evidence ?? [];
+  const submitted = expectSuccess<{
+    workspace_session: {
+      live_workspace?: WorkspaceSessionContract;
+    };
+  }>(handleRequest({
+    command: "submit_workspace_attempt",
+    payload: {
+      workspace_session_id: started.data.workspace_session.workspace_session_id,
+      answer_text: "The runtime command is read from the request object and returned by handleRequest.",
+      selected_evidence: requiredEvidence,
+      declared_confidence: "medium",
+      declared_unknowns: ["I am not sure."],
+    },
+  }));
+
+  const liveAttempt = submitted.data.workspace_session.live_workspace?.submitted_attempt;
+  assert.equal(liveAttempt?.action, "submit");
+});
+
+test("submit_workspace_attempt accepts explicit i_do_not_know action", () => {
+  withTempHome();
+  const root = createRepoFixture();
+  const started = expectSuccess<{ workspace_session: RuntimeWorkspaceSession }>(handleRequest({
+    command: "start_workspace_session",
+    payload: {
+      root_path: root,
+      goal: "Explain this project A-Z",
+      fixture_model_response: {
+        candidate_signals: [{
+          signal_type: "concept",
+          claim: "The runtime command is read from the request object.",
+          confidence: "medium",
+          citations: [{ path: "src/runtime.ts", range: "1-2" }],
+          rationale: "The function accesses request.command.",
+        }],
+      },
+    },
+  }));
+  const requiredEvidence = started.data.workspace_session.loop.active_operation?.required_evidence ?? [];
+  const submitted = expectSuccess<{
+    workspace_session: {
+      live_workspace?: WorkspaceSessionContract;
+    };
+  }>(handleRequest({
+    command: "submit_workspace_attempt",
+    payload: {
+      workspace_session_id: started.data.workspace_session.workspace_session_id,
+      answer_text: "I intentionally do not know this.",
+      selected_evidence: requiredEvidence,
+      declared_confidence: "medium",
+      declared_unknowns: [],
+      action: "i_do_not_know",
+    },
+  }));
+
+  const liveAttempt = submitted.data.workspace_session.live_workspace?.submitted_attempt;
+  assert.equal(liveAttempt?.action, "i_do_not_know");
+});
+
+test("start_workspace_session returns live workspace render contract fields", () => {
+  withTempHome();
+  const root = createRepoFixture();
+  const started = expectSuccess<{
+    workspace_session: {
+      workspace_session_id: string;
+      live_workspace?: WorkspaceSessionContract;
+    };
+  }>(handleRequest({
+    command: "start_workspace_session",
+    payload: {
+      root_path: root,
+      goal: "Explain this project A-Z",
+      fixture_model_response: {
+        model: "fixture-model",
+        reasoning_effort: "fixture",
+        files_read: ["src/runtime.ts"],
+        candidate_signals: [{
+          signal_type: "flow",
+          claim: "The runtime entrypoint returns command.",
+          confidence: "medium",
+          citations: [{ path: "src/runtime.ts", range: "1-2" }],
+          rationale: "The cited function routes command.",
+          proposed_layer: 3,
+        }],
+      },
+    },
+  }));
+
+  const live = started.data.workspace_session.live_workspace;
+  assert.equal(live?.session_id, started.data.workspace_session.workspace_session_id);
+  assert.equal(live?.phase, "AwaitingAttempt");
+  assert.equal(live?.project_label, "Workspace: Explain this project A-Z");
+  assert.equal(live?.artifact_previews.length > 0, true);
+  assert.equal(live?.submitted_attempt, undefined);
+  assert.equal(live?.artifact_tree.paths.every((path) => !path.includes("Evidence slice")), true);
+  assert.equal(live?.worktree.paths.includes("src/runtime.ts"), true);
+  assert.equal(live?.ui_reproduction?.test_path, "Tests/workspace-live-session.test.ts");
+  assert.equal(live?.ui_reproduction?.fixture_path, null);
+});
+
+test("submit_workspace_attempt returns attempt evaluation contract and can be serialized", () => {
+  withTempHome();
+  const root = createRepoFixture();
+  const started = expectSuccess<{
+    workspace_session: {
+      workspace_session_id: string;
+      loop?: { active_operation?: { required_evidence: string[] } };
+      live_workspace?: WorkspaceSessionContract;
+    };
+  }>(handleRequest({
+    command: "start_workspace_session",
+    payload: {
+      root_path: root,
+      goal: "Explain this project A-Z",
+      fixture_model_response: {
+        candidate_signals: [{
+          signal_type: "concept",
+          claim: "The runtime routes command names through request.command.",
+          confidence: "medium",
+          citations: [{ path: "src/runtime.ts", range: "1-2" }],
+          rationale: "The cited function dispatches by command.",
+        }],
+      },
+    },
+  }));
+  const requiredEvidence = started.data.workspace_session.loop?.active_operation?.required_evidence ?? [];
+  const submitted = expectSuccess<{
+    workspace_session: {
+      live_workspace?: WorkspaceSessionContract;
+      loop?: { sample_attempt?: { id: string } };
+    };
+    snapshot: { attempt_stored: boolean; evidence_check_result: { result: string } | null };
+  }>(handleRequest({
+    command: "submit_workspace_attempt",
+    payload: {
+      workspace_session_id: started.data.workspace_session.workspace_session_id,
+      answer_text: "The runtime returns command from request.",
+      selected_evidence: requiredEvidence,
+      declared_confidence: "medium",
+      declared_unknowns: [],
+    },
+  }));
+
+  const live = started.data.workspace_session.live_workspace;
+  assert.equal(live?.last_attempt_evaluation === undefined, true, "start response should not include last attempt evaluation");
+  assert.equal(live?.submitted_attempt === undefined, true);
+  assert.equal(live?.project_label, submitted.data.workspace_session.live_workspace?.project_label);
+
+  const submittedEval = submitted.data.workspace_session.live_workspace?.last_attempt_evaluation;
+  assert.ok(submittedEval);
+  const serialized = JSON.stringify(submittedEval);
+  const parsed = JSON.parse(serialized) as AttemptEvaluationContract;
+  const submittedLive = submitted.data.workspace_session.live_workspace;
+  const submittedAttempt = submittedLive?.submitted_attempt;
+  assert.ok(submittedAttempt);
+
+  assert.equal(parsed.attempt_id, submitted.data.workspace_session.loop?.sample_attempt?.id);
+  assert.equal(parsed.evidence_check.result, "confirmed");
+  assert.equal(parsed.missing_evidence.length <= requiredEvidence.length, true);
+  assert.ok(parsed.scoped_readiness.status === "blocked" || parsed.scoped_readiness.status === "ready");
+  assert.equal(submittedAttempt?.operation_id, submittedLive?.active_operation?.operation_id);
+  assert.equal(submittedAttempt?.action, "submit");
+  assert.deepEqual(submittedAttempt?.selected_evidence_ids, requiredEvidence);
 });
 
 test("codex auto runner is selectable without making blocked sessions invent project facts", () => {
