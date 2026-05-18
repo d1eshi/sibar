@@ -58,14 +58,3 @@ export {
   createProductMutationGate,
   createOpenInEditorCitationPayload,
 } from "./runtime-deep-ownership-command-safety.ts";
-
-export {
-  createDesktopShellContractFromFixture,
-  createDesktopShellFsBridge,
-} from "./runtime-deep-ownership-desktop-shell.ts";
-export type {
-  DesktopShellContract,
-  DesktopShellFsBridge,
-  DesktopShellFsBridgeInput,
-  DesktopShellReadFileResult,
-} from "./runtime-deep-ownership-desktop-shell.ts";
