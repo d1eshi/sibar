@@ -386,24 +386,30 @@ private struct LiveWorkspaceCodeLine: Identifiable {
 public struct LiveWorkspaceSessionView: View {
     private let result: StartWorkspaceSessionResult
     private let onSubmitAttempt: (String, [String], String, [String], SubmitWorkspaceAttemptAction) -> Void
+    private let isSubmittingWorkspaceAttempt: Bool
     @State private var draftAnswer = ""
     @State private var selectedEvidenceIDs = Set<String>()
     @State private var confidence = "medium"
     @State private var declaredUnknownsText = ""
+    @State private var selectedArtifactID = ""
 
     public init(
         result: StartWorkspaceSessionResult,
+        isSubmittingWorkspaceAttempt: Bool = false,
         onSubmitAttempt: @escaping (String, [String], String, [String], SubmitWorkspaceAttemptAction) -> Void = { _, _, _, _, _ in }
     ) {
         self.result = result
+        self.isSubmittingWorkspaceAttempt = isSubmittingWorkspaceAttempt
         self.onSubmitAttempt = onSubmitAttempt
     }
 
     public init(
         result: StartWorkspaceSessionResult,
+        isSubmittingWorkspaceAttempt: Bool = false,
         onSubmitAttempt: @escaping (String, [String], String, [String]) -> Void
     ) {
-        self.init(result: result) { answerText, selectedEvidence, confidence, unknowns, _ in
+        self.init(result: result, isSubmittingWorkspaceAttempt: isSubmittingWorkspaceAttempt) {
+            answerText, selectedEvidence, confidence, unknowns, _ in
             onSubmitAttempt(answerText, selectedEvidence, confidence, unknowns)
         }
     }
@@ -412,6 +418,8 @@ public struct LiveWorkspaceSessionView: View {
         let loop = result.workspace_session.loop
         let liveWorkspace = result.workspace_session.live_workspace
         let renderModel = LiveWorkspaceRenderModel(result: result)
+        let artifactPreviews = liveWorkspace?.artifact_previews ?? []
+        let selectedArtifact = selectedArtifact(from: artifactPreviews)
         let activeOperationID = renderModel.right.activeOperationID
         let requiredEvidence = renderModel.right.requiredEvidenceIDs
         let evidenceItems = evidenceItems(
@@ -429,6 +437,7 @@ public struct LiveWorkspaceSessionView: View {
                 centerPanel(
                     model: renderModel.center,
                     workspace: liveWorkspace,
+                    selectedArtifact: selectedArtifact,
                     loop: loop,
                     evidenceItems: evidenceItems,
                     selectedEvidenceIDs: selectedEvidence,
@@ -443,7 +452,8 @@ public struct LiveWorkspaceSessionView: View {
                     loop: loop,
                     requiredEvidence: renderModel.right.requiredEvidenceIDs,
                     evidenceItems: evidenceItems,
-                    operationActive: renderModel.right.hasActiveOperation
+                    operationActive: renderModel.right.hasActiveOperation,
+                    isSubmittingWorkspaceAttempt: isSubmittingWorkspaceAttempt
                 )
                 .frame(minWidth: 210, maxWidth: .infinity, alignment: .leading)
             }
@@ -452,9 +462,28 @@ public struct LiveWorkspaceSessionView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
         .background(Color.secondary.opacity(0.07), in: RoundedRectangle(cornerRadius: 8))
         .onAppear {
+            if let firstArtifact = artifactPreviews.first {
+                selectedArtifactID = firstArtifact.artifact_id
+            } else {
+                selectedArtifactID = ""
+            }
             selectedEvidenceIDs = Set(renderModel.right.selectedEvidenceIDs)
         }
+        .onChange(of: artifactPreviews.map(\.artifact_id)) { _, newArtifactIDs in
+            if let firstArtifactID = newArtifactIDs.first {
+                if !newArtifactIDs.contains(selectedArtifactID) {
+                    selectedArtifactID = firstArtifactID
+                }
+            } else {
+                selectedArtifactID = ""
+            }
+        }
         .onChange(of: result.workspace_session.workspace_session_id) { _, _ in
+            if let firstArtifact = artifactPreviews.first {
+                selectedArtifactID = firstArtifact.artifact_id
+            } else {
+                selectedArtifactID = ""
+            }
             selectedEvidenceIDs = Set(renderModel.right.selectedEvidenceIDs)
             draftAnswer = ""
             declaredUnknownsText = ""
@@ -523,6 +552,7 @@ public struct LiveWorkspaceSessionView: View {
     private func centerPanel(
         model: LiveWorkspaceRenderModel.CenterPanel,
         workspace: StartWorkspaceLiveSessionContract?,
+        selectedArtifact: StartWorkspaceArtifactPreview?,
         loop: StartWorkspaceLoop?,
         evidenceItems: [LiveWorkspaceEvidenceItem],
         selectedEvidenceIDs: Set<String>,
@@ -535,7 +565,7 @@ public struct LiveWorkspaceSessionView: View {
         let selectedEvidenceToRender = selectedEvidence.isEmpty ? model.requiredEvidenceIDs : selectedEvidence
         return VStack(alignment: .leading, spacing: 6) {
             sectionHeader(model.title)
-            if let artifact = workspace?.artifact_previews.first {
+            if let artifact = selectedArtifact ?? workspace?.artifact_previews.first {
                 liveWorkspaceArtifactPreview(
                     artifact,
                     requiredEvidenceIDs: model.requiredEvidenceIDs,
@@ -587,7 +617,8 @@ public struct LiveWorkspaceSessionView: View {
         loop: StartWorkspaceLoop?,
         requiredEvidence: [String],
         evidenceItems: [LiveWorkspaceEvidenceItem],
-        operationActive: Bool
+        operationActive: Bool,
+        isSubmittingWorkspaceAttempt: Bool
     ) -> some View {
         VStack(alignment: .leading, spacing: 10) {
             sectionHeader(model.title)
@@ -674,7 +705,8 @@ public struct LiveWorkspaceSessionView: View {
             attemptComposer(
                 requiredEvidence: requiredEvidence,
                 operationActive: operationActive,
-                evidenceItems: evidenceItems
+                evidenceItems: evidenceItems,
+                isSubmittingWorkspaceAttempt: isSubmittingWorkspaceAttempt
             )
         }
     }
@@ -713,12 +745,50 @@ public struct LiveWorkspaceSessionView: View {
                     .foregroundStyle(.secondary)
             } else {
                 ForEach(previews, id: \.artifact_id) { preview in
-                    Text(preview.title)
-                        .font(.caption)
-                        .textSelection(.enabled)
+                    let isSelected = preview.artifact_id == selectedArtifactID
+                    Button {
+                        selectedArtifactID = preview.artifact_id
+                    } label: {
+                        HStack(spacing: 8) {
+                            Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
+                                .font(.caption)
+                                .foregroundStyle(isSelected ? Color.accentColor : .secondary)
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text(preview.title)
+                                    .font(.caption)
+                                    .fontWeight(isSelected ? .semibold : .regular)
+                                    .textSelection(.enabled)
+                                Text(preview.path)
+                                    .font(.caption2.monospaced())
+                                    .foregroundStyle(.secondary)
+                                    .lineLimit(1)
+                                    .truncationMode(.middle)
+                            }
+                            Spacer()
+                        }
+                        .padding(6)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                    }
+                    .buttonStyle(.plain)
+                    .contentShape(Rectangle())
+                    .background(isSelected ? Color.accentColor.opacity(0.12) : .clear)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 6)
+                            .stroke(
+                                isSelected ? Color.accentColor : Color.secondary.opacity(0.35),
+                                lineWidth: isSelected ? 1 : 0
+                            )
+                    )
                 }
             }
         }
+    }
+
+    private func selectedArtifact(from previews: [StartWorkspaceArtifactPreview]) -> StartWorkspaceArtifactPreview? {
+        guard !previews.isEmpty else {
+            return nil
+        }
+        return previews.first { $0.artifact_id == selectedArtifactID } ?? previews.first
     }
 
     private func liveWorkspaceArtifactPreview(
@@ -1122,7 +1192,8 @@ public struct LiveWorkspaceSessionView: View {
     private func attemptComposer(
         requiredEvidence: [String],
         operationActive: Bool,
-        evidenceItems: [LiveWorkspaceEvidenceItem]
+        evidenceItems: [LiveWorkspaceEvidenceItem],
+        isSubmittingWorkspaceAttempt: Bool
     ) -> some View {
         VStack(alignment: .leading, spacing: 10) {
             if operationActive {
@@ -1203,10 +1274,23 @@ public struct LiveWorkspaceSessionView: View {
                     Button("Submit attempt") {
                         submitAttempt(action: .submit)
                     }
-                    .disabled(draftAnswer.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                    .disabled(
+                        isSubmittingWorkspaceAttempt
+                            || draftAnswer.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+                    )
 
                     Button("I do not know") {
                         submitAttempt(action: .i_do_not_know)
+                    }
+                    .disabled(isSubmittingWorkspaceAttempt)
+                }
+                if isSubmittingWorkspaceAttempt {
+                    HStack(spacing: 6) {
+                        ProgressView()
+                            .controlSize(.small)
+                        Text("Submitting attempt...")
+                            .font(.caption2)
+                            .foregroundStyle(.secondary)
                     }
                 }
             } else {

@@ -116,6 +116,13 @@ release yet.
 - Updated `StudyPanelLiveModel.submitWorkspaceAttempt` to accept an optional action
   argument (defaulting to `.submit`) and forward it unchanged to runtime payloads.
 
+### Changed - Native Live Workspace Preview and Composer Submit Behavior
+
+- The native live workspace now lets users select among left panel artifact previews; the
+  center preview updates from runtime-provided options to match the selected artifact.
+- During attempt submission, the composer now visibly disables controls until the submit
+  resolves, preventing duplicate interactions while preserving selection state.
+
 Each changelog-worthy change should be updated in the same commit as the work it
 describes. Skip this file only when the commit is purely mechanical and does not
 change product behavior, product docs, release readiness, or the public product
