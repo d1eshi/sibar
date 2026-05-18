@@ -66,12 +66,6 @@ export function resolveDefaultExcludedPaths(rootPath: string, fallbackPaths: str
   return fallbackPaths.filter((entry) => existsSync(join(rootPath, entry)));
 }
 
-export function resolveWorkspaceURL(payload: Record<string, unknown>, defaultURL: string): string {
-  return typeof payload.workspace_url === "string" && payload.workspace_url.trim().length > 0
-    ? payload.workspace_url.trim()
-    : defaultURL;
-}
-
 function relativeRepoPath(rootPath: string, absolutePath: string): string {
   return relative(rootPath, absolutePath).split(sep).join("/") || basename(absolutePath);
 }

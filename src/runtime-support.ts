@@ -17,7 +17,6 @@ export type RuntimeCommand =
   | "get_understanding_memory"
   | "readiness_report"
   | "get_study_panel_state"
-  | "get_workspace_snapshot"
   | "start_workspace_session"
   | "submit_workspace_attempt"
   | "generate_practice_challenges"

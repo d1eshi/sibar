@@ -200,21 +200,6 @@ public final class RuntimeClient: Sendable {
         try send(command: "get_study_panel_state", payload: payload)
     }
 
-    public func getWorkspaceSnapshot(_ payload: WorkspaceSnapshotPayload = .init()) throws -> RuntimeWorkspaceLensState {
-        let resolvedPayload: WorkspaceSnapshotPayload
-        if payload.fixture_path == nil, let repoRoot {
-            resolvedPayload = WorkspaceSnapshotPayload(
-                fixture_path: URL(fileURLWithPath: repoRoot, isDirectory: true)
-                    .appendingPathComponent("docs/specs/deep-ownership-workspace/fixtures/sibi-pedagogy-loop.json")
-                    .path,
-                workspace_url: payload.workspace_url
-            )
-        } else {
-            resolvedPayload = payload
-        }
-        return try send(command: "get_workspace_snapshot", payload: resolvedPayload)
-    }
-
     public func startWorkspaceSession(_ payload: StartWorkspaceSessionPayload) throws -> StartWorkspaceSessionResult {
         try send(command: "start_workspace_session", payload: payload)
     }
