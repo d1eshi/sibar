@@ -20,6 +20,18 @@ release yet.
   deterministic evidence-check results, detected gaps, repair actions, and
   scoped readiness without opening a browser workspace.
 
+### Added - Live Workspace Evaluation Visibility
+
+- Extended `LiveWorkspaceRenderModel` with explicit evidence/evaluation fields:
+  selected/cited/missing evidence IDs and normalized attempt-evaluation data
+  (observed/missing/unsupported/contradicted claims, detected gap, repair action,
+  reattempt prompt, and scoped readiness).
+- Updated the native live-workspace center/right panel rendering to surface those
+  deterministic fields as explicit sections and to mark artifact code lines by
+  active range, cited evidence, selected evidence, and missing evidence.
+- Added focused tests for submit-time evidence defaults and evaluation payload
+  rendering in `Tests/SibiCoreTests/StudyPanelTests.swift`.
+
 ### Added - Deep Ownership Workspace Attempt-First UI Flow
 
 - Implemented the attempt-first UI flow in the static Workspace prototype with

@@ -76,7 +76,28 @@ public struct LiveWorkspaceRenderModel: Equatable, Sendable {
         public let artifactType: String
         public let artifactLineSpan: String
         public let requiredEvidenceIDs: [String]
+        public let selectedEvidenceIDs: [String]
+        public let citedEvidenceIDs: [String]
+        public let missingEvidenceIDs: [String]
         public let hasArtifact: Bool
+    }
+
+    public struct AttemptEvaluationRenderModel: Equatable, Sendable {
+        public let status: String?
+        public let observedClaims: [String]
+        public let missingClaims: [String]
+        public let unsupportedClaims: [String]
+        public let contradictedClaims: [String]
+        public let missingEvidenceIDs: [String]
+        public let detectedGapKind: String?
+        public let detectedGapSeverity: String?
+        public let detectedGapBlocksReadiness: Bool?
+        public let repairActionPrompt: String?
+        public let repairActionOperationKind: String?
+        public let reattemptPrompt: String?
+        public let readinessStatus: String?
+        public let readinessScope: String?
+        public let readinessBlockedClaims: [String]
     }
 
     public struct RightPanel: Equatable, Sendable {
@@ -87,9 +108,13 @@ public struct LiveWorkspaceRenderModel: Equatable, Sendable {
         public let operationPrompt: String
         public let operationSuccessCriteria: [String]
         public let requiredEvidenceIDs: [String]
+        public let selectedEvidenceIDs: [String]
+        public let citedEvidenceIDs: [String]
+        public let missingEvidenceIDs: [String]
         public let hasActiveOperation: Bool
         public let activeOperationID: String
         public let evaluationReadiness: String?
+        public let attemptEvaluation: AttemptEvaluationRenderModel?
     }
 
     public let left: LeftPanel
@@ -101,11 +126,26 @@ public struct LiveWorkspaceRenderModel: Equatable, Sendable {
         let loop = result.workspace_session.loop
 
         let selectedOperation = liveWorkspace?.active_operation ?? loopOperation(from: loop)
+        let attemptEvaluation = buildAttemptEvaluation(
+            liveEvaluation: liveWorkspace?.last_attempt_evaluation,
+            loop: loop
+        )
         let requiredEvidence = deduplicatedEvidence(
             liveWorkspace?.active_operation?.required_evidence
                 ?? liveWorkspace?.required_evidence
                 ?? loop?.active_operation?.required_evidence
                 ?? []
+        )
+        let submittedEvidence = deduplicatedEvidence(
+            liveWorkspace?.submitted_attempt?.selected_evidence_ids
+                ?? loop?.sample_attempt?.selected_evidence
+                ?? []
+        )
+        let selectedEvidence = deduplicatedEvidence(submittedEvidence + requiredEvidence)
+        let citedEvidence = deduplicatedEvidence(
+            liveWorkspace?.last_attempt_evaluation?.evidence_check.cited_evidence.map(\.evidence_id)
+            ?? loop?.evidence_check?.cited_evidence.map(\.evidence_id)
+            ?? []
         )
         let marker = operationMarker(for: liveWorkspace?.active_operation?.slice_id)
 
@@ -134,6 +174,11 @@ public struct LiveWorkspaceRenderModel: Equatable, Sendable {
                 loop: loop?.thinking_artifacts.first
             ),
             requiredEvidenceIDs: requiredEvidence,
+            selectedEvidenceIDs: selectedEvidence,
+            citedEvidenceIDs: citedEvidence,
+            missingEvidenceIDs: deduplicatedEvidence(
+                liveWorkspace?.last_attempt_evaluation?.missing_evidence ?? []
+            ),
             hasArtifact: liveWorkspace?.artifact_previews.first != nil
                 || loop?.thinking_artifacts.first != nil
         )
@@ -148,10 +193,16 @@ public struct LiveWorkspaceRenderModel: Equatable, Sendable {
             operationPrompt: selectedOperation?.prompt ?? "No active operation.",
             operationSuccessCriteria: selectedOperation?.success_criteria ?? [],
             requiredEvidenceIDs: requiredEvidence,
+            selectedEvidenceIDs: selectedEvidence,
+            citedEvidenceIDs: citedEvidence,
+            missingEvidenceIDs: deduplicatedEvidence(
+                liveWorkspace?.last_attempt_evaluation?.missing_evidence ?? []
+            ),
             hasActiveOperation: !(selectedOperation?.operation_id.isEmpty ?? true),
             activeOperationID: selectedOperation?.operation_id ?? "",
             evaluationReadiness: liveWorkspace?.last_attempt_evaluation?.scoped_readiness.status
-                ?? loop?.readiness_claim?.status
+                ?? loop?.readiness_claim?.status,
+            attemptEvaluation: attemptEvaluation
         )
     }
 }
@@ -201,6 +252,52 @@ private func deduplicatedEvidence(_ evidence: [String]) -> [String] {
         }
     }
     return ordered
+}
+
+private func buildAttemptEvaluation(
+    liveEvaluation: StartWorkspaceAttemptEvaluationContract?,
+    loop: StartWorkspaceLoop?
+) -> LiveWorkspaceRenderModel.AttemptEvaluationRenderModel? {
+    if let liveEvaluation {
+        return .init(
+            status: liveEvaluation.evidence_check.result,
+            observedClaims: deduplicatedEvidence(liveEvaluation.evidence_check.observed_claims),
+            missingClaims: deduplicatedEvidence(liveEvaluation.evidence_check.missing_claims),
+            unsupportedClaims: deduplicatedEvidence(liveEvaluation.evidence_check.unsupported_claims),
+            contradictedClaims: deduplicatedEvidence(liveEvaluation.evidence_check.contradicted_claims),
+            missingEvidenceIDs: deduplicatedEvidence(liveEvaluation.missing_evidence),
+            detectedGapKind: liveEvaluation.detected_gap?.kind,
+            detectedGapSeverity: liveEvaluation.detected_gap?.severity,
+            detectedGapBlocksReadiness: liveEvaluation.detected_gap?.blocks_readiness,
+            repairActionPrompt: liveEvaluation.repair_action?.prompt,
+            repairActionOperationKind: liveEvaluation.repair_action?.operation_kind,
+            reattemptPrompt: liveEvaluation.reattempt_prompt,
+            readinessStatus: liveEvaluation.scoped_readiness.status,
+            readinessScope: liveEvaluation.scoped_readiness.scope,
+            readinessBlockedClaims: deduplicatedEvidence(liveEvaluation.scoped_readiness.blocked_claims)
+        )
+    }
+
+    guard let loopEvaluation = loop?.evidence_check else {
+        return nil
+    }
+    return .init(
+        status: loopEvaluation.result,
+        observedClaims: deduplicatedEvidence(loopEvaluation.observed_claims),
+        missingClaims: deduplicatedEvidence(loopEvaluation.missing_claims),
+        unsupportedClaims: deduplicatedEvidence(loopEvaluation.unsupported_claims),
+        contradictedClaims: deduplicatedEvidence(loopEvaluation.contradicted_claims),
+        missingEvidenceIDs: [],
+        detectedGapKind: loop?.detected_gap?.kind,
+        detectedGapSeverity: loop?.detected_gap?.severity,
+        detectedGapBlocksReadiness: loop?.detected_gap?.blocks_readiness,
+        repairActionPrompt: loop?.repair_action?.prompt,
+        repairActionOperationKind: loop?.repair_action?.operation_kind,
+        reattemptPrompt: nil,
+        readinessStatus: loop?.readiness_claim?.status,
+        readinessScope: loop?.readiness_claim?.scope,
+        readinessBlockedClaims: deduplicatedEvidence(loop?.readiness_claim?.blocked_claims ?? [])
+    )
 }
 
 public struct StudyPanelView: View {
@@ -256,18 +353,34 @@ public struct StudyPanelView: View {
 
 private struct LiveWorkspaceEvidenceItem: Identifiable {
     let id: String
+    let artifactID: String
     let path: String
     let tag: String
     let excerpt: String?
     let required: Bool
-    let lineRange: String?
+    let lineStart: Int?
+    let lineEnd: Int?
+
+    var lineRange: String? {
+        guard let start = lineStart else {
+            return nil
+        }
+        let end = lineEnd ?? start
+        if start == end {
+            return "\(start)"
+        }
+        return "\(start)-\(end)"
+    }
 }
 
 private struct LiveWorkspaceCodeLine: Identifiable {
     let id: Int
     let line: String
     let text: String
-    let isHighlighted: Bool
+    let isActiveRange: Bool
+    let isSelectedEvidenceLine: Bool
+    let isCitedEvidenceLine: Bool
+    let isMissingEvidenceLine: Bool
 }
 
 public struct LiveWorkspaceSessionView: View {
@@ -306,13 +419,22 @@ public struct LiveWorkspaceSessionView: View {
             loop: loop,
             requiredEvidence: requiredEvidence
         )
+        let selectedEvidence = selectedEvidenceIDs
 
         ScrollView([.horizontal, .vertical]) {
             HStack(alignment: .top, spacing: 12) {
                 leftPanel(model: renderModel.left, workspace: liveWorkspace, loop: loop)
                     .frame(minWidth: 210, maxWidth: 260, alignment: .leading)
                 Divider()
-                centerPanel(model: renderModel.center, workspace: liveWorkspace, loop: loop)
+                centerPanel(
+                    model: renderModel.center,
+                    workspace: liveWorkspace,
+                    loop: loop,
+                    evidenceItems: evidenceItems,
+                    selectedEvidenceIDs: selectedEvidence,
+                    citedEvidenceIDs: Set(renderModel.right.citedEvidenceIDs),
+                    missingEvidenceIDs: Set(renderModel.right.missingEvidenceIDs)
+                )
                     .frame(minWidth: 220, maxWidth: .infinity, alignment: .leading)
                 Divider()
                 rightPanel(
@@ -330,15 +452,15 @@ public struct LiveWorkspaceSessionView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
         .background(Color.secondary.opacity(0.07), in: RoundedRectangle(cornerRadius: 8))
         .onAppear {
-            selectedEvidenceIDs = Set(requiredEvidence)
+            selectedEvidenceIDs = Set(renderModel.right.selectedEvidenceIDs)
         }
         .onChange(of: result.workspace_session.workspace_session_id) { _, _ in
-            selectedEvidenceIDs = Set(requiredEvidence)
+            selectedEvidenceIDs = Set(renderModel.right.selectedEvidenceIDs)
             draftAnswer = ""
             declaredUnknownsText = ""
         }
         .onChange(of: activeOperationID) { _, _ in
-            selectedEvidenceIDs = Set(requiredEvidence)
+            selectedEvidenceIDs = Set(renderModel.right.selectedEvidenceIDs)
             draftAnswer = ""
             declaredUnknownsText = ""
         }
@@ -401,22 +523,56 @@ public struct LiveWorkspaceSessionView: View {
     private func centerPanel(
         model: LiveWorkspaceRenderModel.CenterPanel,
         workspace: StartWorkspaceLiveSessionContract?,
-        loop: StartWorkspaceLoop?
+        loop: StartWorkspaceLoop?,
+        evidenceItems: [LiveWorkspaceEvidenceItem],
+        selectedEvidenceIDs: Set<String>,
+        citedEvidenceIDs: Set<String>,
+        missingEvidenceIDs: Set<String>
     ) -> some View {
-        VStack(alignment: .leading, spacing: 6) {
+        let selectedEvidence = deduplicatedEvidence(Array(selectedEvidenceIDs))
+        let citedEvidence = deduplicatedEvidence(Array(citedEvidenceIDs))
+        let missingEvidence = deduplicatedEvidence(Array(missingEvidenceIDs))
+        let selectedEvidenceToRender = selectedEvidence.isEmpty ? model.requiredEvidenceIDs : selectedEvidence
+        return VStack(alignment: .leading, spacing: 6) {
             sectionHeader(model.title)
             if let artifact = workspace?.artifact_previews.first {
-                liveWorkspaceArtifactPreview(artifact)
-                let required = model.requiredEvidenceIDs
-                if !required.isEmpty {
-                    requiredEvidenceStrip(required)
+                liveWorkspaceArtifactPreview(
+                    artifact,
+                    requiredEvidenceIDs: model.requiredEvidenceIDs,
+                    evidenceItems: evidenceItems.filter { $0.artifactID == artifact.artifact_id },
+                    selectedEvidenceIDs: selectedEvidenceToRender,
+                    citedEvidenceIDs: citedEvidence,
+                    missingEvidenceIDs: missingEvidence
+                )
+                if !selectedEvidenceToRender.isEmpty || !model.missingEvidenceIDs.isEmpty || !citedEvidence.isEmpty {
+                    evidenceSelectionStrip(
+                        selectedEvidenceIDs: selectedEvidenceToRender,
+                        requiredEvidenceIDs: model.requiredEvidenceIDs,
+                        citedEvidenceIDs: citedEvidence,
+                        missingEvidenceIDs: missingEvidence
+                    )
                 }
             } else if let artifact = loop?.thinking_artifacts.first {
                 loopCodeBlock(artifact)
                     .padding(.bottom, 6)
-                if !model.requiredEvidenceIDs.isEmpty {
-                    requiredEvidenceStrip(model.requiredEvidenceIDs)
+                if !model.selectedEvidenceIDs.isEmpty || !model.missingEvidenceIDs.isEmpty {
+                    evidenceSelectionStrip(
+                        selectedEvidenceIDs: model.selectedEvidenceIDs,
+                        requiredEvidenceIDs: model.requiredEvidenceIDs,
+                        citedEvidenceIDs: model.citedEvidenceIDs,
+                        missingEvidenceIDs: model.missingEvidenceIDs
+                    )
                 }
+            } else if !model.requiredEvidenceIDs.isEmpty {
+                Text("No selected artifact preview in this session.")
+                    .foregroundStyle(.secondary)
+                    .font(.caption)
+                evidenceSelectionStrip(
+                    selectedEvidenceIDs: model.selectedEvidenceIDs,
+                    requiredEvidenceIDs: model.requiredEvidenceIDs,
+                    citedEvidenceIDs: model.citedEvidenceIDs,
+                    missingEvidenceIDs: model.missingEvidenceIDs
+                )
             } else {
                 Text("No selected artifact preview in this session.")
                     .foregroundStyle(.secondary)
@@ -475,13 +631,17 @@ public struct LiveWorkspaceSessionView: View {
                     }
                 }
 
-                let uniqueRequirements = deduplicatedEvidence(requiredEvidence)
-                if !uniqueRequirements.isEmpty {
+                if !model.requiredEvidenceIDs.isEmpty {
                     Text("Required evidence")
                         .font(.caption.weight(.semibold))
-                    requiredEvidenceStrip(uniqueRequirements)
+                    evidenceSelectionStrip(
+                        selectedEvidenceIDs: model.selectedEvidenceIDs,
+                        requiredEvidenceIDs: model.requiredEvidenceIDs,
+                        citedEvidenceIDs: model.citedEvidenceIDs,
+                        missingEvidenceIDs: model.missingEvidenceIDs
+                    )
                 }
-                if let evaluation = workspace.last_attempt_evaluation {
+                if let evaluation = model.attemptEvaluation {
                     Divider()
                     attemptEvaluationSummary(evaluation)
                     if let evaluationReadiness = model.evaluationReadiness {
@@ -503,9 +663,9 @@ public struct LiveWorkspaceSessionView: View {
                         .font(.caption2)
                         .textSelection(.enabled)
                 }
-                if let evaluationReadiness = model.evaluationReadiness {
-                    Text("Evaluation readiness: \(evaluationReadiness)")
-                        .font(.caption2)
+                if let evaluation = model.attemptEvaluation {
+                    Divider()
+                    attemptEvaluationSummary(evaluation)
                 }
                 postAttemptSummary(loop: loop)
             }
@@ -561,8 +721,21 @@ public struct LiveWorkspaceSessionView: View {
         }
     }
 
-    private func liveWorkspaceArtifactPreview(_ artifact: StartWorkspaceArtifactPreview) -> some View {
-        let lines = workspaceCodeLines(from: artifact)
+    private func liveWorkspaceArtifactPreview(
+        _ artifact: StartWorkspaceArtifactPreview,
+        requiredEvidenceIDs: [String],
+        evidenceItems: [LiveWorkspaceEvidenceItem],
+        selectedEvidenceIDs: [String],
+        citedEvidenceIDs: [String],
+        missingEvidenceIDs: [String]
+    ) -> some View {
+        let lines = workspaceCodeLines(
+            from: artifact,
+            evidenceItems: evidenceItems,
+            selectedEvidenceIDs: Set(selectedEvidenceIDs),
+            citedEvidenceIDs: Set(citedEvidenceIDs),
+            missingEvidenceIDs: Set(missingEvidenceIDs)
+        )
         let lineSpan = artifact.line_start.flatMap { startLine in
             "\(startLine)-\(artifact.line_end ?? startLine)"
         }
@@ -601,6 +774,17 @@ public struct LiveWorkspaceSessionView: View {
             if lines.isEmpty {
                 Text("No source preview available for this artifact.")
                     .foregroundStyle(.secondary)
+                if !selectedEvidenceIDs.isEmpty || !citedEvidenceIDs.isEmpty || !missingEvidenceIDs.isEmpty {
+                    Divider().padding(.vertical, 4)
+                    Text("Selected evidence")
+                        .font(.caption.weight(.semibold))
+                    evidenceSelectionStrip(
+                        selectedEvidenceIDs: selectedEvidenceIDs,
+                        requiredEvidenceIDs: requiredEvidenceIDs,
+                        citedEvidenceIDs: citedEvidenceIDs,
+                        missingEvidenceIDs: missingEvidenceIDs
+                    )
+                }
             } else {
                 ScrollView(.horizontal) {
                     VStack(alignment: .leading, spacing: 0) {
@@ -612,11 +796,19 @@ public struct LiveWorkspaceSessionView: View {
                                     .frame(width: 44, alignment: .trailing)
                                 Text(line.text.isEmpty ? " " : line.text)
                                     .font(.caption.monospaced())
-                                    .foregroundStyle(line.isHighlighted ? Color.accentColor : Color.primary)
+                                    .foregroundStyle(line.isActiveRange ? Color.accentColor : Color.primary)
                                     .textSelection(.enabled)
+                                if let marker = codeLineMarkerLabel(line) {
+                                    Spacer(minLength: 6)
+                                    Text(marker)
+                                        .font(.caption2.monospaced())
+                                        .padding(.horizontal, 6)
+                                        .padding(.vertical, 1)
+                                        .background(codeLineMarkerColor(line).opacity(0.25), in: Capsule())
+                                }
                             }
                             .padding(.horizontal, 4)
-                            .background(line.isHighlighted ? Color.accentColor.opacity(0.08) : Color.clear)
+                            .background(codeLineMarkerColor(line).opacity(0.12))
                         }
                     }
                     .padding(10)
@@ -661,45 +853,151 @@ public struct LiveWorkspaceSessionView: View {
         }
     }
 
-    private func requiredEvidenceStrip(_ evidenceIDs: [String]) -> some View {
-        ScrollView(.horizontal) {
+    private func evidenceSelectionStrip(
+        selectedEvidenceIDs: [String],
+        requiredEvidenceIDs: [String],
+        citedEvidenceIDs: [String],
+        missingEvidenceIDs: [String]
+    ) -> some View {
+        let selectedSet = Set(selectedEvidenceIDs)
+        let requiredSet = Set(requiredEvidenceIDs)
+        let citedSet = Set(citedEvidenceIDs)
+        let missingSet = Set(missingEvidenceIDs)
+        let orderedIDs = deduplicatedEvidence(
+            selectedEvidenceIDs + requiredEvidenceIDs + citedEvidenceIDs + missingEvidenceIDs
+        )
+        return ScrollView(.horizontal) {
             HStack(spacing: 6) {
-                ForEach(evidenceIDs, id: \.self) { evidenceID in
-                    Text(evidenceID)
-                        .font(.caption2)
-                        .padding(.horizontal, 6)
-                        .padding(.vertical, 2)
-                        .background(Color.secondary.opacity(0.16), in: Capsule())
+                ForEach(orderedIDs, id: \.self) { evidenceID in
+                    let isRequired = requiredSet.contains(evidenceID)
+                    let isSelected = selectedSet.contains(evidenceID)
+                    let isCited = citedSet.contains(evidenceID)
+                    let isMissing = missingSet.contains(evidenceID)
+                    let statusLabel = isSelected ? "selected" : "available"
+                    let stateLabel = isRequired ? "required" : "optional"
+                    let extra = [isCited ? "cited" : nil, isMissing ? "missing" : nil].compactMap { $0 }
+                    let summary = (statusLabel + (extra.isEmpty ? "" : " • \(extra.joined(separator: ", "))"))
+
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(summary)
+                            .font(.caption2)
+                            .foregroundStyle(.secondary)
+                        HStack(spacing: 6) {
+                            Text(evidenceID)
+                                .font(.caption2)
+                                .fontWeight(isSelected ? .bold : .regular)
+                                .textSelection(.enabled)
+                            Text(stateLabel)
+                                .font(.caption2.weight(.semibold))
+                                .padding(.horizontal, 6)
+                                .padding(.vertical, 2)
+                                .background(stateColor(isRequired).opacity(0.4), in: Capsule())
+                        }
+                    }
+                    .padding(.horizontal, 6)
+                    .padding(.vertical, 2)
+                    .background(evidenceStripColor(
+                        isRequired: isRequired,
+                        isSelected: isSelected,
+                        isCited: isCited,
+                        isMissing: isMissing
+                    ).opacity(0.14), in: Capsule())
                 }
             }
         }
     }
 
-    private func attemptEvaluationSummary(_ evaluation: StartWorkspaceAttemptEvaluationContract) -> some View {
+    private func evidenceStripColor(
+        isRequired: Bool,
+        isSelected: Bool,
+        isCited: Bool,
+        isMissing: Bool
+    ) -> Color {
+        if isMissing {
+            return Color.red
+        }
+        if isCited {
+            return Color.purple
+        }
+        if isSelected {
+            return isRequired ? Color.accentColor : Color.blue
+        }
+        return isRequired ? Color.green : Color.secondary
+    }
+
+    private func stateColor(_ isRequired: Bool) -> Color {
+        isRequired ? Color.accentColor : Color.blue
+    }
+
+    private func attemptEvaluationSummary(_ evaluation: LiveWorkspaceRenderModel.AttemptEvaluationRenderModel) -> some View {
         VStack(alignment: .leading, spacing: 6) {
             sectionHeader("Attempt evaluation")
-            Text("Result: \(evaluation.evidence_check.result)")
-                .font(.caption)
-            Text("Observed: \(evaluation.evidence_check.observed_claims.count), Missing: \(evaluation.evidence_check.missing_claims.count), Unsupported: \(evaluation.evidence_check.unsupported_claims.count), Contradicted: \(evaluation.evidence_check.contradicted_claims.count)")
-                .font(.caption2)
-                .textSelection(.enabled)
-            Text("Readiness: \(evaluation.scoped_readiness.status)")
-                .font(.caption)
-            Text(evaluation.scoped_readiness.scope)
-                .font(.caption2)
-                .textSelection(.enabled)
-            if let repair = evaluation.repair_action {
+            if let status = evaluation.status {
+                Text("Result: \(status)")
+                    .font(.caption)
+            }
+            claimList("Observed claims", claims: evaluation.observedClaims)
+            if !evaluation.missingClaims.isEmpty {
+                claimList("Partial / missing claims", claims: evaluation.missingClaims)
+            }
+            if !evaluation.unsupportedClaims.isEmpty {
+                claimList("Unsupported claims", claims: evaluation.unsupportedClaims)
+            }
+            if !evaluation.contradictedClaims.isEmpty {
+                claimList("Contradicted claims", claims: evaluation.contradictedClaims)
+            }
+            if !evaluation.missingEvidenceIDs.isEmpty {
+                claimList("Missing evidence IDs", claims: evaluation.missingEvidenceIDs)
+            }
+            if let detectedGapKind = evaluation.detectedGapKind {
+                Text("Detected gap")
+                    .font(.caption.weight(.semibold))
+                Text("Kind: \(detectedGapKind)")
+                    .font(.caption)
+                if let severity = evaluation.detectedGapSeverity {
+                    Text("Severity: \(severity)")
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                }
+                if let blocksReadiness = evaluation.detectedGapBlocksReadiness {
+                    Text("Blocks readiness: \(blocksReadiness ? "yes" : "no")")
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                }
+            }
+            if let repairPrompt = evaluation.repairActionPrompt {
                 Text("Repair action")
                     .font(.caption.weight(.semibold))
-                Text(repair.prompt)
+                if let repairKind = evaluation.repairActionOperationKind {
+                    Text("Operation: \(repairKind)")
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                }
+                Text(repairPrompt)
                     .font(.caption2)
                     .textSelection(.enabled)
             }
-            Text("Reattempt prompt")
-                .font(.caption.weight(.semibold))
-            Text(evaluation.reattempt_prompt)
-                .font(.caption2)
-                .textSelection(.enabled)
+            if let reattemptPrompt = evaluation.reattemptPrompt {
+                Text("Reattempt prompt")
+                    .font(.caption.weight(.semibold))
+                Text(reattemptPrompt)
+                    .font(.caption2)
+                    .textSelection(.enabled)
+            }
+            if let readinessStatus = evaluation.readinessStatus {
+                Text("Scoped readiness")
+                    .font(.caption.weight(.semibold))
+                Text("Status: \(readinessStatus)")
+                    .font(.caption)
+                if let scope = evaluation.readinessScope {
+                    Text(scope)
+                        .font(.caption2)
+                        .textSelection(.enabled)
+                }
+                if !evaluation.readinessBlockedClaims.isEmpty {
+                    claimList("Blocked claims", claims: evaluation.readinessBlockedClaims)
+                }
+            }
         }
     }
 
@@ -713,42 +1011,112 @@ public struct LiveWorkspaceSessionView: View {
             return live.evidence.map { item in
                 LiveWorkspaceEvidenceItem(
                     id: item.evidence_id,
+                    artifactID: item.artifact_id,
                     path: item.path,
                     tag: item.label,
                     excerpt: item.excerpt,
                     required: item.required || requiredEvidenceSet.contains(item.evidence_id),
-                    lineRange: "\(item.line_range.line_start)-\(item.line_range.line_end)"
+                    lineStart: item.line_range.line_start,
+                    lineEnd: item.line_range.line_end
                 )
             }
         }
         return loop?.evidence_inventory.map { item in
             LiveWorkspaceEvidenceItem(
                 id: item.id,
+                artifactID: "",
                 path: item.path,
                 tag: item.role,
                 excerpt: item.excerpt,
                 required: requiredEvidenceSet.contains(item.id),
-                lineRange: nil
+                lineStart: nil,
+                lineEnd: nil
             )
         } ?? []
     }
 
-    private func workspaceCodeLines(from artifact: StartWorkspaceArtifactPreview) -> [LiveWorkspaceCodeLine] {
+    private func workspaceCodeLines(
+        from artifact: StartWorkspaceArtifactPreview,
+        evidenceItems: [LiveWorkspaceEvidenceItem],
+        selectedEvidenceIDs: Set<String>,
+        citedEvidenceIDs: Set<String>,
+        missingEvidenceIDs: Set<String>
+    ) -> [LiveWorkspaceCodeLine] {
         let source = artifact.slice_content ?? artifact.excerpt ?? ""
         guard !source.isEmpty else {
             return []
         }
         let startLine = artifact.line_start ?? 1
         let endLine = artifact.line_end ?? startLine
+        let activeLineRange = startLine...endLine
+        var selectedLineNumbers: Set<Int> = []
+        var citedLineNumbers: Set<Int> = []
+        var missingLineNumbers: Set<Int> = []
+
+        for item in evidenceItems where selectedEvidenceIDs.contains(item.id) {
+            appendEvidenceLineNumbers(from: item, into: &selectedLineNumbers)
+        }
+        for item in evidenceItems where citedEvidenceIDs.contains(item.id) {
+            appendEvidenceLineNumbers(from: item, into: &citedLineNumbers)
+        }
+        for item in evidenceItems where missingEvidenceIDs.contains(item.id) {
+            appendEvidenceLineNumbers(from: item, into: &missingLineNumbers)
+        }
+
         return source.components(separatedBy: .newlines).enumerated().map { offset, text in
             let lineNumber = startLine + offset
             return LiveWorkspaceCodeLine(
                 id: offset,
                 line: "\(lineNumber)",
                 text: text,
-                isHighlighted: lineNumber >= startLine && lineNumber <= endLine
+                isActiveRange: activeLineRange.contains(lineNumber),
+                isSelectedEvidenceLine: selectedLineNumbers.contains(lineNumber),
+                isCitedEvidenceLine: citedLineNumbers.contains(lineNumber),
+                isMissingEvidenceLine: missingLineNumbers.contains(lineNumber)
             )
         }
+    }
+
+    private func appendEvidenceLineNumbers(from item: LiveWorkspaceEvidenceItem, into lineNumbers: inout Set<Int>) {
+        guard let start = item.lineStart else {
+            return
+        }
+        let end = item.lineEnd ?? start
+        for line in start...end {
+            lineNumbers.insert(line)
+        }
+    }
+
+    private func codeLineMarkerLabel(_ line: LiveWorkspaceCodeLine) -> String? {
+        if line.isMissingEvidenceLine {
+            return "missing"
+        }
+        if line.isCitedEvidenceLine {
+            return "cited"
+        }
+        if line.isSelectedEvidenceLine {
+            return "selected"
+        }
+        if line.isActiveRange {
+            return "active"
+        }
+        return nil
+    }
+
+    private func codeLineMarkerColor(_ line: LiveWorkspaceCodeLine) -> Color {
+        if line.isMissingEvidenceLine {
+            return Color.red
+        }
+        if line.isCitedEvidenceLine {
+            return Color.purple
+        }
+        if line.isSelectedEvidenceLine {
+            return Color.blue
+        }
+        if line.isActiveRange {
+            return Color.accentColor
+        }
+        return Color.clear
     }
 
     private func attemptComposer(
