@@ -215,6 +215,10 @@ public final class RuntimeClient: Sendable {
         return try send(command: "get_workspace_snapshot", payload: resolvedPayload)
     }
 
+    public func startWorkspaceSession(_ payload: StartWorkspaceSessionPayload) throws -> StartWorkspaceSessionResult {
+        try send(command: "start_workspace_session", payload: payload)
+    }
+
     func send<Response: Decodable, Payload: Encodable>(command: String, payload: Payload) throws -> Response {
         let encoder = JSONEncoder()
         encoder.outputFormatting = [.sortedKeys]

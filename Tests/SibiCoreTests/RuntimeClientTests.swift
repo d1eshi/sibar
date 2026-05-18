@@ -291,9 +291,40 @@ final class RuntimeClientTests: XCTestCase {
         XCTAssertEqual(lensState.open_workspace.label, "Open Workspace")
     }
 
+    func testSendsStartWorkspaceSessionCommand() throws {
+        let runner = StubRunner(result: .init(
+            status: 0,
+            stdout: startWorkspaceSessionEnvelopeJSON,
+            stderr: ""
+        ))
+        let client = RuntimeClient(runner: runner, arguments: ["node", "runtime.js"])
+
+        let result = try client.startWorkspaceSession(.init(
+            goal: "Explain project ownership boundaries.",
+            root: "/tmp/sibi",
+            codex_command: "auto",
+            workspace_url: "http://127.0.0.1:4180/workspace.html"
+        ))
+
+        XCTAssertEqual(result.workspace_session.workspace_session_id, "ws-1")
+        XCTAssertEqual(result.workspace_session.runner.status, "completed")
+
+        let requestData = try XCTUnwrap(runner.standardInput.data(using: .utf8))
+        let requestObject = try JSONSerialization.jsonObject(with: requestData) as? [String: Any]
+        let payload = try XCTUnwrap(requestObject?["payload"] as? [String: Any])
+
+        XCTAssertEqual(requestObject?["command"] as? String, "start_workspace_session")
+        XCTAssertEqual(payload["goal"] as? String, "Explain project ownership boundaries.")
+        XCTAssertEqual(payload["root"] as? String, "/tmp/sibi")
+        XCTAssertEqual(payload["root_path"] as? String, "/tmp/sibi")
+        XCTAssertEqual(payload["codex_command"] as? String, "auto")
+        XCTAssertEqual(payload["workspace_url"] as? String, "http://127.0.0.1:4180/workspace.html")
+    }
+
     private func sendStub(_ client: RuntimeClient) throws -> StubResponse {
         try client.send(command: "stub", payload: StubPayload(value: "x"))
     }
 }
 
 private let workspaceSnapshotEnvelopeJSON = #"{"ok":true,"data":{"snapshot":{"snapshot_id":"SNAP-loop-1","loop_id":"loop-1","goal":"Trace runtime gap detection to readiness limits.","active_operation":null,"readiness":{"status":"ready","scope":"trace operation for runtime gap slice","blocked_claims":[]},"detected_gap":null},"open_workspace":{"label":"Open Workspace","target_url":"http://127.0.0.1:4180/workspace.html"},"operation_state":{"message":"Workspace snapshot projected from runtime-owned state."}}}"#
+private let startWorkspaceSessionEnvelopeJSON = #"{"ok":true,"data":{"workspace_session":{"workspace_session_id":"ws-1","artifact_session_id":"as-1","runner":{"status":"completed","accepted_signal_count":1,"rejected_signal_count":0}}}}"#
