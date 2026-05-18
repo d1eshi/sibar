@@ -50,6 +50,51 @@ final class StudyPanelTests: XCTestCase {
         XCTAssertTrue(model.rows(for: "memory-readiness").contains { $0.contains("Readiness: not ready yet") })
     }
 
+    func testLiveWorkspaceRenderModelExposesLeftCenterAndRightPanels() throws {
+        let result = try decodeLiveWorkspaceRenderSessionResult()
+        let model = LiveWorkspaceRenderModel(result: result)
+
+        XCTAssertEqual(model.left.title, "Worktree / Artifact Directory")
+        XCTAssertEqual(model.left.worktreePaths, ["src/index.ts", "src/guides.rs"])
+        XCTAssertEqual(model.left.artifactPaths, ["src/index.ts"])
+        XCTAssertEqual(model.left.selectedPaths, ["src/index.ts", "src/guides.rs"])
+        XCTAssertEqual(model.left.excludedPaths, ["dist"])
+        XCTAssertEqual(model.left.unknownPaths, ["node_modules/tmp"])
+        XCTAssertEqual(model.left.activeMarker, "Slice SL-1")
+
+        XCTAssertEqual(model.center.title, "Artifact Workspace")
+        XCTAssertTrue(model.center.hasArtifact)
+        XCTAssertEqual(model.center.artifactTitle, "Ownership slice")
+        XCTAssertEqual(model.center.artifactPath, "src/index.ts")
+        XCTAssertEqual(model.center.artifactType, "code")
+        XCTAssertEqual(model.center.artifactLineSpan, "3-4")
+        XCTAssertEqual(model.center.requiredEvidenceIDs, ["EV-LIVE-1", "EV-LIVE-2"])
+
+        XCTAssertEqual(model.right.title, "Sibi Ownership Panel")
+        XCTAssertEqual(model.right.phase, "GapOrReady")
+        XCTAssertEqual(model.right.currentPrompt, "Explain module ownership for this runtime.")
+        XCTAssertEqual(model.right.nextAction, "submit one evidence-backed answer")
+        XCTAssertEqual(model.right.operationPrompt, "What does module ownership mean here?")
+        XCTAssertEqual(model.right.operationSuccessCriteria, ["Explain boundaries", "Mention selected paths"])
+        XCTAssertEqual(model.right.requiredEvidenceIDs, ["EV-LIVE-1", "EV-LIVE-2"])
+        XCTAssertNil(model.right.evaluationReadiness)
+        XCTAssertTrue(model.right.hasActiveOperation)
+    }
+
+    func testLiveWorkspaceRenderModelAfterSubmitCapturesEvaluationReadiness() throws {
+        let result = try decodeSubmitWorkspaceAttemptResult()
+        let model = LiveWorkspaceRenderModel(result: result)
+
+        XCTAssertEqual(model.right.evaluationReadiness, "ready")
+        XCTAssertEqual(model.center.title, "Artifact Workspace")
+        XCTAssertEqual(model.center.artifactTitle, "Runtime dispatcher")
+        XCTAssertEqual(model.center.artifactPath, "src/runtime.ts")
+        XCTAssertEqual(model.center.artifactType, "code_slice")
+        XCTAssertEqual(model.center.artifactLineSpan, "1-3")
+        XCTAssertEqual(model.right.requiredEvidenceIDs, ["EV-LIVE-1"])
+        XCTAssertEqual(model.left.worktreePaths, [])
+    }
+
     @MainActor
     func testLiveModelRefreshLoadsCurrentRuntimeSnapshot() async throws {
         let snapshot = try decodeStudyPanelSnapshot()
@@ -311,6 +356,14 @@ private func decodeStartWorkspaceSessionResult() throws -> StartWorkspaceSession
     let envelope = try JSONDecoder().decode(
         RuntimeEnvelope<StartWorkspaceSessionResult>.self,
         from: Data(startWorkspaceSessionEnvelopeJSON.utf8)
+    )
+    return try XCTUnwrap(envelope.data)
+}
+
+private func decodeLiveWorkspaceRenderSessionResult() throws -> StartWorkspaceSessionResult {
+    let envelope = try JSONDecoder().decode(
+        RuntimeEnvelope<StartWorkspaceSessionResult>.self,
+        from: Data(startWorkspaceRenderSessionEnvelopeJSON.utf8)
     )
     return try XCTUnwrap(envelope.data)
 }
@@ -666,6 +719,111 @@ private let startWorkspaceSessionEnvelopeJSON = #"""
     },
     "snapshot": {
       "loop_state": "AwaitingAttempt"
+    }
+  }
+}
+"""#
+
+private let startWorkspaceRenderSessionEnvelopeJSON = #"""
+{
+  "ok": true,
+  "data": {
+    "workspace_session": {
+      "workspace_session_id": "ws-live-render-1",
+      "artifact_session_id": "as-live-render-1",
+      "runner": {
+        "status": "running"
+      },
+      "live_workspace": {
+        "session_id": "ws-live-render-1",
+        "repo_root": "/tmp/sibi-live",
+        "project_label": "Render model fixture",
+        "source_control_summary": {
+          "available": true,
+          "branch": "main",
+          "head": "abc",
+          "status_short": "clean",
+          "diff_stat": "",
+          "diff_name_status": ""
+        },
+        "worktree": {
+          "root_path": "/tmp/sibi-live",
+          "paths": ["src/index.ts", "src/guides.rs"]
+        },
+        "artifact_tree": {
+          "root_path": "/tmp/sibi-live",
+          "paths": ["src/index.ts"]
+        },
+        "selected": ["src/index.ts", "src/guides.rs"],
+        "excluded": ["dist"],
+        "unknown": ["node_modules/tmp"],
+        "artifact_previews": [
+          {
+            "artifact_id": "art-1",
+            "path": "src/index.ts",
+            "title": "Ownership slice",
+            "artifact_type": "code",
+            "language": "ts",
+            "excerpt": "export function start() {}",
+            "slice_content": "export function start() {}",
+            "line_start": 3,
+            "line_end": 4,
+            "preview_fallback_reason": null,
+            "evidence_ids": ["EV-LIVE-1", "EV-LIVE-2"]
+          }
+        ],
+        "required_evidence": ["EV-LIVE-1", "EV-LIVE-2"],
+        "success_criteria": ["Explain boundaries", "Mention selected paths"],
+        "current_prompt": "Explain module ownership for this runtime.",
+        "phase": "GapOrReady",
+        "next_action": "submit one evidence-backed answer",
+        "evidence": [
+          {
+            "evidence_id": "EV-LIVE-1",
+            "artifact_id": "art-1",
+            "path": "src/index.ts",
+            "title": "ownership function",
+            "line_range": {
+              "line_start": 3,
+              "line_end": 4
+            },
+            "location": "src/index.ts",
+            "label": "implementation",
+            "excerpt": "export function start() {}",
+            "required": true,
+            "optional": false
+          },
+          {
+            "evidence_id": "EV-LIVE-2",
+            "artifact_id": "art-1",
+            "path": "src/guides.rs",
+            "title": "ownership notes",
+            "line_range": {
+              "line_start": 8,
+              "line_end": 9
+            },
+            "location": "src/guides.rs",
+            "label": "reference",
+            "excerpt": "ownership contract",
+            "required": false,
+            "optional": true
+          }
+        ],
+        "active_operation": {
+          "operation_id": "OP-LIVE-1",
+          "slice_id": "SL-1",
+          "operation_kind": "explain",
+          "prompt": "What does module ownership mean here?",
+          "required_evidence": ["EV-LIVE-1", "EV-LIVE-2"],
+          "success_criteria": ["Explain boundaries", "Mention selected paths"]
+        },
+        "submitted_attempt": null,
+        "ui_reproduction": {
+          "fixture_path": null,
+          "demo_path": null,
+          "test_path": null
+        }
+      }
     }
   }
 }
