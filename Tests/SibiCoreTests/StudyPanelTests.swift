@@ -158,12 +158,41 @@ final class StudyPanelTests: XCTestCase {
         XCTAssertEqual(model.snapshot?.artifact_session.artifact_session_id, "a1")
         XCTAssertEqual(model.lastError, "Workspace snapshot unavailable: Workspace snapshot unavailable.")
     }
+
+    @MainActor
+    func testLiveModelStartsWorkspaceSessionForLocalJudgement() async throws {
+        let recorder = StudyPanelActionRecorder()
+        let model = StudyPanelLiveModel(
+            actions: .init(
+                loadSnapshot: { _ in try decodeStudyPanelSnapshot() },
+                startWorkspaceSession: { payload in
+                    recorder.recordStartWorkspacePayload(payload)
+                    return try decodeStartWorkspaceSessionResult()
+                },
+                answerQuestion: { _ in
+                    throw RuntimeClientError.processFailure("unexpected answer")
+                }
+            )
+        )
+
+        await model.startLiveWorkspace(goal: " Explain this project A-Z ", rootPath: "/tmp/sibi")
+
+        XCTAssertEqual(recorder.startWorkspacePayload?.goal, "Explain this project A-Z")
+        XCTAssertEqual(recorder.startWorkspacePayload?.root, "/tmp/sibi")
+        XCTAssertEqual(recorder.startWorkspacePayload?.codex_command, "auto")
+        XCTAssertEqual(model.liveWorkspaceSession?.workspace_session.workspace_session_id, "ws-1")
+        XCTAssertEqual(model.liveWorkspaceSession?.workspace_session.loop?.active_operation?.prompt, "Explain the runtime dispatcher.")
+        XCTAssertEqual(model.artifactSessionID, "as-1")
+        XCTAssertEqual(model.statusText, "Live workspace session started.")
+        XCTAssertEqual(model.lastError, "")
+    }
 }
 
 private final class StudyPanelActionRecorder: @unchecked Sendable {
     private let lock = NSLock()
     private var storedSnapshotPayload: StudyPanelStatePayload?
     private var storedAnswerPayload: AnswerQuestionPayload?
+    private var storedStartWorkspacePayload: StartWorkspaceSessionPayload?
     private var storedRefreshCount = 0
 
     var snapshotPayload: StudyPanelStatePayload? {
@@ -172,6 +201,10 @@ private final class StudyPanelActionRecorder: @unchecked Sendable {
 
     var answerPayload: AnswerQuestionPayload? {
         withLock { storedAnswerPayload }
+    }
+
+    var startWorkspacePayload: StartWorkspaceSessionPayload? {
+        withLock { storedStartWorkspacePayload }
     }
 
     var refreshCount: Int {
@@ -187,6 +220,12 @@ private final class StudyPanelActionRecorder: @unchecked Sendable {
     func recordAnswerPayload(_ payload: AnswerQuestionPayload) {
         withLock {
             storedAnswerPayload = payload
+        }
+    }
+
+    func recordStartWorkspacePayload(_ payload: StartWorkspaceSessionPayload) {
+        withLock {
+            storedStartWorkspacePayload = payload
         }
     }
 
@@ -229,6 +268,14 @@ private func decodeAnswerQuestionResult() throws -> AnswerQuestionResult {
     let envelope = try JSONDecoder().decode(
         RuntimeEnvelope<AnswerQuestionResult>.self,
         from: Data(answerQuestionEnvelopeJSON.utf8)
+    )
+    return try XCTUnwrap(envelope.data)
+}
+
+private func decodeStartWorkspaceSessionResult() throws -> StartWorkspaceSessionResult {
+    let envelope = try JSONDecoder().decode(
+        RuntimeEnvelope<StartWorkspaceSessionResult>.self,
+        from: Data(startWorkspaceSessionEnvelopeJSON.utf8)
     )
     return try XCTUnwrap(envelope.data)
 }
@@ -514,6 +561,68 @@ private let answerQuestionEnvelopeJSON = #"""
     },
     "operation_state": {
       "message": "Saved."
+    }
+  }
+}
+"""#
+
+private let startWorkspaceSessionEnvelopeJSON = #"""
+{
+  "ok": true,
+  "data": {
+    "workspace_session": {
+      "workspace_session_id": "ws-1",
+      "artifact_session_id": "as-1",
+      "runner": {
+        "status": "completed",
+        "accepted_signal_count": 1,
+        "rejected_signal_count": 0
+      },
+      "loop": {
+        "goal": "Explain this project A-Z",
+        "evidence_inventory": [{
+          "id": "EV-LIVE-1",
+          "path": "src/runtime.ts",
+          "role": "implementation",
+          "excerpt": "Runtime dispatcher",
+          "content_hash": "sha256:abc"
+        }],
+        "concept_slice": {
+          "label": "Runtime dispatcher",
+          "domain": "code"
+        },
+        "thinking_artifacts": [{
+          "id": "TA-LIVE-1",
+          "kind": "code_slice",
+          "title": "Runtime dispatcher",
+          "purpose": "Show the command boundary.",
+          "source_evidence": [{
+            "evidence_id": "EV-LIVE-1",
+            "file_path": "src/runtime.ts",
+            "start_line": 1,
+            "end_line": 3,
+            "excerpt": "handleRequest",
+            "role": "implementation"
+          }],
+          "payload": {
+            "file_path": "src/runtime.ts",
+            "lines": [
+              { "line": 1, "text": "export function handleRequest(request) {" },
+              { "line": 2, "text": "  return request.command;" }
+            ]
+          }
+        }],
+        "active_operation": {
+          "id": "OP-LIVE-1",
+          "kind": "explain",
+          "prompt": "Explain the runtime dispatcher.",
+          "required_evidence": ["EV-LIVE-1"],
+          "success_criteria": ["Cites the dispatcher lines."]
+        }
+      }
+    },
+    "snapshot": {
+      "loop_state": "AwaitingAttempt"
     }
   }
 }

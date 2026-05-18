@@ -109,6 +109,131 @@ public struct StudyPanelView: View {
     }
 }
 
+public struct LiveWorkspaceSessionView: View {
+    private let result: StartWorkspaceSessionResult
+
+    public init(result: StartWorkspaceSessionResult) {
+        self.result = result
+    }
+
+    public var body: some View {
+        let loop = result.workspace_session.loop
+        VStack(alignment: .leading, spacing: 12) {
+            header(loop: loop)
+            if let operation = loop?.active_operation {
+                operationBlock(operation)
+            }
+            if let artifact = loop?.thinking_artifacts.first {
+                codeBlock(artifact)
+            } else {
+                Text("No LLM-backed code slice yet. Sibi will not synthesize code without cited runtime output.")
+                    .foregroundStyle(.secondary)
+            }
+            evidenceBlock(loop?.evidence_inventory ?? [], required: loop?.active_operation?.required_evidence ?? [])
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(14)
+        .background(Color.secondary.opacity(0.07), in: RoundedRectangle(cornerRadius: 8))
+    }
+
+    private func header(loop: StartWorkspaceLoop?) -> some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text(loop?.goal ?? "Live workspace")
+                .font(.headline)
+                .textSelection(.enabled)
+            Text("Session \(result.workspace_session.workspace_session_id)")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .textSelection(.enabled)
+            Text("Runner \(result.workspace_session.runner.status)")
+                .font(.caption)
+                .padding(.horizontal, 8)
+                .padding(.vertical, 3)
+                .background(Color.secondary.opacity(0.14), in: Capsule())
+        }
+    }
+
+    private func operationBlock(_ operation: StartWorkspaceOperation) -> some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Text("What Sibi Will Judge")
+                .font(.subheadline.weight(.semibold))
+            Text(operation.prompt)
+                .textSelection(.enabled)
+            if !operation.success_criteria.isEmpty {
+                Text("Success criteria")
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(.secondary)
+                ForEach(operation.success_criteria, id: \.self) { criterion in
+                    Text("• \(criterion)")
+                        .font(.caption)
+                        .textSelection(.enabled)
+                }
+            }
+        }
+    }
+
+    private func codeBlock(_ artifact: StartWorkspaceArtifact) -> some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Text(artifact.title)
+                .font(.subheadline.weight(.semibold))
+            Text(artifact.payload?.file_path ?? artifact.source_evidence.first?.file_path ?? "No file path")
+                .font(.caption.monospaced())
+                .foregroundStyle(.secondary)
+                .textSelection(.enabled)
+            if let lines = artifact.payload?.lines, !lines.isEmpty {
+                ScrollView(.horizontal) {
+                    VStack(alignment: .leading, spacing: 0) {
+                        ForEach(lines) { line in
+                            HStack(alignment: .top, spacing: 10) {
+                                Text("\(line.line)")
+                                    .font(.caption.monospaced())
+                                    .foregroundStyle(.secondary)
+                                    .frame(width: 34, alignment: .trailing)
+                                Text(line.text)
+                                    .font(.caption.monospaced())
+                                    .textSelection(.enabled)
+                            }
+                        }
+                    }
+                    .padding(10)
+                }
+                .frame(maxHeight: 220)
+                .background(Color(nsColor: .textBackgroundColor), in: RoundedRectangle(cornerRadius: 6))
+            } else {
+                Text("No source lines attached by runtime.")
+                    .foregroundStyle(.secondary)
+            }
+        }
+    }
+
+    private func evidenceBlock(_ evidence: [StartWorkspaceEvidence], required: [String]) -> some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Text("Evidence")
+                .font(.subheadline.weight(.semibold))
+            ForEach(evidence.prefix(8)) { item in
+                HStack(alignment: .top, spacing: 8) {
+                    Text(required.contains(item.id) ? "required" : item.role)
+                        .font(.caption2.weight(.semibold))
+                        .padding(.horizontal, 6)
+                        .padding(.vertical, 2)
+                        .background(Color.secondary.opacity(0.14), in: Capsule())
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(item.path)
+                            .font(.caption.monospaced())
+                            .textSelection(.enabled)
+                        if let excerpt = item.excerpt {
+                            Text(excerpt)
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                                .textSelection(.enabled)
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
 private struct StudyPanelSectionView: View {
     let section: StudyPanelSection
 
