@@ -31,12 +31,19 @@ public enum RuntimeClientError: LocalizedError {
 }
 
 public struct SystemProcessRunner: ProcessRunning {
-    public init() {}
+    private let workingDirectory: String?
+
+    public init(workingDirectory: String? = nil) {
+        self.workingDirectory = workingDirectory
+    }
 
     public func run(executable: String, arguments: [String], standardInput: String) throws -> ProcessResult {
         let process = Process()
         process.executableURL = URL(fileURLWithPath: executable)
         process.arguments = arguments
+        if let workingDirectory {
+            process.currentDirectoryURL = URL(fileURLWithPath: workingDirectory, isDirectory: true)
+        }
 
         let inputPipe = Pipe()
         let outputPipe = Pipe()
@@ -69,18 +76,30 @@ public final class RuntimeClient: Sendable {
     private let runner: ProcessRunning
     private let executable: String
     private let arguments: [String]
+    private let repoRoot: String?
 
     public init(
-        runner: ProcessRunning = SystemProcessRunner(),
+        runner: ProcessRunning? = nil,
         executable: String = "/usr/bin/env",
         arguments: [String]? = nil,
         runtimePath: String? = nil
     ) {
-        self.runner = runner
         self.executable = executable
 
         let resolvedRuntimePath = runtimePath ?? Self.defaultRuntimePath()
+        let resolvedRepoRoot = Self.resolveRepoRoot(runtimePath: resolvedRuntimePath)
+        self.repoRoot = resolvedRepoRoot
+        self.runner = runner ?? SystemProcessRunner(workingDirectory: resolvedRepoRoot)
         self.arguments = arguments ?? ["node", "--experimental-strip-types", resolvedRuntimePath]
+    }
+
+    static func resolveRepoRoot(runtimePath: String) -> String? {
+        let runtimeURL = URL(fileURLWithPath: runtimePath).standardizedFileURL
+        guard runtimeURL.lastPathComponent == "runtime.ts",
+              runtimeURL.deletingLastPathComponent().lastPathComponent == "src" else {
+            return nil
+        }
+        return runtimeURL.deletingLastPathComponent().deletingLastPathComponent().path
     }
 
     static func defaultRuntimePath() -> String {
@@ -179,6 +198,14 @@ public final class RuntimeClient: Sendable {
 
     public func getStudyPanelState(_ payload: StudyPanelStatePayload = .init()) throws -> StudyPanelSnapshot {
         try send(command: "get_study_panel_state", payload: payload)
+    }
+
+    public func startWorkspaceSession(_ payload: StartWorkspaceSessionPayload) throws -> StartWorkspaceSessionResult {
+        try send(command: "start_workspace_session", payload: payload)
+    }
+
+    public func submitWorkspaceAttempt(_ payload: SubmitWorkspaceAttemptPayload) throws -> StartWorkspaceSessionResult {
+        try send(command: "submit_workspace_attempt", payload: payload)
     }
 
     func send<Response: Decodable, Payload: Encodable>(command: String, payload: Payload) throws -> Response {

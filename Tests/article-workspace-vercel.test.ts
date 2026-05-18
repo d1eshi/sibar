@@ -10,22 +10,48 @@ const legacyHtml = readFileSync(join(root, "web/article-workspace.html"), "utf8"
 const changelogHtml = readFileSync(join(root, "web/changelog.html"), "utf8");
 const webApiClient = readFileSync(join(root, "web/scripts/api.js"), "utf8");
 const webApi = readFileSync(join(root, "web/api/read.mjs"), "utf8");
+const webDevServer = readFileSync(join(root, "scripts/web-dev.mjs"), "utf8");
+const earlyAccessApi = readFileSync(join(root, "web/api/early-access.mjs"), "utf8");
 const analyticsResearch = readFileSync(join(root, "web/ANALYTICS_RESEARCH.md"), "utf8");
+const vercelOwnershipSpec = readFileSync(join(root, "docs/specs/11_vercel_deploy_ownership.md"), "utf8");
 const rootVercelIgnore = readFileSync(join(root, ".vercelignore"), "utf8");
 const webVercelIgnore = readFileSync(join(root, "web/.vercelignore"), "utf8");
 const rootVercelConfig = JSON.parse(readFileSync(join(root, "vercel.json"), "utf8"));
 const vercelConfig = JSON.parse(readFileSync(join(root, "web/vercel.json"), "utf8"));
 
 test("article workspace web deploy is rooted under /web", () => {
-  assert.match(webHtml, /Sibar Reader/);
-  assert.match(webHtml, /<link rel="stylesheet" href="\/styles\/reader\.css">/);
-  assert.match(webHtml, /<script type="module" src="\/scripts\/app\.js"><\/script>/);
+  assert.match(webHtml, /Sibar Early Access/);
+  assert.match(webHtml, /<link rel="stylesheet" href="styles\/reader\.css">/);
+  assert.match(webHtml, /<script type="module" src="scripts\/app\.js"><\/script>/);
   assert.match(webApiClient, /fetch\(`\/api\/read\?url=\$\{encodeURIComponent\(url\)\}`\)/);
   assert.equal(vercelConfig.framework, null);
   assert.equal(vercelConfig.cleanUrls, true);
   assert.equal(vercelConfig.installCommand, "");
   assert.equal(vercelConfig.buildCommand, null);
+  assert.deepEqual(Object.keys(vercelConfig.functions), ["api/read.mjs", "api/early-access.mjs"]);
+  assert.equal(vercelConfig.functions["api/read.mjs"].maxDuration, 10);
+  assert.equal(vercelConfig.functions["api/early-access.mjs"].maxDuration, 5);
   assert.doesNotMatch(JSON.stringify(vercelConfig), /article-workspace/);
+});
+
+test("Vercel deploy ownership spec protects SSR and function changes", () => {
+  assert.match(vercelOwnershipSpec, /framework.*null/s);
+  assert.match(vercelOwnershipSpec, /installCommand/);
+  assert.match(vercelOwnershipSpec, /buildCommand/);
+  assert.match(vercelOwnershipSpec, /api\/read\.mjs/);
+  assert.match(vercelOwnershipSpec, /maxDuration.*10/s);
+  assert.match(vercelOwnershipSpec, /If this is SSR, why do we own that complexity now\?/);
+  assert.match(vercelOwnershipSpec, /If this is a new function/);
+  assert.match(vercelOwnershipSpec, /What prevents repeated fetches for the same URL\?/);
+  assert.match(vercelOwnershipSpec, /What prevents abuse from anonymous users\?/);
+});
+
+test("local Bun web dev server serves the same article API route", () => {
+  assert.match(webDevServer, /import \{ GET as readArticle \} from "\.\.\/web\/api\/read\.mjs"/);
+  assert.match(webDevServer, /url\.pathname === "\/api\/read"/);
+  assert.match(webDevServer, /return readArticle\(request\)/);
+  assert.match(webDevServer, /url\.pathname === "\/favicon\.ico"/);
+  assert.match(webDevServer, /status: 204/);
 });
 
 test("legacy article workspace path redirects to the root reader", () => {
@@ -49,6 +75,14 @@ test("article workspace Vercel API is self-contained JavaScript", () => {
   assert.match(webApi, /Private network article URLs are not supported/);
   assert.match(webApi, /RATE_LIMIT_MAX_PER_MINUTE/);
   assert.match(webApi, /vercel-cdn-cache-control/);
+});
+
+test("early access Vercel API is server-side only and self-contained", () => {
+  assert.doesNotMatch(earlyAccessApi, /\.\.\/src|src\/article-workspace|typescript|experimental-strip-types/);
+  assert.match(earlyAccessApi, /export async function POST\(request\)/);
+  assert.match(earlyAccessApi, /process\.env\.SUPABASE_SERVICE_ROLE_KEY/);
+  assert.match(earlyAccessApi, /content-type/);
+  assert.doesNotMatch(webHtml, /SUPABASE_SERVICE_ROLE_KEY|service_role/i);
 });
 
 test("article workspace deploy excludes repository internals", () => {

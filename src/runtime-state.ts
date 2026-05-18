@@ -37,6 +37,7 @@ export function readState(): RuntimeState {
       ...parsed,
       sessions: parsed.sessions ?? {},
       artifact_sessions: parsed.artifact_sessions ?? {},
+      workspace_sessions: parsed.workspace_sessions ?? {},
     };
   } catch {
     return { sessions: {}, artifact_sessions: {} };

@@ -1,6 +1,9 @@
 # Sibar Reader Web Deploy
 
 This directory is the isolated public deploy surface for the article reader.
+Deploy-shape changes are governed by
+`../docs/specs/11_vercel_deploy_ownership.md`; read that spec before changing
+`vercel.json`, functions, SSR, framework, build, install, or routing behavior.
 
 It contains only:
 
@@ -52,6 +55,23 @@ The reader calls:
 ```text
 /api/read?url=...
 ```
+
+The early access form calls:
+
+```text
+POST /api/early-access
+```
+
+Configure the required Supabase secrets in Vercel project environment variables,
+not in source code:
+
+```text
+SUPABASE_URL
+SUPABASE_SERVICE_ROLE_KEY
+```
+
+See `../docs/specs/12_early_access_waitlist.md` before changing this endpoint,
+schema, logging, or client behavior.
 
 ## CLI Deploy
 

@@ -1,0 +1,106 @@
+/* ── Artifact Canvas ── */
+.artifact-canvas {
+  grid-area: artifact;
+  overflow-y: auto;
+  padding: 20px 24px;
+  background: var(--surface);
+}
+.artifact-canvas h2 {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  margin-bottom: 14px;
+  font-weight: 600;
+}
+
+.artifact-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+.artifact-header .kind-badge {
+  font-size: 11px;
+  padding: 3px 10px;
+  border-radius: var(--radius-sm);
+  background: var(--surface-warm);
+  color: var(--text-secondary);
+  font-weight: 500;
+  border: 1px solid var(--divider);
+}
+.artifact-header .artifact-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+.artifact-header .ro-badge {
+  font-size: 10px;
+  padding: 2px 7px;
+  border-radius: var(--radius-sm);
+  background: var(--amber-bg);
+  color: var(--amber);
+  border: 1px solid var(--amber-light);
+  font-weight: 500;
+}
+.artifact-header .purpose {
+  width: 100%;
+  font-size: 12px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin-top: 4px;
+}
+
+.artifact-toggle {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 16px;
+}
+.artifact-toggle button {
+  font-size: 12px;
+  padding: 5px 14px;
+  border: 1px solid var(--divider);
+  background: var(--surface-raised);
+  border-radius: var(--radius);
+  cursor: pointer;
+  color: var(--text-secondary);
+  font-weight: 500;
+  transition: all 0.15s;
+}
+.artifact-toggle button.active {
+  background: var(--teal);
+  color: white;
+  border-color: var(--teal);
+}
+
+/* ── Blocked State ── */
+.blocked-state {
+  padding: 16px;
+  text-align: center;
+  border: 1px dashed var(--amber);
+  border-radius: var(--radius);
+  background: var(--amber-bg);
+  margin: 12px 0;
+}
+.blocked-state .blocked-icon {
+  font-size: 20px;
+  margin-bottom: 8px;
+}
+.blocked-state .blocked-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--amber);
+  margin-bottom: 4px;
+}
+.blocked-state .blocked-reason {
+  font-size: 11px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+.blocked-state .blocked-action {
+  font-size: 11px;
+  color: var(--teal);
+  margin-top: 8px;
+  font-weight: 500;
+}

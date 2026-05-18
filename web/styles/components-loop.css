@@ -1,0 +1,137 @@
+/* ── Loop Rail ── */
+.loop-rail {
+  grid-area: loop;
+  border-right: none;
+  border-left: 1px solid var(--divider);
+}
+.loop-rail h2 { color: var(--amber); }
+
+.operation-block {
+  margin-bottom: 16px;
+  padding: 10px 12px;
+  background: var(--amber-bg);
+  border-left: 3px solid var(--amber);
+  border-radius: var(--radius-sm);
+}
+.operation-block .op-kind {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--amber);
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+.operation-block .op-prompt {
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--text-primary);
+}
+
+.success-criteria {
+  margin-bottom: 14px;
+}
+.success-criteria h3 {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 6px;
+}
+.success-criteria ul {
+  list-style: none;
+  font-size: 11px;
+}
+.success-criteria ul li {
+  padding: 2px 6px;
+  color: var(--text-muted);
+}
+.success-criteria ul li::before {
+  content: "○ ";
+  color: var(--divider);
+  font-size: 10px;
+}
+
+.blocked-shortcuts {
+  margin-bottom: 14px;
+  font-size: 10px;
+  color: var(--red);
+  padding: 6px 8px;
+  background: var(--red-bg);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--red-light);
+}
+.blocked-shortcuts h3 {
+  font-size: 10px;
+  font-weight: 600;
+  margin-bottom: 3px;
+  color: var(--red);
+}
+
+/* ── Prerequisite Route ── */
+.prereq-route {
+  margin-bottom: 12px;
+  padding: 8px 10px;
+  border: 1px dashed var(--amber);
+  border-radius: var(--radius);
+  background: var(--amber-bg);
+}
+.prereq-route h3 {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--amber);
+  margin-bottom: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.prereq-route .prereq-chip {
+  display: inline-block;
+  font-size: 10px;
+  padding: 2px 8px;
+  margin: 2px;
+  border-radius: var(--radius-sm);
+  background: var(--amber-light);
+  color: var(--amber);
+  font-weight: 500;
+  border: 1px solid var(--amber);
+}
+.prereq-route .prereq-note {
+  font-size: 10px;
+  color: var(--text-muted);
+  margin-top: 4px;
+  font-style: italic;
+}
+
+/* ── State Chain Progress ── */
+.state-chain {
+  margin-bottom: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+  align-items: center;
+}
+.state-chain .sc-step {
+  font-size: 9px;
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+  background: var(--surface-warm);
+  color: var(--text-muted);
+  border: 1px solid var(--divider);
+  white-space: nowrap;
+}
+.state-chain .sc-step.completed {
+  background: var(--teal-bg);
+  color: var(--teal);
+  border-color: var(--teal-light);
+}
+.state-chain .sc-step.active {
+  background: var(--amber-bg);
+  color: var(--amber);
+  border-color: var(--amber);
+  font-weight: 600;
+}
+.state-chain .sc-step.pending {
+  opacity: 0.5;
+}
+.state-chain .sc-arrow {
+  font-size: 8px;
+  color: var(--text-muted);
+}
