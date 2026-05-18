@@ -12,6 +12,7 @@ import type {
   AttemptEvaluationContract,
   WorkspaceSessionContract,
 } from "../src/runtime-workspace-session-contracts.ts";
+import { buildWorkspaceSessionContract } from "../src/runtime-workspace-session-contracts.ts";
 
 type Success<T> = { ok: true; data: T };
 const LIVE_WORKSPACE_FIXTURE_PATH = resolve(
@@ -281,6 +282,107 @@ test("start_workspace_session returns live workspace render contract fields", ()
   assert.equal(live?.worktree.paths.includes("src/runtime.ts"), true);
   assert.equal(live?.ui_reproduction?.test_path, "Tests/workspace-live-session.test.ts");
   assert.equal(live?.ui_reproduction?.fixture_path, LIVE_WORKSPACE_FIXTURE_PATH);
+  const artifactPreview = live?.artifact_previews.at(0);
+  const artifactHasRenderableText = Boolean(
+    (artifactPreview?.slice_content && artifactPreview.slice_content.trim().length > 0)
+    || (artifactPreview?.excerpt && artifactPreview.excerpt.trim().length > 0),
+  );
+  assert.equal(artifactHasRenderableText, true);
+
+  const firstSourceRef = started.data.workspace_session.loop.thinking_artifacts[0]?.source_evidence?.[0];
+  const artifactEvidence = firstSourceRef
+    ? live?.evidence.find((entry) => entry.evidence_id === firstSourceRef.evidence_id)
+    : undefined;
+  assert.equal(Boolean(firstSourceRef), true);
+  assert.equal(Boolean(artifactEvidence), true);
+  assert.equal(artifactEvidence?.line_range.line_start, firstSourceRef?.start_line);
+  assert.equal(artifactEvidence?.line_range.line_end, firstSourceRef?.end_line);
+  assert.equal(artifactEvidence?.line_range.line_start <= artifactEvidence?.line_range.line_end, true);
+});
+
+test("buildWorkspaceSessionContract classifies pdf artifact previews and sets readable fallback reasons", () => {
+  withTempHome();
+  const root = createRepoFixture();
+  const started = expectSuccess<{
+    workspace_session: RuntimeWorkspaceSession;
+  }>(handleRequest({
+    command: "start_workspace_session",
+    payload: {
+      root_path: root,
+      goal: "Explain this project A-Z",
+      fixture_model_response: {
+        candidate_signals: [{
+          signal_type: "flow",
+          claim: "The runtime entrypoint dispatches behavior by inspecting payload.command.",
+          confidence: "medium",
+          citations: [{ file_path: "src/runtime.ts", range: "1-2" }],
+          rationale: "The file dispatches on command after loading the payload object.",
+          proposed_layer: 2,
+        }],
+      },
+    },
+  }));
+
+  const pdfSession = structuredClone(started.data.workspace_session);
+  const originalArtifact = pdfSession.loop.thinking_artifacts[0];
+  const pdfArtifact = {
+    ...originalArtifact,
+    kind: "paper_excerpt",
+    payload: {
+      file_path: "research/paper.pdf",
+      ranges: [{ start_line: 14, end_line: 14 }],
+      selected_symbols: [],
+      related_tests: [],
+      hidden_lines: [],
+      collapsed_context: "PDF artifact without text payload.",
+    },
+  };
+  pdfSession.loop.thinking_artifacts = [pdfArtifact];
+  pdfSession.loop.evidence_inventory = pdfSession.loop.evidence_inventory.map((entry) => ({
+    ...entry,
+    path: "research/paper.pdf",
+    extension: "pdf",
+  }));
+
+  const rendered = buildWorkspaceSessionContract({
+    session: pdfSession,
+    artifactSessionLabel: started.data.workspace_session.project_label ?? "Workspace",
+    artifactSessionRootPath: pdfSession.loop.artifact_boundary.root_path,
+  });
+
+  const pdfPreview = rendered.artifact_previews.at(0);
+  assert.equal(pdfPreview?.artifact_type, "pdf");
+  assert.equal(pdfPreview?.slice_content, null);
+  assert.equal(pdfPreview?.excerpt, null);
+  assert.equal(pdfPreview?.preview_fallback_reason?.includes("no renderable pdf preview text"), true);
+
+  const paperSession = structuredClone(pdfSession);
+  const paperArtifact = {
+    ...paperSession.loop.thinking_artifacts[0],
+    kind: "paper_excerpt",
+    payload: {
+      ...paperSession.loop.thinking_artifacts[0].payload,
+      file_path: "notes/paper-notes.md",
+    },
+    source_evidence: paperSession.loop.thinking_artifacts[0].source_evidence.map((entry) => ({
+      ...entry,
+      file_path: "notes/paper-notes.md",
+    })),
+  };
+  paperSession.loop.thinking_artifacts = [paperArtifact];
+  paperSession.loop.evidence_inventory = paperSession.loop.evidence_inventory.map((entry) => ({
+    ...entry,
+    path: "notes/paper-notes.md",
+  }));
+
+  const paperRendered = buildWorkspaceSessionContract({
+    session: paperSession,
+    artifactSessionLabel: started.data.workspace_session.project_label ?? "Workspace",
+    artifactSessionRootPath: paperSession.loop.artifact_boundary.root_path,
+  });
+  const paperPreview = paperRendered.artifact_previews.at(0);
+  assert.equal(paperPreview?.artifact_type, "paper");
+  assert.equal(paperPreview?.preview_fallback_reason?.includes("no renderable paper preview text"), true);
 });
 
 test("submit_workspace_attempt returns attempt evaluation contract and can be serialized", () => {
