@@ -44,6 +44,13 @@ type WorkspaceSessionResponse = {
   operation_state: { message: string };
 };
 
+function resolveFixtureModelResponsePath(payload: Record<string, unknown>): string | undefined {
+  if (typeof payload.fixture_model_response_path !== "string") return undefined;
+  const value = payload.fixture_model_response_path.trim();
+  if (!value) return undefined;
+  return resolve(value);
+}
+
 function getWorkspaceSession(workspaceSessionID: unknown): RuntimeWorkspaceSession {
   const id = String(workspaceSessionID || "").trim();
   if (!id) fail("invalid_payload", "workspace_session_id is required.");
@@ -58,6 +65,7 @@ export function startWorkspaceSessionCommand(
 ): RuntimeSuccess<WorkspaceSessionResponse> {
   const goal = String(payload.goal || "").trim();
   const rootPath = resolve(String(payload.root_path || process.cwd()));
+  const fixtureModelResponsePath = resolveFixtureModelResponsePath(payload);
   if (!goal) fail("invalid_payload", "start_workspace_session requires goal.");
   if (!existsSync(rootPath)) fail("missing_artifact_root", `Workspace root ${rootPath} does not exist.`);
 
@@ -85,7 +93,7 @@ export function startWorkspaceSessionCommand(
     model_name: payload.model_name,
     reasoning_effort: payload.reasoning_effort,
     fixture_model_response: payload.fixture_model_response,
-    fixture_model_response_path: payload.fixture_model_response_path,
+    fixture_model_response_path: fixtureModelResponsePath,
   }).data;
 
   const workspaceSessionID = randomUUID();
@@ -102,6 +110,7 @@ export function startWorkspaceSessionCommand(
     artifact_session_id: artifactSession.artifact_session_id,
     project_label: artifactSession.label,
     loop,
+    fixture_model_response_path: fixtureModelResponsePath,
     runner: buildRunnerSummary(agentResult),
     source_control: inventory.context.source_control,
     created_at: timestamp,
@@ -111,6 +120,7 @@ export function startWorkspaceSessionCommand(
     session: workspaceSession,
     artifactSessionLabel: artifactSession.label,
     artifactSessionRootPath: loop.artifact_boundary.root_path,
+    fixtureModelResponsePath,
   });
 
   const state = readState();
@@ -210,6 +220,7 @@ export function submitWorkspaceAttemptCommand(
     artifactSessionRootPath: loop.artifact_boundary.root_path,
     lastAttemptEvaluation: attemptEvaluation,
     submittedAttempt: ownershipAttempt,
+    fixtureModelResponsePath: workspaceSession.fixture_model_response_path,
   });
 
   workspaceSession.updated_at = now();

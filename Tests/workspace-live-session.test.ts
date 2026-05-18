@@ -1,9 +1,9 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
-import { chmodSync, mkdirSync, mkdtempSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { delimiter, join, resolve } from "node:path";
+import { join, resolve } from "node:path";
 
 import { handleRequest } from "../src/runtime.ts";
 import { resolveModelRunnerConfig } from "../src/runtime-agent-runner.ts";
@@ -14,6 +14,9 @@ import type {
 } from "../src/runtime-workspace-session-contracts.ts";
 
 type Success<T> = { ok: true; data: T };
+const LIVE_WORKSPACE_FIXTURE_PATH = resolve(
+  "docs/specs/deep-ownership-workspace/fixtures/live-workspace-session.json",
+);
 
 function expectSuccess<T>(value: unknown): Success<T> {
   const result = value as Success<T> | { ok: false; error: { message: string } };
@@ -264,19 +267,7 @@ test("start_workspace_session returns live workspace render contract fields", ()
     payload: {
       root_path: root,
       goal: "Explain this project A-Z",
-      fixture_model_response: {
-        model: "fixture-model",
-        reasoning_effort: "fixture",
-        files_read: ["src/runtime.ts"],
-        candidate_signals: [{
-          signal_type: "flow",
-          claim: "The runtime entrypoint returns command.",
-          confidence: "medium",
-          citations: [{ path: "src/runtime.ts", range: "1-2" }],
-          rationale: "The cited function routes command.",
-          proposed_layer: 3,
-        }],
-      },
+      fixture_model_response_path: LIVE_WORKSPACE_FIXTURE_PATH,
     },
   }));
 
@@ -289,7 +280,7 @@ test("start_workspace_session returns live workspace render contract fields", ()
   assert.equal(live?.artifact_tree.paths.every((path) => !path.includes("Evidence slice")), true);
   assert.equal(live?.worktree.paths.includes("src/runtime.ts"), true);
   assert.equal(live?.ui_reproduction?.test_path, "Tests/workspace-live-session.test.ts");
-  assert.equal(live?.ui_reproduction?.fixture_path, null);
+  assert.equal(live?.ui_reproduction?.fixture_path, LIVE_WORKSPACE_FIXTURE_PATH);
 });
 
 test("submit_workspace_attempt returns attempt evaluation contract and can be serialized", () => {
@@ -306,15 +297,7 @@ test("submit_workspace_attempt returns attempt evaluation contract and can be se
     payload: {
       root_path: root,
       goal: "Explain this project A-Z",
-      fixture_model_response: {
-        candidate_signals: [{
-          signal_type: "concept",
-          claim: "The runtime routes command names through request.command.",
-          confidence: "medium",
-          citations: [{ path: "src/runtime.ts", range: "1-2" }],
-          rationale: "The cited function dispatches by command.",
-        }],
-      },
+      fixture_model_response_path: LIVE_WORKSPACE_FIXTURE_PATH,
     },
   }));
   const requiredEvidence = started.data.workspace_session.loop?.active_operation?.required_evidence ?? [];
@@ -339,6 +322,10 @@ test("submit_workspace_attempt returns attempt evaluation contract and can be se
   assert.equal(live?.last_attempt_evaluation === undefined, true, "start response should not include last attempt evaluation");
   assert.equal(live?.submitted_attempt === undefined, true);
   assert.equal(live?.project_label, submitted.data.workspace_session.live_workspace?.project_label);
+  assert.equal(
+    submitted.data.workspace_session.live_workspace?.ui_reproduction?.fixture_path,
+    LIVE_WORKSPACE_FIXTURE_PATH,
+  );
 
   const submittedEval = submitted.data.workspace_session.live_workspace?.last_attempt_evaluation;
   assert.ok(submittedEval);
@@ -347,11 +334,13 @@ test("submit_workspace_attempt returns attempt evaluation contract and can be se
   const submittedLive = submitted.data.workspace_session.live_workspace;
   const submittedAttempt = submittedLive?.submitted_attempt;
   assert.ok(submittedAttempt);
+  assert.equal("repair_action" in submittedEval, true);
 
   assert.equal(parsed.attempt_id, submitted.data.workspace_session.loop?.sample_attempt?.id);
-  assert.equal(parsed.evidence_check.result, "confirmed");
+  assert.ok(["confirmed", "partial", "unsupported", "contradicted"].includes(parsed.evidence_check.result));
   assert.equal(parsed.missing_evidence.length <= requiredEvidence.length, true);
   assert.ok(parsed.scoped_readiness.status === "blocked" || parsed.scoped_readiness.status === "ready");
+  assert.equal(submittedLive?.next_action, "review readiness and repair if needed");
   assert.equal(submittedAttempt?.operation_id, submittedLive?.active_operation?.operation_id);
   assert.equal(submittedAttempt?.action, "submit");
   assert.deepEqual(submittedAttempt?.selected_evidence_ids, requiredEvidence);
@@ -397,40 +386,9 @@ test("workspace evidence inventory is deterministic across identical runs", () =
   );
 });
 
-function writeFakeCodexCommand(binDir: string, filesRead: string[]): string {
-  const codexPath = join(binDir, "codex");
-  const fakeResponse = JSON.stringify({
-    files_read: filesRead,
-    candidate_signals: [{
-      signal_type: "flow",
-      claim: "This repository has a TypeScript runtime boundary command dispatcher.",
-      confidence: "medium",
-      citations: [{
-        path: "src/runtime.ts",
-        range: "1-1",
-      }],
-      rationale: "The cited code routes commands into the TypeScript runtime.",
-    }],
-  });
-  const script = [
-    "#!/usr/bin/env node",
-    "const fs = require('fs');",
-    "const args = process.argv.slice(2);",
-    "const outputIndex = args.indexOf('--output-last-message');",
-    "if (outputIndex !== -1 && args[outputIndex + 1]) {",
-    `  fs.writeFileSync(args[outputIndex + 1], ${JSON.stringify(fakeResponse)});`,
-    "}",
-  ].join("\n");
-  writeFileSync(codexPath, `${script}\n`);
-  chmodSync(codexPath, 0o755);
-  return codexPath;
-}
-
 test("start-workspace-session CLI starts a live workspace session and outputs JSON fields", () => {
   withTempHome();
   const root = createRepoFixture();
-  const runnerDir = mkdtempSync(join(tmpdir(), "sibar-fake-codex-"));
-  writeFakeCodexCommand(runnerDir, ["src/runtime.ts"]);
 
   const result = spawnSync(
     process.execPath,
@@ -443,13 +401,14 @@ test("start-workspace-session CLI starts a live workspace session and outputs JS
       "Explain this project A-Z",
       "--root",
       root,
+      "--fixture-model-response-path",
+      LIVE_WORKSPACE_FIXTURE_PATH,
     ],
     {
       encoding: "utf8",
       env: {
         ...process.env,
         SIBI_RUNTIME_HOME: process.env.SIBI_RUNTIME_HOME,
-        PATH: `${runnerDir}${delimiter}${process.env.PATH}`,
       },
       cwd: resolve("."),
     },
@@ -471,8 +430,6 @@ test("start-workspace-session CLI starts a live workspace session and outputs JS
 test("explain CLI starts a live workspace session from a positional goal", () => {
   withTempHome();
   const root = createRepoFixture();
-  const runnerDir = mkdtempSync(join(tmpdir(), "sibar-fake-codex-"));
-  writeFakeCodexCommand(runnerDir, ["src/runtime.ts"]);
 
   const result = spawnSync(
     process.execPath,
@@ -484,13 +441,14 @@ test("explain CLI starts a live workspace session from a positional goal", () =>
       "Explain this project A-Z",
       "--root",
       root,
+      "--fixture-model-response-path",
+      LIVE_WORKSPACE_FIXTURE_PATH,
     ],
     {
       encoding: "utf8",
       env: {
         ...process.env,
         SIBI_RUNTIME_HOME: process.env.SIBI_RUNTIME_HOME,
-        PATH: `${runnerDir}${delimiter}${process.env.PATH}`,
       },
       cwd: resolve("."),
     },

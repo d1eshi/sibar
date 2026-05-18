@@ -139,6 +139,25 @@ Minimum visible proof:
 7. one gap or readiness panel
 8. one next repair action
 
+## Reproducible Live Workspace Repro
+
+For deterministic developer verification of the live ownership loop (no external LLM call),
+use the committed fixture:
+
+- `docs/specs/deep-ownership-workspace/fixtures/live-workspace-session.json`
+
+Runtime/CLI:
+
+- `node --experimental-strip-types src/sibi.ts start-workspace-session --goal "Explain this project A-Z" --root /path/to/repo --fixture-model-response-path docs/specs/deep-ownership-workspace/fixtures/live-workspace-session.json`
+- `node --experimental-strip-types src/sibi.ts explain "Explain this project A-Z" --root /path/to/repo --fixture-model-response-path docs/specs/deep-ownership-workspace/fixtures/live-workspace-session.json`
+
+From the native app:
+
+- `swift run SibiStudyApp`
+- Open SibiStudyApp, click `Start`, and choose the repo path.
+- In-app start/submit still uses the local TypeScript runtime; fixture mode is for
+  deterministic CLI/dev checks, not for end-user runtime defaults.
+
 ## Relationship To Existing Specs
 
 This spec pack extends the existing foundation specs rather than replacing them.
