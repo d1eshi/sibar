@@ -4,6 +4,10 @@
 "use strict";
 
   function renderArtifact(artifactId) {
+    if (!fixture.thinking_artifacts || fixture.thinking_artifacts.length === 0) {
+      el("artifactContent").innerHTML = '<div class="empty-state"><p>No LLM-backed artifact yet</p><p>Start a live session with a configured runner or inspect the raw evidence inventory.</p></div>';
+      return;
+    }
     var art = fixture.thinking_artifacts.find(function(a) { return a.id === artifactId; });
     if (!art) { el("artifactContent").innerHTML = '<div class="empty-state"><p>No artifact selected</p></div>'; return; }
 
@@ -140,7 +144,19 @@
     // Code lines with line numbers — group hidden lines into collapsed regions
     html += '<div class="code-lines">';
 
-    // Lines before range (1-10 sample, then collapsed context marker)
+    if (p.lines && p.lines.length > 0) {
+      p.lines.forEach(function(line) {
+        html += '<div class="code-line in-range selectable" data-line="' + esc(line.line) + '" tabindex="0" role="option" aria-label="Line ' + esc(line.line) + '">';
+        html += '<span class="ln">' + esc(line.line) + '</span>';
+        html += '<span class="cl">' + esc(line.text) + '</span>';
+        html += '</div>';
+      });
+      html += '</div>';
+      html += '</div>';
+      return html;
+    }
+
+    // Lines before range (fixture fallback only)
     for (var i = 1; i <= 10; i++) {
       html += '<div class="code-line">';
       html += '<span class="ln">' + i + '</span>';

@@ -20,6 +20,19 @@
     var cs = fixture.concept_slice;
     var ls = fixture.loop_state;
 
+    if (!op || !cs) {
+      html += '<div class="operation-block">';
+      html += '<div class="op-kind">Live Session</div>';
+      html += '<div class="op-prompt">No accepted LLM-backed operation yet. The runtime has boundary/evidence state, but it will not generate project facts without cited model signals.</div>';
+      if (window.sibiLive && window.sibiLive.runner) {
+        html += '<div style="margin-top:8px;font-size:11px;color:var(--text-muted);">Runner: ' + esc(window.sibiLive.runner.status);
+        if (window.sibiLive.runner.blocked_reason) html += ' — ' + esc(window.sibiLive.runner.blocked_reason);
+        html += '</div>';
+      }
+      html += '</div>';
+      return html;
+    }
+
     // ── State Chain Progress Indicator ──
     html += '<div class="state-chain" role="progressbar" aria-label="Loop state chain" aria-valuenow="' + ls.state_chain.indexOf(ls.current_state) + '" aria-valuemin="0" aria-valuemax="' + (ls.state_chain.length - 1) + '">';
     ls.state_chain.forEach(function(st, idx) {
@@ -98,26 +111,30 @@
     html += '<div class="attempt-actions">';
     html += '<button class="submit-btn" id="submitAttempt">Submit</button>';
     html += '<button class="dunno-btn" id="dunnoAttempt">I Don\'t Know</button>';
-    html += '<button class="sample-btn" id="useSampleAttempt">Use Sample Attempt</button>';
+    if (fixture.sample_attempt) {
+      html += '<button class="sample-btn" id="useSampleAttempt">Use Sample Attempt</button>';
+    }
     html += '</div>';
     html += '</div>';
 
     // Hint ladder (never reveals hidden answer — VAL-LOOP-014)
     // Hint content is stored in HINT_REVEAL_CONTENT and injected dynamically on reveal.
     // No solution-bearing text is embedded in the pre-attempt DOM or accessibility tree.
-    html += '<div class="hint-ladder">';
-    html += '<h3>Hint Ladder (' + op.allowed_hints + ' available)</h3>';
-    html += '<div class="hint" data-hint="1" role="button" tabindex="0" aria-label="Reveal hint 1" aria-expanded="false">';
-    html += '<span class="hint-num">1</span> Look at the function signature — what fields does the return type declare?';
-    html += '</div>';
-    html += '<div class="hint" data-hint="2" role="button" tabindex="0" aria-label="Reveal hint 2" aria-expanded="false">';
-    html += '<span class="hint-num">2</span> severityFor and confidenceFor are pure functions. What does each receive as arguments?';
-    html += '</div>';
-    html += '<div class="hint" data-hint="3" role="button" tabindex="0" aria-label="Reveal hint 3" aria-expanded="false">';
-    html += '<span class="hint-num">3</span> Map each quality value to its severity and confidence. Which case changes the most between partial and gap_confirmed?';
-    html += '</div>';
-    html += '<div style="font-size:9px;color:var(--text-muted);margin-top:4px;">Hints orient attention and name evidence — they never reveal the hidden solution content before attempt (VAL-LOOP-014).</div>';
-    html += '</div>';
+    if ((op.allowed_hints || 0) > 0) {
+      html += '<div class="hint-ladder">';
+      html += '<h3>Hint Ladder (' + op.allowed_hints + ' available)</h3>';
+      html += '<div class="hint" data-hint="1" role="button" tabindex="0" aria-label="Reveal hint 1" aria-expanded="false">';
+      html += '<span class="hint-num">1</span> Look at the function signature — what fields does the return type declare?';
+      html += '</div>';
+      html += '<div class="hint" data-hint="2" role="button" tabindex="0" aria-label="Reveal hint 2" aria-expanded="false">';
+      html += '<span class="hint-num">2</span> severityFor and confidenceFor are pure functions. What does each receive as arguments?';
+      html += '</div>';
+      html += '<div class="hint" data-hint="3" role="button" tabindex="0" aria-label="Reveal hint 3" aria-expanded="false">';
+      html += '<span class="hint-num">3</span> Map each quality value to its severity and confidence. Which case changes the most between partial and gap_confirmed?';
+      html += '</div>';
+      html += '<div style="font-size:9px;color:var(--text-muted);margin-top:4px;">Hints orient attention and name evidence — they never reveal the hidden solution content before attempt (VAL-LOOP-014).</div>';
+      html += '</div>';
+    }
 
     return html;
   }

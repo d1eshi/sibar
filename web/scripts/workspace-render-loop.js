@@ -68,7 +68,7 @@
       var sampleBtn = el("useSampleAttempt");
 
       if (submitBtn) {
-        submitBtn.addEventListener("click", function() {
+        submitBtn.addEventListener("click", async function() {
           // Capture selected evidence from checkboxes
           var selectedEv = [];
           Array.from(document.querySelectorAll(".ev-checkbox:checked")).forEach(function(cb) {
@@ -78,6 +78,26 @@
           console.log("[Attempt-First] Submitting attempt at " + new Date().toISOString());
           console.log("[Attempt-First] Selected evidence:", selectedEv.join(", "));
           console.log("[Attempt-First] Pre-attempt hidden answer gate: VERIFIED (no solution in DOM/accessibility)");
+          if (window.sibiLive && window.sibiLive.workspace_session_id) {
+            submitBtn.disabled = true;
+            try {
+              var unknowns = (el("attemptUnknowns").value || "").split(",").map(function(s) { return s.trim(); }).filter(Boolean);
+              var result = await submitLiveWorkspaceAttempt({
+                workspace_session_id: window.sibiLive.workspace_session_id,
+                answer_text: el("attemptText").value,
+                selected_evidence: selectedEv,
+                declared_confidence: el("attemptConfidence").value,
+                declared_unknowns: unknowns
+              });
+              applyLiveWorkspace(result.data);
+              setTimeout(assertHiddenAnswerGated, 50);
+              return;
+            } catch (error) {
+              showToast(error instanceof Error ? error.message : "Live attempt failed.");
+              submitBtn.disabled = false;
+              return;
+            }
+          }
           state.attemptSubmitted = true;
           renderLoop();
           // Update top bar state
@@ -98,6 +118,7 @@
       if (sampleBtn) {
         sampleBtn.addEventListener("click", function() {
           var sa = fixture.sample_attempt;
+          if (!sa) return;
           el("attemptText").value = sa.answer_text;
           el("attemptConfidence").value = sa.declared_confidence;
           el("attemptUnknowns").value = sa.declared_unknowns.join(", ");
@@ -171,7 +192,8 @@
             state.revealedHints = 0;
             renderLoop();
             el("loopState").textContent = "RepairOrReevaluation";
-            var ta = document.querySelectorAll('[data-art="TA-001"]')[0];
+            var nextArtifact = state.activeArtifact || (fixture.thinking_artifacts[0] && fixture.thinking_artifacts[0].id);
+            var ta = nextArtifact ? document.querySelectorAll('[data-art="' + nextArtifact + '"]')[0] : null;
             if (ta) ta.click();
           }, 1000);
         });
@@ -181,9 +203,9 @@
           state.attemptSubmitted = false;
           state.revealedHints = 0;
           state.selectedEvidence = null;
-          state.activeArtifact = "TA-001";
+          state.activeArtifact = fixture.thinking_artifacts[0] ? fixture.thinking_artifacts[0].id : null;
           renderLoop();
-          renderArtifact("TA-001");
+          renderArtifact(state.activeArtifact);
           renderEvidence();
           el("loopState").textContent = "AwaitingAttempt";
           console.log("[Demo Chain] Reset to beginning of loop.");
