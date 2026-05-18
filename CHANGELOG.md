@@ -11,6 +11,15 @@ accepted specs and iterations, not by raw commit count.
 Use this section for changes that have landed but are not part of a tagged
 release yet.
 
+### Added - Native Explain A-Z Attempt Bridge
+
+- Added the native Swift live-loop attempt bridge for `Explain this project A-Z`:
+  the study panel can now submit workspace attempts to `submit_workspace_attempt`
+  with selected evidence, declared confidence, and unknowns.
+- The Swift panel now renders the attempt composer, locked required evidence,
+  deterministic evidence-check results, detected gaps, repair actions, and
+  scoped readiness without opening a browser workspace.
+
 ### Added - Deep Ownership Workspace Attempt-First UI Flow
 
 - Implemented the attempt-first UI flow in the static Workspace prototype with
