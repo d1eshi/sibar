@@ -91,9 +91,13 @@
         // Select current
         line.classList.add("selected-line");
         state.selectedLine = lineNum;
-        // Find related evidence for this line range
+        // Find evidence cited by this artifact. The live workspace must not
+        // infer project-specific paths from old demo fixtures.
+        var citedPaths = (art.source_evidence || []).map(function(ref) {
+          return ref.file_path;
+        }).filter(Boolean);
         var relatedEv = fixture.evidence_inventory.filter(function(ev) {
-          return ev.path && ev.path.indexOf("runtime-gap-detection") !== -1;
+          return citedPaths.indexOf(ev.path) !== -1;
         });
         // Highlight evidence cards for related evidence
         var evCards = el("evidenceStrip").querySelectorAll(".ev-card");
@@ -156,43 +160,7 @@
       return html;
     }
 
-    // Lines before range (fixture fallback only)
-    for (var i = 1; i <= 10; i++) {
-      html += '<div class="code-line">';
-      html += '<span class="ln">' + i + '</span>';
-      html += '<span class="cl">' + esc(generateCodeLine(i, false, symbols)) + '</span>';
-      html += '</div>';
-    }
-    html += '<div class="code-line collapsed-context" style="color:var(--text-muted);font-family:var(--font-mono);font-size:11px;padding:4px 12px;background:var(--surface-warm);border-top:1px solid var(--divider-thin);border-bottom:1px solid var(--divider-thin);">';
-    html += '⋯ ' + esc(p.collapsed_context) + ' ⋯';
-    html += '</div>';
-
-    // Main range 120-180 — group consecutive hidden lines into collapsed regions
-    var start = ranges[0].start_line;
-    var end = ranges[0].end_line;
-    var i = start;
-    while (i <= end) {
-      if (hiddenLines.indexOf(i) !== -1) {
-        // Count consecutive hidden lines
-        var hiddenStart = i;
-        var hiddenCount = 0;
-        while (i <= end && hiddenLines.indexOf(i) !== -1) {
-          hiddenCount++;
-          i++;
-        }
-        html += '<div class="code-line in-range hidden-group" aria-hidden="true" style="padding:3px 12px;background:var(--amber-bg);border-left:3px solid var(--amber);font-family:var(--font-mono);font-size:11px;color:var(--amber);cursor:default;" title="Solution evidence hidden until attempt is submitted">';
-        html += '<span class="ln" style="color:var(--amber);">' + hiddenStart + '-' + (hiddenStart + hiddenCount - 1) + '</span>';
-        html += '<span class="cl">// ' + hiddenCount + ' lines hidden — solution evidence (expand in full workspace)</span>';
-        html += '</div>';
-      } else {
-        html += '<div class="code-line in-range selectable" data-line="' + i + '" tabindex="0" role="option" aria-label="Line ' + i + '">';
-        html += '<span class="ln">' + i + '</span>';
-        html += '<span class="cl">' + esc(generateCodeLine(i, false, symbols)) + '</span>';
-        html += '</div>';
-        i++;
-      }
-    }
-
+    html += '<div class="empty-state"><p>No source lines attached</p><p>The runtime did not include line payload for this artifact, so the UI will not synthesize code.</p></div>';
     html += '</div>'; // end code-lines
 
     // Related info

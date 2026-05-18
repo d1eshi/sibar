@@ -103,7 +103,7 @@
       '<input id="liveCodexCommand" aria-label="Codex runner command" value="auto" placeholder="auto, SIBI_CODEX_COMMAND, or shell command">',
       '<button id="useCodexAuto" type="button">Codex CLI</button>',
       '<button id="startLiveWorkspace" type="submit">Start Live</button>',
-      '<span id="liveStatus" class="live-status" aria-live="polite">static fixture loaded</span>'
+      '<span id="liveStatus" class="live-status" aria-live="polite">runtime idle</span>'
     ].join("");
     bar.insertBefore(form, el("loopState"));
 

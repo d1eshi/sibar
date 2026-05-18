@@ -11,6 +11,9 @@
     html += '<div class="goal-block">';
     html += '<div class="goal-label">Goal</div>';
     html += '<p>' + esc(fixture.goal) + '</p>';
+    if (fixture.loop_state.current_state === "RuntimeRequired") {
+      html += '<p style="font-size:12px;color:var(--text-muted);margin-top:8px;">No runtime session has been started. This panel will stay empty until Sibar inventories the repository.</p>';
+    }
     html += '</div>';
 
     // Included sources (compact)

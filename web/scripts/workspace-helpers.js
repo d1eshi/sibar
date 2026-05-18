@@ -1,13 +1,51 @@
 // ── workspace-helpers.js ──
 // Shared state, DOM helpers, error monitoring, hidden-answer gate, code-line generator
-// Must be loaded after workspace-fixture.js and before any renderer
+// Must be loaded before any renderer. The live workspace starts empty and only
+// renders project facts returned by the runtime.
 "use strict";
 
-var fixture = window.deepOwnershipFixture;
+function emptyWorkspaceFixture() {
+  return {
+    fixture_id: "runtime-empty",
+    generated_at: new Date().toISOString(),
+    goal: "Start a live runtime session to inspect this project.",
+    artifact_boundary: {
+      root_path: "",
+      source_type: "repository",
+      included_sources: [],
+      excluded_sources: []
+    },
+    evidence_inventory: [],
+    skip_records: [],
+    unknown_zones: [],
+    research_bridges: [],
+    workspace_signals: [],
+    out_of_scope_evidence: [],
+    boundary_expansion_routes: [],
+    out_of_bound_refs: [],
+    concept_slice: null,
+    thinking_artifacts: [],
+    active_operation: null,
+    sample_attempt: null,
+    evidence_check: null,
+    detected_gap: null,
+    repair_action: null,
+    readiness_claim: null,
+    loop_state: {
+      id: "LOOP-runtime-empty",
+      current_state: "RuntimeRequired",
+      state_chain: ["RuntimeRequired"],
+      boundary_enforced: true
+    }
+  };
+}
+
+var fixture = window.deepOwnershipFixture || emptyWorkspaceFixture();
+window.deepOwnershipFixture = fixture;
 
 // ── State ──
   var state = {
-    activeArtifact: "TA-001", // code_slice by default
+    activeArtifact: null,
     attemptSubmitted: false,
     revealedHints: 0,
     selectedEvidence: null
@@ -65,97 +103,6 @@ var fixture = window.deepOwnershipFixture;
     };
     blockedValidations.push(record);
     console.warn("[Blocked Validation]", JSON.stringify(record, null, 2));
-  }
-
-// ── Code Line Generator ──
-  function generateCodeLine(lineNum, isHidden, symbols) {
-    if (isHidden) return "// [hidden line — solution evidence]";
-    var lines = [
-      "/**",
-      " * detectLearningGapFromAnswer",
-      " * Maps an answer_quality to a typed LearningGap with severity,",
-      " * confidence, suspected_misconception, and repair_action.",
-      " */",
-      "export function detectLearningGapFromAnswer(",
-      "  quality: AnswerQuality,",
-      "  context: ArtifactAnswerContext",
-      "): LearningGap {",
-      "  const layer = observedLayer(context, quality);",
-      "  const severity = severityFor(quality, layer);",
-      "  const confidence = confidenceFor(quality, severity);",
-      "  const misconception = misconceptionFor(quality, context);",
-      "  const repair = repairActionFor(quality, severity, misconception);",
-      "",
-      "  return {",
-      "    id: generateGapId(context.sessionId, quality),",
-      "    quality,",
-      "    layer,",
-      "    severity,",
-      "    confidence,",
-      "    suspected_misconception: misconception,",
-      "    repair_action: repair,",
-      "    artifact_evidence: context.artifactEvidence,",
-      "    created_at: new Date().toISOString(),",
-      "    blocks_readiness: severity !== 'none'",
-      "  };",
-      "}",
-      "",
-      "/**",
-      " * severityFor: maps answer quality to gap severity level.",
-      " */",
-      "function severityFor(quality: AnswerQuality, layer: ObservedLayer): Severity {",
-      "  switch (quality) {",
-      "    case 'verified': return 'none';",
-      "    case 'partial':  return 'important';",
-      "    case 'uncertain': return 'critical';",
-      "    case 'wrong':    return 'critical';",
-      "    case 'gap_confirmed': return 'critical';",
-      "    default: return 'critical';",
-      "  }",
-      "}",
-      "",
-      "/**",
-      " * confidenceFor: estimates confidence based on quality and severity.",
-      " */",
-      "function confidenceFor(quality: AnswerQuality, severity: Severity): Confidence {",
-      "  if (quality === 'verified') return 'high';",
-      "  if (quality === 'partial') return 'medium';",
-      "  if (quality === 'gap_confirmed') return 'high';",
-      "  return 'low';",
-      "}",
-      "",
-      "/**",
-      " * misconceptionFor: derives suspected misconception from answer content.",
-      " */",
-      "function misconceptionFor(",
-      "  quality: AnswerQuality,",
-      "  context: ArtifactAnswerContext",
-      "): string | null {",
-      "  if (quality === 'verified') return null;",
-      "  if (quality === 'partial') {",
-      "    return 'Incomplete understanding of severity branching based on quality';",
-      "  }",
-      "  return 'Fundamental misunderstanding of quality-to-severity mapping';",
-      "}",
-      "",
-      "/**",
-      " * repairActionFor: generates a concrete re-read/retry prompt.",
-      " */",
-      "function repairActionFor(",
-      "  quality: AnswerQuality,",
-      "  severity: Severity,",
-      "  misconception: string | null",
-      "): RepairAction {",
-      "  return {",
-      "    kind: 'trace',",
-      "    prompt: generateRepairPrompt(quality, severity, misconception),",
-      "    focus_lines: severityLinesFor(severity),",
-      "    operation: 're-read-and-map'",
-      "  };",
-      "}"
-    ];
-    var idx = lineNum - 1;
-    return idx >= 0 && idx < lines.length ? lines[idx] : "  const field = derive(" + lineNum + ");";
   }
 
 // ── Hidden Answer Check ──

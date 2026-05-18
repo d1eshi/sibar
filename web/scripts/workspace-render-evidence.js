@@ -10,6 +10,9 @@
     el("evCount").textContent = inventory.length + " items";
 
     var stripHtml = "";
+    if (inventory.length === 0) {
+      stripHtml = '<div class="empty-state"><p>No runtime evidence yet</p><p>Start a live session to inventory repository files and source-control context.</p></div>';
+    }
     inventory.forEach(function(ev) {
       var selClass = state.selectedEvidence && state.selectedEvidence.id === ev.id ? " selected" : "";
       stripHtml += '<div class="ev-card' + selClass + '" data-ev-id="' + esc(ev.id) + '" tabindex="0" role="button" aria-label="Evidence ' + esc(ev.id) + ': ' + esc(ev.path) + '">';

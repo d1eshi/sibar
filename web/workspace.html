@@ -25,11 +25,6 @@
 <a href="#loopRail" class="skip-nav" style="left:150px;" aria-label="Skip to loop rail">Skip to Loop</a>
 <a href="#evidenceRail" class="skip-nav" style="left:280px;" aria-label="Skip to evidence">Skip to Evidence</a>
 
-<!-- ── First-Run Setup Overlay ── -->
-<div class="setup-overlay" id="setupOverlay" role="dialog" aria-label="Workspace Setup" aria-modal="true">
-  <div class="setup-card" id="setupCard"></div>
-</div>
-
 <!-- ── Error Monitor ── -->
 <div class="error-monitor" id="errorMonitor" role="alert" aria-live="assertive">
   <span class="err-count" id="errCount">0</span> page errors
@@ -39,7 +34,7 @@
 <div class="top-bar" data-component="lab-shell" data-component-label="Lab Shell">
   <span class="brand">Sibar Lab</span>
   <span class="breadcrumb">/ Deep Ownership Workspace</span>
-  <span class="state-badge" id="loopState" role="status" aria-live="polite">AwaitingAttempt</span>
+  <span class="state-badge" id="loopState" role="status" aria-live="polite">RuntimeRequired</span>
 </div>
 
 <!-- ── Workspace Grid ── -->
@@ -77,12 +72,8 @@
 
 <div class="toast" id="toast"></div>
 
-<!-- ── Fixture Data ── -->
-<script src="scripts/workspace-fixture.js"></script>
-
 <!-- ── Application Scripts (load order matters) ── -->
 <script src="scripts/workspace-helpers.js"></script>
-<script src="scripts/workspace-setup.js"></script>
 <script src="scripts/workspace-render-boundary.js"></script>
 <script src="scripts/workspace-render-evidence.js"></script>
 <script src="scripts/workspace-render-patch-readiness.js"></script>
