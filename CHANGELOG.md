@@ -108,6 +108,10 @@ exist to make the public reader story reviewable before production promotion.
 
 ### Added
 
+- Added typed live workspace contracts in the current runtime/Swift slice:
+  `live_workspace` render contracts for start/submit, the submitted attempt
+  contract, attempt evaluation contract, and `ui_reproduction` contract, including
+  Swift decoding plus contract tests for round-trip validation.
 - Live Deep Ownership Workspace sessions that inventory repo evidence, include
   source-control context, run the project-learning agent through Codex CLI
   `auto`, and expose a `sibi explain` command for starting the A-Z project
