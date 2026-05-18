@@ -1,0 +1,56 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "files_read": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "candidate_signals": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "signal_type": {
+            "type": "string",
+            "enum": [
+              "concept",
+              "flow",
+              "risk",
+              "gap_candidate",
+              "misconception_candidate",
+              "practice_candidate"
+            ]
+          },
+          "claim": { "type": "string" },
+          "confidence": {
+            "type": "string",
+            "enum": ["low", "medium", "high"]
+          },
+          "citations": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "path": { "type": "string" },
+                "range": { "type": "string" },
+                "excerpt": { "type": "string" }
+              },
+              "required": ["path", "range", "excerpt"]
+            }
+          },
+          "rationale": { "type": "string" },
+          "proposed_layer": {
+            "type": ["integer", "null"],
+            "minimum": 1,
+            "maximum": 5
+          }
+        },
+        "required": ["signal_type", "claim", "confidence", "citations", "rationale", "proposed_layer"]
+      }
+    }
+  },
+  "required": ["files_read", "candidate_signals"]
+}

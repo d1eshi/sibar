@@ -3,13 +3,23 @@ import SwiftUI
 
 public struct StudyPanelRuntimeActions: Sendable {
     public let loadSnapshot: @Sendable (StudyPanelStatePayload) throws -> StudyPanelSnapshot
+    public let startWorkspaceSession: @Sendable (StartWorkspaceSessionPayload) throws -> StartWorkspaceSessionResult
+    public let submitWorkspaceAttempt: @Sendable (SubmitWorkspaceAttemptPayload) throws -> StartWorkspaceSessionResult
     public let answerQuestion: @Sendable (AnswerQuestionPayload) throws -> AnswerQuestionResult
 
     public init(
         loadSnapshot: @escaping @Sendable (StudyPanelStatePayload) throws -> StudyPanelSnapshot,
+        startWorkspaceSession: @escaping @Sendable (StartWorkspaceSessionPayload) throws -> StartWorkspaceSessionResult = { _ in
+            throw RuntimeClientError.processFailure("Live workspace sessions unavailable.")
+        },
+        submitWorkspaceAttempt: @escaping @Sendable (SubmitWorkspaceAttemptPayload) throws -> StartWorkspaceSessionResult = { _ in
+            throw RuntimeClientError.processFailure("Live workspace attempts are unavailable.")
+        },
         answerQuestion: @escaping @Sendable (AnswerQuestionPayload) throws -> AnswerQuestionResult
     ) {
         self.loadSnapshot = loadSnapshot
+        self.startWorkspaceSession = startWorkspaceSession
+        self.submitWorkspaceAttempt = submitWorkspaceAttempt
         self.answerQuestion = answerQuestion
     }
 
@@ -17,6 +27,12 @@ public struct StudyPanelRuntimeActions: Sendable {
         StudyPanelRuntimeActions(
             loadSnapshot: { payload in
                 try client.getStudyPanelState(payload)
+            },
+            startWorkspaceSession: { payload in
+                try client.startWorkspaceSession(payload)
+            },
+            submitWorkspaceAttempt: { payload in
+                try client.submitWorkspaceAttempt(payload)
             },
             answerQuestion: { payload in
                 try client.answerQuestion(payload)
@@ -29,10 +45,13 @@ public struct StudyPanelRuntimeActions: Sendable {
 public final class StudyPanelLiveModel: ObservableObject {
     @Published public var artifactSessionID: String
     @Published public private(set) var snapshot: StudyPanelSnapshot?
+    @Published public private(set) var liveWorkspaceSession: StartWorkspaceSessionResult?
     @Published public private(set) var statusText: String
     @Published public private(set) var lastError: String
     @Published public private(set) var isRefreshing: Bool
     @Published public private(set) var isAutoRefreshing: Bool
+    @Published public private(set) var isStartingWorkspace: Bool
+    @Published public private(set) var isSubmittingWorkspaceAttempt: Bool
 
     private let actions: StudyPanelRuntimeActions
     private var autoRefreshTask: Task<Void, Never>?
@@ -44,10 +63,13 @@ public final class StudyPanelLiveModel: ObservableObject {
         self.artifactSessionID = artifactSessionID
         self.actions = actions
         self.snapshot = nil
+        self.liveWorkspaceSession = nil
         self.statusText = "No study snapshot loaded."
         self.lastError = ""
         self.isRefreshing = false
         self.isAutoRefreshing = false
+        self.isStartingWorkspace = false
+        self.isSubmittingWorkspaceAttempt = false
     }
 
     deinit {
@@ -74,6 +96,81 @@ public final class StudyPanelLiveModel: ObservableObject {
         } catch {
             lastError = error.localizedDescription
             statusText = "Study snapshot unavailable."
+        }
+    }
+
+    public func startLiveWorkspace(
+        goal: String = "Explain this project A-Z",
+        rootPath: String = FileManager.default.currentDirectoryPath
+    ) async {
+        guard !isStartingWorkspace else { return }
+        isStartingWorkspace = true
+        defer { isStartingWorkspace = false }
+
+        let trimmedGoal = goal.trimmingCharacters(in: .whitespacesAndNewlines)
+        let payload = StartWorkspaceSessionPayload(
+            goal: trimmedGoal.isEmpty ? "Explain this project A-Z" : trimmedGoal,
+            root: rootPath,
+            codex_command: "auto"
+        )
+        let actions = actions
+
+        do {
+            let result = try await Task.detached(priority: .userInitiated) {
+                try actions.startWorkspaceSession(payload)
+            }.value
+            liveWorkspaceSession = result
+            artifactSessionID = result.workspace_session.artifact_session_id
+            lastError = ""
+            statusText = "Live workspace session started."
+        } catch is CancellationError {
+            statusText = "Live workspace start cancelled."
+        } catch {
+            lastError = error.localizedDescription
+            statusText = "Live workspace unavailable."
+        }
+    }
+
+    public func submitWorkspaceAttempt(
+        answerText: String,
+        selectedEvidence: [String],
+        confidence: String,
+        declaredUnknowns: [String]
+    ) async {
+        guard !isSubmittingWorkspaceAttempt else { return }
+        guard let workspaceSession = liveWorkspaceSession?.workspace_session else {
+            let message = "Start a live workspace session first."
+            lastError = message
+            statusText = message
+            return
+        }
+
+        isSubmittingWorkspaceAttempt = true
+        defer { isSubmittingWorkspaceAttempt = false }
+
+        let normalizedConfidence = confidence.trimmingCharacters(in: .whitespacesAndNewlines)
+        let payload = SubmitWorkspaceAttemptPayload(
+            workspace_session_id: workspaceSession.workspace_session_id,
+            answer_text: answerText.trimmingCharacters(in: .whitespacesAndNewlines),
+            selected_evidence: selectedEvidence,
+            declared_confidence: normalizedConfidence.isEmpty ? "medium" : normalizedConfidence,
+            declared_unknowns: declaredUnknowns
+        )
+        let actions = actions
+
+        do {
+            let result = try await Task.detached(priority: .userInitiated) {
+                try actions.submitWorkspaceAttempt(payload)
+            }.value
+            liveWorkspaceSession = result
+            artifactSessionID = result.workspace_session.artifact_session_id
+            lastError = ""
+            statusText = "Workspace attempt evaluated."
+        } catch is CancellationError {
+            statusText = "Workspace attempt submission cancelled."
+        } catch {
+            lastError = error.localizedDescription
+            statusText = "Workspace attempt rejected."
         }
     }
 

@@ -1,6 +1,8 @@
 import { randomUUID } from "node:crypto";
-import { readFileSync } from "node:fs";
+import { mkdtempSync, readFileSync } from "node:fs";
 import { spawnSync } from "node:child_process";
+import { join } from "node:path";
+import { tmpdir } from "node:os";
 
 import { normalizeCitation } from "./runtime-agent-validation.ts";
 import {
@@ -8,6 +10,9 @@ import {
   type ArtifactSession,
   type ModelSignalCandidate,
 } from "./runtime-support.ts";
+
+const AUTO_CODEX_COMMAND = "__sibi_codex_cli_auto__";
+const OUTPUT_SCHEMA_PATH = join(import.meta.dirname, "runtime-agent-output.schema.json");
 
 export type ModelRunnerConfig = {
   command: string | null;
@@ -26,13 +31,39 @@ export type ModelRunnerOutput = {
 
 export function resolveModelRunnerConfig(payload: Record<string, unknown>): ModelRunnerConfig {
   const timeoutValue = Number(payload.codex_timeout_ms ?? process.env.SIBI_CODEX_TIMEOUT_MS ?? 30_000);
+  const rawCommand = String(payload.codex_command ?? process.env.SIBI_CODEX_COMMAND ?? "").trim();
   return {
-    command: String(payload.codex_command ?? process.env.SIBI_CODEX_COMMAND ?? "").trim() || null,
+    command: rawCommand === "auto" || rawCommand === "codex-auto" ? AUTO_CODEX_COMMAND : rawCommand || null,
     modelName: String(payload.model_name ?? process.env.SIBI_CODEX_MODEL ?? "codex").trim() || "codex",
     reasoningEffort: String(payload.reasoning_effort ?? process.env.SIBI_CODEX_REASONING ?? "unspecified").trim()
       || "unspecified",
     timeoutMs: Number.isFinite(timeoutValue) && timeoutValue > 0 ? timeoutValue : 30_000,
   };
+}
+
+function shellQuote(value: string): string {
+  return `'${value.replace(/'/g, "'\\''")}'`;
+}
+
+function codexCLICommand(config: ModelRunnerConfig, artifactSession: ArtifactSession, outputPath: string): string {
+  const args = [
+    "codex",
+    "exec",
+    "--cd",
+    shellQuote(artifactSession.root_path),
+    "--sandbox",
+    "read-only",
+    "--ephemeral",
+    "--output-schema",
+    shellQuote(OUTPUT_SCHEMA_PATH),
+    "--output-last-message",
+    shellQuote(outputPath),
+  ];
+  if (config.modelName && config.modelName !== "codex") {
+    args.push("--model", shellQuote(config.modelName));
+  }
+  args.push("-");
+  return args.join(" ");
 }
 
 export function loadFixtureModelOutput(
@@ -78,7 +109,14 @@ export function runConfiguredCodexRunner(
     );
   }
 
-  const result = spawnSync(config.command, {
+  const autoOutputPath = config.command === AUTO_CODEX_COMMAND
+    ? join(mkdtempSync(join(tmpdir(), "sibi-codex-runner-")), "last-message.json")
+    : null;
+  const command = config.command === AUTO_CODEX_COMMAND
+    ? codexCLICommand(config, artifactSession, autoOutputPath!)
+    : config.command;
+
+  const result = spawnSync(command, {
     shell: true,
     input: prompt,
     encoding: "utf8",
@@ -96,12 +134,13 @@ export function runConfiguredCodexRunner(
     fail("model_runner_failed", result.stderr.trim() || `Codex runner exited with status ${result.status}.`);
   }
 
-  const parsed = JSON.parse(result.stdout) as {
+  const rawOutput = autoOutputPath ? readFileSync(autoOutputPath, "utf8") : result.stdout;
+  const parsed = JSON.parse(rawOutput) as {
     files_read?: unknown;
     candidate_signals?: unknown;
   };
   return {
-    modelRunner: config.command,
+    modelRunner: command,
     modelName: config.modelName,
     reasoningEffort: config.reasoningEffort,
     filesRead: Array.isArray(parsed.files_read) ? parsed.files_read.map((entry) => String(entry)) : [],
@@ -148,7 +187,9 @@ function normalizeCandidateSignals(
       citations,
       confidence: String(candidate.confidence ?? "low"),
       rationale: String(candidate.rationale ?? ""),
-      proposed_layer: candidate.proposed_layer === undefined ? undefined : Number(candidate.proposed_layer),
+      proposed_layer: candidate.proposed_layer === undefined || candidate.proposed_layer === null
+        ? undefined
+        : Number(candidate.proposed_layer),
       validation_error_hints,
     };
   });

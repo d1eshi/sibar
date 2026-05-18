@@ -22,11 +22,17 @@ export type ProjectLearningAgentResult = {
   operation_state: { message: string };
 };
 
-function buildAgentPrompt(artifactSession: ArtifactSession): string {
+function buildAgentPrompt(artifactSession: ArtifactSession, workspaceContext: unknown): string {
   return JSON.stringify({
     role: "sibi_project_learning_agent",
     instruction:
       "Return candidate learning signals only. Do not decide truth, learner mastery, readiness, or final grades.",
+    rules: [
+      "Only claim facts supported by cited files inside the artifact boundary.",
+      "Use source_control and file_inventory as orientation, not as proof for uncited project facts.",
+      "Every candidate_signal must include at least one citation to an allowed file.",
+      "If evidence is insufficient, return fewer candidate_signals instead of guessing.",
+    ],
     output_schema: {
       files_read: ["path inside artifact boundary"],
       candidate_signals: [{
@@ -38,6 +44,7 @@ function buildAgentPrompt(artifactSession: ArtifactSession): string {
         proposed_layer: "optional integer 1-5",
       }],
     },
+    workspace_context: workspaceContext ?? null,
     artifact_boundary: {
       artifact_session_id: artifactSession.artifact_session_id,
       root_path: artifactSession.root_path,
@@ -65,7 +72,7 @@ export function runProjectLearningAgentCommand(payload: Record<string, unknown>)
     };
   }
 
-  const prompt = buildAgentPrompt(artifactSession);
+  const prompt = buildAgentPrompt(artifactSession, payload.workspace_context ?? null);
   const runnerOutput = fixtureOutput ?? runConfiguredCodexRunner(config, prompt, artifactSession);
   const validation = validateModelSignalCandidates(
     runnerOutput.candidateSignals,
