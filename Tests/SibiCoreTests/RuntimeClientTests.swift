@@ -283,9 +283,107 @@ final class RuntimeClientTests: XCTestCase {
         XCTAssertEqual(payload["codex_command"] as? String, "auto")
     }
 
+    func testSendsSubmitWorkspaceAttemptCommand() throws {
+        let runner = StubRunner(result: .init(
+            status: 0,
+            stdout: submitWorkspaceAttemptEnvelopeJSON,
+            stderr: ""
+        ))
+        let client = RuntimeClient(runner: runner, arguments: ["node", "runtime.js"])
+
+        let result = try client.submitWorkspaceAttempt(.init(
+            workspace_session_id: "ws-1",
+            answer_text: "The project handles command dispatch by reading the input.",
+            selected_evidence: ["EV-LIVE-1"],
+            declared_confidence: "medium",
+            declared_unknowns: ["I am not sure about edge cases."]
+        ))
+
+        XCTAssertEqual(result.workspace_session.workspace_session_id, "ws-1")
+        XCTAssertEqual(result.workspace_session.loop?.sample_attempt?.declared_confidence, "medium")
+        XCTAssertEqual(result.workspace_session.loop?.evidence_check?.result, "confirmed")
+
+        let requestData = try XCTUnwrap(runner.standardInput.data(using: .utf8))
+        let requestObject = try JSONSerialization.jsonObject(with: requestData) as? [String: Any]
+        let payload = try XCTUnwrap(requestObject?["payload"] as? [String: Any])
+
+        XCTAssertEqual(requestObject?["command"] as? String, "submit_workspace_attempt")
+        XCTAssertEqual(payload["workspace_session_id"] as? String, "ws-1")
+        XCTAssertEqual(payload["answer_text"] as? String, "The project handles command dispatch by reading the input.")
+        XCTAssertEqual((payload["selected_evidence"] as? [String]), ["EV-LIVE-1"])
+        XCTAssertEqual(payload["declared_confidence"] as? String, "medium")
+        XCTAssertEqual((payload["declared_unknowns"] as? [String]), ["I am not sure about edge cases."])
+    }
+
     private func sendStub(_ client: RuntimeClient) throws -> StubResponse {
         try client.send(command: "stub", payload: StubPayload(value: "x"))
     }
 }
 
 private let startWorkspaceSessionEnvelopeJSON = #"{"ok":true,"data":{"workspace_session":{"workspace_session_id":"ws-1","artifact_session_id":"as-1","runner":{"status":"completed","accepted_signal_count":1,"rejected_signal_count":0}}}}"#
+
+private let submitWorkspaceAttemptEnvelopeJSON = #"""
+{
+  "ok": true,
+  "data": {
+    "workspace_session": {
+      "workspace_session_id": "ws-1",
+      "artifact_session_id": "as-1",
+      "runner": {
+        "status": "completed",
+        "accepted_signal_count": 1,
+        "rejected_signal_count": 0
+      },
+      "loop": {
+        "goal": "Explain this project A-Z",
+        "evidence_inventory": [
+          {
+            "id": "EV-LIVE-1",
+            "path": "src/runtime.ts",
+            "role": "implementation",
+            "excerpt": "Runtime dispatcher",
+            "content_hash": "sha256:abc"
+          }
+        ],
+        "concept_slice": null,
+        "thinking_artifacts": [],
+        "active_operation": {
+          "id": "OP-LIVE-1",
+          "kind": "explain",
+          "prompt": "Explain the command dispatcher.",
+          "required_evidence": ["EV-LIVE-1"],
+          "success_criteria": ["Cites command dispatch behavior."]
+        },
+        "sample_attempt": {
+          "id": "AT-1",
+          "operation_id": "OP-LIVE-1",
+          "answer_text": "The project handles command dispatch by reading the input.",
+          "selected_evidence": ["EV-LIVE-1"],
+          "declared_confidence": "medium",
+          "declared_unknowns": ["I am not sure about edge cases."]
+        },
+        "evidence_check": {
+          "id": "EC-1",
+          "attempt_id": "AT-1",
+          "required_claims": ["Runtime has a command input"],
+          "observed_claims": ["Runtime has a command input"],
+          "missing_claims": [],
+          "contradicted_claims": [],
+          "unsupported_claims": [],
+          "cited_evidence": [{
+            "evidence_id": "EV-LIVE-1",
+            "file_path": "src/runtime.ts",
+            "start_line": 1,
+            "end_line": 3,
+            "excerpt": "Runtime dispatcher",
+            "role": "implementation"
+          }],
+          "artifact_counterevidence": [],
+          "result": "confirmed"
+        }
+      }
+    },
+    "snapshot": null
+  }
+}
+"""#

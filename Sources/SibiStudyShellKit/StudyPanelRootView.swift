@@ -74,7 +74,19 @@ struct StudyPanelRootView: View {
             }
 
             if let liveWorkspaceSession = model.liveWorkspaceSession {
-                LiveWorkspaceSessionView(result: liveWorkspaceSession)
+                LiveWorkspaceSessionView(
+                    result: liveWorkspaceSession,
+                    onSubmitAttempt: { answerText, selectedEvidence, confidence, unknowns in
+                        Task {
+                            await model.submitWorkspaceAttempt(
+                                answerText: answerText,
+                                selectedEvidence: selectedEvidence,
+                                confidence: confidence,
+                                declaredUnknowns: unknowns
+                            )
+                        }
+                    }
+                )
                     .padding(.horizontal, 20)
                     .padding(.top, 8)
                     .padding(.bottom, 4)

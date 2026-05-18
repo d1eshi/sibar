@@ -35,6 +35,28 @@ public struct StartWorkspaceSessionPayload: Codable, Sendable {
     }
 }
 
+public struct SubmitWorkspaceAttemptPayload: Codable, Sendable {
+    public let workspace_session_id: String
+    public let answer_text: String
+    public let selected_evidence: [String]
+    public let declared_confidence: String
+    public let declared_unknowns: [String]
+
+    public init(
+        workspace_session_id: String,
+        answer_text: String,
+        selected_evidence: [String] = [],
+        declared_confidence: String = "medium",
+        declared_unknowns: [String] = []
+    ) {
+        self.workspace_session_id = workspace_session_id
+        self.answer_text = answer_text
+        self.selected_evidence = selected_evidence
+        self.declared_confidence = declared_confidence
+        self.declared_unknowns = declared_unknowns
+    }
+}
+
 public struct StartWorkspaceSessionRunner: Codable, Sendable {
     public let status: String
     public let blocked_reason: String?
@@ -61,12 +83,67 @@ public struct StartWorkspaceSnapshot: Codable, Sendable {
     public let loop_state: String?
 }
 
+public struct StartWorkspaceEvidenceRef: Codable, Sendable {
+    public let evidence_id: String
+    public let file_path: String
+    public let start_line: Int
+    public let end_line: Int
+    public let excerpt: String
+    public let role: String?
+}
+
+public struct StartWorkspaceAttempt: Codable, Sendable {
+    public let id: String
+    public let operation_id: String
+    public let answer_text: String
+    public let selected_evidence: [String]
+    public let declared_confidence: String
+    public let declared_unknowns: [String]
+}
+
+public struct StartWorkspaceEvidenceCheck: Codable, Sendable {
+    public let id: String
+    public let attempt_id: String
+    public let required_claims: [String]
+    public let observed_claims: [String]
+    public let missing_claims: [String]
+    public let contradicted_claims: [String]
+    public let unsupported_claims: [String]
+    public let cited_evidence: [StartWorkspaceEvidenceRef]
+    public let artifact_counterevidence: [StartWorkspaceEvidenceRef]
+    public let result: String
+}
+
+public struct StartWorkspaceGap: Codable, Sendable {
+    public let id: String
+    public let kind: String
+    public let severity: String
+    public let blocks_readiness: Bool
+}
+
+public struct StartWorkspaceRepairAction: Codable, Sendable {
+    public let id: String
+    public let operation_kind: String
+    public let prompt: String
+}
+
+public struct StartWorkspaceReadiness: Codable, Sendable {
+    public let status: String
+    public let scope: String
+    public let blocked_claims: [String]
+}
+
 public struct StartWorkspaceLoop: Codable, Sendable {
     public let goal: String
     public let evidence_inventory: [StartWorkspaceEvidence]
     public let concept_slice: StartWorkspaceConceptSlice?
     public let thinking_artifacts: [StartWorkspaceArtifact]
     public let active_operation: StartWorkspaceOperation?
+    public let sample_attempt: StartWorkspaceAttempt?
+    public let evidence_check: StartWorkspaceEvidenceCheck?
+    public let detected_gap: StartWorkspaceGap?
+    public let repair_action: StartWorkspaceRepairAction?
+    public let readiness_claim: StartWorkspaceReadiness?
 }
 
 public struct StartWorkspaceEvidence: Codable, Sendable, Identifiable {
