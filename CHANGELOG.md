@@ -171,6 +171,9 @@ exist to make the public reader story reviewable before production promotion.
   Learning Log as independent scroll areas.
 - Article workspace history now excludes local demo articles and prunes any
   previously saved non-web entries.
+- StudyShell now treats an active live workspace session as the exclusive panel
+  surface so `StudyPanelView` and the “No Study Session” fallback do not render
+  underneath it.
 
 ### Docs
 

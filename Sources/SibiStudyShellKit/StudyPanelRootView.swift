@@ -6,6 +6,22 @@ struct StudyPanelRootView: View {
     let onToggleCollapsed: () -> Void
     let onOpenCanvas: () -> Void
 
+    enum PanelSurface: Equatable {
+        case liveWorkspaceSession
+        case snapshot
+        case unavailable
+    }
+
+    var panelSurface: PanelSurface {
+        if model.liveWorkspaceSession != nil {
+            return .liveWorkspaceSession
+        }
+        if model.snapshot != nil {
+            return .snapshot
+        }
+        return .unavailable
+    }
+
     var body: some View {
         VStack(spacing: 0) {
             toolbar
@@ -73,32 +89,35 @@ struct StudyPanelRootView: View {
                     .padding(.top, 8)
             }
 
-            if let liveWorkspaceSession = model.liveWorkspaceSession {
-                LiveWorkspaceSessionView(
-                    result: liveWorkspaceSession,
-                    onSubmitAttempt: { answerText, selectedEvidence, confidence, unknowns in
+            switch panelSurface {
+            case .liveWorkspaceSession:
+                if let liveWorkspaceSession = model.liveWorkspaceSession {
+                    LiveWorkspaceSessionView(
+                        result: liveWorkspaceSession,
+                        onSubmitAttempt: { answerText, selectedEvidence, confidence, unknowns in
+                            Task {
+                                await model.submitWorkspaceAttempt(
+                                    answerText: answerText,
+                                    selectedEvidence: selectedEvidence,
+                                    confidence: confidence,
+                                    declaredUnknowns: unknowns
+                                )
+                            }
+                        }
+                    )
+                        .padding(.horizontal, 20)
+                        .padding(.top, 8)
+                        .padding(.bottom, 4)
+                }
+            case .snapshot:
+                if let snapshot = model.snapshot {
+                    StudyPanelView(snapshot: snapshot) { question, answer in
                         Task {
-                            await model.submitWorkspaceAttempt(
-                                answerText: answerText,
-                                selectedEvidence: selectedEvidence,
-                                confidence: confidence,
-                                declaredUnknowns: unknowns
-                            )
+                            await model.submitAnswer(question: question, answer: answer)
                         }
                     }
-                )
-                    .padding(.horizontal, 20)
-                    .padding(.top, 8)
-                    .padding(.bottom, 4)
-            }
-
-            if let snapshot = model.snapshot {
-                StudyPanelView(snapshot: snapshot) { question, answer in
-                    Task {
-                        await model.submitAnswer(question: question, answer: answer)
-                    }
                 }
-            } else {
+            case .unavailable:
                 ContentUnavailableView(
                     "No Study Session",
                     systemImage: "rectangle.stack.badge.person.crop",

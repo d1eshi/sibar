@@ -57,6 +57,7 @@ let package = Package(
             sources: [
                 "StudyGraphCodeCanvasTests.swift",
                 "StudyPanelControllerTests.swift",
+                "StudyPanelRootViewTests.swift",
             ]
         ),
     ]
