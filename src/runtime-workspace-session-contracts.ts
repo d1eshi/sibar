@@ -358,6 +358,7 @@ export function buildWorkspaceSessionContract(input: {
   artifactSessionRootPath: string;
   lastAttemptEvaluation?: AttemptEvaluationContract | null;
   submittedAttempt?: OwnershipAttemptContract;
+  fixtureModelResponsePath?: string | null;
 }): WorkspaceSessionContract {
   const operation = input.session.loop.active_operation;
   const requiredEvidenceIds = operation?.required_evidence ?? [];
@@ -409,7 +410,7 @@ export function buildWorkspaceSessionContract(input: {
     ui_reproduction: buildUIReproductionContract({
       testPath: LIVE_WORKSPACE_UI_REPRODUCTION_TEST_PATH,
       demoPath: null,
-      fixturePath: null,
+      fixturePath: input.fixtureModelResponsePath ?? null,
     }),
     active_operation: buildActiveOperation(operation, sliceId),
   };

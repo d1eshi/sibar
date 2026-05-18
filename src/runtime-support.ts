@@ -355,6 +355,7 @@ export type RuntimeWorkspaceSession = {
   artifact_session_id: string;
   project_label?: string;
   loop: DeepOwnershipLoop;
+  fixture_model_response_path?: string | null;
   runner: {
     status: "completed" | "blocked";
     blocked_reason?: string;

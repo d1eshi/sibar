@@ -32,6 +32,17 @@ release yet.
 - Added focused tests for submit-time evidence defaults and evaluation payload
   rendering in `Tests/SibiCoreTests/StudyPanelTests.swift`.
 
+### Added - Deterministic Live Workspace Repro Path
+
+- Added a committed fixture at
+  `docs/specs/deep-ownership-workspace/fixtures/live-workspace-session.json`
+  and wired `start_workspace_session` to expose it in `live_workspace.ui_reproduction.fixture_path`.
+- Extended `start-workspace-session` and `explain` CLI commands with
+  `--fixture-model-response-path` for deterministic dev/runtime checks.
+- Added runtime and CLI tests in `Tests/workspace-live-session.test.ts`
+  proving `start` + `submit` paths return attempt evaluation, submitted attempt,
+  readiness, and deterministic reproduction metadata without requiring a live model runner.
+
 ### Added - Deep Ownership Workspace Attempt-First UI Flow
 
 - Implemented the attempt-first UI flow in the static Workspace prototype with
