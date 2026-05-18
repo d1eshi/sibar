@@ -19,8 +19,8 @@ final class StudyPanelControllerTests: XCTestCase {
         XCTAssertTrue(panel.collectionBehavior.contains(.fullScreenAuxiliary))
         XCTAssertEqual(panel.titleVisibility, .hidden)
         XCTAssertTrue(panel.titlebarAppearsTransparent)
-        XCTAssertEqual(panel.backgroundColor, .clear)
-        XCTAssertFalse(panel.isOpaque)
+        XCTAssertEqual(panel.backgroundColor, .windowBackgroundColor)
+        XCTAssertTrue(panel.isOpaque)
         XCTAssertTrue(panel.standardWindowButton(.closeButton)?.isHidden ?? false)
         XCTAssertTrue(panel.standardWindowButton(.miniaturizeButton)?.isHidden ?? false)
         XCTAssertTrue(panel.standardWindowButton(.zoomButton)?.isHidden ?? false)
@@ -76,6 +76,7 @@ final class StudyPanelControllerTests: XCTestCase {
         XCTAssertEqual(panel.title, "Sibi Graph + Code")
         XCTAssertEqual(panel.contentView?.frame.size.width ?? 0, StudyPanelController.canvasSize.width, accuracy: 0.5)
     }
+
 }
 
 @MainActor

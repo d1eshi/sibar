@@ -1,0 +1,133 @@
+/* ── Reset & Base ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; }
+body {
+  font-family: var(--font-sans);
+  background: var(--surface);
+  color: var(--text-primary);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  overflow: hidden;
+}
+
+/* ── Rail (shared) ── */
+.rail {
+  overflow-y: auto;
+  padding: 16px;
+  border-right: 1px solid var(--divider);
+  background: var(--surface-raised);
+}
+.rail h2 {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  margin-bottom: 12px;
+  font-weight: 600;
+}
+
+/* ── Empty State ── */
+.empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+.empty-state p:first-child { font-weight: 500; color: var(--text-secondary); }
+
+/* ── Toast ── */
+.toast {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 8px 18px;
+  border-radius: var(--radius);
+  background: var(--text-primary);
+  color: white;
+  font-size: 12px;
+  font-weight: 500;
+  z-index: 100;
+  opacity: 0;
+  transition: opacity 0.3s;
+  pointer-events: none;
+}
+.toast.show { opacity: 1; }
+
+/* ── Keyboard Accessibility ── */
+.skip-nav {
+  position: absolute;
+  top: -100px;
+  left: 8px;
+  z-index: 1000;
+  padding: 6px 12px;
+  background: var(--teal);
+  color: white;
+  font-size: 12px;
+  border-radius: var(--radius);
+  text-decoration: none;
+  font-weight: 500;
+  transition: top 0.2s;
+}
+.skip-nav:focus { top: 8px; }
+
+*:focus-visible {
+  outline: 2px solid var(--teal);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible, .ev-card:focus-visible {
+  outline: 2px solid var(--teal);
+  outline-offset: 2px;
+}
+
+.ev-card:focus-visible {
+  border-color: var(--teal);
+  background: var(--teal-bg);
+  box-shadow: 0 0 0 2px var(--teal-light);
+}
+
+.artifact-toggle button:focus-visible {
+  outline: 2px solid var(--teal);
+  outline-offset: 1px;
+}
+
+.cv-actions button:focus-visible {
+  outline: 2px solid var(--teal);
+  outline-offset: 1px;
+}
+
+/* ── Error Monitor ── */
+.error-monitor {
+  position: fixed;
+  bottom: 8px;
+  right: 8px;
+  z-index: 200;
+  font-size: 10px;
+  padding: 4px 10px;
+  border-radius: var(--radius-sm);
+  background: var(--red-bg);
+  color: var(--red);
+  border: 1px solid var(--red-light);
+  cursor: pointer;
+  display: none;
+}
+.error-monitor.visible { display: block; }
+.error-monitor .err-count { font-weight: 700; }
+
+/* ── Component Contract Labels ── */
+[data-component] { position: relative; }
+[data-component]::before {
+  content: attr(data-component-label);
+  position: absolute;
+  top: -1px;
+  right: 4px;
+  font-size: 8px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  pointer-events: none;
+  opacity: 0.5;
+  z-index: 1;
+}
