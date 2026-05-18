@@ -4,7 +4,7 @@
 "use strict";
 
   // ── Render: Boundary Rail ──
-  (function renderBoundary() {
+  function renderBoundary() {
     var html = "";
 
     // Goal
@@ -39,11 +39,19 @@
     var cs = fixture.concept_slice;
     html += '<div class="boundary-section">';
     html += '<h3>Concept Slice</h3>';
-    html += '<span class="concept-chip">' + esc(cs.label) + '</span>';
-    html += '<span style="font-size:11px;color:var(--text-muted);margin-left:6px;">' + esc(cs.domain) + '</span>';
-    html += '<div style="margin-top:6px;font-size:10px;color:var(--text-muted);">';
-    html += 'Expected ops: ' + cs.expected_user_operations.map(function(o) { return '<code style="font-size:10px;">' + esc(o) + '</code>'; }).join(", ");
-    html += '</div></div>';
+    if (cs) {
+      html += '<span class="concept-chip">' + esc(cs.label) + '</span>';
+      html += '<span style="font-size:11px;color:var(--text-muted);margin-left:6px;">' + esc(cs.domain) + '</span>';
+      html += '<div style="margin-top:6px;font-size:10px;color:var(--text-muted);">';
+      html += 'Expected ops: ' + cs.expected_user_operations.map(function(o) { return '<code style="font-size:10px;">' + esc(o) + '</code>'; }).join(", ");
+      html += '</div>';
+    } else {
+      html += '<div class="unknown-zone-item">';
+      html += '<div class="uz-path">No accepted LLM-backed concept slice yet</div>';
+      html += '<div class="uz-reason">The runtime has inventoried the boundary, but it will not invent project facts without accepted cited LLM signals.</div>';
+      html += '</div>';
+    }
+    html += '</div>';
 
     // Unknown zones
     html += '<div class="boundary-section">';
@@ -72,4 +80,6 @@
     html += '</ul></details></div></div>';
 
     el("boundaryContent").innerHTML = html;
-  })();
+  }
+
+  renderBoundary();

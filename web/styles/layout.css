@@ -41,6 +41,50 @@
   border: 1px solid var(--teal-light);
   font-weight: 500;
 }
+.live-controls {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+  min-width: 0;
+}
+.live-controls input {
+  height: 26px;
+  min-width: 0;
+  border: 1px solid var(--divider);
+  border-radius: var(--radius-sm);
+  padding: 3px 8px;
+  font-size: 11px;
+  color: var(--text-primary);
+  background: var(--surface);
+}
+.live-controls #liveGoal { width: 210px; }
+.live-controls #liveCodexCommand { width: 260px; }
+.live-controls button {
+  height: 26px;
+  border: 1px solid var(--teal-light);
+  border-radius: var(--radius-sm);
+  padding: 3px 8px;
+  font-size: 11px;
+  color: var(--teal);
+  background: var(--teal-bg);
+  cursor: pointer;
+}
+.live-controls button:disabled {
+  cursor: progress;
+  opacity: 0.65;
+}
+.live-status {
+  max-width: 340px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 10px;
+  color: var(--text-muted);
+}
+.live-status[data-tone="ok"] { color: var(--green); }
+.live-status[data-tone="blocked"] { color: var(--amber); }
+.top-bar .live-controls + .state-badge { margin-left: 0; }
 
 /* ── Responsive: stack on narrow screens ── */
 @media (max-width: 1100px) {

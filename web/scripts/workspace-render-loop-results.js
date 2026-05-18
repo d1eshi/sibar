@@ -12,6 +12,10 @@
     var rc = fixture.readiness_claim;
     var sa = fixture.sample_attempt;
 
+    if (!sa || !ec) {
+      return '<div class="empty-state"><p>No evaluated attempt yet</p></div>';
+    }
+
     // Submitted attempt summary
     html += '<div style="margin-bottom:10px;padding:8px 10px;border:1px solid var(--divider);border-radius:var(--radius);background:var(--surface-warm);">';
     html += '<div style="font-size:10px;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-muted);font-weight:600;margin-bottom:4px;">Your Attempt</div>';
@@ -46,27 +50,36 @@
     html += '</div>';
 
     // Detected gap
-    html += '<div class="gap-block">';
-    html += '<span class="gap-label">Detected Gap</span>';
-    html += '<span class="gap-severity ' + esc(gap.severity) + '">' + esc(gap.severity) + '</span>';
-    html += '<div style="font-size:11px;margin-top:4px;line-height:1.45;">' + esc(gap.evidence) + '</div>';
-    if (gap.blocks_readiness) {
-      html += '<div class="gap-blocks">🚫 Blocks readiness</div>';
+    if (gap) {
+      html += '<div class="gap-block">';
+      html += '<span class="gap-label">Detected Gap</span>';
+      html += '<span class="gap-severity ' + esc(gap.severity) + '">' + esc(gap.severity) + '</span>';
+      html += '<div style="font-size:11px;margin-top:4px;line-height:1.45;">' + esc(gap.evidence) + '</div>';
+      if (gap.blocks_readiness) {
+        html += '<div class="gap-blocks">Blocks readiness</div>';
+      }
+      html += '<div class="gap-evidence">Evidence: ' + esc(gap.kind) + '</div>';
+      html += '<div style="font-size:10px;color:var(--text-muted);margin-top:3px;">User evidence ref: ' + esc(gap.user_attempt_ref) + ' · Artifact evidence: ' + gap.artifact_evidence_refs.map(function(r) { return esc(r.file_path + ":" + r.start_line); }).join(", ") + '</div>';
+      html += '</div>';
+    } else {
+      html += '<div class="gap-block">';
+      html += '<span class="gap-label">Detected Gap</span>';
+      html += '<div style="font-size:11px;margin-top:4px;line-height:1.45;">No blocking gap detected for this scoped attempt.</div>';
+      html += '</div>';
     }
-    html += '<div class="gap-evidence">Evidence: ' + esc(gap.kind) + '</div>';
-    html += '<div style="font-size:10px;color:var(--text-muted);margin-top:3px;">User evidence ref: ' + esc(gap.user_attempt_ref) + ' · Artifact evidence: ' + gap.artifact_evidence_refs.map(function(r) { return esc(r.file_path + ":" + r.start_line); }).join(", ") + '</div>';
-    html += '</div>';
 
     // Repair action
-    html += '<div class="repair-block">';
-    html += '<span class="repair-label">Repair Action</span>';
-    html += '<div class="repair-prompt">' + esc(repair.prompt) + '</div>';
-    html += '<div class="gap-evidence" style="margin-top:4px;">Required evidence: ';
-    repair.required_evidence.forEach(function(ev) {
-      html += esc(ev.file_path + ":" + ev.start_line + "-" + ev.end_line) + ' ';
-    });
-    html += '</div>';
-    html += '</div>';
+    if (repair) {
+      html += '<div class="repair-block">';
+      html += '<span class="repair-label">Repair Action</span>';
+      html += '<div class="repair-prompt">' + esc(repair.prompt) + '</div>';
+      html += '<div class="gap-evidence" style="margin-top:4px;">Required evidence: ';
+      repair.required_evidence.forEach(function(ev) {
+        html += esc(ev.file_path + ":" + ev.start_line + "-" + ev.end_line) + ' ';
+      });
+      html += '</div>';
+      html += '</div>';
+    }
 
     // Readiness claim (scoped)
     html += '<div class="readiness-block">';
@@ -86,7 +99,7 @@
     html += '<h3>Continue</h3>';
     html += '<div class="retry-actions">';
     html += '<button class="retry-btn" id="retryAttempt">Try Again</button>';
-    html += '<button class="repair-btn" id="executeRepair">Execute Repair Action</button>';
+    if (repair) html += '<button class="repair-btn" id="executeRepair">Execute Repair Action</button>';
     html += '<button id="resetWorkspace" style="color:var(--text-muted);">Reset</button>';
     html += '</div>';
     html += '<div style="font-size:9px;color:var(--text-muted);margin-top:4px;">Repair actions and retries do not advance readiness — only a successful attempt or satisfying re-evaluation can upgrade readiness (VAL-PED-007).</div>';
