@@ -99,6 +99,13 @@ exist to make the public reader story reviewable before production promotion.
 
 ### Added
 
+- Live Deep Ownership Workspace sessions that inventory repo evidence, include
+  source-control context, run the project-learning agent through Codex CLI
+  `auto`, and expose a `sibi explain` command for starting the A-Z project
+  explanation flow.
+- Local workspace sidecar endpoints and UI controls for starting a live session,
+  rendering LLM-cited concepts/artifacts, and submitting attempts back to the
+  runtime instead of hardcoded browser fixtures.
 - Browser early access signup for the public reader, backed by a server-side
   waitlist endpoint that collects only email plus optional X handle without
   exposing Supabase secrets to the client.
