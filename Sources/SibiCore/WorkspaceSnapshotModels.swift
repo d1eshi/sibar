@@ -151,8 +151,73 @@ public struct StartWorkspaceSessionWorkspaceState: Codable, Sendable {
     public let workspace_session_id: String
     public let artifact_session_id: String
     public let runner: StartWorkspaceSessionRunner
+    public let loop: StartWorkspaceLoop?
 }
 
 public struct StartWorkspaceSessionResult: Codable, Sendable {
     public let workspace_session: StartWorkspaceSessionWorkspaceState
+    public let snapshot: StartWorkspaceSnapshot?
+    public let open_workspace: RuntimeOpenWorkspaceAction?
+}
+
+public struct StartWorkspaceSnapshot: Codable, Sendable {
+    public let loop_state: String?
+}
+
+public struct StartWorkspaceLoop: Codable, Sendable {
+    public let goal: String
+    public let evidence_inventory: [StartWorkspaceEvidence]
+    public let concept_slice: StartWorkspaceConceptSlice?
+    public let thinking_artifacts: [StartWorkspaceArtifact]
+    public let active_operation: StartWorkspaceOperation?
+}
+
+public struct StartWorkspaceEvidence: Codable, Sendable, Identifiable {
+    public let id: String
+    public let path: String
+    public let role: String
+    public let excerpt: String?
+    public let content_hash: String?
+}
+
+public struct StartWorkspaceConceptSlice: Codable, Sendable {
+    public let label: String
+    public let domain: String?
+}
+
+public struct StartWorkspaceOperation: Codable, Sendable {
+    public let id: String
+    public let kind: String
+    public let prompt: String
+    public let required_evidence: [String]
+    public let success_criteria: [String]
+}
+
+public struct StartWorkspaceArtifact: Codable, Sendable, Identifiable {
+    public let id: String
+    public let kind: String
+    public let title: String
+    public let purpose: String
+    public let source_evidence: [StartWorkspaceArtifactEvidence]
+    public let payload: StartWorkspaceArtifactPayload?
+}
+
+public struct StartWorkspaceArtifactEvidence: Codable, Sendable {
+    public let evidence_id: String
+    public let file_path: String
+    public let start_line: Int?
+    public let end_line: Int?
+    public let excerpt: String?
+    public let role: String?
+}
+
+public struct StartWorkspaceArtifactPayload: Codable, Sendable {
+    public let file_path: String?
+    public let lines: [StartWorkspaceCodeLine]?
+}
+
+public struct StartWorkspaceCodeLine: Codable, Sendable, Identifiable {
+    public var id: Int { line }
+    public let line: Int
+    public let text: String
 }

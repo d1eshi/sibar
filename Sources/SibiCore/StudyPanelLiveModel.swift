@@ -4,6 +4,7 @@ import SwiftUI
 public struct StudyPanelRuntimeActions: Sendable {
     public let loadSnapshot: @Sendable (StudyPanelStatePayload) throws -> StudyPanelSnapshot
     public let loadWorkspaceSnapshot: @Sendable (WorkspaceSnapshotPayload) throws -> RuntimeWorkspaceLensState
+    public let startWorkspaceSession: @Sendable (StartWorkspaceSessionPayload) throws -> StartWorkspaceSessionResult
     public let answerQuestion: @Sendable (AnswerQuestionPayload) throws -> AnswerQuestionResult
 
     public init(
@@ -11,10 +12,14 @@ public struct StudyPanelRuntimeActions: Sendable {
         loadWorkspaceSnapshot: @escaping @Sendable (WorkspaceSnapshotPayload) throws -> RuntimeWorkspaceLensState = { _ in
             throw RuntimeClientError.processFailure("Workspace snapshot unavailable.")
         },
+        startWorkspaceSession: @escaping @Sendable (StartWorkspaceSessionPayload) throws -> StartWorkspaceSessionResult = { _ in
+            throw RuntimeClientError.processFailure("Live workspace sessions unavailable.")
+        },
         answerQuestion: @escaping @Sendable (AnswerQuestionPayload) throws -> AnswerQuestionResult
     ) {
         self.loadSnapshot = loadSnapshot
         self.loadWorkspaceSnapshot = loadWorkspaceSnapshot
+        self.startWorkspaceSession = startWorkspaceSession
         self.answerQuestion = answerQuestion
     }
 
@@ -25,6 +30,9 @@ public struct StudyPanelRuntimeActions: Sendable {
             },
             loadWorkspaceSnapshot: { payload in
                 try client.getWorkspaceSnapshot(payload)
+            },
+            startWorkspaceSession: { payload in
+                try client.startWorkspaceSession(payload)
             },
             answerQuestion: { payload in
                 try client.answerQuestion(payload)
@@ -38,10 +46,12 @@ public final class StudyPanelLiveModel: ObservableObject {
     @Published public var artifactSessionID: String
     @Published public private(set) var snapshot: StudyPanelSnapshot?
     @Published public private(set) var workspaceLensState: RuntimeWorkspaceLensState?
+    @Published public private(set) var liveWorkspaceSession: StartWorkspaceSessionResult?
     @Published public private(set) var statusText: String
     @Published public private(set) var lastError: String
     @Published public private(set) var isRefreshing: Bool
     @Published public private(set) var isAutoRefreshing: Bool
+    @Published public private(set) var isStartingWorkspace: Bool
 
     private let actions: StudyPanelRuntimeActions
     private var autoRefreshTask: Task<Void, Never>?
@@ -54,10 +64,12 @@ public final class StudyPanelLiveModel: ObservableObject {
         self.actions = actions
         self.snapshot = nil
         self.workspaceLensState = nil
+        self.liveWorkspaceSession = nil
         self.statusText = "No study snapshot loaded."
         self.lastError = ""
         self.isRefreshing = false
         self.isAutoRefreshing = false
+        self.isStartingWorkspace = false
     }
 
     deinit {
@@ -103,6 +115,38 @@ public final class StudyPanelLiveModel: ObservableObject {
     public var workspaceLensModel: WorkspaceLensRenderModel? {
         guard let workspaceLensState else { return nil }
         return WorkspaceLensRenderModel(lensState: workspaceLensState)
+    }
+
+    public func startLiveWorkspace(
+        goal: String = "Explain this project A-Z",
+        rootPath: String = FileManager.default.currentDirectoryPath
+    ) async {
+        guard !isStartingWorkspace else { return }
+        isStartingWorkspace = true
+        defer { isStartingWorkspace = false }
+
+        let trimmedGoal = goal.trimmingCharacters(in: .whitespacesAndNewlines)
+        let payload = StartWorkspaceSessionPayload(
+            goal: trimmedGoal.isEmpty ? "Explain this project A-Z" : trimmedGoal,
+            root: rootPath,
+            codex_command: "auto"
+        )
+        let actions = actions
+
+        do {
+            let result = try await Task.detached(priority: .userInitiated) {
+                try actions.startWorkspaceSession(payload)
+            }.value
+            liveWorkspaceSession = result
+            artifactSessionID = result.workspace_session.artifact_session_id
+            lastError = ""
+            statusText = "Live workspace session started."
+        } catch is CancellationError {
+            statusText = "Live workspace start cancelled."
+        } catch {
+            lastError = error.localizedDescription
+            statusText = "Live workspace unavailable."
+        }
     }
 
     public func submitAnswer(question: RuntimeQuestion, answer: String) async {
