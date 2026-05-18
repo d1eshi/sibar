@@ -272,7 +272,7 @@ private struct LiveWorkspaceCodeLine: Identifiable {
 
 public struct LiveWorkspaceSessionView: View {
     private let result: StartWorkspaceSessionResult
-    private let onSubmitAttempt: (String, [String], String, [String]) -> Void
+    private let onSubmitAttempt: (String, [String], String, [String], SubmitWorkspaceAttemptAction) -> Void
     @State private var draftAnswer = ""
     @State private var selectedEvidenceIDs = Set<String>()
     @State private var confidence = "medium"
@@ -280,10 +280,19 @@ public struct LiveWorkspaceSessionView: View {
 
     public init(
         result: StartWorkspaceSessionResult,
-        onSubmitAttempt: @escaping (String, [String], String, [String]) -> Void = { _, _, _, _ in }
+        onSubmitAttempt: @escaping (String, [String], String, [String], SubmitWorkspaceAttemptAction) -> Void = { _, _, _, _, _ in }
     ) {
         self.result = result
         self.onSubmitAttempt = onSubmitAttempt
+    }
+
+    public init(
+        result: StartWorkspaceSessionResult,
+        onSubmitAttempt: @escaping (String, [String], String, [String]) -> Void
+    ) {
+        self.init(result: result) { answerText, selectedEvidence, confidence, unknowns, _ in
+            onSubmitAttempt(answerText, selectedEvidence, confidence, unknowns)
+        }
     }
 
     public var body: some View {
@@ -824,12 +833,12 @@ public struct LiveWorkspaceSessionView: View {
 
                 HStack(spacing: 10) {
                     Button("Submit attempt") {
-                        submitAttempt(isUnknown: false)
+                        submitAttempt(action: .submit)
                     }
                     .disabled(draftAnswer.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
 
                     Button("I do not know") {
-                        submitAttempt(isUnknown: true)
+                        submitAttempt(action: .i_do_not_know)
                     }
                 }
             } else {
@@ -923,20 +932,22 @@ public struct LiveWorkspaceSessionView: View {
         )
     }
 
-    private func submitAttempt(isUnknown: Bool) {
+    private func submitAttempt(action: SubmitWorkspaceAttemptAction) {
         let parsedUnknowns = declaredUnknownsText
             .split(whereSeparator: \.isNewline)
             .map { part in
                 part.trimmingCharacters(in: .whitespacesAndNewlines)
             }
             .filter { !$0.isEmpty }
+        let isUnknown = action == .i_do_not_know
         let submittedUnknowns = isUnknown && parsedUnknowns.isEmpty ? ["I do not know"] : parsedUnknowns
         let submittedAnswer = isUnknown ? "I do not know." : draftAnswer
         onSubmitAttempt(
             submittedAnswer.trimmingCharacters(in: .whitespacesAndNewlines),
             Array(selectedEvidenceIDs),
             confidence,
-            submittedUnknowns
+            submittedUnknowns,
+            action
         )
         draftAnswer = ""
         declaredUnknownsText = ""

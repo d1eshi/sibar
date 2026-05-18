@@ -211,9 +211,50 @@ final class StudyPanelTests: XCTestCase {
         XCTAssertEqual(recorder.submitWorkspaceAttemptPayload?.selected_evidence, ["EV-LIVE-1"])
         XCTAssertEqual(recorder.submitWorkspaceAttemptPayload?.declared_confidence, "high")
         XCTAssertEqual(recorder.submitWorkspaceAttemptPayload?.declared_unknowns, ["I am not sure about every fallback path."])
+        XCTAssertEqual(recorder.submitWorkspaceAttemptPayload?.action, .submit)
         XCTAssertEqual(model.liveWorkspaceSession?.workspace_session.workspace_session_id, "ws-2")
         XCTAssertEqual(model.liveWorkspaceSession?.workspace_session.loop?.evidence_check?.result, "confirmed")
         XCTAssertEqual(model.statusText, "Workspace attempt evaluated.")
+        XCTAssertEqual(model.lastError, "")
+    }
+
+    @MainActor
+    func testLiveModelSubmitWorkspaceAttemptAcceptsDoNotKnowAction() async throws {
+        let initialSession = try decodeStartWorkspaceSessionResult()
+        let updatedSession = try decodeSubmitWorkspaceAttemptResult()
+        let recorder = StudyPanelActionRecorder()
+        let model = StudyPanelLiveModel(
+            artifactSessionID: "",
+            actions: .init(
+                loadSnapshot: { _ in try decodeStudyPanelSnapshot() },
+                startWorkspaceSession: { _ in
+                    return initialSession
+                },
+                submitWorkspaceAttempt: { payload in
+                    recorder.recordSubmitWorkspaceAttemptPayload(payload)
+                    return updatedSession
+                },
+                answerQuestion: { _ in
+                    throw RuntimeClientError.processFailure("unexpected answer")
+                }
+            )
+        )
+        await model.startLiveWorkspace(goal: "Explain this project A-Z", rootPath: "/tmp/sibi")
+
+        await model.submitWorkspaceAttempt(
+            answerText: "I do not know.",
+            selectedEvidence: ["EV-LIVE-2"],
+            confidence: "low",
+            declaredUnknowns: ["I do not know anything useful yet."],
+            action: .i_do_not_know
+        )
+
+        XCTAssertEqual(recorder.submitWorkspaceAttemptPayload?.action, .i_do_not_know)
+        XCTAssertEqual(recorder.submitWorkspaceAttemptPayload?.answer_text, "I do not know.")
+        XCTAssertEqual(recorder.submitWorkspaceAttemptPayload?.selected_evidence, ["EV-LIVE-2"])
+        XCTAssertEqual(recorder.submitWorkspaceAttemptPayload?.declared_confidence, "low")
+        XCTAssertEqual(recorder.submitWorkspaceAttemptPayload?.declared_unknowns, ["I do not know anything useful yet."])
+        XCTAssertEqual(model.liveWorkspaceSession?.workspace_session.workspace_session_id, "ws-2")
         XCTAssertEqual(model.lastError, "")
     }
 
