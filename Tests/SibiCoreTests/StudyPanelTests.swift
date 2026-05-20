@@ -50,6 +50,80 @@ final class StudyPanelTests: XCTestCase {
         XCTAssertTrue(model.rows(for: "memory-readiness").contains { $0.contains("Readiness: not ready yet") })
     }
 
+    func testLiveWorkspaceRenderModelExposesLeftCenterAndRightPanels() throws {
+        let result = try decodeLiveWorkspaceRenderSessionResult()
+        let model = LiveWorkspaceRenderModel(result: result)
+
+        XCTAssertEqual(model.left.title, "Worktree / Artifact Directory")
+        XCTAssertEqual(model.left.worktreePaths, ["src/index.ts", "src/guides.rs"])
+        XCTAssertEqual(model.left.artifactPaths, ["src/index.ts"])
+        XCTAssertEqual(model.left.selectedPaths, ["src/index.ts", "src/guides.rs"])
+        XCTAssertEqual(model.left.excludedPaths, ["dist"])
+        XCTAssertEqual(model.left.unknownPaths, ["node_modules/tmp"])
+        XCTAssertEqual(model.left.activeMarker, "Slice SL-1")
+
+        XCTAssertEqual(model.center.title, "Artifact Workspace")
+        XCTAssertTrue(model.center.hasArtifact)
+        XCTAssertEqual(model.center.artifactTitle, "Ownership slice")
+        XCTAssertEqual(model.center.artifactPath, "src/index.ts")
+        XCTAssertEqual(model.center.artifactType, "code")
+        XCTAssertEqual(model.center.artifactLineSpan, "3-4")
+        XCTAssertEqual(model.center.requiredEvidenceIDs, ["EV-LIVE-1", "EV-LIVE-2"])
+
+        XCTAssertEqual(model.right.title, "Sibi Ownership Panel")
+        XCTAssertEqual(model.right.phase, "GapOrReady")
+        XCTAssertEqual(model.right.currentPrompt, "Explain module ownership for this runtime.")
+        XCTAssertEqual(model.right.nextAction, "submit one evidence-backed answer")
+        XCTAssertEqual(model.right.operationPrompt, "What does module ownership mean here?")
+        XCTAssertEqual(model.right.operationSuccessCriteria, ["Explain boundaries", "Mention selected paths"])
+        XCTAssertEqual(model.right.requiredEvidenceIDs, ["EV-LIVE-1", "EV-LIVE-2"])
+        XCTAssertNil(model.right.evaluationReadiness)
+        XCTAssertTrue(model.right.hasActiveOperation)
+    }
+
+    func testLiveWorkspaceRenderModelAfterSubmitCapturesEvaluationReadiness() throws {
+        let result = try decodeSubmitWorkspaceAttemptResult()
+        let model = LiveWorkspaceRenderModel(result: result)
+
+        XCTAssertEqual(model.right.evaluationReadiness, "ready")
+        XCTAssertEqual(model.center.title, "Artifact Workspace")
+        XCTAssertEqual(model.center.artifactTitle, "Runtime dispatcher")
+        XCTAssertEqual(model.center.artifactPath, "src/runtime.ts")
+        XCTAssertEqual(model.center.artifactType, "code_slice")
+        XCTAssertEqual(model.center.artifactLineSpan, "1-3")
+        XCTAssertEqual(model.right.requiredEvidenceIDs, ["EV-LIVE-1"])
+        XCTAssertEqual(model.left.worktreePaths, [])
+    }
+
+    func testLiveWorkspaceRenderModelAfterSubmitCapturesEvidenceAndEvaluationDetails() throws {
+        let result = try decodeSubmitWorkspaceAttemptEvaluationResult()
+        let model = LiveWorkspaceRenderModel(result: result)
+
+        XCTAssertEqual(model.right.requiredEvidenceIDs, ["EV-REQ-1", "EV-REQ-2"])
+        XCTAssertEqual(model.center.requiredEvidenceIDs, ["EV-REQ-1", "EV-REQ-2"])
+        XCTAssertEqual(model.right.selectedEvidenceIDs, ["EV-REQ-2", "EV-OPT-1", "EV-REQ-1"])
+        XCTAssertEqual(model.right.missingEvidenceIDs, ["EV-MISS-1", "EV-MISS-2"])
+        XCTAssertEqual(model.center.selectedEvidenceIDs, ["EV-REQ-2", "EV-OPT-1", "EV-REQ-1"])
+        XCTAssertEqual(model.center.missingEvidenceIDs, ["EV-MISS-1", "EV-MISS-2"])
+        XCTAssertEqual(model.right.citedEvidenceIDs, ["EV-REQ-1"])
+
+        let evaluation = try XCTUnwrap(model.right.attemptEvaluation)
+        XCTAssertEqual(evaluation.status, "partial")
+        XCTAssertEqual(evaluation.observedClaims, ["The runtime validates dispatch commands."])
+        XCTAssertEqual(evaluation.missingClaims, ["Fallback handling is validated in every code path."])
+        XCTAssertEqual(evaluation.unsupportedClaims, ["The runtime retries queue overflow with backoff."])
+        XCTAssertEqual(evaluation.contradictedClaims, ["The runtime ignores command payloads."])
+        XCTAssertEqual(evaluation.detectedGapKind, "control")
+        XCTAssertEqual(evaluation.detectedGapSeverity, "high")
+        XCTAssertEqual(evaluation.detectedGapBlocksReadiness, false)
+        XCTAssertEqual(evaluation.repairActionPrompt, "Re-run with direct dispatch evidence.")
+        XCTAssertEqual(evaluation.repairActionOperationKind, "inspect")
+        XCTAssertEqual(evaluation.reattemptPrompt, "Retry and cite the dispatcher and fallback lines.")
+        XCTAssertEqual(evaluation.readinessStatus, "partially ready")
+        XCTAssertEqual(evaluation.readinessScope, "Dispatch claim is supported; fallback claim is not ready.")
+        XCTAssertEqual(evaluation.readinessBlockedClaims, ["fallback handling", "retry behavior"])
+    }
+
     @MainActor
     func testLiveModelRefreshLoadsCurrentRuntimeSnapshot() async throws {
         let snapshot = try decodeStudyPanelSnapshot()
@@ -132,6 +206,98 @@ final class StudyPanelTests: XCTestCase {
     }
 
     @MainActor
+    func testLiveModelStartsWorkspaceSessionUsingFixturePathFromEnvironment() async throws {
+        let recorder = StudyPanelActionRecorder()
+        let model = StudyPanelLiveModel(
+            actions: .init(
+                loadSnapshot: { _ in try decodeStudyPanelSnapshot() },
+                startWorkspaceSession: { payload in
+                    recorder.recordStartWorkspacePayload(payload)
+                    return try decodeStartWorkspaceSessionResult()
+                },
+                answerQuestion: { _ in
+                    throw RuntimeClientError.processFailure("unexpected answer")
+                }
+            ),
+            environment: ["SIBI_WORKSPACE_FIXTURE_MODEL_RESPONSE_PATH": "docs/specs/deep-ownership-workspace/fixtures/live-workspace-session.json"]
+        )
+
+        await model.startLiveWorkspace(goal: "Explain this project A-Z", rootPath: "/tmp/sibi")
+
+        XCTAssertEqual(
+            recorder.startWorkspacePayload?.fixture_model_response_path,
+            "docs/specs/deep-ownership-workspace/fixtures/live-workspace-session.json"
+        )
+        XCTAssertEqual(model.liveWorkspaceSession?.workspace_session.workspace_session_id, "ws-1")
+        XCTAssertEqual(model.statusText, "Live workspace session started.")
+        XCTAssertEqual(model.lastError, "")
+    }
+
+    @MainActor
+    func testLiveModelStartsWorkspaceSessionUsesExplicitFixturePathOverEnvironment() async throws {
+        let recorder = StudyPanelActionRecorder()
+        let model = StudyPanelLiveModel(
+            actions: .init(
+                loadSnapshot: { _ in try decodeStudyPanelSnapshot() },
+                startWorkspaceSession: { payload in
+                    recorder.recordStartWorkspacePayload(payload)
+                    return try decodeStartWorkspaceSessionResult()
+                },
+                answerQuestion: { _ in
+                    throw RuntimeClientError.processFailure("unexpected answer")
+                }
+            ),
+            environment: ["SIBI_WORKSPACE_FIXTURE_MODEL_RESPONSE_PATH": "docs/specs/deep-ownership-workspace/fixtures/live-workspace-session.json"]
+        )
+
+        await model.startLiveWorkspace(
+            goal: "Explain this project A-Z",
+            rootPath: "/tmp/sibi",
+            fixtureModelResponsePath: "fixtures/explicit-live-workspace-session.json"
+        )
+
+        XCTAssertEqual(
+            recorder.startWorkspacePayload?.fixture_model_response_path,
+            "fixtures/explicit-live-workspace-session.json"
+        )
+        XCTAssertEqual(model.liveWorkspaceSession?.workspace_session.workspace_session_id, "ws-1")
+        XCTAssertEqual(model.statusText, "Live workspace session started.")
+        XCTAssertEqual(model.lastError, "")
+    }
+
+    @MainActor
+    func testLiveModelStartsWorkspaceSessionWithBlankFixturePathFallsBackToEnvironment() async throws {
+        let recorder = StudyPanelActionRecorder()
+        let model = StudyPanelLiveModel(
+            actions: .init(
+                loadSnapshot: { _ in try decodeStudyPanelSnapshot() },
+                startWorkspaceSession: { payload in
+                    recorder.recordStartWorkspacePayload(payload)
+                    return try decodeStartWorkspaceSessionResult()
+                },
+                answerQuestion: { _ in
+                    throw RuntimeClientError.processFailure("unexpected answer")
+                }
+            ),
+            environment: ["SIBI_WORKSPACE_FIXTURE_MODEL_RESPONSE_PATH": "docs/specs/deep-ownership-workspace/fixtures/live-workspace-session.json"]
+        )
+
+        await model.startLiveWorkspace(
+            goal: "Explain this project A-Z",
+            rootPath: "/tmp/sibi",
+            fixtureModelResponsePath: ""
+        )
+
+        XCTAssertEqual(
+            recorder.startWorkspacePayload?.fixture_model_response_path,
+            "docs/specs/deep-ownership-workspace/fixtures/live-workspace-session.json"
+        )
+        XCTAssertEqual(model.liveWorkspaceSession?.workspace_session.workspace_session_id, "ws-1")
+        XCTAssertEqual(model.statusText, "Live workspace session started.")
+        XCTAssertEqual(model.lastError, "")
+    }
+
+    @MainActor
     func testLiveModelSubmitWorkspaceAttemptCallsRuntimeAndReplacesLiveSession() async throws {
         let initialSession = try decodeStartWorkspaceSessionResult()
         let updatedSession = try decodeSubmitWorkspaceAttemptResult()
@@ -166,9 +332,50 @@ final class StudyPanelTests: XCTestCase {
         XCTAssertEqual(recorder.submitWorkspaceAttemptPayload?.selected_evidence, ["EV-LIVE-1"])
         XCTAssertEqual(recorder.submitWorkspaceAttemptPayload?.declared_confidence, "high")
         XCTAssertEqual(recorder.submitWorkspaceAttemptPayload?.declared_unknowns, ["I am not sure about every fallback path."])
+        XCTAssertEqual(recorder.submitWorkspaceAttemptPayload?.action, .submit)
         XCTAssertEqual(model.liveWorkspaceSession?.workspace_session.workspace_session_id, "ws-2")
         XCTAssertEqual(model.liveWorkspaceSession?.workspace_session.loop?.evidence_check?.result, "confirmed")
         XCTAssertEqual(model.statusText, "Workspace attempt evaluated.")
+        XCTAssertEqual(model.lastError, "")
+    }
+
+    @MainActor
+    func testLiveModelSubmitWorkspaceAttemptAcceptsDoNotKnowAction() async throws {
+        let initialSession = try decodeStartWorkspaceSessionResult()
+        let updatedSession = try decodeSubmitWorkspaceAttemptResult()
+        let recorder = StudyPanelActionRecorder()
+        let model = StudyPanelLiveModel(
+            artifactSessionID: "",
+            actions: .init(
+                loadSnapshot: { _ in try decodeStudyPanelSnapshot() },
+                startWorkspaceSession: { _ in
+                    return initialSession
+                },
+                submitWorkspaceAttempt: { payload in
+                    recorder.recordSubmitWorkspaceAttemptPayload(payload)
+                    return updatedSession
+                },
+                answerQuestion: { _ in
+                    throw RuntimeClientError.processFailure("unexpected answer")
+                }
+            )
+        )
+        await model.startLiveWorkspace(goal: "Explain this project A-Z", rootPath: "/tmp/sibi")
+
+        await model.submitWorkspaceAttempt(
+            answerText: "I do not know.",
+            selectedEvidence: ["EV-LIVE-2"],
+            confidence: "low",
+            declaredUnknowns: ["I do not know anything useful yet."],
+            action: .i_do_not_know
+        )
+
+        XCTAssertEqual(recorder.submitWorkspaceAttemptPayload?.action, .i_do_not_know)
+        XCTAssertEqual(recorder.submitWorkspaceAttemptPayload?.answer_text, "I do not know.")
+        XCTAssertEqual(recorder.submitWorkspaceAttemptPayload?.selected_evidence, ["EV-LIVE-2"])
+        XCTAssertEqual(recorder.submitWorkspaceAttemptPayload?.declared_confidence, "low")
+        XCTAssertEqual(recorder.submitWorkspaceAttemptPayload?.declared_unknowns, ["I do not know anything useful yet."])
+        XCTAssertEqual(model.liveWorkspaceSession?.workspace_session.workspace_session_id, "ws-2")
         XCTAssertEqual(model.lastError, "")
     }
 
@@ -315,10 +522,26 @@ private func decodeStartWorkspaceSessionResult() throws -> StartWorkspaceSession
     return try XCTUnwrap(envelope.data)
 }
 
+private func decodeLiveWorkspaceRenderSessionResult() throws -> StartWorkspaceSessionResult {
+    let envelope = try JSONDecoder().decode(
+        RuntimeEnvelope<StartWorkspaceSessionResult>.self,
+        from: Data(startWorkspaceRenderSessionEnvelopeJSON.utf8)
+    )
+    return try XCTUnwrap(envelope.data)
+}
+
 private func decodeSubmitWorkspaceAttemptResult() throws -> StartWorkspaceSessionResult {
     let envelope = try JSONDecoder().decode(
         RuntimeEnvelope<StartWorkspaceSessionResult>.self,
         from: Data(submitWorkspaceAttemptEnvelopeJSON.utf8)
+    )
+    return try XCTUnwrap(envelope.data)
+}
+
+private func decodeSubmitWorkspaceAttemptEvaluationResult() throws -> StartWorkspaceSessionResult {
+    let envelope = try JSONDecoder().decode(
+        RuntimeEnvelope<StartWorkspaceSessionResult>.self,
+        from: Data(submitWorkspaceAttemptDetailedEnvelopeJSON.utf8)
     )
     return try XCTUnwrap(envelope.data)
 }
@@ -671,6 +894,111 @@ private let startWorkspaceSessionEnvelopeJSON = #"""
 }
 """#
 
+private let startWorkspaceRenderSessionEnvelopeJSON = #"""
+{
+  "ok": true,
+  "data": {
+    "workspace_session": {
+      "workspace_session_id": "ws-live-render-1",
+      "artifact_session_id": "as-live-render-1",
+      "runner": {
+        "status": "running"
+      },
+      "live_workspace": {
+        "session_id": "ws-live-render-1",
+        "repo_root": "/tmp/sibi-live",
+        "project_label": "Render model fixture",
+        "source_control_summary": {
+          "available": true,
+          "branch": "main",
+          "head": "abc",
+          "status_short": "clean",
+          "diff_stat": "",
+          "diff_name_status": ""
+        },
+        "worktree": {
+          "root_path": "/tmp/sibi-live",
+          "paths": ["src/index.ts", "src/guides.rs"]
+        },
+        "artifact_tree": {
+          "root_path": "/tmp/sibi-live",
+          "paths": ["src/index.ts"]
+        },
+        "selected": ["src/index.ts", "src/guides.rs"],
+        "excluded": ["dist"],
+        "unknown": ["node_modules/tmp"],
+        "artifact_previews": [
+          {
+            "artifact_id": "art-1",
+            "path": "src/index.ts",
+            "title": "Ownership slice",
+            "artifact_type": "code",
+            "language": "ts",
+            "excerpt": "export function start() {}",
+            "slice_content": "export function start() {}",
+            "line_start": 3,
+            "line_end": 4,
+            "preview_fallback_reason": null,
+            "evidence_ids": ["EV-LIVE-1", "EV-LIVE-2"]
+          }
+        ],
+        "required_evidence": ["EV-LIVE-1", "EV-LIVE-2"],
+        "success_criteria": ["Explain boundaries", "Mention selected paths"],
+        "current_prompt": "Explain module ownership for this runtime.",
+        "phase": "GapOrReady",
+        "next_action": "submit one evidence-backed answer",
+        "evidence": [
+          {
+            "evidence_id": "EV-LIVE-1",
+            "artifact_id": "art-1",
+            "path": "src/index.ts",
+            "title": "ownership function",
+            "line_range": {
+              "line_start": 3,
+              "line_end": 4
+            },
+            "location": "src/index.ts",
+            "label": "implementation",
+            "excerpt": "export function start() {}",
+            "required": true,
+            "optional": false
+          },
+          {
+            "evidence_id": "EV-LIVE-2",
+            "artifact_id": "art-1",
+            "path": "src/guides.rs",
+            "title": "ownership notes",
+            "line_range": {
+              "line_start": 8,
+              "line_end": 9
+            },
+            "location": "src/guides.rs",
+            "label": "reference",
+            "excerpt": "ownership contract",
+            "required": false,
+            "optional": true
+          }
+        ],
+        "active_operation": {
+          "operation_id": "OP-LIVE-1",
+          "slice_id": "SL-1",
+          "operation_kind": "explain",
+          "prompt": "What does module ownership mean here?",
+          "required_evidence": ["EV-LIVE-1", "EV-LIVE-2"],
+          "success_criteria": ["Explain boundaries", "Mention selected paths"]
+        },
+        "submitted_attempt": null,
+        "ui_reproduction": {
+          "fixture_path": null,
+          "demo_path": null,
+          "test_path": null
+        }
+      }
+    }
+  }
+}
+"""#
+
 private let submitWorkspaceAttemptEnvelopeJSON = #"""
 {
   "ok": true,
@@ -761,6 +1089,216 @@ private let submitWorkspaceAttemptEnvelopeJSON = #"""
           "status": "ready",
           "scope": "Confirmed for this slice.",
           "blocked_claims": []
+        }
+      }
+    }
+  }
+}
+"""#
+
+private let submitWorkspaceAttemptDetailedEnvelopeJSON = #"""
+{
+  "ok": true,
+  "data": {
+    "workspace_session": {
+      "workspace_session_id": "ws-3",
+      "artifact_session_id": "as-3",
+      "runner": {
+        "status": "completed",
+        "accepted_signal_count": 0,
+        "rejected_signal_count": 1,
+        "model_runner": "gpt",
+        "model_name": "demo-v1",
+        "reasoning_effort": "high"
+      },
+      "live_workspace": {
+        "session_id": "ws-3-live",
+        "repo_root": "/tmp/sibi-live",
+        "project_label": "Detailed evaluation fixture",
+        "source_control_summary": {
+          "available": true,
+          "branch": "main",
+          "head": "abc123",
+          "status_short": "clean",
+          "diff_stat": "",
+          "diff_name_status": ""
+        },
+        "worktree": {
+          "root_path": "/tmp/sibi-live",
+          "paths": ["src/index.ts"]
+        },
+        "artifact_tree": {
+          "root_path": "/tmp/sibi-live",
+          "paths": ["src/index.ts"]
+        },
+        "selected": ["src/index.ts"],
+        "excluded": [],
+        "unknown": [],
+        "artifact_previews": [
+          {
+            "artifact_id": "art-eval-1",
+            "path": "src/index.ts",
+            "title": "Dispatch slice",
+            "artifact_type": "code_slice",
+            "language": "ts",
+            "excerpt": "export function dispatch(event) {}",
+            "slice_content": "export function dispatch(event) {\\n  if (!event) throw new Error('missing');\\n}",
+            "line_start": 1,
+            "line_end": 3,
+            "preview_fallback_reason": null,
+            "evidence_ids": ["EV-REQ-1", "EV-OPT-1"]
+          }
+        ],
+        "required_evidence": ["EV-REQ-1", "EV-REQ-2"],
+        "success_criteria": ["Explain dispatch and fallback behavior."],
+        "current_prompt": "Explain dispatch ownership and fallback path.",
+        "phase": "GapOrReady",
+        "next_action": "submit improved evidence-backed answer",
+        "last_attempt_evaluation": {
+          "attempt_id": "AT-EVAL-1",
+          "evidence_check": {
+            "result": "partial",
+            "required_claims": [
+              "The runtime validates dispatch commands.",
+              "The runtime handles fallback safely."
+            ],
+            "observed_claims": [
+              "The runtime validates dispatch commands."
+            ],
+            "missing_claims": [
+              "Fallback handling is validated in every code path."
+            ],
+            "contradicted_claims": [
+              "The runtime ignores command payloads."
+            ],
+            "unsupported_claims": [
+              "The runtime retries queue overflow with backoff."
+            ],
+            "cited_evidence": [
+              {
+                "evidence_id": "EV-REQ-1",
+                "artifact_id": "art-eval-1",
+                "path": "src/index.ts",
+                "title": "Dispatch boundary",
+                "line_range": {
+                  "line_start": 1,
+                  "line_end": 3
+                },
+                "location": "src/index.ts",
+                "label": "implementation",
+                "excerpt": "export function dispatch(event) {}",
+                "required": true,
+                "optional": false
+              }
+            ]
+          },
+          "missing_evidence": [
+            "EV-MISS-1",
+            "EV-MISS-2"
+          ],
+          "detected_gap": {
+            "kind": "control",
+            "severity": "high",
+            "blocks_readiness": false
+          },
+          "repair_action": {
+            "id": "repair-1",
+            "operation_kind": "inspect",
+            "prompt": "Re-run with direct dispatch evidence.",
+            "required_evidence": ["EV-REQ-1", "EV-REQ-2"]
+          },
+          "reattempt_prompt": "Retry and cite the dispatcher and fallback lines.",
+          "scoped_readiness": {
+            "status": "partially ready",
+            "scope": "Dispatch claim is supported; fallback claim is not ready.",
+            "blocked_claims": ["fallback handling", "retry behavior"]
+          },
+          "updated_workspace_session": {
+            "session_id": "ws-3-live",
+            "phase": "GapOrReady",
+            "next_action": "submit improved evidence-backed answer"
+          }
+        },
+        "evidence": [
+          {
+            "evidence_id": "EV-REQ-1",
+            "artifact_id": "art-eval-1",
+            "path": "src/index.ts",
+            "title": "dispatch function",
+            "line_range": {
+              "line_start": 1,
+              "line_end": 2
+            },
+            "location": "src/index.ts",
+            "label": "implementation",
+            "excerpt": "export function dispatch(event) {}",
+            "required": true,
+            "optional": false
+          },
+          {
+            "evidence_id": "EV-REQ-2",
+            "artifact_id": "art-eval-1",
+            "path": "src/index.ts",
+            "title": "fallback check",
+            "line_range": {
+              "line_start": 2,
+              "line_end": 3
+            },
+            "location": "src/index.ts",
+            "label": "test",
+            "excerpt": "if (!event) throw new Error('missing');",
+            "required": true,
+            "optional": false
+          },
+          {
+            "evidence_id": "EV-OPT-1",
+            "artifact_id": "art-eval-1",
+            "path": "src/index.ts",
+            "title": "retry notes",
+            "line_range": {
+              "line_start": 1,
+              "line_end": 1
+            },
+            "location": "src/index.ts",
+            "label": "reference",
+            "excerpt": "dispatch fallback marker",
+            "required": false,
+            "optional": true
+          }
+        ],
+        "submitted_attempt": {
+          "session_id": "ws-3",
+          "operation_id": "OP-3",
+          "slice_id": "SL-3",
+          "answer_text": "The runtime validates dispatch but fallback is not covered yet.",
+          "selected_evidence_ids": [
+            "EV-REQ-2",
+            "EV-OPT-1"
+          ],
+          "confidence": "medium",
+          "declared_unknowns": [
+            "The fallback behavior was not visible in the first slice."
+          ],
+          "action": "submit"
+        },
+        "ui_reproduction": {
+          "fixture_path": null,
+          "demo_path": null,
+          "test_path": null
+        },
+        "active_operation": {
+          "operation_id": "OP-3",
+          "slice_id": "SL-3",
+          "operation_kind": "explain",
+          "prompt": "Explain dispatch and fallback behavior.",
+          "required_evidence": [
+            "EV-REQ-1",
+            "EV-REQ-2"
+          ],
+            "success_criteria": [
+            "Explain dispatch.",
+            "Explain fallback behavior."
+          ]
         }
       }
     }

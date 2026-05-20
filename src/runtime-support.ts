@@ -353,7 +353,9 @@ export type RuntimeSessionSummary = AgentWorkSessionSummary & {
 export type RuntimeWorkspaceSession = {
   workspace_session_id: string;
   artifact_session_id: string;
+  project_label?: string;
   loop: DeepOwnershipLoop;
+  fixture_model_response_path?: string | null;
   runner: {
     status: "completed" | "blocked";
     blocked_reason?: string;

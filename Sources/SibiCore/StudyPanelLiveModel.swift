@@ -54,14 +54,17 @@ public final class StudyPanelLiveModel: ObservableObject {
     @Published public private(set) var isSubmittingWorkspaceAttempt: Bool
 
     private let actions: StudyPanelRuntimeActions
+    private let environment: [String: String]
     private var autoRefreshTask: Task<Void, Never>?
 
     public init(
         artifactSessionID: String = "",
-        actions: StudyPanelRuntimeActions = .runtimeClient()
+        actions: StudyPanelRuntimeActions = .runtimeClient(),
+        environment: [String: String] = ProcessInfo.processInfo.environment
     ) {
         self.artifactSessionID = artifactSessionID
         self.actions = actions
+        self.environment = environment
         self.snapshot = nil
         self.liveWorkspaceSession = nil
         self.statusText = "No study snapshot loaded."
@@ -101,17 +104,22 @@ public final class StudyPanelLiveModel: ObservableObject {
 
     public func startLiveWorkspace(
         goal: String = "Explain this project A-Z",
-        rootPath: String = FileManager.default.currentDirectoryPath
+        rootPath: String = FileManager.default.currentDirectoryPath,
+        fixtureModelResponsePath: String? = nil
     ) async {
         guard !isStartingWorkspace else { return }
         isStartingWorkspace = true
         defer { isStartingWorkspace = false }
 
         let trimmedGoal = goal.trimmingCharacters(in: .whitespacesAndNewlines)
+        let explicitFixtureModelResponsePath = self.normalizedFixtureModelResponsePath(fixtureModelResponsePath)
+        let trimmedFixtureModelResponsePath = explicitFixtureModelResponsePath
+            ?? self.normalizedFixtureModelResponsePath(environment["SIBI_WORKSPACE_FIXTURE_MODEL_RESPONSE_PATH"])
         let payload = StartWorkspaceSessionPayload(
             goal: trimmedGoal.isEmpty ? "Explain this project A-Z" : trimmedGoal,
             root: rootPath,
-            codex_command: "auto"
+            codex_command: "auto",
+            fixture_model_response_path: trimmedFixtureModelResponsePath
         )
         let actions = actions
 
@@ -135,7 +143,8 @@ public final class StudyPanelLiveModel: ObservableObject {
         answerText: String,
         selectedEvidence: [String],
         confidence: String,
-        declaredUnknowns: [String]
+        declaredUnknowns: [String],
+        action: SubmitWorkspaceAttemptAction = .submit
     ) async {
         guard !isSubmittingWorkspaceAttempt else { return }
         guard let workspaceSession = liveWorkspaceSession?.workspace_session else {
@@ -154,7 +163,8 @@ public final class StudyPanelLiveModel: ObservableObject {
             answer_text: answerText.trimmingCharacters(in: .whitespacesAndNewlines),
             selected_evidence: selectedEvidence,
             declared_confidence: normalizedConfidence.isEmpty ? "medium" : normalizedConfidence,
-            declared_unknowns: declaredUnknowns
+            declared_unknowns: declaredUnknowns,
+            action: action
         )
         let actions = actions
 
@@ -223,5 +233,12 @@ public final class StudyPanelLiveModel: ObservableObject {
     private var normalizedArtifactSessionID: String? {
         let trimmed = artifactSessionID.trimmingCharacters(in: .whitespacesAndNewlines)
         return trimmed.isEmpty ? nil : trimmed
+    }
+
+    private func normalizedFixtureModelResponsePath(_ value: String?) -> String? {
+        guard let trimmed = value?.trimmingCharacters(in: .whitespacesAndNewlines), !trimmed.isEmpty else {
+            return nil
+        }
+        return trimmed
     }
 }
