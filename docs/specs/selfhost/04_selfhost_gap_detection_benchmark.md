@@ -137,7 +137,8 @@ The benchmark fails when:
 
 The benchmark should later become executable through the existing eval tooling
 under `src/evals` after a worker-owned integration slice, while active pilot
-artifacts remain in `docs/specs/selfhost/pilot/`.
+eval artifacts live in `evals/attempt-readiness/` and review prototypes live in
+`prototypes/attempt-readiness/`.
 
 Do not add a new eval framework until the pilot dataset proves that the
 self-hosted contract needs behavior not supported by the current eval runner.
@@ -157,7 +158,7 @@ This spec owns three feature outcomes:
 ## Manual Harness
 
 Use the current report at
-`docs/specs/selfhost/pilot/reports/VAL-EVAL-006-selfhost-benchmark.json` and
+`evals/attempt-readiness/reports/VAL-EVAL-006-selfhost-benchmark.json` and
 confirm:
 
 1. all 40 cases load

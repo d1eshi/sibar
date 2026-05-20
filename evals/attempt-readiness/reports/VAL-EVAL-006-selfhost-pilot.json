@@ -1,9 +1,9 @@
 {
-  "generated_at": "2026-05-14T23:48:40.516Z",
+  "generated_at": "2026-05-20T17:05:17.258Z",
   "validation": "VAL-EVAL-006-selfhost-pilot",
-  "manifest_path": "sibar.selfhost.manifest.json",
-  "gold_case_index_path": "docs/specs/selfhost/pilot/gold-cases/index.json",
-  "mastery_check_index_path": "docs/specs/selfhost/pilot/mastery-checks/index.json",
+  "manifest_path": "evals/attempt-readiness/manifest.json",
+  "gold_case_index_path": "evals/attempt-readiness/gold-cases/index.json",
+  "mastery_check_index_path": "evals/attempt-readiness/mastery-checks/index.json",
   "aggregate": {
     "total_checks": 1495,
     "total_mismatches": 0,

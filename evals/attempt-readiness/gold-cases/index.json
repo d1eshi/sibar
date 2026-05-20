@@ -1,7 +1,7 @@
 {
   "dataset_id": "selfhost-pilot-gold-cases-first-slice",
   "version": "1.0.0",
-  "artifact": "sibar.selfhost.manifest.json",
+  "artifact": "evals/attempt-readiness/manifest.json",
   "concepts": [
     "artifact_boundary",
     "concept_graph_generation",

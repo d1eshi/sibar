@@ -1,8 +1,8 @@
 {
-  "generated_at": "2026-05-14T23:48:25.886Z",
+  "generated_at": "2026-05-20T17:06:10.883Z",
   "validation": "VAL-EVAL-008-selfhost-freeform",
-  "gold_case_index_path": "docs/specs/selfhost/pilot/gold-cases/index.json",
-  "manifest_path": "sibar.selfhost.manifest.json",
+  "gold_case_index_path": "evals/attempt-readiness/gold-cases/index.json",
+  "manifest_path": "evals/attempt-readiness/manifest.json",
   "mismatches": [],
   "cases": [
     {
@@ -29,7 +29,7 @@
         "issue_candidate_type": "none",
         "issue_candidate": null,
         "issue_candidates": [],
-        "user_evidence_excerpt": "I would trace boundary control in `sibar.selfhost.manifest.json` and `src/runtime-concept-graph.ts`, cite at least one included file path such as `src/runtime-support.ts` and one excluded path in the manifest, and explain that only listed included paths can support artifact evidence.",
+        "user_evidence_excerpt": "I would trace boundary control in `evals/attempt-readiness/manifest.json` and `src/runtime-concept-graph.ts`, cite at least one included file path such as `src/runtime-support.ts` and one excluded path in the manifest, and explain that only listed included paths can support artifact evidence.",
         "repo_evidence_citations": [
           {
             "path": "src/runtime-concept-graph.ts",

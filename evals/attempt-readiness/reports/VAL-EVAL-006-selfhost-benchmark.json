@@ -1,14 +1,14 @@
 {
-  "generated_at": "2026-05-14T23:48:49.769Z",
+  "generated_at": "2026-05-20T17:05:17.340Z",
   "validation": "VAL-EVAL-007-selfhost-benchmark",
-  "manifest_path": "sibar.selfhost.manifest.json",
-  "gold_case_index_path": "docs/specs/selfhost/pilot/gold-cases/index.json",
+  "manifest_path": "evals/attempt-readiness/manifest.json",
+  "gold_case_index_path": "evals/attempt-readiness/gold-cases/index.json",
   "pilot_validation": {
-    "generated_at": "2026-05-14T23:48:49.733Z",
+    "generated_at": "2026-05-20T17:05:17.306Z",
     "validation": "VAL-EVAL-006-selfhost-pilot",
-    "manifest_path": "sibar.selfhost.manifest.json",
-    "gold_case_index_path": "docs/specs/selfhost/pilot/gold-cases/index.json",
-    "mastery_check_index_path": "docs/specs/selfhost/pilot/mastery-checks/index.json",
+    "manifest_path": "evals/attempt-readiness/manifest.json",
+    "gold_case_index_path": "evals/attempt-readiness/gold-cases/index.json",
+    "mastery_check_index_path": "evals/attempt-readiness/mastery-checks/index.json",
     "aggregate": {
       "total_checks": 1495,
       "total_mismatches": 0,
@@ -1797,10 +1797,10 @@
     }
   ],
   "freeform_validation": {
-    "generated_at": "2026-05-14T23:48:49.766Z",
+    "generated_at": "2026-05-20T17:05:17.336Z",
     "validation": "VAL-EVAL-008-selfhost-freeform",
-    "gold_case_index_path": "docs/specs/selfhost/pilot/gold-cases/index.json",
-    "manifest_path": "sibar.selfhost.manifest.json",
+    "gold_case_index_path": "evals/attempt-readiness/gold-cases/index.json",
+    "manifest_path": "evals/attempt-readiness/manifest.json",
     "mismatches": [],
     "cases": [
       {
@@ -1827,7 +1827,7 @@
           "issue_candidate_type": "none",
           "issue_candidate": null,
           "issue_candidates": [],
-          "user_evidence_excerpt": "I would trace boundary control in `sibar.selfhost.manifest.json` and `src/runtime-concept-graph.ts`, cite at least one included file path such as `src/runtime-support.ts` and one excluded path in the manifest, and explain that only listed included paths can support artifact evidence.",
+          "user_evidence_excerpt": "I would trace boundary control in `evals/attempt-readiness/manifest.json` and `src/runtime-concept-graph.ts`, cite at least one included file path such as `src/runtime-support.ts` and one excluded path in the manifest, and explain that only listed included paths can support artifact evidence.",
           "repo_evidence_citations": [
             {
               "path": "src/runtime-concept-graph.ts",

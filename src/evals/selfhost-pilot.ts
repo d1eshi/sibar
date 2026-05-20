@@ -10,8 +10,8 @@ function toRepoRelative(filePath: string): string {
   return rel || ".";
 }
 
-const DEFAULT_MANIFEST_PATH = "sibar.selfhost.manifest.json";
-const DEFAULT_GOLD_CASE_INDEX = "docs/specs/selfhost/pilot/gold-cases/index.json";
+const DEFAULT_MANIFEST_PATH = "evals/attempt-readiness/manifest.json";
+const DEFAULT_GOLD_CASE_INDEX = "evals/attempt-readiness/gold-cases/index.json";
 const SELFHOST_VALIDATION_ID = "VAL-EVAL-006-selfhost-pilot";
 
 const FIRST_SLICE_CONCEPT_IDS = [
@@ -171,6 +171,7 @@ function isInsideIncludedPaths(includedPaths: string[], candidate: string): bool
 
 function resolveRelativeToManifest(manifestPath: string, entry: string): string {
   if (isAbsolute(entry)) return entry;
+  if (existsSync(resolve(entry))) return resolve(entry);
   return resolve(dirname(manifestPath), entry);
 }
 
@@ -410,9 +411,7 @@ function validateGoldCaseIndex(
   state: ValidationState,
 ): string {
   const requestedIndex = options.indexPath ?? asString(manifest.gold_case_index) ?? DEFAULT_GOLD_CASE_INDEX;
-  const goldCaseIndexPath = isAbsolute(requestedIndex)
-    ? requestedIndex
-    : resolve(dirname(manifestPath), requestedIndex);
+  const goldCaseIndexPath = resolveRelativeToManifest(manifestPath, requestedIndex);
 
   check(state, {
     ok: existsSync(goldCaseIndexPath),

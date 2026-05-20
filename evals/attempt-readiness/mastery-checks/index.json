@@ -1,7 +1,7 @@
 {
   "dataset_id": "selfhost-pilot-manifest-first-slice",
   "version": "0.1.0",
-  "artifact": "sibar.selfhost.manifest.json",
+  "artifact": "evals/attempt-readiness/manifest.json",
   "checks": [
     {
       "id": "SC-001-artifact-boundary",

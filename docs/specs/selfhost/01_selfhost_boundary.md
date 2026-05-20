@@ -27,7 +27,7 @@ artifact intake
 The first implementation artifact should be:
 
 ```text
-sibar.selfhost.manifest.json
+evals/attempt-readiness/manifest.json
 ```
 
 The manifest must declare:
@@ -122,7 +122,7 @@ they exceed the manifest boundary.
 
 ## Manual Harness
 
-Manual testers should use `sibar.selfhost.manifest.json` and inspect:
+Manual testers should use `evals/attempt-readiness/manifest.json` and inspect:
 
 1. `included_paths` contain only the first runtime learning-loop slice.
 2. `excluded_paths` block `Sources/`, build artifacts, mission handoffs, and
@@ -161,7 +161,7 @@ Missing coverage:
 
 Input used:
 
-- `sibar.selfhost.manifest.json`
+- `evals/attempt-readiness/manifest.json`
 - the five first-slice concepts
 - current self-hosted pilot validator behavior
 

@@ -167,7 +167,7 @@ This spec owns three feature outcomes:
 
 ## Manual Harness
 
-Use one mastery check from `docs/specs/selfhost/pilot/mastery-checks/` and test
+Use one mastery check from `evals/attempt-readiness/mastery-checks/` and test
 the following freeform answers manually:
 
 | Case | Input answer shape | Expected outcome |
@@ -193,7 +193,7 @@ Manual testers should record:
 Path:
 
 ```text
-docs/specs/selfhost/pilot/prototypes/02_evaluation_contract/freeform-first-slice/
+prototypes/attempt-readiness/02_evaluation_contract/freeform-first-slice/
 ```
 
 Question answered:
@@ -326,7 +326,7 @@ Actual outcome:
 - Added `Tests/selfhost-freeform.test.ts` for grounded, uncited, partial,
   overconfident wrong, and design-induced answers.
 - Wrote the first-slice report to
-  `docs/specs/selfhost/pilot/reports/VAL-EVAL-008-selfhost-freeform-first-slice.json`.
+  `evals/attempt-readiness/reports/VAL-EVAL-008-selfhost-freeform-first-slice.json`.
 
 Observed results:
 

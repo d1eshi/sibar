@@ -379,7 +379,7 @@ window.workspaceFixture = {
         "confidence": "high",
         "evidence": [
           {
-            "file_path": "/Users/d1eshi/projects/startup/sibar/src/runtime-concept-graph.ts",
+            "file_path": "src/runtime-concept-graph.ts",
             "start_line": 57,
             "end_line": 57,
             "excerpt": "linePattern: /\\b(runFromSTDIO|handleRequest|main\\(|start|listen|spawnSync|command)\\b/,"
@@ -401,7 +401,7 @@ window.workspaceFixture = {
           "intent_id": "b032aea5-7d74-4748-9adf-32cc59e81825",
           "created_at": "2026-05-15T01:36:38.436Z",
           "project_label": "SIBAR Self-Hosted MVP First Slice",
-          "project_path": "/Users/d1eshi/projects/startup/sibar",
+          "project_path": ".",
           "statement": "Attempt an autopsy step for concept runtime-boundary.",
           "uncertainty": "User must predict or trace the artifact evidence before receiving an explanation.",
           "expected_work_area": "Command boundary and payload contract",
@@ -418,7 +418,7 @@ window.workspaceFixture = {
             "created_at": "2026-05-15T01:36:38.436Z",
             "source": "ownership_question",
             "project_label": "SIBAR Self-Hosted MVP First Slice",
-            "project_path": "/Users/d1eshi/projects/startup/sibar",
+            "project_path": ".",
             "concept_or_area": "Command boundary and payload contract",
             "reason": "Runtime prepared an attempt-first autopsy step from persisted concept graph evidence.",
             "evidence": [
@@ -432,7 +432,7 @@ window.workspaceFixture = {
             "created_at": "2026-05-15T01:36:38.438Z",
             "source": "ownership_question",
             "project_label": "SIBAR Self-Hosted MVP First Slice",
-            "project_path": "/Users/d1eshi/projects/startup/sibar",
+            "project_path": ".",
             "concept_or_area": "Command boundary and payload contract",
             "reason": "Great! Your answer shows confident understanding with system-level connections. Moving this concept forward.",
             "evidence": [
@@ -500,7 +500,7 @@ window.workspaceFixture = {
         "observed_answer_or_uncertainty": "I am not sure how the boundary rejects excluded paths. I know commands route through runtime, but I cannot trace the artifact evidence filtering yet.",
         "artifact_evidence": [
           {
-            "file_path": "/Users/d1eshi/projects/startup/sibar/src/runtime-concept-graph.ts",
+            "file_path": "src/runtime-concept-graph.ts",
             "start_line": 4,
             "end_line": 4,
             "excerpt": "import { getArtifactSession, readState, writeState } from \"./runtime-state.ts\";"
@@ -525,7 +525,7 @@ window.workspaceFixture = {
           "intent_id": "6c59b770-eb24-4ce1-b70e-7c703ef7fc1f",
           "created_at": "2026-05-15T01:36:38.438Z",
           "project_label": "SIBAR Self-Hosted MVP First Slice",
-          "project_path": "/Users/d1eshi/projects/startup/sibar",
+          "project_path": ".",
           "statement": "Attempt an autopsy step for concept artifact-data-flow.",
           "uncertainty": "User must predict or trace the artifact evidence before receiving an explanation.",
           "expected_work_area": "Artifact data flow",
@@ -542,7 +542,7 @@ window.workspaceFixture = {
             "created_at": "2026-05-15T01:36:38.438Z",
             "source": "ownership_question",
             "project_label": "SIBAR Self-Hosted MVP First Slice",
-            "project_path": "/Users/d1eshi/projects/startup/sibar",
+            "project_path": ".",
             "concept_or_area": "Artifact data flow",
             "reason": "Runtime prepared an attempt-first autopsy step from persisted concept graph evidence.",
             "evidence": [
@@ -556,7 +556,7 @@ window.workspaceFixture = {
             "created_at": "2026-05-15T01:36:38.439Z",
             "source": "ownership_question",
             "project_label": "SIBAR Self-Hosted MVP First Slice",
-            "project_path": "/Users/d1eshi/projects/startup/sibar",
+            "project_path": ".",
             "concept_or_area": "Artifact data flow",
             "reason": "Good explanation in isolation. Let's connect this to the broader system with a follow-up question.",
             "evidence": [
@@ -601,13 +601,13 @@ window.workspaceFixture = {
       "concept_id": "artifact-data-flow",
       "gap_id": "99af6012-45c8-4d6a-9b69-ff8b52165cfd",
       "challenge_type": "explain_flow_without_looking",
-      "prompt": "Explain Artifact data flow without looking first, then check against /Users/d1eshi/projects/startup/sibar/src/runtime-concept-graph.ts:4-4 and mark what was missing.",
+      "prompt": "Explain Artifact data flow without looking first, then check against src/runtime-concept-graph.ts:4-4 and mark what was missing.",
       "expected_evidence": [
         "gap_id=99af6012-45c8-4d6a-9b69-ff8b52165cfd",
         "concept_id=artifact-data-flow",
         "produce=written explanation, trace, prediction, or test idea that directly repairs the detected gap",
         "counts=must cite artifact evidence and address suspected misconception: The answer may explain Artifact data flow in isolation but does not yet connect it to the cited artifact evidence, boundary, or change risk.",
-        "artifact=/Users/d1eshi/projects/startup/sibar/src/runtime-concept-graph.ts:4-4 excerpt=import { getArtifactSession, readState, writeState } from \"./runtime-state.ts\";"
+        "artifact=src/runtime-concept-graph.ts:4-4 excerpt=import { getArtifactSession, readState, writeState } from \"./runtime-state.ts\";"
       ],
       "difficulty": "medium",
       "due_after": "24h",
@@ -696,7 +696,7 @@ window.workspaceFixture = {
         "confidence": "medium",
         "due_after": "24h",
         "revisit_after": "2026-05-16T01:36:38.440Z",
-        "prompt": "Explain Artifact data flow without looking first, then check against /Users/d1eshi/projects/startup/sibar/src/runtime-concept-graph.ts:4-4 and mark what was missing.",
+        "prompt": "Explain Artifact data flow without looking first, then check against src/runtime-concept-graph.ts:4-4 and mark what was missing.",
         "evidence_ids": [
           "E2"
         ]
@@ -705,7 +705,7 @@ window.workspaceFixture = {
     "recommended_next_action": {
       "claim_id": "next-action",
       "title": "Recommended next action",
-      "action": "Explain Artifact data flow without looking first, then check against /Users/d1eshi/projects/startup/sibar/src/runtime-concept-graph.ts:4-4 and mark what was missing.",
+      "action": "Explain Artifact data flow without looking first, then check against src/runtime-concept-graph.ts:4-4 and mark what was missing.",
       "claim": "Start the queued practice for Artifact data flow.",
       "readiness": "not ready yet",
       "confidence": "medium",
@@ -717,7 +717,7 @@ window.workspaceFixture = {
       {
         "evidence_id": "E1",
         "source": "confirmed_concept",
-        "file_path": "/Users/d1eshi/projects/startup/sibar/src/runtime-concept-graph.ts",
+        "file_path": "src/runtime-concept-graph.ts",
         "start_line": 57,
         "end_line": 57,
         "excerpt": "linePattern: /\\b(runFromSTDIO|handleRequest|main\\(|start|listen|spawnSync|command)\\b/,"
@@ -725,7 +725,7 @@ window.workspaceFixture = {
       {
         "evidence_id": "E2",
         "source": "learning_gap",
-        "file_path": "/Users/d1eshi/projects/startup/sibar/src/runtime-concept-graph.ts",
+        "file_path": "src/runtime-concept-graph.ts",
         "start_line": 4,
         "end_line": 4,
         "excerpt": "import { getArtifactSession, readState, writeState } from \"./runtime-state.ts\";"
@@ -840,13 +840,13 @@ window.workspaceFixture = {
         "concept_id": "artifact-data-flow",
         "gap_id": "99af6012-45c8-4d6a-9b69-ff8b52165cfd",
         "challenge_type": "explain_flow_without_looking",
-        "prompt": "Explain Artifact data flow without looking first, then check against /Users/d1eshi/projects/startup/sibar/src/runtime-concept-graph.ts:4-4 and mark what was missing.",
+        "prompt": "Explain Artifact data flow without looking first, then check against src/runtime-concept-graph.ts:4-4 and mark what was missing.",
         "expected_evidence": [
           "gap_id=99af6012-45c8-4d6a-9b69-ff8b52165cfd",
           "concept_id=artifact-data-flow",
           "produce=written explanation, trace, prediction, or test idea that directly repairs the detected gap",
           "counts=must cite artifact evidence and address suspected misconception: The answer may explain Artifact data flow in isolation but does not yet connect it to the cited artifact evidence, boundary, or change risk.",
-          "artifact=/Users/d1eshi/projects/startup/sibar/src/runtime-concept-graph.ts:4-4 excerpt=import { getArtifactSession, readState, writeState } from \"./runtime-state.ts\";"
+          "artifact=src/runtime-concept-graph.ts:4-4 excerpt=import { getArtifactSession, readState, writeState } from \"./runtime-state.ts\";"
         ],
         "difficulty": "medium",
         "due_after": "24h",
@@ -858,7 +858,7 @@ window.workspaceFixture = {
     "memory_summary": {
       "artifact_session_id": "94bbe59d-6352-4fc0-aa40-ca3775d4cff4",
       "label": "SIBAR Self-Hosted MVP First Slice",
-      "root_path": "/Users/d1eshi/projects/startup/sibar",
+      "root_path": ".",
       "generated_at": "2026-05-15T01:36:38.443Z",
       "concept_states": [
         {
@@ -870,7 +870,7 @@ window.workspaceFixture = {
           "observed_layer": 1,
           "evidence": [
             {
-              "file_path": "/Users/d1eshi/projects/startup/sibar/src/runtime-concept-graph.ts",
+              "file_path": "src/runtime-concept-graph.ts",
               "start_line": 4,
               "end_line": 4,
               "excerpt": "import { getArtifactSession, readState, writeState } from \"./runtime-state.ts\";"
@@ -891,7 +891,7 @@ window.workspaceFixture = {
           "status": "unseen",
           "evidence": [
             {
-              "file_path": "/Users/d1eshi/projects/startup/sibar/src/runtime-concept-graph.ts",
+              "file_path": "src/runtime-concept-graph.ts",
               "start_line": 78,
               "end_line": 78,
               "excerpt": "id: \"core-policy\","
@@ -906,7 +906,7 @@ window.workspaceFixture = {
           "status": "unseen",
           "evidence": [
             {
-              "file_path": "/Users/d1eshi/projects/startup/sibar/src/runtime-concept-graph.ts",
+              "file_path": "src/runtime-concept-graph.ts",
               "start_line": 57,
               "end_line": 57,
               "excerpt": "linePattern: /\\b(runFromSTDIO|handleRequest|main\\(|start|listen|spawnSync|command)\\b/,"
@@ -921,7 +921,7 @@ window.workspaceFixture = {
           "status": "unseen",
           "evidence": [
             {
-              "file_path": "/Users/d1eshi/projects/startup/sibar/src/runtime-concept-graph.ts",
+              "file_path": "src/runtime-concept-graph.ts",
               "start_line": 111,
               "end_line": 111,
               "excerpt": "linePattern: /\\b(fail\\(|throw new|catch|reject|outside|invalid|missing|error\\.code)\\b/,"
@@ -939,7 +939,7 @@ window.workspaceFixture = {
           "observed_layer": 4,
           "evidence": [
             {
-              "file_path": "/Users/d1eshi/projects/startup/sibar/src/runtime-concept-graph.ts",
+              "file_path": "src/runtime-concept-graph.ts",
               "start_line": 57,
               "end_line": 57,
               "excerpt": "linePattern: /\\b(runFromSTDIO|handleRequest|main\\(|start|listen|spawnSync|command)\\b/,"
@@ -956,7 +956,7 @@ window.workspaceFixture = {
           "status": "unseen",
           "evidence": [
             {
-              "file_path": "/Users/d1eshi/projects/startup/sibar/src/runtime-memory.ts",
+              "file_path": "src/runtime-memory.ts",
               "start_line": 15,
               "end_line": 15,
               "excerpt": "import { getArtifactSession, readState } from \"./runtime-state.ts\";"
@@ -971,7 +971,7 @@ window.workspaceFixture = {
           "status": "unseen",
           "evidence": [
             {
-              "file_path": "/Users/d1eshi/projects/startup/sibar/Tests/concept-graph.test.ts",
+              "file_path": "Tests/concept-graph.test.ts",
               "start_line": 7,
               "end_line": 7,
               "excerpt": "import { handleRequest } from \"../src/runtime.ts\";"
@@ -994,7 +994,7 @@ window.workspaceFixture = {
           "created_at": "2026-05-15T01:36:38.438Z",
           "evidence": [
             {
-              "file_path": "/Users/d1eshi/projects/startup/sibar/src/runtime-concept-graph.ts",
+              "file_path": "src/runtime-concept-graph.ts",
               "start_line": 57,
               "end_line": 57,
               "excerpt": "linePattern: /\\b(runFromSTDIO|handleRequest|main\\(|start|listen|spawnSync|command)\\b/,"
@@ -1013,7 +1013,7 @@ window.workspaceFixture = {
           "created_at": "2026-05-15T01:36:38.439Z",
           "evidence": [
             {
-              "file_path": "/Users/d1eshi/projects/startup/sibar/src/runtime-concept-graph.ts",
+              "file_path": "src/runtime-concept-graph.ts",
               "start_line": 4,
               "end_line": 4,
               "excerpt": "import { getArtifactSession, readState, writeState } from \"./runtime-state.ts\";"
@@ -1034,7 +1034,7 @@ window.workspaceFixture = {
           "observed_answer_or_uncertainty": "I am not sure how the boundary rejects excluded paths. I know commands route through runtime, but I cannot trace the artifact evidence filtering yet.",
           "artifact_evidence": [
             {
-              "file_path": "/Users/d1eshi/projects/startup/sibar/src/runtime-concept-graph.ts",
+              "file_path": "src/runtime-concept-graph.ts",
               "start_line": 4,
               "end_line": 4,
               "excerpt": "import { getArtifactSession, readState, writeState } from \"./runtime-state.ts\";"
@@ -1059,13 +1059,13 @@ window.workspaceFixture = {
           "concept_id": "artifact-data-flow",
           "gap_id": "99af6012-45c8-4d6a-9b69-ff8b52165cfd",
           "challenge_type": "explain_flow_without_looking",
-          "prompt": "Explain Artifact data flow without looking first, then check against /Users/d1eshi/projects/startup/sibar/src/runtime-concept-graph.ts:4-4 and mark what was missing.",
+          "prompt": "Explain Artifact data flow without looking first, then check against src/runtime-concept-graph.ts:4-4 and mark what was missing.",
           "expected_evidence": [
             "gap_id=99af6012-45c8-4d6a-9b69-ff8b52165cfd",
             "concept_id=artifact-data-flow",
             "produce=written explanation, trace, prediction, or test idea that directly repairs the detected gap",
             "counts=must cite artifact evidence and address suspected misconception: The answer may explain Artifact data flow in isolation but does not yet connect it to the cited artifact evidence, boundary, or change risk.",
-            "artifact=/Users/d1eshi/projects/startup/sibar/src/runtime-concept-graph.ts:4-4 excerpt=import { getArtifactSession, readState, writeState } from \"./runtime-state.ts\";"
+            "artifact=src/runtime-concept-graph.ts:4-4 excerpt=import { getArtifactSession, readState, writeState } from \"./runtime-state.ts\";"
           ],
           "difficulty": "medium",
           "due_after": "24h",

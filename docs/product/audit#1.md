@@ -463,7 +463,7 @@ Riesgos de producto:
 ## 7-Day Build Plan
 
 Día 1:
-Definir `sibar.selfhost.manifest.json` con boundary, entrypoints, concepts iniciales, test commands y scope explícito.
+Definir `evals/attempt-readiness/manifest.json` con boundary, entrypoints, concepts iniciales, test commands y scope explícito.
 
 Día 2:
 Crear 5 mastery checks self-hosted sobre runtime/concept graph/gap/readiness. Cada check debe tener gold answer, required evidence y forbidden claims.

@@ -4,7 +4,7 @@
   "concept_id": "artifact_boundary",
   "operation": "trace",
   "answer_class": "correct_grounded",
-  "simulated_user_answer": "I would trace boundary control in `sibar.selfhost.manifest.json` and `src/runtime-concept-graph.ts`, cite at least one included file path such as `src/runtime-support.ts` and one excluded path in the manifest, and explain that only listed included paths can support artifact evidence.",
+  "simulated_user_answer": "I would trace boundary control in `evals/attempt-readiness/manifest.json` and `src/runtime-concept-graph.ts`, cite at least one included file path such as `src/runtime-support.ts` and one excluded path in the manifest, and explain that only listed included paths can support artifact evidence.",
   "declared_confidence": "high",
   "expected_gap_type": null,
   "expected_layer": 4,
