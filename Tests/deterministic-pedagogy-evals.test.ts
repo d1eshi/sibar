@@ -19,6 +19,7 @@ test("deterministic pedagogy eval runner loads the E01 dataset and writes explic
     const report = runDeterministicPedagogyEvals({ reportPath });
 
     assert.equal(report.validation, "VAL-EVAL-002");
+    assert.match(report.dataset.index_path, /evals\/pedagogy-layers\/dataset\/index\.json$/);
     assert.equal(report.no_llm, true);
     assert.equal(report.aggregate.total_cases, 7);
     assert.equal(report.aggregate.passed_cases, 7);

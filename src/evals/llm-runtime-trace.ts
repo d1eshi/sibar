@@ -1,5 +1,5 @@
 import { existsSync, mkdirSync, rmSync, writeFileSync } from "node:fs";
-import { dirname, join, resolve } from "node:path";
+import { dirname, join, relative, resolve } from "node:path";
 import { randomUUID } from "node:crypto";
 
 import { handleRequest } from "../runtime.ts";
@@ -8,9 +8,14 @@ import { loadEvalDataset } from "./deterministic-pedagogy/dataset.ts";
 import { materializeFixture } from "./deterministic-pedagogy/fixtures.ts";
 import type { EvalCase } from "./deterministic-pedagogy/types.ts";
 
-const DEFAULT_INDEX = "docs/missions/sibi-v01-build-to-learn/evals/dataset/index.json";
-const DEFAULT_REPORT = "docs/missions/sibi-v01-build-to-learn/evals/reports/VAL-EVAL-003-005-llm-runtime-trace.json";
+const DEFAULT_INDEX = "evals/pedagogy-layers/dataset/index.json";
+const DEFAULT_REPORT = "evals/pedagogy-layers/reports/VAL-EVAL-003-005-llm-runtime-trace.json";
 const DEFAULT_TEMP_PREFIX = ".sibi-llm-trace-eval-runtime-";
+
+function toRepoRelative(filePath: string): string {
+  const rel = relative(process.cwd(), resolve(filePath));
+  return rel || ".";
+}
 
 type CodexModelConfig = {
   model_name: "gpt-5.2" | "gpt-5.5";
@@ -300,7 +305,7 @@ export function runLlmRuntimeTraceEvals(options: LlmRuntimeTraceRunOptions = {})
       dataset: {
         id: index.dataset_id,
         version: index.version,
-        index_path: indexPath,
+        index_path: toRepoRelative(indexPath),
         benchmark_quality_claim: false,
         sizing_note: "Uses the E01 7-case contract seed only; dataset_sizing_research.md requires 35 pilot and 210 scale cases before benchmark-quality claims.",
       },

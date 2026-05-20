@@ -19,7 +19,7 @@
   ],
   "notes": [
     "This is a canonical pilot contract, not a benchmark-quality corpus.",
-    "Benchmark-size claims require evals/dataset_sizing_research.md and a larger stratified dataset."
+    "Benchmark-size claims require docs/missions/sibi-v01-build-to-learn/evals/dataset_sizing_research.md and a larger stratified dataset."
   ],
   "cases": [
     {

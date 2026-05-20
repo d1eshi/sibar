@@ -8,7 +8,8 @@
     "raw LLM text cannot bypass JSON extraction, schema validation, or pedagogy invariants",
     "fixture adapters remain deterministic and offline",
     "Rust workspace compiler process output maps into the Pedagogo WorkspacePlan contract",
-    "Codex runner execution is represented as auditable metadata when live execution is disabled"
+    "Codex runner execution is represented as auditable metadata when live execution is disabled",
+    "provider-neutral model output must normalize to CandidatePlan before WorkspacePlan state"
   ],
   "docs": [
     "docs/specs/deep-ownership-workspace/15_workspace_intent_compiler.md",
@@ -30,6 +31,11 @@
       "kind": "eval-manifest",
       "path": "evals/workspace-plan-adapters/workspace-runner-adapter.eval.json",
       "description": "Case declarations for Rust fixture and offline Codex runner adapter coverage."
+    },
+    {
+      "kind": "eval-manifest",
+      "path": "evals/workspace-plan-adapters/workspace-model-io-boundary.eval.json",
+      "description": "Case declarations for provider-neutral model output parsing and adapter rejection."
     },
     {
       "kind": "rust-fixture",
@@ -66,6 +72,20 @@
         "evals/workspace-plan-adapters/reports/VAL-EVAL-010-workspace-runner-adapter.json"
       ],
       "answers": "Does the Rust fixture path execute and project correctly while Codex execution remains blocked and auditable offline?"
+    },
+    {
+      "validation": "VAL-EVAL-011-workspace-model-io-boundary",
+      "title": "Workspace model IO boundary eval",
+      "command": "pnpm eval:workspace-model-io-boundary",
+      "implementation": "src/evals/workspace-model-io-boundary.ts",
+      "llm_execution": "disabled",
+      "inputs": [
+        "evals/workspace-plan-adapters/workspace-model-io-boundary.eval.json"
+      ],
+      "reports": [
+        "evals/workspace-plan-adapters/reports/VAL-EVAL-011-workspace-model-io-boundary.json"
+      ],
+      "answers": "Can any provider output be normalized from direct JSON, candidate_plan envelopes, or logged stdout while malformed output and unknown adapters are rejected?"
     }
   ]
 }

@@ -6,6 +6,9 @@ Evaluate Sibi's pedagogy runtime without any LLM dependency.
 
 ## Scope
 
+The deterministic dataset and generated reports live in
+`evals/pedagogy-layers/`; this document describes the validation contract.
+
 Use `EvalCase` fixtures to test:
 
 1. layer classification
@@ -26,4 +29,3 @@ Use `EvalCase` fixtures to test:
 
 The deterministic eval command or test suite must pass against the canonical
 dataset and produce an inspectable report.
-

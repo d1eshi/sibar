@@ -11,6 +11,9 @@ Start here:
   readiness loop.
 - `workspace-plan-adapters/eval-suite.json`: evals for WorkspacePlan LLM and
   runner adapters.
+- `pedagogy-layers/eval-suite.json`: deterministic pedagogy cases plus semantic
+  coverage reporting across layers, answer classes, gaps, operations, evidence,
+  and loop stages.
 
 Use `pnpm eval:catalog` to list suites, inputs, commands, and report outputs.
 The catalog test verifies that declared paths and commands stay valid.

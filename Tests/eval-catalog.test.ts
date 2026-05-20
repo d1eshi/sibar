@@ -12,7 +12,7 @@ test("eval catalog declares discoverable suites with valid commands and paths", 
   assert.equal(validation.valid, true);
   assert.deepEqual(
     validation.suites.map((suite) => suite.suiteId),
-    ["attempt-readiness", "workspace-plan-adapters"],
+    ["attempt-readiness", "workspace-plan-adapters", "pedagogy-layers"],
   );
 
   for (const suite of validation.suites) {
@@ -39,6 +39,8 @@ test("eval:catalog prints the repo eval suites", () => {
   assert.equal(result.status, 0, result.stderr);
   assert.match(result.stdout, /attempt-readiness: Attempt readiness loop evals/);
   assert.match(result.stdout, /workspace-plan-adapters: WorkspacePlan adapter evals/);
+  assert.match(result.stdout, /pedagogy-layers: Pedagogy layer coverage evals/);
   assert.match(result.stdout, /rust-fixture: evals\/workspace-plan-adapters\/fixtures\/rust_workspace_plan_fixture\.json/);
   assert.match(result.stdout, /VAL-EVAL-010-workspace-runner-adapter: pnpm eval:workspace-runner-adapter/);
+  assert.match(result.stdout, /VAL-EVAL-012-pedagogy-coverage: pnpm eval:pedagogy-coverage/);
 });

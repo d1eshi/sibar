@@ -183,7 +183,7 @@ El primer benchmark interno debe probar si SIBI detecta gaps reales mejor que un
 Ya existe una base en:
 
 - `Tests/deterministic-pedagogy-evals.test.ts`
-- `docs/missions/sibi-v01-build-to-learn/evals/dataset/cases`
+- `evals/pedagogy-layers/dataset/cases`
 - `src/evals/deterministic-pedagogy`
 
 Pero el benchmark actual parece centrado en clasificación de casos fixture. El benchmark self-hosted debe agregar casos con respuestas humanas o simuladas sobre el propio repo.

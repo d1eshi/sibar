@@ -6,6 +6,9 @@ Define canonical datasets for measuring Sibi's pedagogy, boundaries, and moat.
 
 ## Contract
 
+The executable dataset lives in `evals/pedagogy-layers/dataset/`. This document
+keeps the historical contract and sizing rationale only.
+
 ```text
 EvalCase
   id
