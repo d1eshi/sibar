@@ -2,6 +2,10 @@
 
 This directory owns the direct Tauri workspace prototype UI.
 
+Its implementation direction is governed by the cross-cutting UI technology
+architecture in `../01_ui_technology_architecture.md` (React + TypeScript + Vite,
+Rust/Tauri native boundary, CSS Modules + tokens, static-first behavior).
+
 The active product goal is not a web dashboard in a desktop frame. It is a
 native-feeling study workspace with one bounded onboarding flow and one focused
 workspace session.

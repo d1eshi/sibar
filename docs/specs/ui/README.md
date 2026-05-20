@@ -6,6 +6,11 @@ iteration notes, and prototypes.
 
 ## Surfaces
 
+### Transversal UI Specs
+
+- `01_ui_technology_architecture.md` - cross-cutting UI technology and boundary
+  architecture for the Tauri desktop workspace.
+
 1. `web/`
    Public web surface: landing, public demo, reader/source-ingestion moments,
    and deployable narrative prototypes.
