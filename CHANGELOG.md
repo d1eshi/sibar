@@ -11,6 +11,37 @@ accepted specs and iterations, not by raw commit count.
 Use this section for changes that have landed but are not part of a tagged
 release yet.
 
+### Added - Workspace Intent First Flow
+
+- Added the Workspace Intent spec as the first user-facing Sibar Research
+  Workspace flow, distinguishing global ambition from a bounded workspace and
+  documenting the transition from `WorkspaceIntent` to `WorkspacePlan`,
+  `SessionPlan`, and `EvidencePlan`.
+- Added PedagogoAI Workspace Intent contracts, deterministic builders, and
+  validators under `src/pedagogoai`.
+- Added a minimal `Create Workspace` UI entry in the Sibar research workspace
+  app that compiles the intent through the core contract layer before opening
+  the first session.
+
+### Changed - Sibar Research Workspace Visual Direction
+
+- Added an image-first UI/UX report and mockup reference for the Sibar research
+  workspace direction.
+- Reworked the static research workspace variation around a macOS-like shell,
+  left learning tree, focused Backpropagation session, contextual Discussion
+  panel, and a warmer artifact/evidence strip.
+- Wired the three visible next actions to observable workspace actions: Read,
+  Code, and Explain.
+
+### Internal - PedagogoAI Layer Boundary
+
+- Added a declarative `src/pedagogoai` architecture layer that maps learning
+  workspace contracts, pedagogy policy, evidence/artifacts, readiness/mastery,
+  gap repair, recall/review, source-to-session compilation, and track
+  specialization into explicit domain entrypoints.
+- Reframed Explain A-Z as a PedagogoAI track alongside Deep Ownership, while
+  preserving existing runtime imports through adapter reexports.
+
 ### Fixed - Live Workspace Preview and Evidence Ranges
 
 - Updated live workspace contract generation so `artifact_previews` render text from
@@ -21,6 +52,28 @@ release yet.
 - Updated artifact type inference for PDF/paper handling, including `.pdf` path
   detection and clearer `preview_fallback_reason` messages when no renderable
   snippet exists for non-text previews.
+
+### Fixed - Deep Ownership Workspace Tree Selection State
+
+- Fixed roadmap tree selection in the second Tauri workspace so container nodes
+  still control expand/collapse while node and mini-node selections no longer
+  collapse their children unexpectedly.
+- Fixed roadmap source-node selection so source clicks now drive reader/LM
+  context consistently (`activeSourceSelection`, `activeNodeSource`,
+  `lmReaderMove`) and log the selection action.
+- Fixed applied roadmap artifacts so imported `mini_nodes`, `sources`,
+  prerequisites, and reader guidance survive into the roadmap tree and reader
+  instead of falling back to generic node defaults.
+- Updated tests and spec pack references so the live spec source is read from
+  `00_new_app_tauri_workspace.md` and the README identifies
+  `13_tauri_second_app_product_plan.md` as derived/historical context.
+
+### Internal - Deep Ownership Workspace Modularization
+
+- Refactored the monolithic `research-workspace.js` into focused modules
+  (`workspace-data`, `workspace-utils`, `workspace-study-plans`,
+  `workspace-contract`, `workspace-session`, `workspace-render`, and
+  `workspace-app`) while keeping the facade API and behavior stable.
 
 ### Added - Native Explain A-Z Attempt Bridge
 
@@ -133,6 +186,48 @@ release yet.
   center preview updates from runtime-provided options to match the selected artifact.
 - During attempt submission, the composer now visibly disables controls until the submit
   resolves, preventing duplicate interactions while preserving selection state.
+
+### Docs - Tauri Second App Workspace Spec
+
+- Treat `docs/specs/deep-ownership-workspace/00_new_app_tauri_workspace.md`
+  as the current source spec for the second sibling Sibar app in Tauri
+  (`workspace investigador`), with
+  `docs/specs/deep-ownership-workspace/13_tauri_second_app_product_plan.md`
+  retained as a derived implementation plan, including:
+  - conceptual stack (Mission → Roadmap → Node → Session → Artifact → Evidence → Recall),
+  - first-screen UX (`Today`) requirements,
+  - bounded LM tool mode,
+  - no-goals and acceptance gates,
+  - concrete criteria to decide whether Swift or Tauri continues as the main
+    native shell.
+  - implemented static/Tauri slice in `apps/sibar-research-workspace/` with:
+    - Today-first workspace entry and source-to-roadmap screen,
+    - bounded LM modes with the attempt/evidence/readiness loop,
+    - source-to-roadmap + attempt, evidence, and readiness flow contracts,
+    - selectable roadmap nodes that expand the reader into five mini-node
+      study paths with paper/direct-reading resources,
+    - contextual LM guidance that tracks the active node, selected mini-node,
+      and "No entiendo este concepto" repair path,
+    - focused tests over the implemented workspace behavior and static Tauri
+      scaffold.
+
+### Added - Tauri Research Workspace Contract Work
+
+- Reworked the static roadmap pane into an expandable hierarchy (Mission → Arc → Track →
+  Node → Mini-node → Source) with expansion state persisted in UI state and active
+  selection tied into reader/LM updates.
+- Added exported contract helpers for the static artifact flow:
+  `buildRoadmapCompilerRequest`, `buildRoadmapArtifactFromRequest`,
+  `validateRoadmapArtifact`, `importRoadmapArtifact`, and `applyRoadmapArtifact`,
+  enabling validate/import loops without external APIs.
+- Extended node coverage beyond Backprop-only fallbacks by adding explicit mini-node
+  plans for `tokenization`, `transformer`, and `scaling` with dedicated reader paths.
+- Added anti-overload behavior in contract decisions and session state (`max
+  active sessions: 1`, `max visible choices: 3`, locked reasons/prerequisites,
+  recommended next node plus alternatives and why-not rationale).
+- Added UI controls to generate a contract payload and apply generated or validated
+  sample artifacts directly in the session panel; `todayMission`/`todayArc` now
+  update from applied artifact metadata.
 
 Each changelog-worthy change should be updated in the same commit as the work it
 describes. Skip this file only when the commit is purely mechanical and does not

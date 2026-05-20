@@ -48,29 +48,33 @@ understanding.
 
 ## Directory Reading Order
 
-1. `00_north_star.md` explains the product ambition, first user, and moat.
-2. `01_deep_ownership_loop.md` defines the core loop and data contract.
-3. `02_workspace_architecture.md` defines the headless core, desktop surfaces,
+1. `00_new_app_tauri_workspace.md` is the current source spec for the second Tauri app.
+2. `00_north_star.md` explains the product ambition, first user, and moat.
+3. `01_deep_ownership_loop.md` defines the core loop and data contract.
+4. `02_workspace_architecture.md` defines the headless core, desktop surfaces,
    adapters, storage, and trust boundaries.
-4. `03_ui_product_surface.md` defines the Sibi Lens and Sibi Workspace/Lab UI.
-5. `04_generated_thinking_artifacts.md` defines artifacts such as code slices,
+5. `03_ui_product_surface.md` defines the Sibi Lens and Sibi Workspace/Lab UI.
+6. `04_generated_thinking_artifacts.md` defines artifacts such as code slices,
    diagrams, equation breakdowns, paper excerpts, hypothesis tables, and
    experiments.
-6. `05_codebase_and_research_intelligence.md` defines how Sibi reads repos,
+7. `05_codebase_and_research_intelligence.md` defines how Sibi reads repos,
    tests, docs, papers, notebooks, and large directories without pretending
    context is infinite.
-7. `06_pedagogy_memory_and_readiness.md` defines the attempt-first rules,
+8. `06_pedagogy_memory_and_readiness.md` defines the attempt-first rules,
    prerequisite ladders, memory, and readiness.
-8. `07_commands_workspace_signals_and_mutation.md` defines commands, signals,
+9. `07_commands_workspace_signals_and_mutation.md` defines commands, signals,
    study mutations, and product mutations.
-9. `08_validation_contract.md` defines `VAL-*` assertions that implementation
+10. `08_validation_contract.md` defines `VAL-*` assertions that implementation
    must satisfy.
-10. `09_implementation_plan.md` defines a Droid-ready implementation sequence.
-11. `10_droid_execution_brief.md` gives a concise worker/orchestrator brief.
-12. `11_open_decisions.md` lists decisions that remain intentionally open.
-13. `12_ui_reference_components.md` extracts reproducible UI components from
+11. `09_implementation_plan.md` defines a Droid-ready implementation sequence.
+12. `10_droid_execution_brief.md` gives a concise worker/orchestrator brief.
+13. `11_open_decisions.md` lists decisions that remain intentionally open.
+14. `12_ui_reference_components.md` extracts reproducible UI components from
     the Sibi Lens + Lab iteration references.
-14. `features.json` translates the spec pack into an implementation queue.
+15. `13_tauri_second_app_product_plan.md` is the derived/historical plan for this workspace.
+16. `14_workspace_intent_flow.md` defines Workspace Intent as the first
+    user-facing create-workspace flow before a pre-filled workspace appears.
+17. `features.json` translates the spec pack into an implementation queue.
 
 ## Naming Decision
 
