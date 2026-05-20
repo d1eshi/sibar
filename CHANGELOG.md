@@ -57,6 +57,10 @@ release yet.
 - Updated the research workspace UI adapter to prefer the native Tauri compiler
   bridge when available, falling back to the local dev endpoint or deterministic
   compiler outside the desktop host.
+- Tightened the native compiler bridge after verifier review: fixture paths are
+  forwarded when configured, static HTML no longer attempts the web compiler by
+  default, Tauri runs the compiler on a blocking worker, and Rust validates the
+  2-3 `next_actions` UI contract.
 
 ### Fixed - Codex Workspace Output Schema Strictness
 

@@ -296,6 +296,7 @@ export async function compileWorkspaceIntentWithRunner(input, options = {}) {
           input,
           adapter,
           runCodex: true,
+          ...(options.fixturePath ? { fixturePath: options.fixturePath } : {}),
         },
       });
       return compileWorkspaceIntentFromNativeResult(input, nativeResult, adapter);
@@ -306,6 +307,14 @@ export async function compileWorkspaceIntentWithRunner(input, options = {}) {
         adapter,
       );
     }
+  }
+
+  if (options.allowWebCompiler !== true) {
+    return buildWorkspaceIntentRunnerFallback(
+      input,
+      "Native workspace compiler unavailable; local compiler generated the workspace plan without network calls.",
+      adapter,
+    );
   }
 
   try {

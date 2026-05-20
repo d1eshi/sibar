@@ -39,11 +39,18 @@ function buildRustPlanFixture(rustIntent: { source_bundle: { evidence: { id: str
       },
       is_advanced: false,
     }],
-    next_actions: [{
-      label: "Revisar node runtime-entry",
-      target_node_id: "node-runtime-entry",
-      visible: true,
-    }],
+    next_actions: [
+      {
+        label: "Revisar node runtime-entry",
+        target_node_id: "node-runtime-entry",
+        visible: true,
+      },
+      {
+        label: "Producir artifact de entrada",
+        target_node_id: "node-runtime-entry",
+        visible: true,
+      },
+    ],
     artifact_requirements: [{
       id: "artifact-runtime-entry",
       path: "src/runtime.ts",
