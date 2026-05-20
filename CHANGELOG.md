@@ -20,6 +20,18 @@ release yet.
 - Moved generated workspace UI references under
   `docs/specs/ui/workspace-tauri/assets/`.
 
+### Docs - UI Technology Architecture (Tauri Workspace)
+
+- Added `docs/specs/ui/01_ui_technology_architecture.md` as a transversal UI
+  architecture spec for the Tauri workspace.
+- Declared React + TypeScript + Vite as the UI baseline with CSS Modules plus
+  tokens as the initial styling strategy.
+- Clarified the Rust/Tauri native boundary and that runner/sidecar/runtime
+  effects are out-of-scope for UI specs (handoff to deep-ownership execution and
+  adapter specs).
+- Added static-first, bounded-state, and component-boundary constraints to avoid
+  "AI slop," including file-size limits and component-boundary rules.
+
 ### Changed - Tauri Workspace UI Prototype
 
 - Refined the static Tauri workspace prototype toward a native two-surface flow:
