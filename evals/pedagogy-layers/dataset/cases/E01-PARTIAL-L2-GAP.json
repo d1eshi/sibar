@@ -1,0 +1,94 @@
+{
+  "id": "E01-PARTIAL-L2-GAP",
+  "title": "Partial isolated explanation creates an important gap and one repair challenge",
+  "case_class": "partial_answer",
+  "artifact_fixture": "fixtures/sibi-runtime-mini",
+  "artifact_boundary": {
+    "root": "fixtures/sibi-runtime-mini",
+    "included_paths": [
+      "src/runtime.ts",
+      "src/runtime-gap-detection.ts",
+      "src/runtime-practice.ts"
+    ],
+    "excluded_paths": [
+      "docs/private-notes.md"
+    ]
+  },
+  "learning_goal": "Trace how a weak answer becomes a gap and then a practice challenge.",
+  "concept_under_test": {
+    "id": "gap-to-practice-flow",
+    "label": "Gap detection to practice challenge flow",
+    "layer_target": 4
+  },
+  "user_answer": {
+    "kind": "answer",
+    "text": "It probably looks at the answer and then makes a practice item later.",
+    "declared_confidence": "low"
+  },
+  "llm_fixture_response": null,
+  "expected_layer": {
+    "level": 2,
+    "label": "Isolated Explanation",
+    "rationale": "The answer names the idea but does not connect evidence, severity, confidence, or gap linkage."
+  },
+  "expected_gap": {
+    "should_create": true,
+    "severity": "important",
+    "confidence": "medium",
+    "observed_layer": 2,
+    "reason": "The answer is directionally right but too thin for applied reasoning."
+  },
+  "expected_misconception": {
+    "should_create": false,
+    "label": null,
+    "reason": "Thin answer evidence supports a gap, not a specific wrong belief."
+  },
+  "expected_challenge": {
+    "should_create": true,
+    "challenge_type": "trace_a_path_across_files",
+    "expected_evidence": [
+      "gap id",
+      "practice challenge id",
+      "one runtime or test citation"
+    ]
+  },
+  "expected_readiness": {
+    "claim": "not ready yet",
+    "confidence": "medium",
+    "must_cite_evidence": true
+  },
+  "required_evidence": [
+    {
+      "path": "src/runtime-gap-detection.ts",
+      "range": "gap creation logic",
+      "expectation": "Accepted evidence must show how answer quality becomes a LearningGap."
+    },
+    {
+      "path": "src/runtime-practice.ts",
+      "range": "challenge construction from gap",
+      "expectation": "Accepted evidence must show the challenge is tied to a gap id."
+    }
+  ],
+  "forbidden_evidence": [],
+  "boundary_expectations": {
+    "accepted_evidence_must_be_inside_boundary": true,
+    "reject_forbidden_evidence": false,
+    "expected_rejection_reason": null
+  },
+  "gap_readiness_expectations": {
+    "create_gap": true,
+    "create_challenge": true,
+    "persist_declared_uncertainty": false,
+    "allowed_readiness_claims": [
+      "not ready yet"
+    ],
+    "disallowed_readiness_claims": [
+      "ready to modify with guardrails",
+      "ready to own"
+    ]
+  },
+  "validation_notes": [
+    "Covers partial answer behavior for VAL-GAP-001 consumers.",
+    "Keeps expected misconception null because the fixture lacks contradiction evidence."
+  ]
+}

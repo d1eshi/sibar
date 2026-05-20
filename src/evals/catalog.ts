@@ -232,7 +232,11 @@ export function validateEvalCatalog(options: { rootDir?: string; catalogPath?: s
         }
         if (existsSync(resolve(rootDir, reportPath))) {
           const report = readJson(resolve(rootDir, reportPath));
-          if (validation && report.validation !== validation) {
+          const reportValidations = Array.isArray(report.validations)
+            ? report.validations.filter((entry): entry is string => typeof entry === "string")
+            : [];
+          const reportMatchesValidation = report.validation === validation || reportValidations.includes(validation ?? "");
+          if (validation && !reportMatchesValidation) {
             pushProblem(problems, reportPath, `report validation must be ${validation}`);
           }
         }

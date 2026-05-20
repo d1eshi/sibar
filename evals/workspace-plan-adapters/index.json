@@ -51,6 +51,28 @@
         "rust_fixture_missing",
         "codex_exec_blocked"
       ]
+    },
+    {
+      "validation": "VAL-EVAL-011-workspace-model-io-boundary",
+      "title": "Workspace model IO boundary eval",
+      "manifest_path": "workspace-model-io-boundary.eval.json",
+      "report_path": "evals/workspace-plan-adapters/reports/VAL-EVAL-011-workspace-model-io-boundary.json",
+      "command": "pnpm eval:workspace-model-io-boundary",
+      "intent_tags": [
+        "provider-neutral",
+        "candidate-plan",
+        "json-extraction",
+        "adapter-selection",
+        "schema-validation"
+      ],
+      "case_classes": [
+        "direct_json_valid",
+        "candidate_plan_envelope_valid",
+        "stdout_contaminated_valid",
+        "malformed_output_rejected",
+        "invalid_candidate_plan_rejected",
+        "unknown_adapter_rejected"
+      ]
     }
   ]
 }

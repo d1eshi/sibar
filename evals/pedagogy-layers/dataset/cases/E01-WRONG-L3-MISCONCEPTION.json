@@ -1,0 +1,99 @@
+{
+  "id": "E01-WRONG-L3-MISCONCEPTION",
+  "title": "Wrong contextual answer records a misconception and immediate repair",
+  "case_class": "wrong_misconception",
+  "artifact_fixture": "fixtures/sibi-runtime-mini",
+  "artifact_boundary": {
+    "root": "fixtures/sibi-runtime-mini",
+    "included_paths": [
+      "src/runtime-support.ts",
+      "src/runtime-gap-detection.ts",
+      "Tests/gap-detection.test.ts"
+    ],
+    "excluded_paths": [
+      "docs/private-notes.md"
+    ]
+  },
+  "learning_goal": "Distinguish runtime lifecycle persistence from one request's in-memory state.",
+  "concept_under_test": {
+    "id": "runtime-lifecycle-vs-request-lifecycle",
+    "label": "Runtime lifecycle versus request lifecycle",
+    "layer_target": 4
+  },
+  "user_answer": {
+    "kind": "answer",
+    "text": "The session only lives in the current request object; after the command returns there is no persisted state to reload.",
+    "declared_confidence": "high"
+  },
+  "llm_fixture_response": null,
+  "expected_layer": {
+    "level": 3,
+    "label": "Contextual Connection",
+    "rationale": "The answer connects request and runtime lifecycle concepts, but the connection contradicts persisted artifact evidence."
+  },
+  "expected_gap": {
+    "should_create": true,
+    "severity": "critical",
+    "confidence": "high",
+    "observed_layer": 3,
+    "reason": "High-confidence contradiction against storage evidence is a critical misconception."
+  },
+  "expected_misconception": {
+    "should_create": true,
+    "label": "runtime lifecycle vs request lifecycle",
+    "reason": "The answer confuses transient request handling with persisted session state."
+  },
+  "expected_challenge": {
+    "should_create": true,
+    "challenge_type": "trace_a_path_across_files",
+    "expected_evidence": [
+      "persistence citation",
+      "reload citation",
+      "misconception label"
+    ]
+  },
+  "expected_readiness": {
+    "claim": "not ready yet",
+    "confidence": "high",
+    "must_cite_evidence": true
+  },
+  "required_evidence": [
+    {
+      "path": "src/runtime-support.ts",
+      "range": "artifact session persistence type or helper",
+      "expectation": "Accepted evidence must show session state exists beyond one request."
+    },
+    {
+      "path": "Tests/gap-detection.test.ts",
+      "range": "wrong answer fixture",
+      "expectation": "Accepted evidence may show the runtime already treats confident contradiction as a critical gap."
+    }
+  ],
+  "forbidden_evidence": [
+    {
+      "path": "docs/private-notes.md",
+      "reason": "Excluded by artifact boundary."
+    }
+  ],
+  "boundary_expectations": {
+    "accepted_evidence_must_be_inside_boundary": true,
+    "reject_forbidden_evidence": true,
+    "expected_rejection_reason": "excluded_path"
+  },
+  "gap_readiness_expectations": {
+    "create_gap": true,
+    "create_challenge": true,
+    "persist_declared_uncertainty": false,
+    "allowed_readiness_claims": [
+      "not ready yet"
+    ],
+    "disallowed_readiness_claims": [
+      "ready to modify with guardrails",
+      "ready to own"
+    ]
+  },
+  "validation_notes": [
+    "Covers a named Sibi misconception class from Spec 05.",
+    "Overconfidence comes from the user's declared confidence here; LLM overconfidence has a separate case."
+  ]
+}

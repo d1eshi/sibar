@@ -1,0 +1,93 @@
+{
+  "id": "E01-MISSING-EVIDENCE-L3",
+  "title": "Plausible answer without citations cannot support readiness",
+  "case_class": "missing_evidence",
+  "artifact_fixture": "fixtures/sibi-runtime-mini",
+  "artifact_boundary": {
+    "root": "fixtures/sibi-runtime-mini",
+    "included_paths": [
+      "src/runtime-readiness.ts",
+      "src/runtime-memory.ts",
+      "Tests/readiness-report.test.ts"
+    ],
+    "excluded_paths": []
+  },
+  "learning_goal": "Explain why readiness claims require citations.",
+  "concept_under_test": {
+    "id": "readiness-claim-evidence",
+    "label": "Readiness claims cite evidence",
+    "layer_target": 4
+  },
+  "user_answer": {
+    "kind": "answer",
+    "text": "Readiness is decided from the memory summary and each claim should point to proof, but I cannot point to the files or ranges yet.",
+    "declared_confidence": "medium"
+  },
+  "llm_fixture_response": null,
+  "expected_layer": {
+    "level": 3,
+    "label": "Contextual Connection",
+    "rationale": "The answer understands the relationship but lacks required evidence citations for applied readiness."
+  },
+  "expected_gap": {
+    "should_create": true,
+    "severity": "important",
+    "confidence": "medium",
+    "observed_layer": 3,
+    "reason": "Missing evidence prevents a readiness upgrade even when the verbal model is plausible."
+  },
+  "expected_misconception": {
+    "should_create": false,
+    "label": null,
+    "reason": "The answer is not contradicted; it is under-evidenced."
+  },
+  "expected_challenge": {
+    "should_create": true,
+    "challenge_type": "write_or_adjust_a_test",
+    "expected_evidence": [
+      "readiness claim evidence ids",
+      "evidence index entry",
+      "test assertion for claim citations"
+    ]
+  },
+  "expected_readiness": {
+    "claim": "not ready yet",
+    "confidence": "medium",
+    "must_cite_evidence": true
+  },
+  "required_evidence": [
+    {
+      "path": "src/runtime-readiness.ts",
+      "range": "claim evidence and evidence index construction",
+      "expectation": "Accepted evidence must show readiness claims are evidence-indexed."
+    },
+    {
+      "path": "Tests/readiness-report.test.ts",
+      "range": "claim citation assertion",
+      "expectation": "Accepted evidence should show tests reject unsupported readiness claims."
+    }
+  ],
+  "forbidden_evidence": [],
+  "boundary_expectations": {
+    "accepted_evidence_must_be_inside_boundary": true,
+    "reject_forbidden_evidence": false,
+    "expected_rejection_reason": null
+  },
+  "gap_readiness_expectations": {
+    "create_gap": true,
+    "create_challenge": true,
+    "persist_declared_uncertainty": false,
+    "allowed_readiness_claims": [
+      "not ready yet",
+      "ready to inspect"
+    ],
+    "disallowed_readiness_claims": [
+      "ready to modify with guardrails",
+      "ready to own"
+    ]
+  },
+  "validation_notes": [
+    "Covers missing evidence separately from wrongness.",
+    "Protects the rule that readiness confidence is not proof."
+  ]
+}

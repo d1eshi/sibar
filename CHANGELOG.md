@@ -40,13 +40,20 @@ release yet.
   identifying Workspace Intent, Rust fixture, and `codex-exec` adapter coverage.
 - Moved attempt-readiness eval manifests, gold cases, mastery checks, generated
   reports, and prototypes out of `docs/specs/selfhost/` into `evals/` and
-  `prototypes/` so docs stay Markdown-only.
+  `prototypes/` so the self-hosted pilot docs stay Markdown-only.
 - Added a declarative `evals/index.json` and per-suite `eval-suite.json`
   manifests plus `pnpm eval:catalog` so agents can discover eval purpose,
   fixtures, commands, and generated reports from the repo root.
 - Added `VAL-EVAL-010-workspace-runner-adapter` for offline runner adapter
   checks across Rust fixture execution, missing-fixture fallback, and blocked
   Codex command metadata.
+- Added `VAL-EVAL-011-workspace-model-io-boundary` for provider-neutral
+  CandidatePlan parsing across direct JSON, envelopes, logged stdout,
+  malformed output, invalid candidates, and unknown adapter rejection.
+- Added `evals/pedagogy-layers/` with the migrated deterministic pedagogy
+  dataset, report outputs, and `VAL-EVAL-012-pedagogy-coverage` for semantic
+  coverage across L1-L5, answer classes, gap labels, operations, evidence
+  conditions, and loop stages.
 
 ### Changed - Workspace Intent Onboarding Compiler
 

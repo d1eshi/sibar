@@ -18,6 +18,9 @@ discoverable together without using historical spec names.
   evals for `WorkspaceIntent` to `WorkspacePlan`.
 - `workspace-runner-adapter.eval.json`: PR #11 Rust runner and Codex runner
   adapter evals.
+- `workspace-model-io-boundary.eval.json`: provider-neutral model output evals
+  for direct JSON, `candidate_plan` envelopes, logged stdout, malformed output,
+  invalid candidates, and unknown adapter rejection.
 
 ## Current Architecture
 
@@ -52,6 +55,10 @@ evals/workspace-plan-adapters/reports/*.json
   explicitly enabled.
 - Rust process: owned by `sibi-workspace-compiler`; TypeScript evals only
   verify runner invocation, adapter status, fallback behavior, and plan mapping.
+- Model IO: any provider may produce direct plan JSON or an envelope containing
+  `candidate_plan`, but the parsed candidate must validate before it can become
+  WorkspacePlan state. Unknown adapter values fail explicitly; only an omitted
+  adapter defaults to the fixture runner.
 
 Run `pnpm eval:catalog` from the repo root to see the suite purpose, protected
 contracts, eval commands, and generated reports.
