@@ -50,6 +50,20 @@ const MODE_DISPLAY_LABELS = {
   "/publish": "Evidence",
 };
 
+function setText(node, value) {
+  if (node) node.textContent = value;
+}
+
+function setHidden(node, hidden) {
+  if (!node) return;
+  node.hidden = hidden;
+  if (hidden) {
+    node.setAttribute?.("hidden", "");
+  } else {
+    node.removeAttribute?.("hidden");
+  }
+}
+
 function nextHint(attemptsCount) {
   return HINTS[Math.min(attemptsCount - 1, HINTS.length - 1)] || "Repair mode: create a smaller reconstruction and re-run attempt.";
 }
@@ -232,14 +246,20 @@ export function initResearchWorkspace({
     hydrateWorkspaceIntentForm(root);
     root.generateWorkspace?.addEventListener("click", async () => {
       root.generateWorkspace.disabled = true;
+      setHidden(root.workspaceIntentPreview, false);
+      setText(root.workspaceIntentPreviewTitle, "Generating Workspace");
+      if (root.workspaceIntentOutputs) root.workspaceIntentOutputs.innerHTML = "";
+      setText(root.workspaceIntentFirstSession, "Waiting for native compiler");
+      if (root.openWorkspaceSession) root.openWorkspaceSession.disabled = true;
       if (root.workspaceIntentStatus) {
-        root.workspaceIntentStatus.textContent = "Generating workspace from your intent.";
+        root.workspaceIntentStatus.textContent = "Running native Codex compiler. This can take 20-60 seconds.";
       }
       try {
         const compiled = await compileWorkspaceIntentWithRunner(readWorkspaceIntentForm(root), {
           adapter: "codex-exec",
           runCodex: true,
         });
+        console.info("[sibar] workspace intent compiler result", compiled.runner);
         const applied = applyWorkspacePlanPreviewToState(state, compiled.workspace_plan);
         state.workspaceIntentCompiled = compiled;
         state.workspaceIntentRunner = compiled.runner;
@@ -254,12 +274,13 @@ export function initResearchWorkspace({
         });
         if (root.workspaceIntentStatus) {
           if (compiled.runner?.status === "completed") {
-            root.workspaceIntentStatus.textContent = "Workspace plan ready.";
+            root.workspaceIntentStatus.textContent = "Workspace plan ready from Codex.";
           } else {
-            root.workspaceIntentStatus.textContent = "Workspace plan ready from local compiler.";
+            root.workspaceIntentStatus.textContent = `Local fallback used: ${compiled.runner?.blocked_reason || "native compiler did not complete"}`;
           }
         }
       } catch (error) {
+        console.error("[sibar] workspace intent compiler failed", error);
         if (root.workspaceIntentStatus) {
           root.workspaceIntentStatus.textContent = error instanceof Error ? error.message : "Workspace compiler failed before render.";
         }
