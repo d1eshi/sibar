@@ -1,0 +1,26 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "Sibar Research Workspace",
+  "version": "0.1.0",
+  "identifier": "com.sibar.research.workspace",
+  "build": {
+    "beforeBuildCommand": "",
+    "beforeDevCommand": "",
+    "beforeBundleCommand": "",
+    "frontendDist": "../"
+  },
+  "app": {
+    "withGlobalTauri": false,
+    "windows": [
+      {
+        "title": "Sibar Research Workspace",
+        "width": 1500,
+        "height": 940,
+        "minWidth": 1100,
+        "minHeight": 720,
+        "resizable": true,
+        "fullscreen": false
+      }
+    ]
+  }
+}

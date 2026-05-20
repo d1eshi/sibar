@@ -134,6 +134,24 @@ release yet.
 - During attempt submission, the composer now visibly disables controls until the submit
   resolves, preventing duplicate interactions while preserving selection state.
 
+### Docs - Tauri Second App Product Plan
+
+- Added `docs/specs/deep-ownership-workspace/13_tauri_second_app_product_plan.md`
+  as the primary artifact for the second sibling Sibar app in Tauri (`workspace
+  investigador`) prototype, including:
+  - conceptual stack (Mission → Roadmap → Node → Session → Artifact → Evidence → Recall),
+  - first-screen UX (`Today`) requirements,
+  - bounded LM tool mode,
+  - no-goals and acceptance gates,
+  - concrete criteria to decide whether Swift or Tauri continues as the main
+    native shell.
+  - implemented static/Tauri slice in `apps/sibar-research-workspace/` with:
+    - Today-first workspace entry and source-to-roadmap screen,
+    - bounded LM modes with the attempt/evidence/readiness loop,
+    - source-to-roadmap + attempt, evidence, and readiness flow contracts,
+    - focused tests over the implemented workspace behavior and static Tauri
+      scaffold.
+
 Each changelog-worthy change should be updated in the same commit as the work it
 describes. Skip this file only when the commit is purely mechanical and does not
 change product behavior, product docs, release readiness, or the public product

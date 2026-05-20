@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sibar Research Workspace</title>
+  <link rel="stylesheet" href="./styles/tokens.css" />
+  <link rel="stylesheet" href="./styles/base.css" />
+  <link rel="stylesheet" href="./styles/workspace.css" />
+</head>
+<body>
+  <main class="research-shell" data-component="research-workspace-root">
+    <section class="today-banner" data-component="today-screen">
+      <p class="eyebrow">Sibar / Research Workspace</p>
+      <h1>Researcher Workspace</h1>
+      <p class="mission-line">
+        Mission status:
+        <span data-field="ambition">Frontier AI researcher</span>
+        ·
+        <span data-field="arc">Neural Nets from Scratch</span>
+      </p>
+
+      <div class="today-grid">
+        <article class="tile">
+          <h2>TODAY</h2>
+          <div class="field-group">
+            <strong>Current ambition</strong>
+            <span data-field="ambition">Frontier AI researcher</span>
+          </div>
+          <div class="field-group">
+            <strong>Current arc</strong>
+            <span data-field="arc">Neural Nets from Scratch</span>
+          </div>
+          <div class="field-group">
+            <strong>Session objective</strong>
+            <span data-field="objective">Build a minimal backprop artifact and explain it without notes.</span>
+          </div>
+          <ul class="checklist" aria-label="Today's required output">
+            <li>1 notebook / explanation pair</li>
+            <li>1 recall card</li>
+            <li>1 evidence commit stub</li>
+          </ul>
+        </article>
+        <article class="tile">
+          <h2>CURRENT STATE</h2>
+          <ul class="state-list">
+            <li><span aria-label="understood">●</span> Neural Nets foundations</li>
+            <li><span aria-label="in-progress">◐</span> Micrograd reconstruction</li>
+            <li><span aria-label="locked">○</span> Scaling intuition and systems</li>
+          </ul>
+        </article>
+      </div>
+    </section>
+
+    <section class="trinity-grid" data-component="workspace-trinity">
+      <section class="panel roadmap-panel" aria-labelledby="roadmap-title" data-component="roadmap-panel">
+        <header>
+          <h2 id="roadmap-title">ROADMAP</h2>
+          <small>Evidence-ready readiness graph</small>
+        </header>
+        <ul id="roadmapList" class="roadmap-list"></ul>
+      </section>
+
+      <section class="panel session-panel" aria-labelledby="session-title" data-component="session-reader-panel">
+        <header>
+          <h2 id="session-title">SESSION / READER</h2>
+          <small>Session loop: Active reconstruction lane</small>
+        </header>
+
+        <label class="sr-only" for="sourceText">Source input</label>
+        <textarea
+          id="sourceText"
+          rows="4"
+          placeholder="Paste a URL, paper note, or article excerpt. Sibar extracts claims and maps them to roadmap nodes."
+        ></textarea>
+        <button id="compileSource" type="button">Compile source to roadmap</button>
+        <p id="compilerResult" class="compiler-result" role="status" aria-live="polite"></p>
+        <section id="sourceCard" class="source-card">
+          <h3>Source card</h3>
+          <p id="sourceCardTitle"></p>
+          <ul id="sourceClaims" class="item-list-inline"></ul>
+          <p class="muted">Suggested nodes</p>
+          <ul id="sourceSuggested" class="item-list-inline"></ul>
+          <p class="muted">Next session outputs</p>
+          <ul id="sourceNextSession" class="item-list-inline"></ul>
+        </section>
+
+        <div class="session-loop">
+          <h3>Learning Node: Backpropagation</h3>
+          <p>Workbench</p>
+          <p>Source: Karpathy-style backprop walkthrough</p>
+          <ul class="session-tasks">
+            <li>Read</li>
+            <li>Explain</li>
+            <li>Build</li>
+            <li>Critique</li>
+            <li>Repair</li>
+          </ul>
+
+          <label for="attemptInput"><strong>Attempt reconstruction first</strong></label>
+          <textarea
+            id="attemptInput"
+            rows="5"
+            placeholder="Write your first reconstruction attempt before requesting a guided hint."
+          ></textarea>
+          <div class="attempt-actions">
+            <button id="submitAttempt" type="button">Submit attempt</button>
+            <button id="requestHint" type="button" disabled>Get next hint</button>
+            <span id="attemptBadge" class="attempt-badge">Attempt 0</span>
+          </div>
+          <p id="attemptFeedback" class="attempt-feedback" aria-live="polite"></p>
+          <div id="attemptHistory" class="attempt-history" aria-live="polite"></div>
+        </div>
+        <section id="workspaceSignals" class="workspace-signals">
+          <p><strong>Readiness:</strong> <span id="readinessSummary">No evidence yet</span></p>
+          <p><strong>Detected gap:</strong> <span id="gapSummary">Attempt before gating actions</span></p>
+          <ul id="evidenceChecklist" class="item-list-inline" aria-live="polite"></ul>
+          <p><strong>Repair action:</strong> <span id="repairActionText">None</span></p>
+        </section>
+      </section>
+
+      <section class="panel lm-panel" aria-labelledby="lm-guide-title" data-component="lm-guide-panel">
+        <header>
+          <h2 id="lm-guide-title">LM GUIDE</h2>
+          <small>Active toolset: /map /read /explain /test /critic /repair /build /publish</small>
+        </header>
+        <ul class="lm-modes" id="lmModes">
+          <li><button type="button" data-mode="/map">/map</button></li>
+          <li><button type="button" data-mode="/read">/read</button></li>
+          <li><button type="button" data-mode="/explain">/explain</button></li>
+          <li><button type="button" data-mode="/test">/test</button></li>
+          <li><button type="button" data-mode="/critic">/critic</button></li>
+          <li><button type="button" data-mode="/repair">/repair</button></li>
+          <li><button type="button" data-mode="/build">/build</button></li>
+          <li><button type="button" data-mode="/publish">/publish</button></li>
+        </ul>
+        <p id="lmModeStatus" class="lm-mode-status" aria-live="polite">Mode: /map</p>
+        <ul id="modeActionLog" class="mode-log" aria-live="polite"></ul>
+      </section>
+    </section>
+
+    <section class="artifact-strip" data-component="artifacts-evidence-strip">
+      <h2>ARTIFACTS / EVIDENCE</h2>
+      <div class="artifact-columns">
+        <div>
+          <h3>Artifacts</h3>
+          <ul id="artifactList" class="item-list"></ul>
+        </div>
+        <div>
+          <h3>Evidence</h3>
+          <ul id="evidenceList" class="item-list"></ul>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script type="module" src="./scripts/research-workspace.js"></script>
+</body>
+</html>
