@@ -3,7 +3,7 @@
   "$id": "https://example.com/workspace-plan.schema.json",
   "type": "object",
   "additionalProperties": false,
-  "required": ["objective", "bounded_objective", "nodes", "next_actions", "artifact_requirements", "questions_if_blocked"],
+  "required": ["objective", "bounded_objective", "nodes", "next_actions", "artifact_requirements", "questions_if_blocked", "ui_projection"],
   "properties": {
     "objective": {
       "type": "string",
@@ -19,23 +19,30 @@
     },
     "next_actions": {
       "type": "array",
-      "items": { "$ref": "#/$defs/next_action" }
+      "items": { "$ref": "#/$defs/next_action" },
+      "minItems": 1
     },
     "artifact_requirements": {
       "type": "array",
-      "items": { "$ref": "#/$defs/workspace_artifact_requirement" }
+      "items": { "$ref": "#/$defs/workspace_artifact_requirement" },
+      "minItems": 1
     },
     "questions_if_blocked": {
       "type": "array",
       "items": { "type": "string" }
     },
-    "ui_projection": { "$ref": "#/$defs/ui_projection" }
+    "ui_projection": {
+      "anyOf": [
+        { "$ref": "#/$defs/ui_projection" },
+        { "type": "null" }
+      ]
+    }
   },
   "$defs": {
     "workspace_artifact_requirement": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["id", "path", "requires"],
+      "required": ["id", "path", "requires", "optional", "confidence"],
       "properties": {
         "id": { "type": "string", "minLength": 1 },
         "path": { "type": "string", "minLength": 1 },
@@ -50,21 +57,24 @@
     "workspace_node": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["id", "prerequisites", "concepts", "source_links", "artifact_requirement", "is_advanced"],
+      "required": ["id", "title", "prerequisites", "concepts", "source_links", "artifact_requirement", "is_advanced", "locked"],
       "properties": {
         "id": { "type": "string", "minLength": 1 },
         "title": { "type": ["string", "null"] },
         "prerequisites": {
           "type": "array",
-          "items": { "type": "string" }
+          "items": { "type": "string", "minLength": 1 },
+          "minItems": 1
         },
         "concepts": {
           "type": "array",
-          "items": { "type": "string" }
+          "items": { "type": "string", "minLength": 1 },
+          "minItems": 1
         },
         "source_links": {
           "type": "array",
-          "items": { "$ref": "#/$defs/source_link" }
+          "items": { "$ref": "#/$defs/source_link" },
+          "minItems": 1
         },
         "artifact_requirement": { "$ref": "#/$defs/workspace_artifact_requirement" },
         "is_advanced": { "type": "boolean" },
@@ -81,7 +91,7 @@
     "next_action": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["label", "visible"],
+      "required": ["label", "target_node_id", "visible"],
       "properties": {
         "label": { "type": "string", "minLength": 1 },
         "target_node_id": { "type": ["string", "null"] },
@@ -91,7 +101,7 @@
     "source_link": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["evidence_id"],
+      "required": ["evidence_id", "rationale"],
       "properties": {
         "evidence_id": { "type": "string", "minLength": 1 },
         "rationale": { "type": ["string", "null"] }
@@ -99,7 +109,8 @@
     },
     "ui_projection": {
       "type": "object",
-      "required": ["title", "summary"],
+      "additionalProperties": false,
+      "required": ["title", "summary", "badges"],
       "properties": {
         "title": { "type": "string", "minLength": 1 },
         "summary": { "type": "string", "minLength": 1 },

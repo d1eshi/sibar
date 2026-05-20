@@ -206,6 +206,8 @@ pub fn build_codex_prompt(
             "Use evidence_id values strictly from source_bundle.evidence.\n",
             "Do not invent paths, node ids, source ids, or other fields.\n",
             "At most 3 next_actions may have visible=true.\n\n",
+            "Every node must include at least one prerequisite, one concept, one source_link, and one artifact requirement.\n",
+            "If a beginner node has no prior prerequisite, use a concrete prerequisite like 'read e-embedding-definition first'.\n\n",
             "WorkspaceIntent (normalized_user_intent):\n",
             "{normalized}\n\n",
             "Source paths:\n",
