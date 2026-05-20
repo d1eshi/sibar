@@ -25,9 +25,9 @@ then run the conventional Tauri command from this folder.
 
 ## Product surface checks in this slice
 
-- Today-first header and work queue
-- 3-column workspace: ROADMAP, SESSION / READER, LM GUIDE
-- LM tool mode rail with `/map /read /explain /test /critic /repair /build /publish`
+- Native-style shell with left learning tree, focused session, and Discussion panel
+- 3-column workspace: learning tree, Today session, contextual Discussion
+- Three visible next actions: Read, Code, Explain
 - Source-to-roadmap behavior
 - Attempt-first reconstruction flow and hint ladder
-- Bottom evidence/artifact strip
+- Bottom artifact/evidence/recall strip

@@ -11,6 +11,16 @@ accepted specs and iterations, not by raw commit count.
 Use this section for changes that have landed but are not part of a tagged
 release yet.
 
+### Changed - Sibar Research Workspace Visual Direction
+
+- Added an image-first UI/UX report and mockup reference for the Sibar research
+  workspace direction.
+- Reworked the static research workspace variation around a macOS-like shell,
+  left learning tree, focused Backpropagation session, contextual Discussion
+  panel, and a warmer artifact/evidence strip.
+- Wired the three visible next actions to observable workspace actions: Read,
+  Code, and Explain.
+
 ### Internal - PedagogoAI Layer Boundary
 
 - Added a declarative `src/pedagogoai` architecture layer that maps learning

@@ -145,6 +145,32 @@ function makeSimpleNode() {
   };
 }
 
+function makeInteractiveNode(dataset = {}) {
+  const eventMap = {};
+  return {
+    innerHTML: "",
+    textContent: "",
+    value: "",
+    disabled: false,
+    dataset: { ...dataset },
+    attributes: {},
+    addEventListener(eventName, handler) {
+      if (!eventMap[eventName]) eventMap[eventName] = [];
+      eventMap[eventName].push(handler);
+    },
+    click() {
+      (eventMap.click || []).forEach((handler) => handler({ currentTarget: this, target: this }));
+    },
+    setAttribute(name, value) {
+      this.attributes[name] = String(value);
+    },
+    getAttribute(name) {
+      return this.attributes[name];
+    },
+    querySelectorAll: () => [],
+  };
+}
+
 function createElementSpy(tagName) {
   return {
     tagName: tagName.toUpperCase(),
@@ -180,23 +206,120 @@ const productTerms = [
 ];
 
 test("second app exposes the research workspace screen contract", () => {
-  assert.match(workspaceHtml, /<h1>Researcher Workspace<\/h1>/);
-  assert.match(workspaceHtml, /TODAY/);
-  assert.match(workspaceHtml, /ROADMAP/);
-  assert.match(workspaceHtml, /SESSION \/ READER/);
-  assert.match(workspaceHtml, /LM GUIDE/);
-  assert.match(workspaceHtml, /ARTIFACTS \/ EVIDENCE/);
+  assert.match(workspaceHtml, /<strong>Sibar<\/strong>/);
+  assert.match(workspaceHtml, /Today/);
+  assert.match(workspaceHtml, /Backpropagation/);
+  assert.match(workspaceHtml, /Discussion/);
+  assert.match(workspaceHtml, /Learning tree focus/);
+  assert.match(workspaceHtml, /Artifacts \/ Evidence/);
+  assert.match(workspaceHtml, /Read/);
+  assert.match(workspaceHtml, /Code/);
+  assert.match(workspaceHtml, /Explain/);
   assert.match(workspaceHtml, /Compile source to roadmap/);
   assert.match(workspaceHtml, /Generate compiler contract payload/);
   assert.match(workspaceHtml, /Apply generated artifact/);
   assert.match(workspaceHtml, /Apply validated sample artifact/);
   assert.match(workspaceHtml, /Attempt reconstruction first/);
-  assert.match(workspaceHtml, /No entiendo este concepto/);
-  assert.match(workspaceHtml, /Deep knowledge mini-nodes/);
-  assert.match(workspaceHtml, /Decision alternatives/);
-  assert.match(workspaceHtml, /Why not others/);
-  assert.match(workspaceHtml, /Active study context/);
-  assert.match(workspaceHtml, /\//); // command-like tool mode markers exist in HTML
+  assert.match(workspaceHtml, /Ask/);
+  assert.match(workspaceHtml, /Key insight/);
+  assert.doesNotMatch(workspaceHtml, /LM GUIDE/);
+  assert.doesNotMatch(workspaceHtml, /Slash command/i);
+  assert.doesNotMatch(workspaceHtml, /data-mode="\/map"/);
+});
+
+test("next actions are declared and wired to read, code, and explain actions", async () => {
+  assert.match(workspaceHtml, /id="studyChoiceNow"[^>]*data-study-choice="read"/);
+  assert.match(workspaceHtml, /id="studyChoiceBuild"[^>]*data-study-choice="build"[^>]*data-action-mode="\/build"/);
+  assert.match(workspaceHtml, /id="studyChoiceExplain"[^>]*data-study-choice="explain"[^>]*data-action-mode="\/explain"/);
+
+  const workspaceModule = await import(moduleUrl);
+  const modeButtons = LM_MODES.map((mode) => makeInteractiveNode({ mode }));
+  const modePanel = {
+    querySelectorAll: () => modeButtons,
+    appendChild: () => {},
+  };
+  const ids = [
+    "todayMission",
+    "todayMissionField",
+    "todayArc",
+    "todayArcField",
+    "contractPayload",
+    "contractStatus",
+    "buildContractPayload",
+    "applyGeneratedArtifact",
+    "applySampleArtifact",
+    "roadmapList",
+    "artifactList",
+    "evidenceList",
+    "lmModeStatus",
+    "modeActionLog",
+    "attemptHistory",
+    "sourceText",
+    "compileSource",
+    "compilerResult",
+    "attemptInput",
+    "submitAttempt",
+    "requestHint",
+    "attemptBadge",
+    "attemptFeedback",
+    "sourceCard",
+    "sourceCardTitle",
+    "sourceClaims",
+    "sourceSuggested",
+    "sourceNextSession",
+    "activeNodeTitle",
+    "activeNodeFocus",
+    "activeNodeSource",
+    "conceptConfusion",
+    "miniNodeList",
+    "readerInstruction",
+    "readerResourceList",
+    "evidenceChecklist",
+    "readinessSummary",
+    "gapSummary",
+    "repairActionText",
+    "lmActiveNode",
+    "lmActiveMiniNode",
+    "lmRecommendedDecision",
+    "lmDecisionAlternatives",
+    "lmDecisionLockedReasons",
+    "lmReaderMove",
+  ];
+  const nodesById = new Map(ids.map((id) => [id, createHtmlAwareElement(id)]));
+  nodesById.set("lmModes", modePanel);
+  nodesById.set("studyChoiceNow", makeInteractiveNode({ studyChoice: "read" }));
+  nodesById.set("studyChoiceBuild", makeInteractiveNode({ studyChoice: "build", actionMode: "/build" }));
+  nodesById.set("studyChoiceExplain", makeInteractiveNode({ studyChoice: "explain", actionMode: "/explain" }));
+
+  const previousDocument = globalThis.document;
+  const previousWindow = globalThis.window;
+
+  try {
+    // @ts-expect-error test shim
+    globalThis.document = { getElementById: (id) => nodesById.get(id) || null };
+    // @ts-expect-error test shim
+    globalThis.window = { addEventListener: () => {} };
+
+    const workspace = workspaceModule.initResearchWorkspace({});
+
+    nodesById.get("studyChoiceNow")?.click();
+    assert.equal(workspace.state.mode, "/read");
+    assert.match(nodesById.get("attemptFeedback")?.textContent || "", /Reader focus for/);
+    assert.match(nodesById.get("modeActionLog")?.innerHTML || "", /\[read\]/);
+
+    nodesById.get("studyChoiceBuild")?.click();
+    assert.equal(workspace.state.mode, "/build");
+    assert.match(nodesById.get("attemptFeedback")?.textContent || "", /Build scope pinned/);
+    assert.equal(workspace.state.artifacts.some((item) => item.includes("Build requirement")), true);
+
+    nodesById.get("studyChoiceExplain")?.click();
+    assert.equal(workspace.state.mode, "/explain");
+    assert.match(nodesById.get("attemptFeedback")?.textContent || "", /Explain is scoped and withheld|Hint-only explain scope/);
+    assert.match(nodesById.get("modeActionLog")?.innerHTML || "", /\[scope\]/);
+  } finally {
+    globalThis.document = previousDocument;
+    globalThis.window = previousWindow;
+  }
 });
 
 test("product vocabulary is present in the current Tauri workspace spec", () => {
@@ -247,10 +370,10 @@ test("workspace copy is work-surface oriented", () => {
   for (const matcher of META_COPY_CANDIDATES) {
     assert.doesNotMatch(workspaceHtml, matcher);
   }
-  assert.match(workspaceHtml, /Sibar \/ Research Workspace/);
-  assert.match(workspaceHtml, /Mission status/);
-  assert.match(workspaceHtml, /Session loop: Active reconstruction lane/);
-  assert.match(workspaceHtml, /Active toolset: \/map \/read \/explain \/test \/critic \/repair \/build \/publish/);
+  assert.match(workspaceHtml, /Scope: Selected fragment in "Backpropagation"/);
+  assert.match(workspaceHtml, /Session output/);
+  assert.match(workspaceHtml, /Context notes/);
+  assert.match(workspaceHtml, /Ask about the selected fragment/);
 });
 
 test("source-to-roadmap compiler updates roadmap and emits source card payload", async () => {
@@ -1039,43 +1162,24 @@ test("final answer-like output is gated until attempts exist", async () => {
   assert.equal(open.text.includes("full"), false);
 });
 
-test("LM modes are defined once in markup and not duplicated by startup wiring", async () => {
+test("discussion panel replaces the visible command mode grid", async () => {
   const markupModes = [...workspaceHtml.matchAll(/<button[^>]*data-mode="([^"]+)"[^>]*>/g)].map((match) => match[1]);
-  assert.equal(markupModes.length, LM_MODES.length);
-  assert.deepStrictEqual([...markupModes].sort(), [...LM_MODES].sort());
+  assert.equal(markupModes.length, 0);
+  assert.doesNotMatch(workspaceHtml, /id="lmModes"/);
+  assert.match(workspaceHtml, /id="modeActionLog"/);
 
   const scriptModesMatch = workspaceScript.match(/const LM_MODES\s*=\s*\[(.*?)\];/s);
   assert.ok(scriptModesMatch);
   const scriptModes = [...scriptModesMatch[1].matchAll(/"([^"]+)"/g)].map((modeMatch) => modeMatch[1]);
-  assert.equal(scriptModes.length, LM_MODES.length);
   assert.deepStrictEqual([...scriptModes].sort(), [...LM_MODES].sort());
 
   const workspaceModule = await import(moduleUrl);
-
-  const modeButtons = LM_MODES.map((mode) => ({
-    dataset: { mode },
-    textContent: mode,
-    setAttribute: () => {},
-    addEventListener: () => {},
-    type: "button",
-  }));
-
-  const modePanel = {
-    appendCount: 0,
-    querySelectorAll: () => modeButtons,
-    appendChild: (button) => {
-      modePanel.appendCount += 1;
-      modeButtons.push(button);
-      return button;
-    },
-  };
-
   const nodesById = new Map([
     ["roadmapList", makeSimpleNode()],
     ["artifactList", makeSimpleNode()],
     ["evidenceList", makeSimpleNode()],
-    ["lmModes", modePanel],
     ["lmModeStatus", makeSimpleNode()],
+    ["modeActionLog", makeSimpleNode()],
     ["attemptHistory", makeSimpleNode()],
     ["sourceText", makeSimpleNode()],
     ["compileSource", makeSimpleNode()],
@@ -1096,24 +1200,34 @@ test("LM modes are defined once in markup and not duplicated by startup wiring",
     // @ts-expect-error test shim
     globalThis.window = { addEventListener: () => {} };
 
-    workspaceModule.initResearchWorkspace({});
-    assert.equal(modePanel.appendCount, 0);
-    assert.equal(modeButtons.length, LM_MODES.length);
+    const workspace = workspaceModule.initResearchWorkspace({});
+    assert.deepStrictEqual(workspace.wiredModes, []);
+    assert.equal(nodesById.get("lmModeStatus")?.textContent, "Context: Roadmap");
   } finally {
     globalThis.document = previousDocument;
     globalThis.window = previousWindow;
   }
 });
 
-test("fallback LM modes are rendered as list items, not direct buttons", async () => {
+test("optional discussion action controls do not synthesize a slash command grid", async () => {
   const workspaceModule = await import(moduleUrl);
-  const modePanel = createElementSpy("ul");
-  modePanel._children = [];
-  modePanel.querySelectorAll = () =>
-    modePanel._children.flatMap((child) => child.children.filter((childEntry) => childEntry.dataset?.mode));
-  modePanel.appendChild = (node) => {
-    modePanel._children.push(node);
-    return node;
+  const modeButtons = [
+    makeInteractiveNode({ mode: "/read" }),
+    makeInteractiveNode({ mode: "/build" }),
+    makeInteractiveNode({ mode: "/explain" }),
+  ];
+  modeButtons[0].textContent = "Read";
+  modeButtons[1].textContent = "Code";
+  modeButtons[2].textContent = "Explain";
+
+  const modePanel = {
+    appendCount: 0,
+    querySelectorAll: () => modeButtons,
+    appendChild: (button) => {
+      modePanel.appendCount += 1;
+      modeButtons.push(button);
+      return button;
+    },
   };
 
   const nodesById = new Map([
@@ -1122,6 +1236,7 @@ test("fallback LM modes are rendered as list items, not direct buttons", async (
     ["evidenceList", makeSimpleNode()],
     ["lmModes", modePanel],
     ["lmModeStatus", makeSimpleNode()],
+    ["modeActionLog", makeSimpleNode()],
     ["attemptHistory", makeSimpleNode()],
     ["sourceText", makeSimpleNode()],
     ["compileSource", makeSimpleNode()],
@@ -1138,33 +1253,18 @@ test("fallback LM modes are rendered as list items, not direct buttons", async (
 
   try {
     // @ts-expect-error test shim
-    globalThis.document = {
-      getElementById: (id) => nodesById.get(id) || null,
-      createElement: (tagName) => {
-        const created = createElementSpy(tagName);
-        return created;
-      },
-    };
+    globalThis.document = { getElementById: (id) => nodesById.get(id) || null };
     // @ts-expect-error test shim
     globalThis.window = { addEventListener: () => {} };
 
     const workspace = workspaceModule.initResearchWorkspace({});
-    const insertedNodes = modePanel._children;
-    const buttons = insertedNodes.flatMap((li) => li.children).filter((node) => node.tagName === "BUTTON");
+    assert.equal(modePanel.appendCount, 0);
+    assert.deepStrictEqual([...workspace.wiredModes].sort(), ["/build", "/explain", "/read"]);
 
-    assert.equal(insertedNodes.length, LM_MODES.length);
-    assert.equal(buttons.length, LM_MODES.length);
-
-    const allAreInListItems = insertedNodes.every(
-      (child) => child.tagName === "LI" && Array.isArray(child.children) && child.children[0]?.tagName === "BUTTON",
-    );
-    assert.equal(allAreInListItems, true);
-
-    workspace.setMode("/repair");
-    const repairButton = buttons.find((button) => button.dataset.mode === "/repair");
-    const pressedCount = buttons.filter((button) => button.attributes["aria-pressed"] === "true").length;
-    assert.equal(pressedCount, 1);
-    assert.equal(repairButton?.attributes["aria-pressed"], "true");
+    modeButtons[1].click();
+    assert.equal(workspace.state.mode, "/build");
+    assert.equal(nodesById.get("lmModeStatus")?.textContent, "Context: Code");
+    assert.equal(modeButtons.length, 3);
   } finally {
     globalThis.document = previousDocument;
     globalThis.window = previousWindow;

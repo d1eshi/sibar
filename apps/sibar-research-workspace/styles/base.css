@@ -12,24 +12,27 @@ body {
 body {
   margin: 0;
   font-family: var(--font-sans);
-  background: var(--surface);
+  background: #16130f;
   color: var(--text-primary);
   line-height: 1.45;
+  font-variant-numeric: tabular-nums;
 }
 
 .research-shell {
   min-height: 100vh;
-  padding: 16px;
+  padding: 12px;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  justify-content: center;
+  max-width: 1560px;
+  margin: 0 auto;
 }
 
 .eyebrow {
   margin: 0 0 6px;
   color: var(--text-muted);
   font-size: 12px;
-  letter-spacing: 0.06em;
+  letter-spacing: 0;
   text-transform: uppercase;
 }
 
@@ -60,35 +63,47 @@ h1, h2, h3, p {
 }
 
 button,
+input,
 textarea {
   font: inherit;
 }
 
 button {
   border: 1px solid var(--divider);
-  background: var(--surface);
+  background: var(--surface-field);
   color: var(--text-primary);
   padding: 8px 12px;
   border-radius: var(--radius-sm);
   cursor: pointer;
+  transition: background 180ms ease, border-color 180ms ease, transform 180ms ease;
 }
 
 button:hover {
   background: var(--surface-soft);
+  border-color: var(--accent);
+}
+
+button:active {
+  transform: translateY(1px);
 }
 
 button:focus-visible,
+input:focus-visible,
 textarea:focus-visible {
-  outline: 2px solid var(--blue);
+  outline: 2px solid var(--accent);
   outline-offset: 2px;
 }
 
+input,
 textarea {
   width: 100%;
-  resize: vertical;
   padding: 8px;
   color: var(--text-primary);
-  background: var(--surface);
+  background: var(--surface-field);
   border: 1px solid var(--divider);
   border-radius: var(--radius-sm);
+}
+
+textarea {
+  resize: vertical;
 }

@@ -17,7 +17,6 @@ import {
 } from "./workspace-session.js";
 import {
   initRootElements,
-  makeModeButtonList,
   renderChecklist,
   renderContractPanel,
   renderHistory,
@@ -32,6 +31,16 @@ import {
 } from "./workspace-render.js";
 
 const LM_MODES = ["/map", "/read", "/explain", "/test", "/critic", "/repair", "/build", "/publish"];
+const MODE_DISPLAY_LABELS = {
+  "/map": "Roadmap",
+  "/read": "Read",
+  "/explain": "Explain",
+  "/test": "Recall",
+  "/critic": "Diagnostic",
+  "/repair": "Repair",
+  "/build": "Code",
+  "/publish": "Evidence",
+};
 
 function nextHint(attemptsCount) {
   return HINTS[Math.min(attemptsCount - 1, HINTS.length - 1)] || "Repair mode: create a smaller reconstruction and re-run attempt.";
@@ -184,8 +193,26 @@ export function initResearchWorkspace({
     state.mode = nextMode;
     const buttons = root.modePanel?.querySelectorAll("button[data-mode]");
     buttons?.forEach((button) => button.setAttribute("aria-pressed", button.dataset.mode === nextMode ? "true" : "false"));
-    if (root.modeStatus) root.modeStatus.textContent = `Mode: ${nextMode}`;
+    if (root.modeStatus) root.modeStatus.textContent = `Context: ${MODE_DISPLAY_LABELS[nextMode] || "Workspace"}`;
     runMode(nextMode);
+  }
+
+  function focusRecommendedStudyChoice() {
+    const decision = buildDecisionState(state);
+    const recommendedNodeId = decision.recommended_next_node_id || state.activeNodeId;
+    if (recommendedNodeId && recommendedNodeId !== state.activeNodeId) {
+      selectNode(recommendedNodeId);
+    }
+    const plan = buildNodeStudyPlan(state.activeNodeId, state.roadmap);
+    state.activeMiniNodeId = state.activeMiniNodeId || plan.defaultMiniNodeId;
+    state.lastDecision = buildDecisionState(state);
+    setMode("/read");
+  }
+
+  function wireStudyChoices() {
+    root.studyChoiceNow?.addEventListener("click", () => focusRecommendedStudyChoice());
+    root.studyChoiceBuild?.addEventListener("click", () => setMode(root.studyChoiceBuild?.dataset?.actionMode || "/build"));
+    root.studyChoiceExplain?.addEventListener("click", () => setMode(root.studyChoiceExplain?.dataset?.actionMode || "/explain"));
   }
 
   function wireModes() {
@@ -204,7 +231,7 @@ export function initResearchWorkspace({
       button.addEventListener("click", () => setMode(mode));
     });
 
-    return makeModeButtonList(root.modePanel, LM_MODES);
+    return Array.from(configuredModes);
   }
 
   function applyPayloadFromTextarea(label) {
@@ -323,6 +350,7 @@ export function initResearchWorkspace({
 
   state.lastDecision = buildDecisionState(state);
   render();
+  wireStudyChoices();
   const wiredModes = wireModes();
   setMode("/map");
 
