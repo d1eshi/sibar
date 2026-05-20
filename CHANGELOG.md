@@ -54,6 +54,9 @@ release yet.
   fixtures for existing workspaces (`Embeddings`, `RAG`, `JAX`) and action routing:
   `New workspace`, `Open`, and `Resume` to either study-path overview or active
   learning-material session.
+- Reworked the workspace home layout to fit the Tauri desktop viewport as a
+  single-screen workspace surface, with compact header and side-by-side resume
+  panels instead of a long scrolling page.
 
 ### Added - Workspace Intent First Flow
 
