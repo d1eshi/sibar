@@ -23,6 +23,8 @@ export type WorkspaceStudyNode = {
   id: string;
   name: string;
   scope: string;
+  sessionTitle: string;
+  status: "ready" | "queued" | "locked";
   miniNodes: readonly WorkspaceMiniNode[];
 };
 
@@ -37,6 +39,7 @@ export type WorkspaceSessionProjection = {
   title: string;
   sessionHint: string;
   nodes: readonly WorkspaceStudyNode[];
+  sourceCount: number;
   selectedNode: WorkspaceStudyNode;
   selectedMiniNode: WorkspaceMiniNode;
   selectedSource: WorkspaceSource;
@@ -52,6 +55,8 @@ export const firstWorkspaceSessionFixture: WorkspaceSessionFixture = {
       id: "goal-embeddings",
       name: "Embedding basics",
       scope: "How do embeddings turn meaning into vectors and where do they fail?",
+      sessionTitle: "Session 01 - read the first source slice",
+      status: "ready",
       miniNodes: [
         {
           id: "mn-tokenization",
@@ -77,6 +82,8 @@ export const firstWorkspaceSessionFixture: WorkspaceSessionFixture = {
       id: "goal-correctness",
       name: "Failure cases",
       scope: "Can this approach handle negation, ambiguity, and short queries?",
+      sessionTitle: "Session 02 - test retrieval boundaries",
+      status: "queued",
       miniNodes: [
         {
           id: "mn-failure-boundaries",
@@ -137,6 +144,8 @@ const fallbackNode: WorkspaceStudyNode = {
   id: "fallback-node",
   name: "Ready node",
   scope: "Define a focus to see this study node.",
+  sessionTitle: "Session unavailable",
+  status: "locked",
   miniNodes: [],
 };
 
@@ -200,6 +209,7 @@ export function projectWorkspaceSession(
     selectedSource,
     activeAction: state.activeAction,
     nodes: fixture.nodes,
+    sourceCount: fixture.sources.length,
     readinessLabel: "Ready to mark readiness once a source claim is evidenced and one artifact is produced.",
   };
 }

@@ -21,14 +21,14 @@ const onboardingCopy = {
   cta: "Review workspace plan",
   sectionLabel: "Proposed plan",
   optionalLabel: "Optional background",
-  openSessionLabel: "Open first session",
+  openWorkspaceLabel: "Open workspace",
   knownLabel: "What do you already know?",
   unknownLabel: "What do you not know yet?",
   desiredOutputLabel: "Desired output",
   sourceLabel: "Source, repo, paper, or note",
   intentLabel: "What are you trying to build or understand?",
   constraintLabel: "Constraint or reason",
-  statusReady: "Workspace plan is ready. You can open the first session.",
+  statusReady: "Workspace plan is ready. You can review the learning path.",
   statusWaiting: "Update fields and click Review workspace plan to regenerate the preview.",
 };
 
@@ -57,7 +57,7 @@ type FlowState = {
 };
 
 type OnboardingFlowProps = {
-  onOpenFirstSession: () => void;
+  onOpenWorkspace: () => void;
 };
 
 type FlowAction =
@@ -309,11 +309,11 @@ function IntentForm({
 function IntentPreview({
   state,
   reviewReady,
-  onOpenFirstSession,
+  onOpenWorkspace,
 }: {
   state: FlowState;
   reviewReady: boolean;
-  onOpenFirstSession: () => void;
+  onOpenWorkspace: () => void;
 }) {
   const statusMessage = reviewReady
     ? onboardingCopy.statusReady
@@ -340,15 +340,15 @@ function IntentPreview({
         type="button"
         disabled={!reviewReady}
         className={styles.openButton}
-        onClick={onOpenFirstSession}
+        onClick={onOpenWorkspace}
       >
-        {onboardingCopy.openSessionLabel}
+        {onboardingCopy.openWorkspaceLabel}
       </button>
     </aside>
   );
 }
 
-export function OnboardingFlow({ onOpenFirstSession }: OnboardingFlowProps) {
+export function OnboardingFlow({ onOpenWorkspace }: OnboardingFlowProps) {
   const [state, dispatch] = React.useReducer(reducer, initialState);
   const reviewReady = hasReviewedPlan(state);
 
@@ -365,7 +365,7 @@ export function OnboardingFlow({ onOpenFirstSession }: OnboardingFlowProps) {
         <IntentPreview
           state={state}
           reviewReady={reviewReady}
-          onOpenFirstSession={onOpenFirstSession}
+          onOpenWorkspace={onOpenWorkspace}
         />
       </section>
     </section>

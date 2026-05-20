@@ -5,6 +5,207 @@
   gap: 0;
 }
 
+.workspaceOverview {
+  min-height: 100dvh;
+  display: grid;
+  grid-template-columns: minmax(280px, 340px) minmax(0, 1fr) minmax(300px, 360px);
+  background: #fbf8f1;
+}
+
+.overviewRail,
+.nodeBoard,
+.overviewGuide {
+  min-width: 0;
+  padding: 28px;
+  border-right: 1px solid var(--divider);
+}
+
+.overviewRail {
+  display: grid;
+  align-content: start;
+  gap: 18px;
+  background: var(--surface);
+}
+
+.overviewRail h1,
+.boardHeader h2,
+.overviewGuide h2 {
+  margin: 0;
+}
+
+.overviewRail h1 {
+  max-width: 12ch;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 42px;
+  line-height: 1;
+  font-weight: 500;
+  text-wrap: balance;
+}
+
+.overviewRail p,
+.overviewGuide p {
+  max-width: 42ch;
+  color: var(--text-secondary);
+}
+
+.overviewStats {
+  display: grid;
+  gap: 12px;
+  margin: 10px 0 0;
+}
+
+.overviewStats div {
+  display: grid;
+  gap: 3px;
+  padding-top: 12px;
+  border-top: 1px solid var(--divider);
+}
+
+.overviewStats dt {
+  color: var(--text-muted);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.overviewStats dd {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: 15px;
+  font-weight: 650;
+}
+
+.nodeBoard {
+  display: grid;
+  align-content: start;
+  gap: 22px;
+  background: #fffdf8;
+}
+
+.boardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  gap: 16px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--divider);
+}
+
+.boardHeader h2 {
+  font-size: 30px;
+  line-height: 1;
+}
+
+.nodeCards {
+  display: grid;
+  gap: 14px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.nodeCard,
+.nodeCardSelected {
+  width: 100%;
+  min-height: 126px;
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 18px;
+  padding: 18px;
+  text-align: left;
+  border: 1px solid var(--divider);
+  border-radius: var(--radius);
+  background: #fffaf3;
+}
+
+.nodeCardSelected {
+  border-color: var(--teal);
+  background: var(--teal-bg);
+}
+
+.nodeIndex {
+  width: 34px;
+  height: 34px;
+  display: inline-grid;
+  place-items: center;
+  border: 1px solid var(--divider);
+  border-radius: 50%;
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.nodeCardBody {
+  display: grid;
+  gap: 7px;
+}
+
+.nodeCardBody strong {
+  font-size: 18px;
+}
+
+.nodeCardBody span {
+  max-width: 68ch;
+  color: var(--text-secondary);
+}
+
+.nodeCardBody em {
+  color: var(--text-muted);
+  font-style: normal;
+  font-size: 13px;
+}
+
+.nodeStatus {
+  padding: 4px 7px;
+  border: 1px solid var(--divider);
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  font-size: 12px;
+  text-transform: capitalize;
+}
+
+.nodeStatus[data-status="ready"] {
+  border-color: var(--teal);
+  color: var(--teal);
+  background: #fffdf8;
+}
+
+.overviewGuide {
+  display: grid;
+  align-content: start;
+  gap: 16px;
+  border-right: 0;
+  background: #f5f0e6;
+}
+
+.readinessSummary {
+  padding-top: 16px;
+  border-top: 1px solid var(--divider);
+}
+
+.overviewGuide ul {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding-left: 18px;
+  color: var(--text-secondary);
+}
+
+.primaryAction,
+.secondaryAction {
+  border-color: var(--teal);
+  background: var(--teal);
+  color: #fffaf1;
+  font-weight: 700;
+}
+
+.secondaryAction {
+  width: 100%;
+  margin-top: 8px;
+}
+
 .studyPathRail {
   border-right: 1px solid var(--divider);
   padding: 14px 0;
@@ -214,6 +415,32 @@
 }
 
 @media (max-width: 1020px) {
+  .workspaceOverview {
+    grid-template-columns: 1fr;
+  }
+
+  .overviewRail,
+  .nodeBoard,
+  .overviewGuide {
+    border-right: 0;
+    border-bottom: 1px solid var(--divider);
+  }
+
+  .boardHeader {
+    align-items: start;
+    flex-direction: column;
+  }
+
+  .nodeCard,
+  .nodeCardSelected {
+    grid-template-columns: 36px minmax(0, 1fr);
+  }
+
+  .nodeStatus {
+    grid-column: 2;
+    justify-self: start;
+  }
+
   .workspaceFrame {
     grid-template-columns: 1fr;
     grid-template-areas:

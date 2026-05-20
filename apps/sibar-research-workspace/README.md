@@ -21,22 +21,24 @@ compiler path.
 - Converted the onboarding screen to controlled form fields for intent, source,
   constraint, and optional background fields.
 - `Review workspace plan` now computes a deterministic local workspace preview from
-  the current intent/source payload and enables `Open first session`.
-- In this slice, `Open first session` updated local flow state and surfaced a
+  the current intent/source payload and enables the next workspace action.
+- In this slice, the first-session action updated local flow state and surfaced a
   local "First session ready" status before workspace navigation was introduced.
 - No fetch calls, Tauri invoke calls, or Rust/compiler execution is performed in
   this step.
 
-## React migration slice 2 (workspace shell and first session)
+## React migration slice 2 (workspace shell, overview, and first session)
 
 - Added the dedicated `WorkspaceShell` boundary so onboarding renders inside a
-  reusable native-style top bar container.
-- `OnboardingFlow` now emits an `onOpenFirstSession` callback from `Open first session`
+  reusable native-style container.
+- `OnboardingFlow` now emits an `onOpenWorkspace` callback from `Open workspace`
   after local preview generation.
+- Added a workspace overview screen that shows planned learning nodes and the
+  available first-session entry point before opening an active node session.
 - Added a static first-session workspace surface with reducer-backed selection state:
   - study path rail
   - session workbench
-  - active action row (`Read` / `Code` / `Recall`)
+  - active action row (`Read` / `Build` / `Recall`)
   - compact readiness/source panel
 - No fetch calls, Tauri invoke calls, compiler integration, runner sidecar, or
   external execution calls were added in this slice.

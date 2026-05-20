@@ -6,7 +6,11 @@ import type {
 } from "../../state/workspaceReducer";
 import type { WorkspaceSessionProjection } from "../../state/workspaceProjection";
 
-const actionItems = ["read", "code", "recall"] as const;
+const actionItems = [
+  { kind: "read", label: "Read" },
+  { kind: "code", label: "Build" },
+  { kind: "recall", label: "Recall" },
+] as const;
 
 export function SessionWorkbench({
   projection,
@@ -39,14 +43,16 @@ export function SessionWorkbench({
       <div className={styles.actionRow} role="radiogroup" aria-label="Session actions">
         {actionItems.map((action) => (
           <button
-            key={action}
+            key={action.kind}
             type="button"
-            aria-pressed={state.activeAction === action}
+            aria-pressed={state.activeAction === action.kind}
             className={styles.actionButton}
-            data-active={state.activeAction === action ? "true" : "false"}
-            onClick={() => dispatch({ type: "set_active_action", action })}
+            data-active={state.activeAction === action.kind ? "true" : "false"}
+            onClick={() =>
+              dispatch({ type: "set_active_action", action: action.kind })
+            }
           >
-            {action}
+            {action.label}
           </button>
         ))}
       </div>

@@ -112,20 +112,21 @@ release yet.
 - Reworked the React onboarding screen into an interactive flow with controlled
   intent/source/constraint inputs and optional background fields.
 - Added local deterministic preview generation on `Review workspace plan` from the
-  current inputs, and a clear local transition state when `Open first session`
+  current inputs, and a clear local transition state when `Open workspace`
   is pressed.
 
 ### Changed - Tauri Workspace Shell (Slice 2)
 
 - Extracted the native topbar into a dedicated `WorkspaceShell` boundary.
 - Added reducer-backed workspace session UI state for selected node, mini-node,
-  source, and active action (`read`/`code`/`recall`) with a compact
+  source, and active action (`Read`/`Build`/`Recall`) with a compact
   readiness panel visibility flag.
-- Added the static first-session workspace view composed of `WorkspaceShell`,
+- Added a workspace overview between onboarding and the active session so the
+  user sees learning nodes and available sessions before entering a node.
+- Added the static active-session workspace view composed of `WorkspaceShell`,
   `StudyPathRail`, and `SessionWorkbench`.
-- Hooked onboarding to open the first session via an `OnboardingFlow` callback
-  after local preview generation, with no fetch/Tauri/runner integrations in this
-  slice.
+- Hooked onboarding to open the workspace overview after local preview
+  generation, with no fetch/Tauri/runner integrations in this slice.
 
 ### Changed - Tauri Workspace Onboarding Layout
 
