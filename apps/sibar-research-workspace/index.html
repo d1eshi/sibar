@@ -85,10 +85,16 @@
           <ul id="sourceNextSession" class="item-list-inline"></ul>
         </section>
 
-        <div class="session-loop">
-          <h3>Learning Node: Backpropagation</h3>
-          <p>Workbench</p>
-          <p>Source: Karpathy-style backprop walkthrough</p>
+        <div class="session-loop" data-component="active-node-reader">
+          <div class="node-reader-header">
+            <div>
+              <p class="muted">Active node</p>
+              <h3 id="activeNodeTitle">Learning Node: Backpropagation</h3>
+            </div>
+            <button id="conceptConfusion" type="button">No entiendo este concepto</button>
+          </div>
+          <p id="activeNodeFocus">Reader-ready decomposition for deeper ownership.</p>
+          <p id="activeNodeSource">Source: Karpathy-style backprop walkthrough</p>
           <ul class="session-tasks">
             <li>Read</li>
             <li>Explain</li>
@@ -96,6 +102,17 @@
             <li>Critique</li>
             <li>Repair</li>
           </ul>
+
+          <section class="mini-node-section" aria-labelledby="mini-node-title">
+            <h4 id="mini-node-title">Deep knowledge mini-nodes</h4>
+            <ul id="miniNodeList" class="mini-node-list"></ul>
+          </section>
+
+          <section class="reader-detail" aria-labelledby="reader-focus-title">
+            <h4 id="reader-focus-title">Reader focus</h4>
+            <p id="readerInstruction">Select a roadmap node to load its reading path.</p>
+            <ul id="readerResourceList" class="reader-resource-list"></ul>
+          </section>
 
           <label for="attemptInput"><strong>Attempt reconstruction first</strong></label>
           <textarea
@@ -135,6 +152,13 @@
           <li><button type="button" data-mode="/publish">/publish</button></li>
         </ul>
         <p id="lmModeStatus" class="lm-mode-status" aria-live="polite">Mode: /map</p>
+        <section class="lm-context" aria-label="Active study context">
+          <h3>Active study context</h3>
+          <p><strong>Touching:</strong> <span id="lmActiveNode">Backpropagation</span></p>
+          <p><strong>Mini-node:</strong> <span id="lmActiveMiniNode">Chain rule trace</span></p>
+          <p><strong>Decision:</strong> <span id="lmRecommendedDecision">Read the smallest prerequisite, attempt, then repair.</span></p>
+          <p><strong>Reader move:</strong> <span id="lmReaderMove">Open the current mini-node resources.</span></p>
+        </section>
         <ul id="modeActionLog" class="mode-log" aria-live="polite"></ul>
       </section>
     </section>

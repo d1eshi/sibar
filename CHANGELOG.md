@@ -149,6 +149,10 @@ release yet.
     - Today-first workspace entry and source-to-roadmap screen,
     - bounded LM modes with the attempt/evidence/readiness loop,
     - source-to-roadmap + attempt, evidence, and readiness flow contracts,
+    - selectable roadmap nodes that expand the reader into five mini-node
+      study paths with paper/direct-reading resources,
+    - contextual LM guidance that tracks the active node, selected mini-node,
+      and "No entiendo este concepto" repair path,
     - focused tests over the implemented workspace behavior and static Tauri
       scaffold.
 
