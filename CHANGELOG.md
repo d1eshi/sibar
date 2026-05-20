@@ -118,6 +118,14 @@ release yet.
 ### Changed - Tauri Workspace Shell (Slice 2)
 
 - Extracted the native topbar into a dedicated `WorkspaceShell` boundary.
+
+### Changed - Tauri Workspace Active Session
+
+- Aligned the React `Active Node Session` screen with the Workspace Overview /
+  Study Path visual language, including the editorial study panel, path rail,
+  Read / Build / Recall action cards, source evidence, and guide/readiness rail.
+- Promoted shared workspace color, typography, radius, and shadow values into
+  reusable CSS tokens for the onboarding, overview, and session surfaces.
 - Added reducer-backed workspace session UI state for selected node, mini-node,
   source, and active action (`Read`/`Build`/`Recall`) with a compact
   readiness panel visibility flag.

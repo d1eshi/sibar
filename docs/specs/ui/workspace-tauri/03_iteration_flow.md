@@ -62,7 +62,10 @@ study session.
 ## Step 4: First Session
 
 The selected node opens to the study surface. The session panel is primary even
-on narrow responsive layouts.
+on narrow responsive layouts. It should read as the third screen in the same
+Workspace Overview / Study Path product language: left study-path rail, warm
+ivory central reading/artifact panel, and right guide/readiness rail with thin
+dividers and low-radius surfaces.
 
 Visible elements:
 
