@@ -9,6 +9,7 @@ export type WorkspaceSource = {
   id: string;
   title: string;
   type: SourceType;
+  metadata: string;
   snippet: string;
 };
 
@@ -24,7 +25,7 @@ export type WorkspaceStudyNode = {
   name: string;
   scope: string;
   sessionTitle: string;
-  status: "ready" | "queued" | "locked";
+  status: "complete" | "ready" | "queued" | "locked";
   miniNodes: readonly WorkspaceMiniNode[];
 };
 
@@ -39,6 +40,7 @@ export type WorkspaceSessionProjection = {
   title: string;
   sessionHint: string;
   nodes: readonly WorkspaceStudyNode[];
+  sources: readonly WorkspaceSource[];
   sourceCount: number;
   selectedNode: WorkspaceStudyNode;
   selectedMiniNode: WorkspaceMiniNode;
@@ -56,7 +58,7 @@ export const firstWorkspaceSessionFixture: WorkspaceSessionFixture = {
       name: "Embedding basics",
       scope: "How do embeddings turn meaning into vectors and where do they fail?",
       sessionTitle: "Session 01 - read the first source slice",
-      status: "ready",
+      status: "complete",
       miniNodes: [
         {
           id: "mn-tokenization",
@@ -83,7 +85,7 @@ export const firstWorkspaceSessionFixture: WorkspaceSessionFixture = {
       name: "Failure cases",
       scope: "Can this approach handle negation, ambiguity, and short queries?",
       sessionTitle: "Session 02 - test retrieval boundaries",
-      status: "queued",
+      status: "ready",
       miniNodes: [
         {
           id: "mn-failure-boundaries",
@@ -99,28 +101,76 @@ export const firstWorkspaceSessionFixture: WorkspaceSessionFixture = {
         },
       ],
     },
+    {
+      id: "goal-toy-implementation",
+      name: "Toy implementation",
+      scope: "What small artifact proves retrieval quality?",
+      sessionTitle: "Session 03 - build a toy retrieval proof",
+      status: "queued",
+      miniNodes: [
+        {
+          id: "mn-small-retrieval-loop",
+          name: "Small retrieval loop",
+          question: "What minimal code path shows the retrieval failure?",
+          sourceId: "source-repo",
+        },
+      ],
+    },
+    {
+      id: "goal-tradeoffs",
+      name: "Retrieval trade-offs",
+      scope: "When should retrieval use embeddings versus explicit rules?",
+      sessionTitle: "Session 04 - compare trade-offs",
+      status: "locked",
+      miniNodes: [
+        {
+          id: "mn-tradeoff-matrix",
+          name: "Trade-off matrix",
+          question: "Which failure modes need non-embedding signals?",
+          sourceId: "source-note",
+        },
+      ],
+    },
+    {
+      id: "goal-readiness",
+      name: "Readiness review",
+      scope: "What evidence is enough to trust the artifact?",
+      sessionTitle: "Session 05 - readiness review",
+      status: "locked",
+      miniNodes: [
+        {
+          id: "mn-readiness-evidence",
+          name: "Readiness evidence",
+          question: "What still needs proof before shipping the retrieval feature?",
+          sourceId: "source-note",
+        },
+      ],
+    },
   ],
   sources: [
     {
       id: "source-overview",
       type: "paper",
       title: "Embedding overview paper excerpt",
+      metadata: "Wu et al. - arXiv:2309.12345 - 2023",
       snippet:
-        "Embedding methods map text into dense vectors so semantic similarity becomes a nearest-neighbor query.",
+        "Short queries and out-of-domain language often break semantic generalization...",
     },
     {
       id: "source-repo",
       type: "code",
       title: "Local toy retrieval notebook",
+      metadata: "Local artifact - Notebook - 2024",
       snippet:
-        "Generate vectors, index them, and evaluate retrieval by recall@k against a tiny query set.",
+        "Nearest neighbors drift when the query distribution shifts...",
     },
     {
       id: "source-note",
       type: "artifact",
       title: "Limitations and caveats note",
+      metadata: "Sibar workspace note - 2024",
       snippet:
-        "Short queries, out-of-domain language, and negation are common retrieval failure modes.",
+        "Negation, ambiguity, and very short queries are common retrieval failure modes.",
     },
   ],
 };
@@ -135,6 +185,7 @@ function getWorkspaceSourceById(
       id: "unresolved-source",
       type: "artifact",
       title: "Source unavailable",
+      metadata: "No source selected",
       snippet: "Select a source from the study path to load a study context.",
     }
   );
@@ -161,14 +212,16 @@ export function createInitialWorkspaceStateFromFixture(
   overrides?: Partial<WorkspaceSessionState>,
 ): WorkspaceSessionState {
   const firstNode = fixture.nodes[0];
-  const firstMini = firstNode?.miniNodes[0];
+  const initialNode =
+    fixture.nodes.find((node) => node.status !== "complete") ?? firstNode;
+  const firstMini = initialNode?.miniNodes[0];
   const fallbackSourceId =
     firstMini?.sourceId ??
     fixture.sources[0]?.id ??
     "unresolved-source";
 
   return {
-    selectedNodeId: firstNode?.id ?? "",
+    selectedNodeId: initialNode?.id ?? "",
     selectedMiniNodeId: firstMini?.id ?? "",
     selectedSourceId: fallbackSourceId,
     activeAction: "read",
@@ -209,6 +262,7 @@ export function projectWorkspaceSession(
     selectedSource,
     activeAction: state.activeAction,
     nodes: fixture.nodes,
+    sources: fixture.sources,
     sourceCount: fixture.sources.length,
     readinessLabel: "Ready to mark readiness once a source claim is evidenced and one artifact is produced.",
   };

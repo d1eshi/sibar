@@ -26,17 +26,22 @@ export default function App() {
     firstWorkspaceSessionFixture,
   );
 
+  function openFlowStep(nextStep: "overview" | "session") {
+    setFlowStep(nextStep);
+    window.requestAnimationFrame(() => window.scrollTo({ top: 0, left: 0 }));
+  }
+
   return (
     <main className={styles.researchShell} data-component="research-workspace-root">
       <WorkspaceShell mode={flowStep}>
         {flowStep === "onboarding" ? (
-          <OnboardingFlow onOpenWorkspace={() => setFlowStep("overview")} />
+          <OnboardingFlow onOpenWorkspace={() => openFlowStep("overview")} />
         ) : flowStep === "overview" ? (
           <WorkspaceOverview
             projection={workspaceProjection}
             state={workspaceState}
             dispatch={dispatchWorkspace}
-            onOpenSelectedNode={() => setFlowStep("session")}
+            onOpenSelectedNode={() => openFlowStep("session")}
           />
         ) : (
           <section

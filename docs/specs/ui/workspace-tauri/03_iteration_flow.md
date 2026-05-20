@@ -46,14 +46,15 @@ Success means the user can reject or proceed from a compact summary.
 
 ## Step 3: Workspace Overview
 
-The workspace opens to a bounded overview, not directly to a node. This screen
-shows:
+The workspace opens to a bounded study-path overview, not directly to the active
+node session. The visual reference is the three-column study surface:
 
-1. workspace title and scope
-2. planned learning nodes
-3. available first-session entry points
-4. source/evidence readiness summary
-5. a clear action to enter the selected learning node
+1. left rail with study path progress, nodes, and selected mini-node
+2. center panel with current-study headline, Read / Build / Recall entry cards,
+   and evidence from sources
+3. right tutor rail with focus guidance, readiness, and compact ask input
+4. no generic dashboard cards or oversized CTA block
+5. a selected action card opens the active node session
 
 Success means the user understands the route before committing to an active
 study session.

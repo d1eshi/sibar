@@ -1,0 +1,886 @@
+.workspaceOverview {
+  min-height: 100dvh;
+  display: grid;
+  grid-template-columns: clamp(250px, 22vw, 360px) minmax(460px, 1fr) clamp(260px, 24vw, 360px);
+  color: #151512;
+  background: #fbf8f1;
+}
+
+.kicker {
+  margin: 0;
+  color: #747023;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.overviewPathRail,
+.overviewStudyPanel,
+.overviewTutorRail {
+  min-width: 0;
+  border-right: 1px solid #e6ddd0;
+}
+
+.overviewPathRail {
+  min-height: 100dvh;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  background: #f8f3eb;
+}
+
+.overviewPathHeader {
+  padding: 28px 28px 22px;
+  border-bottom: 1px solid #e6ddd0;
+}
+
+.overviewRailTitle,
+.tutorHeader,
+.overviewEvidenceHeader,
+.overviewStudyUtilities {
+  display: flex;
+  align-items: center;
+}
+
+.overviewRailTitle {
+  gap: 10px;
+  color: #20201b;
+  font-size: 16px;
+}
+
+.studyPathGlyph,
+.tutorGlyph {
+  position: relative;
+  width: 24px;
+  height: 24px;
+  flex: 0 0 auto;
+}
+
+.studyPathGlyph::before,
+.studyPathGlyph::after {
+  content: "";
+  position: absolute;
+  top: 4px;
+  width: 6px;
+  height: 16px;
+  border: 2px solid #798122;
+  border-radius: 5px;
+}
+
+.studyPathGlyph::before {
+  left: 2px;
+}
+
+.studyPathGlyph::after {
+  right: 2px;
+}
+
+.railUtilityButton {
+  width: 24px;
+  height: 24px;
+  margin-left: auto;
+  padding: 0;
+  display: inline-grid;
+  place-items: center;
+  border: 1px solid #d8cfbf;
+  border-radius: 4px;
+  background: transparent;
+}
+
+.railUtilityButton span,
+.railUtilityButton span::before,
+.railUtilityButton span::after {
+  width: 10px;
+  height: 1px;
+  display: block;
+  background: #4e4b43;
+}
+
+.railUtilityButton span {
+  position: relative;
+}
+
+.railUtilityButton span::before,
+.railUtilityButton span::after {
+  content: "";
+  position: absolute;
+  left: 0;
+}
+
+.railUtilityButton span::before {
+  top: -4px;
+}
+
+.railUtilityButton span::after {
+  top: 4px;
+}
+
+.overviewPathHeader h2 {
+  margin: 34px 0 6px;
+  color: #24231f;
+  font-size: 19px;
+  line-height: 1.2;
+}
+
+.overviewPathHeader p {
+  margin: 0 0 16px;
+  color: #6f6a5d;
+}
+
+.overviewProgressTrack,
+.tutorProgressTrack {
+  height: 6px;
+  display: block;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #ddd6cb;
+}
+
+.overviewProgressTrack span,
+.tutorProgressTrack span {
+  height: 100%;
+  display: block;
+  border-radius: inherit;
+  background: #77801c;
+}
+
+.overviewPathList {
+  margin: 0;
+  padding: 0;
+  overflow: auto;
+  list-style: none;
+}
+
+.overviewPathItem {
+  border-bottom: 1px solid #e6ddd0;
+}
+
+.overviewPathButton {
+  width: 100%;
+  min-height: 78px;
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr) 18px;
+  align-items: center;
+  gap: 14px;
+  padding: 0 28px;
+  border: 0;
+  border-radius: 0;
+  color: #292821;
+  background: transparent;
+  text-align: left;
+}
+
+.overviewPathButton[aria-current="step"] {
+  background: #eee9df;
+}
+
+.overviewPathButton strong {
+  font-size: 16px;
+  line-height: 1.15;
+}
+
+.overviewNodeBadge {
+  width: 28px;
+  height: 28px;
+  display: inline-grid;
+  place-items: center;
+  border: 1px solid #ded6c9;
+  border-radius: 50%;
+  color: #6b675d;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.overviewPathItem[data-state="complete"] .overviewNodeBadge,
+.overviewPathItem[data-state="ready"] .overviewNodeBadge {
+  border-color: #77801c;
+  color: #fffdf7;
+  background: #77801c;
+}
+
+.overviewPathItem[data-state="complete"] .overviewNodeBadge {
+  font-size: 0;
+}
+
+.overviewPathItem[data-state="complete"] .overviewNodeBadge::before {
+  content: "";
+  width: 8px;
+  height: 4px;
+  transform: rotate(-45deg);
+  border-left: 2px solid #fffdf7;
+  border-bottom: 2px solid #fffdf7;
+}
+
+.overviewPathItem[data-state="locked"] {
+  color: #8c8679;
+}
+
+.overviewChevron {
+  width: 8px;
+  height: 8px;
+  transform: rotate(45deg);
+  border-top: 2px solid #4c493f;
+  border-right: 2px solid #4c493f;
+}
+
+.overviewPathButton[aria-current="step"] .overviewChevron {
+  transform: rotate(135deg);
+}
+
+.overviewMiniList {
+  position: relative;
+  display: grid;
+  gap: 2px;
+  margin: -2px 10px 14px 42px;
+  padding: 0 0 0 24px;
+  list-style: none;
+}
+
+.overviewMiniList::before {
+  content: "";
+  position: absolute;
+  top: -4px;
+  bottom: 8px;
+  left: 5px;
+  width: 1px;
+  background: #cfc7b8;
+}
+
+.overviewMiniButton {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 38px minmax(0, 1fr);
+  align-items: center;
+  gap: 8px;
+  padding: 12px 14px;
+  border: 0;
+  border-radius: 8px;
+  color: #5d594d;
+  background: transparent;
+  text-align: left;
+}
+
+.overviewMiniButton[aria-current="step"] {
+  color: #70791d;
+  background: #e8e3d5;
+}
+
+.overviewMiniButton span {
+  font-size: 13px;
+}
+
+.overviewMiniButton strong {
+  font-size: 14px;
+  font-weight: 650;
+}
+
+.overviewPathFooter {
+  display: grid;
+  grid-template-columns: 1fr 1fr 44px;
+  gap: 18px;
+  padding: 22px 28px;
+  border-top: 1px solid #e6ddd0;
+}
+
+.overviewPathFooter span {
+  min-width: 0;
+  display: grid;
+  gap: 4px;
+}
+
+.overviewPathFooter strong {
+  color: #27261f;
+}
+
+.overviewPathFooter em {
+  color: #777165;
+  font-style: normal;
+}
+
+.focusFlame {
+  width: 42px;
+  height: 42px;
+  align-self: center;
+  justify-self: end;
+  border: 1px solid #e1d8ca;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 50% 66%, transparent 0 6px, #a85f38 7px 8px, transparent 9px),
+    #fffaf3;
+}
+
+.overviewStudyPanel {
+  min-height: 100dvh;
+  padding: 48px min(5vw, 76px) 56px;
+  background: linear-gradient(90deg, #fffdf8 0%, #fbf8f1 100%);
+}
+
+.overviewStudyHeader {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 28px;
+  align-items: start;
+}
+
+.overviewStudyHeader h1 {
+  max-width: 720px;
+  margin: 34px 0 0;
+  color: #151512;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(44px, 4.35vw, 72px);
+  font-weight: 500;
+  line-height: 1.03;
+  letter-spacing: 0;
+}
+
+.overviewStudyUtilities {
+  gap: 18px;
+  color: #4d493e;
+  font-size: 14px;
+}
+
+.overviewStudyUtilities span:last-child,
+.sourceMore,
+.tutorHeaderDots {
+  width: 18px;
+  height: 18px;
+  background:
+    radial-gradient(circle, currentColor 1.5px, transparent 2px) 0 50% / 6px 6px repeat-x;
+}
+
+.overviewDivider {
+  height: 1px;
+  margin: 42px 0 32px;
+  background: #e2d8ca;
+}
+
+.overviewActionSection h2,
+.overviewEvidenceHeader h2,
+.guidanceCard h2,
+.readinessCard h2 {
+  margin: 0;
+  color: #6f6a5d;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.overviewActionSection {
+  display: grid;
+  gap: 26px;
+}
+
+.overviewActionGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(160px, 1fr));
+  gap: 28px;
+}
+
+.overviewActionCard {
+  min-height: 120px;
+  display: grid;
+  grid-template-columns: 54px minmax(0, 1fr);
+  gap: 20px;
+  align-items: center;
+  padding: 24px;
+  border: 1px solid #c9bfae;
+  border-radius: 6px;
+  color: #25231d;
+  background: #fffdf8;
+  text-align: left;
+}
+
+.overviewActionCard[data-action="code"] {
+  border-color: #bd7655;
+}
+
+.overviewActionCard:hover,
+.overviewActionCard:focus-visible {
+  box-shadow: 0 10px 22px rgba(61, 50, 35, 0.08);
+  transform: translateY(-1px);
+}
+
+.overviewActionCard span:last-child {
+  display: grid;
+  gap: 5px;
+}
+
+.overviewActionCard strong {
+  font-size: 18px;
+  line-height: 1.1;
+}
+
+.overviewActionCard em {
+  color: #746e61;
+  font-style: normal;
+}
+
+.overviewActionIcon {
+  position: relative;
+  width: 46px;
+  height: 46px;
+  color: #7c842f;
+}
+
+.overviewActionIcon::before,
+.overviewActionIcon::after {
+  content: "";
+  position: absolute;
+  box-sizing: border-box;
+}
+
+.overviewActionCard[data-action="read"] .overviewActionIcon::before,
+.overviewActionCard[data-action="read"] .overviewActionIcon::after {
+  top: 8px;
+  width: 18px;
+  height: 28px;
+  border: 3px solid currentColor;
+  border-radius: 3px 0 0 3px;
+}
+
+.overviewActionCard[data-action="read"] .overviewActionIcon::before {
+  left: 4px;
+}
+
+.overviewActionCard[data-action="read"] .overviewActionIcon::after {
+  right: 4px;
+  transform: scaleX(-1);
+}
+
+.overviewActionCard[data-action="code"] .overviewActionIcon {
+  color: #b36946;
+}
+
+.overviewActionCard[data-action="code"] .overviewActionIcon::before {
+  left: 16px;
+  top: 5px;
+  width: 15px;
+  height: 15px;
+  border: 3px solid currentColor;
+  box-shadow:
+    -18px 22px 0 -3px #fffdf8,
+    -18px 22px 0 0 currentColor,
+    0 22px 0 -3px #fffdf8,
+    0 22px 0 0 currentColor,
+    18px 22px 0 -3px #fffdf8,
+    18px 22px 0 0 currentColor;
+}
+
+.overviewActionCard[data-action="code"] .overviewActionIcon::after {
+  left: 23px;
+  top: 20px;
+  width: 3px;
+  height: 14px;
+  background: currentColor;
+}
+
+.overviewActionCard[data-action="recall"] .overviewActionIcon::before {
+  left: 8px;
+  top: 8px;
+  width: 30px;
+  height: 30px;
+  border: 3px solid #898b61;
+  border-radius: 50%;
+}
+
+.overviewActionCard[data-action="recall"] .overviewActionIcon::after {
+  left: 22px;
+  top: 24px;
+  width: 10px;
+  height: 10px;
+  border-left: 3px solid #898b61;
+  border-bottom: 3px solid #898b61;
+  transform: rotate(-45deg);
+}
+
+.overviewEvidenceSection {
+  margin-top: 38px;
+  padding-top: 30px;
+  border-top: 1px solid #e2d8ca;
+}
+
+.overviewEvidenceHeader {
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 22px;
+}
+
+.overviewEvidenceHeader h2 span {
+  width: 24px;
+  height: 24px;
+  margin-left: 8px;
+  display: inline-grid;
+  place-items: center;
+  border-radius: 50%;
+  color: #6f6a5d;
+  background: #eee8dd;
+  font-size: 12px;
+}
+
+.overviewEvidenceHeader button {
+  border: 0;
+  color: #4b473d;
+  background: transparent;
+}
+
+.overviewSourceList {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.overviewSourceList li {
+  border-top: 1px solid #e7ded1;
+}
+
+.overviewSourceButton {
+  width: 100%;
+  min-height: 104px;
+  display: grid;
+  grid-template-columns: 54px minmax(170px, 1fr) minmax(210px, 0.7fr) 18px;
+  align-items: center;
+  gap: 22px;
+  padding: 20px 0;
+  border: 0;
+  border-radius: 0;
+  color: #25231d;
+  background: transparent;
+  text-align: left;
+}
+
+.overviewSourceIcon {
+  position: relative;
+  width: 46px;
+  height: 46px;
+  display: inline-grid;
+  place-items: center;
+  border-radius: 8px;
+  background: #eee9df;
+}
+
+.overviewSourceIcon::before {
+  content: "";
+  width: 20px;
+  height: 26px;
+  border: 2px solid #777c28;
+  border-radius: 2px;
+}
+
+.overviewSourceIcon[data-source="code"]::before {
+  width: 24px;
+  height: 18px;
+  border-radius: 3px;
+}
+
+.overviewSourceIcon[data-source="artifact"]::after {
+  content: "";
+  position: absolute;
+  right: 15px;
+  top: 13px;
+  width: 6px;
+  height: 6px;
+  border-left: 2px solid #777c28;
+  border-bottom: 2px solid #777c28;
+}
+
+.overviewSourceText {
+  display: grid;
+  gap: 7px;
+}
+
+.overviewSourceText strong {
+  font-size: 16px;
+  line-height: 1.25;
+}
+
+.overviewSourceText em {
+  color: #777165;
+  font-style: normal;
+  line-height: 1.35;
+}
+
+.overviewSourceButton q {
+  color: #9c4f2f;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 16px;
+  line-height: 1.35;
+}
+
+.overviewTutorRail {
+  min-height: 100dvh;
+  display: grid;
+  align-content: start;
+  gap: 20px;
+  padding: 38px 28px;
+  border-right: 0;
+  background: #fbf8f1;
+}
+
+.tutorHeader {
+  gap: 10px;
+}
+
+.tutorGlyph::before,
+.tutorGlyph::after {
+  content: "";
+  position: absolute;
+  border: 2px solid #7a812d;
+}
+
+.tutorGlyph::before {
+  left: 3px;
+  top: 10px;
+  width: 16px;
+  height: 8px;
+  border-radius: 50%;
+  transform: rotate(-28deg);
+}
+
+.tutorGlyph::after {
+  left: 12px;
+  top: 3px;
+  width: 8px;
+  height: 14px;
+  border-radius: 50%;
+  transform: rotate(38deg);
+}
+
+.tutorHeaderDots {
+  margin-left: auto;
+  color: #4c493f;
+}
+
+.tutorStatusCard,
+.guidanceCard,
+.readinessCard,
+.askTutorButton {
+  border: 1px solid #e0d7ca;
+  border-radius: 8px;
+  background: #fffdf8;
+}
+
+.tutorStatusCard {
+  display: grid;
+  grid-template-columns: 70px minmax(0, 1fr);
+  gap: 12px;
+  align-items: center;
+  padding: 24px;
+}
+
+.seedlingMark {
+  position: relative;
+  width: 56px;
+  height: 56px;
+  border: 2px solid #e1dacd;
+  border-radius: 50%;
+}
+
+.seedlingMark::before,
+.seedlingMark::after {
+  content: "";
+  position: absolute;
+  border: 2px solid #7a812d;
+  border-radius: 50%;
+}
+
+.seedlingMark::before {
+  left: 18px;
+  top: 24px;
+  width: 20px;
+  height: 9px;
+  transform: rotate(-30deg);
+}
+
+.seedlingMark::after {
+  left: 27px;
+  top: 14px;
+  width: 9px;
+  height: 19px;
+  transform: rotate(35deg);
+}
+
+.tutorStatusCard strong,
+.guidanceCard strong,
+.readinessCard strong {
+  font-size: 17px;
+}
+
+.tutorStatusCard p,
+.guidanceCard p,
+.readinessCard p {
+  margin: 6px 0 0;
+  color: #6f6a5d;
+  line-height: 1.45;
+}
+
+.tutorProgressTrack {
+  grid-column: 1 / -1;
+}
+
+.tutorProgressTrack span {
+  width: 56%;
+}
+
+.guidanceCard {
+  display: grid;
+  gap: 30px;
+  padding: 26px 24px 32px;
+}
+
+.guidanceCard article {
+  display: grid;
+  grid-template-columns: 46px minmax(0, 1fr);
+  gap: 20px;
+}
+
+.guidanceIcon {
+  position: relative;
+  width: 38px;
+  height: 38px;
+}
+
+.guidanceIcon::before,
+.guidanceIcon::after {
+  content: "";
+  position: absolute;
+  box-sizing: border-box;
+}
+
+.guidanceIcon[data-kind="focus"]::before {
+  left: 3px;
+  top: 3px;
+  width: 22px;
+  height: 22px;
+  border: 3px solid #25231d;
+  border-radius: 50%;
+}
+
+.guidanceIcon[data-kind="focus"]::after {
+  left: 24px;
+  top: 24px;
+  width: 14px;
+  height: 3px;
+  transform: rotate(45deg);
+  background: #25231d;
+}
+
+.guidanceIcon[data-kind="consider"]::before {
+  left: 5px;
+  top: 8px;
+  width: 28px;
+  height: 18px;
+  border-bottom: 3px solid #25231d;
+  border-left: 3px solid #25231d;
+  border-right: 3px solid #25231d;
+}
+
+.guidanceIcon[data-kind="consider"]::after {
+  left: 17px;
+  top: 2px;
+  width: 3px;
+  height: 32px;
+  background: #25231d;
+}
+
+.guidanceIcon[data-kind="produce"]::before {
+  left: 8px;
+  top: 5px;
+  width: 14px;
+  height: 30px;
+  transform: rotate(42deg);
+  border: 3px solid #25231d;
+  border-radius: 4px;
+}
+
+.readinessCard {
+  padding: 24px;
+}
+
+.readinessCard > div {
+  display: grid;
+  grid-template-columns: 84px minmax(0, 1fr);
+  gap: 18px;
+  align-items: center;
+  margin-top: 24px;
+}
+
+.readinessMeter {
+  width: 78px;
+  height: 78px;
+  display: inline-grid;
+  place-items: center;
+  border-radius: 50%;
+  color: #25231d;
+  font-size: 22px;
+  background:
+    radial-gradient(circle, #fffdf8 0 57%, transparent 58%),
+    conic-gradient(#77801c 0 78%, #dfd8ce 78% 100%);
+}
+
+.askTutorButton {
+  min-height: 58px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 18px;
+  color: #716b60;
+  text-align: left;
+}
+
+@media (max-width: 980px) {
+  .workspaceOverview {
+    grid-template-columns: minmax(250px, 28vw) minmax(0, 1fr);
+  }
+
+  .overviewTutorRail {
+    grid-column: 1 / -1;
+    min-height: auto;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    border-top: 1px solid #e6ddd0;
+    border-left: 0;
+  }
+
+  .tutorHeader,
+  .askTutorButton {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 820px) {
+  .workspaceOverview,
+  .overviewTutorRail {
+    grid-template-columns: 1fr;
+  }
+
+  .overviewPathRail,
+  .overviewStudyPanel,
+  .overviewTutorRail {
+    min-height: auto;
+    border-right: 0;
+    border-bottom: 1px solid #e6ddd0;
+  }
+
+  .overviewStudyPanel {
+    padding: 34px 22px;
+  }
+
+  .overviewStudyHeader,
+  .overviewActionGrid,
+  .overviewSourceButton {
+    grid-template-columns: 1fr;
+  }
+
+  .overviewStudyUtilities {
+    display: none;
+  }
+
+  .overviewStudyHeader h1 {
+    font-size: 40px;
+  }
+
+  .overviewSourceButton {
+    gap: 12px;
+  }
+}
