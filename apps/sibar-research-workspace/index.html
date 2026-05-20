@@ -44,42 +44,41 @@
           <p class="intent-copy">Turn one bounded intent into sessions and evidence before opening the full workspace.</p>
 
           <label for="workspaceIntentBuild">What are you trying to build or understand?</label>
-          <textarea id="workspaceIntentBuild" rows="3">I want to follow this blog and build a JAX transformer + kernel path</textarea>
+          <textarea id="workspaceIntentBuild" rows="3" placeholder="quiero aprender embeddings, a no mas poder"></textarea>
 
           <label for="workspaceIntentSource">Source / playbook</label>
-          <textarea id="workspaceIntentSource" rows="3">URL / pasted text / paper / repo</textarea>
+          <textarea id="workspaceIntentSource" rows="3" placeholder="URL / pasted text / paper / repo"></textarea>
 
           <label for="workspaceIntentWhy">Why does this matter?</label>
-          <textarea id="workspaceIntentWhy" rows="2">I want evidence for frontier AI researcher preparation</textarea>
+          <textarea id="workspaceIntentWhy" rows="2" placeholder="Why this workspace matters now"></textarea>
 
           <div class="intent-field-grid">
             <div>
               <label for="workspaceIntentKnown">What do you already know?</label>
-              <textarea id="workspaceIntentKnown" rows="3">Python, basic ML, some PyTorch</textarea>
+              <textarea id="workspaceIntentKnown" rows="3" placeholder="What background can the plan assume?"></textarea>
             </div>
             <div>
               <label for="workspaceIntentUnknown">What do you not know yet?</label>
-              <textarea id="workspaceIntentUnknown" rows="3">JAX, Flax, scaling laws, kernels</textarea>
+              <textarea id="workspaceIntentUnknown" rows="3" placeholder="What should stay explicit or locked?"></textarea>
             </div>
           </div>
 
           <label for="workspaceIntentDesiredOutput">Desired output</label>
-          <input id="workspaceIntentDesiredOutput" type="text" value="repo, notes, benchmark, public writeup" />
+          <input id="workspaceIntentDesiredOutput" type="text" placeholder="repo, notes, benchmark, public writeup" />
 
           <div class="workspace-intent-actions">
             <button id="generateWorkspace" class="generate-workspace-button" type="button">Generate workspace</button>
-            <button id="runCodexWorkspace" class="runner-workspace-button" type="button">Run Codex runner</button>
           </div>
         </div>
 
         <aside id="workspaceIntentPreview" class="workspace-intent-preview" aria-live="polite" hidden>
           <p class="section-kicker">Proposed plan</p>
-          <h2 id="workspaceIntentPreviewTitle">Proposed Workspace: JAX Transformers</h2>
+          <h2 id="workspaceIntentPreviewTitle">Proposed Workspace</h2>
           <p class="muted">This workspace will produce:</p>
           <ul id="workspaceIntentOutputs" class="item-list"></ul>
           <div class="first-session-callout">
             <span>Start with</span>
-            <strong id="workspaceIntentFirstSession">Session 01 - JAX arrays and autodiff</strong>
+            <strong id="workspaceIntentFirstSession">First focused session</strong>
           </div>
           <p id="workspaceIntentStatus" class="contract-status" role="status"></p>
           <button id="openWorkspaceSession" type="button" disabled>Open first session</button>

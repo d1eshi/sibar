@@ -242,8 +242,8 @@ test("second app exposes the research workspace screen contract", () => {
   assert.match(workspaceHtml, /Create Workspace/);
   assert.match(workspaceHtml, /What are you trying to build or understand\?/);
   assert.match(workspaceHtml, /Generate workspace/);
-  assert.match(workspaceHtml, /Run Codex runner/);
-  assert.match(workspaceHtml, /Proposed Workspace: JAX Transformers/);
+  assert.doesNotMatch(workspaceHtml, /Run Codex runner/);
+  assert.match(workspaceHtml, /Proposed Workspace/);
   assert.match(workspaceHtml, /Ask/);
   assert.match(workspaceHtml, /Key insight/);
   assert.doesNotMatch(workspaceHtml, /LM GUIDE/);
@@ -267,7 +267,6 @@ test("create workspace intent compiles a core WorkspacePlan before opening the s
     "workspaceIntentUnknown",
     "workspaceIntentDesiredOutput",
     "generateWorkspace",
-    "runCodexWorkspace",
     "workspaceIntentPreview",
     "workspaceIntentPreviewTitle",
     "workspaceIntentOutputs",
@@ -311,15 +310,14 @@ test("create workspace intent compiles a core WorkspacePlan before opening the s
   ];
   const nodesById = new Map(ids.map((id) => [id, createHtmlAwareElement(id)]));
   nodesById.set("generateWorkspace", makeInteractiveNode());
-  nodesById.set("runCodexWorkspace", makeInteractiveNode());
   nodesById.set("openWorkspaceSession", makeInteractiveNode());
 
-  nodesById.get("workspaceIntentBuild").value = "I want to follow this blog and build a JAX transformer + kernel path";
-  nodesById.get("workspaceIntentSource").value = "https://example.com/jax-transformer-playbook plus repo notes";
-  nodesById.get("workspaceIntentWhy").value = "I want evidence for frontier AI researcher preparation";
-  nodesById.get("workspaceIntentKnown").value = "Python, basic ML, some PyTorch";
-  nodesById.get("workspaceIntentUnknown").value = "JAX, Flax, scaling laws, kernels";
-  nodesById.get("workspaceIntentDesiredOutput").value = "repo, notes, benchmark, public writeup";
+  nodesById.get("workspaceIntentBuild").value = "quiero aprender embeddings, a no mas poder";
+  nodesById.get("workspaceIntentSource").value = "";
+  nodesById.get("workspaceIntentWhy").value = "";
+  nodesById.get("workspaceIntentKnown").value = "";
+  nodesById.get("workspaceIntentUnknown").value = "";
+  nodesById.get("workspaceIntentDesiredOutput").value = "";
 
   const previousDocument = globalThis.document;
   const previousWindow = globalThis.window;
@@ -332,20 +330,21 @@ test("create workspace intent compiles a core WorkspacePlan before opening the s
 
     const workspace = workspaceModule.initResearchWorkspace({});
     nodesById.get("generateWorkspace")?.click();
+    await new Promise((resolve) => setTimeout(resolve, 0));
 
     assert.equal(workspace.state.workspaceIntentPlan.schema, "WorkspacePlan");
-    assert.equal(workspace.state.todayArc, "JAX Transformers");
+    assert.match(workspace.state.todayArc, /Embeddings/i);
     assert.equal(workspace.state.todayMission, "Convertirme en AI researcher-builder");
-    assert.equal(workspace.state.roadmap[0].id, "jax-arrays-autodiff");
-    assert.match(nodesById.get("workspaceIntentOutputs")?.innerHTML || "", /toy transformer in JAX/);
-    assert.match(nodesById.get("workspaceIntentFirstSession")?.textContent || "", /Session 01 - JAX arrays and autodiff/);
+    assert.match(workspace.state.roadmap[0].id, /embeddings/i);
+    assert.match(nodesById.get("workspaceIntentOutputs")?.innerHTML || "", /embeddings artifact/i);
+    assert.match(nodesById.get("workspaceIntentFirstSession")?.textContent || "", /Session 01/);
     assert.equal(nodesById.get("openWorkspaceSession")?.disabled, false);
     assert.equal(nodesById.get("workspaceRoot")?.getAttribute("data-workspace-state"), "preview");
 
     nodesById.get("openWorkspaceSession")?.click();
     assert.equal(nodesById.get("workspaceRoot")?.getAttribute("data-workspace-state"), "session");
-    assert.match(nodesById.get("activeNodeTitle")?.textContent || "", /JAX arrays and autodiff/);
-    assert.match(nodesById.get("readerInstruction")?.textContent || "", /shape trace|JAX array/);
+    assert.match(nodesById.get("activeNodeTitle")?.textContent || "", /Embeddings|embeddings/);
+    assert.match(nodesById.get("readerInstruction")?.textContent || "", /scope map|constraints|success criteria|Read/);
   } finally {
     globalThis.document = previousDocument;
     globalThis.window = previousWindow;

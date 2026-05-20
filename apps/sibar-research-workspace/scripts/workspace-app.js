@@ -230,25 +230,10 @@ export function initResearchWorkspace({
 
   function wireWorkspaceIntent() {
     hydrateWorkspaceIntentForm(root);
-    root.generateWorkspace?.addEventListener("click", () => {
-      const compiled = compileWorkspaceIntentPreview(readWorkspaceIntentForm(root));
-      const applied = applyWorkspacePlanPreviewToState(state, compiled.workspace_plan);
-      state.workspaceIntentCompiled = compiled;
-      renderWorkspaceIntentPreview(root, compiled);
-      setWorkspaceStage(applied.applied ? "preview" : "intent");
-      render();
-      pushModeAction({
-        scope: "workspace-intent",
-        text: applied.applied
-          ? `Workspace intent compiled: ${compiled.preview.proposed_workspace}; first session ${compiled.preview.first_session}.`
-          : "Workspace intent compile failed validation.",
-      });
-    });
-
-    root.runCodexWorkspace?.addEventListener("click", async () => {
-      root.runCodexWorkspace.disabled = true;
+    root.generateWorkspace?.addEventListener("click", async () => {
+      root.generateWorkspace.disabled = true;
       if (root.workspaceIntentStatus) {
-        root.workspaceIntentStatus.textContent = "Running Rust codex-exec workspace compiler...";
+        root.workspaceIntentStatus.textContent = "Generating workspace from your intent.";
       }
       try {
         const compiled = await compileWorkspaceIntentWithRunner(readWorkspaceIntentForm(root), {
@@ -262,21 +247,28 @@ export function initResearchWorkspace({
         setWorkspaceStage(applied.applied ? "preview" : "intent");
         render();
         pushModeAction({
-          scope: "codex-exec",
+          scope: "workspace-intent",
           text: applied.applied
-            ? `Codex runner rendered: ${compiled.preview.proposed_workspace}; status ${compiled.runner?.status || "unknown"}.`
-            : `Codex runner returned an invalid workspace plan: ${compiled.runner?.blocked_reason || "validation failed"}.`,
+            ? `Workspace plan generated: ${compiled.preview.proposed_workspace}.`
+            : `Workspace plan generation returned invalid data: ${compiled.runner?.blocked_reason || "validation failed"}.`,
         });
+        if (root.workspaceIntentStatus) {
+          if (compiled.runner?.status === "completed") {
+            root.workspaceIntentStatus.textContent = "Workspace plan ready.";
+          } else {
+            root.workspaceIntentStatus.textContent = "Workspace plan ready from local compiler.";
+          }
+        }
       } catch (error) {
         if (root.workspaceIntentStatus) {
-          root.workspaceIntentStatus.textContent = error instanceof Error ? error.message : "Rust codex-exec runner failed.";
+          root.workspaceIntentStatus.textContent = error instanceof Error ? error.message : "Workspace compiler failed before render.";
         }
         pushModeAction({
-          scope: "codex-exec",
-          text: "Rust codex-exec runner failed before render.",
+          scope: "workspace-intent",
+          text: "Workspace intent compiler failed before render.",
         });
       } finally {
-        root.runCodexWorkspace.disabled = false;
+        root.generateWorkspace.disabled = false;
       }
     });
 
