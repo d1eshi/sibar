@@ -66,7 +66,10 @@
           <label for="workspaceIntentDesiredOutput">Desired output</label>
           <input id="workspaceIntentDesiredOutput" type="text" value="repo, notes, benchmark, public writeup" />
 
-          <button id="generateWorkspace" class="generate-workspace-button" type="button">Generate workspace</button>
+          <div class="workspace-intent-actions">
+            <button id="generateWorkspace" class="generate-workspace-button" type="button">Generate workspace</button>
+            <button id="runCodexWorkspace" class="runner-workspace-button" type="button">Run Codex runner</button>
+          </div>
         </div>
 
         <aside id="workspaceIntentPreview" class="workspace-intent-preview" aria-live="polite" hidden>

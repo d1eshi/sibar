@@ -10,6 +10,7 @@ import {
 } from "./workspace-contract.js";
 import {
   applyWorkspacePlanPreviewToState,
+  compileWorkspaceIntentWithRunner,
   compileWorkspaceIntentPreview,
   hydrateWorkspaceIntentForm,
   readWorkspaceIntentForm,
@@ -244,6 +245,41 @@ export function initResearchWorkspace({
       });
     });
 
+    root.runCodexWorkspace?.addEventListener("click", async () => {
+      root.runCodexWorkspace.disabled = true;
+      if (root.workspaceIntentStatus) {
+        root.workspaceIntentStatus.textContent = "Running Rust codex-exec workspace compiler...";
+      }
+      try {
+        const compiled = await compileWorkspaceIntentWithRunner(readWorkspaceIntentForm(root), {
+          adapter: "codex-exec",
+          runCodex: true,
+        });
+        const applied = applyWorkspacePlanPreviewToState(state, compiled.workspace_plan);
+        state.workspaceIntentCompiled = compiled;
+        state.workspaceIntentRunner = compiled.runner;
+        renderWorkspaceIntentPreview(root, compiled);
+        setWorkspaceStage(applied.applied ? "preview" : "intent");
+        render();
+        pushModeAction({
+          scope: "codex-exec",
+          text: applied.applied
+            ? `Codex runner rendered: ${compiled.preview.proposed_workspace}; status ${compiled.runner?.status || "unknown"}.`
+            : `Codex runner returned an invalid workspace plan: ${compiled.runner?.blocked_reason || "validation failed"}.`,
+        });
+      } catch (error) {
+        if (root.workspaceIntentStatus) {
+          root.workspaceIntentStatus.textContent = error instanceof Error ? error.message : "Rust codex-exec runner failed.";
+        }
+        pushModeAction({
+          scope: "codex-exec",
+          text: "Rust codex-exec runner failed before render.",
+        });
+      } finally {
+        root.runCodexWorkspace.disabled = false;
+      }
+    });
+
     root.openWorkspaceSession?.addEventListener("click", () => {
       setWorkspaceStage("session");
       render();
@@ -407,6 +443,7 @@ export function initResearchWorkspace({
     buildRoadmapArtifactFromRequest,
     applyRoadmapArtifact,
     compileCurrentStateArtifact,
+    compileWorkspaceIntentWithRunner,
     compileWorkspaceIntentPreview,
   };
 }

@@ -187,7 +187,7 @@ function inferSourcePaths(intent: WorkspaceIntent): string[] {
     })
     .map((entry) => resolve(entry))
     .filter((entry) => existsSync(entry));
-  return dedupe(tokens.length > 0 ? tokens : [resolve(DEFAULT_WORKDIR)]);
+  return dedupe(tokens);
 }
 
 function resolveRootPath(candidatePaths: string[], explicitRoot?: string): string {
@@ -195,13 +195,16 @@ function resolveRootPath(candidatePaths: string[], explicitRoot?: string): strin
   return resolve(DEFAULT_WORKDIR);
 }
 
-function buildRustEvidence(sourcePaths: string[]): RustEvidenceRef[] {
+function buildRustEvidence(sourcePaths: string[], intent: WorkspaceIntent): RustEvidenceRef[] {
   if (sourcePaths.length === 0) {
     return [{
-      id: "evidence-root",
-      path: ".",
+      id: "evidence-workspace-intent-source",
+      path: "inline://workspace-intent-source",
       line_range: { line_start: 1, line_end: 1 },
-      excerpt: "Generated fallback evidence for PedagogoAI intent.",
+      excerpt:
+        intent.source_intake.raw_input
+        || intent.trying_to_build_or_understand
+        || "Inline source captured from WorkspaceIntent.",
     }];
   }
 
@@ -228,11 +231,13 @@ export function buildRustWorkspaceIntent(
   const inferredPaths = inferSourcePaths(intent);
   const sourcePaths = dedupe(pathOverrides.length > 0 ? pathOverrides : inferredPaths);
   const rootPath = resolveRootPath(sourcePaths, overrides?.rootPath);
-  const paths = sourcePaths.map((entry) => {
-    const relativePath = normalizePath(relative(rootPath, entry));
-    return relativePath || ".";
-  });
-  const evidence = buildRustEvidence(paths);
+  const paths = sourcePaths.length
+    ? sourcePaths.map((entry) => {
+      const relativePath = normalizePath(relative(rootPath, entry));
+      return relativePath || ".";
+    })
+    : ["inline://workspace-intent-source"];
+  const evidence = buildRustEvidence(paths, intent);
 
   return {
     user_intent:
