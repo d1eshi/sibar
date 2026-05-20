@@ -2,6 +2,7 @@
   "report_id": "VAL-EVAL-009-workspace-intent-compiler-2026-05-20T00:00:00.000Z",
   "generated_at": "2026-05-20T00:00:00.000Z",
   "validation": "VAL-EVAL-009-workspace-intent-compiler",
+  "eval_spec_path": "docs/specs/selfhost/pilot/evals/workspace-intent-compiler.eval.json",
   "no_llm": true,
   "aggregate": {
     "total_cases": 7,

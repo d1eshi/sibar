@@ -1,0 +1,103 @@
+{
+  "schema": "SibarEvalManifest",
+  "version": 1,
+  "validation": "VAL-EVAL-009-workspace-intent-compiler",
+  "title": "Workspace Intent compiler adapter eval",
+  "purpose": "Verify the PR #10 adapter surface that accepts fixture or raw model output, parses JSON, validates WorkspacePlan shape, and rejects schema or pedagogy drift before any LLM output can become runtime state.",
+  "source_prs": [
+    "#10 codex/workspace-intent-evals"
+  ],
+  "runner": {
+    "command": "pnpm eval:workspace-intent",
+    "implementation": "src/evals/workspace-intent-compiler.ts",
+    "report_path": "../reports/VAL-EVAL-009-workspace-intent-compiler.json",
+    "llm_execution": "disabled"
+  },
+  "adapter_coverage": [
+    {
+      "adapter": "fixture",
+      "coverage": "deterministic WorkspacePlan generation"
+    },
+    {
+      "adapter": "raw-output",
+      "coverage": "model text extraction, parser rejection, schema rejection, pedagogy rejection"
+    }
+  ],
+  "cases": [
+    {
+      "id": "WI-001-FIXTURE-ADAPTER",
+      "case_class": "fixture_adapter",
+      "intent": "fixture adapter produces a valid deterministic WorkspacePlan",
+      "expectation": {
+        "valid": true,
+        "model_called": false
+      }
+    },
+    {
+      "id": "WI-002-RAW-JSON",
+      "case_class": "raw_model_json",
+      "intent": "plain JSON model output parses and validates",
+      "expectation": {
+        "valid": true,
+        "model_called": false
+      }
+    },
+    {
+      "id": "WI-003-FENCED-JSON",
+      "case_class": "raw_model_markdown",
+      "intent": "markdown fenced JSON is extracted before validation",
+      "expectation": {
+        "valid": true,
+        "model_called": false
+      }
+    },
+    {
+      "id": "WI-004-PROSE-WRAPPED-JSON",
+      "case_class": "raw_model_prose",
+      "intent": "prose-wrapped JSON is extracted before validation",
+      "expectation": {
+        "valid": true,
+        "model_called": false
+      }
+    },
+    {
+      "id": "WI-005-INVALID-JSON",
+      "case_class": "parse_rejection",
+      "intent": "invalid model output fails closed before validation",
+      "expectation": {
+        "valid": false,
+        "parse_error": "model_output_invalid_or_unclosed_json"
+      }
+    },
+    {
+      "id": "WI-006-SCHEMA-REJECTION",
+      "case_class": "schema_rejection",
+      "intent": "missing required fields and invented fields are rejected",
+      "expectation": {
+        "valid": false,
+        "issue_codes": [
+          "pedagogy_first_session_empty",
+          "schema_first_session_required",
+          "schema_first_session_required_fields",
+          "schema_required_fields",
+          "schema_session_not_object",
+          "schema_unknown_fields"
+        ]
+      }
+    },
+    {
+      "id": "WI-007-PEDAGOGY-REJECTION",
+      "case_class": "pedagogy_rejection",
+      "intent": "unbounded whole-repo mastery claims and broken refs are rejected",
+      "expectation": {
+        "valid": false,
+        "issue_codes": [
+          "pedagogy_forbidden_mastery_claim",
+          "pedagogy_missing_reference",
+          "pedagogy_unknown_questions",
+          "pedagogy_unbounded"
+        ]
+      }
+    }
+  ]
+}
