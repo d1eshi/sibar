@@ -36,6 +36,24 @@ release yet.
 - Added tests that verify fixture execution path, mapped audit payload, and
   `trying_to_build_or_understand` + evidence inclusion in the generated Rust intent.
 
+### Added - Workspace Codex Runner Smoke UI
+
+- Added a local Sibar Research Workspace dev server route for running the Rust
+  workspace compiler from the browser and rendering the returned workspace plan.
+- Added a `Run Codex runner` action to the Workspace Intent UI so a bounded
+  intent can execute the Rust `codex-exec` adapter and preview the generated
+  first learning node.
+- Added inline source evidence fallback for runner intents that use pasted source
+  text instead of repository file paths.
+
+### Fixed - Codex Workspace Output Schema Strictness
+
+- Updated the Rust workspace plan JSON Schema and Codex prompt constraints so
+  `codex exec --output-schema` accepts the contract in strict mode and returns
+  node plans with evidence links, prerequisites, concepts, and artifacts.
+- Added a Rust regression test that verifies every object property in the static
+  output schema is listed as required, matching Codex structured output rules.
+
 ### Changed - Sibar Research Workspace Visual Direction
 
 - Added an image-first UI/UX report and mockup reference for the Sibar research
