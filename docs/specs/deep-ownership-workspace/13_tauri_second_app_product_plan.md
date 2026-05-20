@@ -24,7 +24,7 @@ make learning output visible as artifacts before it is considered done.
 
 The entry screen must prioritize what to work on now.
 
-- `TODAY` shows the selected mission and current arc.
+- `TODAY` shows the selected goal and current arc.
 - `Current session` lists one concrete work item and required outputs.
 - The view should not open with a generic chat area.
 

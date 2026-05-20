@@ -230,7 +230,7 @@ El workspace debería poder decirte:
 ```txt
 TODAY
 ────────────────────────────────────
-Mission: Become AI researcher-builder
+Goal: Become AI researcher-builder
 
 Current arc:
 Neural Nets From Scratch
@@ -332,7 +332,7 @@ Eso sería poderosísimo.
 No técnica de implementación todavía. Visual de entidades:
 
 ```txt
-User Mission
+User Goal
     │
     ▼
 Roadmap
@@ -436,7 +436,7 @@ No como recomendación externa, sino como **lo que Sibar podría generar en pant
 
 ```txt
 ONE-MONTH ROADMAP
-Mission: AI Researcher-Builder
+Goal: AI Researcher-Builder
 
 Week 1 — Neural Nets From Scratch
 Goal:

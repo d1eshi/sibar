@@ -64,6 +64,9 @@ release yet.
 - Added visible native compiler progress for the onboarding flow and configured
   the Codex runner to use `gpt-5.4` with medium reasoning, terminal logs, and a
   stricter no-tool prompt for first workspace generation.
+- Added a pending Workspace Trace contract gate for durable intent attempts, LLM
+  run traces, session history, compaction, replay, and failed workspace creation
+  diagnostics.
 
 ### Fixed - Codex Workspace Output Schema Strictness
 
@@ -252,7 +255,7 @@ release yet.
   (`workspace investigador`), with
   `docs/specs/deep-ownership-workspace/13_tauri_second_app_product_plan.md`
   retained as a derived implementation plan, including:
-  - conceptual stack (Mission → Roadmap → Node → Session → Artifact → Evidence → Recall),
+  - conceptual stack (Goal → Roadmap → Node → Session → Artifact → Evidence → Recall),
   - first-screen UX (`Today`) requirements,
   - bounded LM tool mode,
   - no-goals and acceptance gates,
@@ -271,7 +274,7 @@ release yet.
 
 ### Added - Tauri Research Workspace Contract Work
 
-- Reworked the static roadmap pane into an expandable hierarchy (Mission → Arc → Track →
+- Reworked the static roadmap pane into an expandable hierarchy (Goal → Arc → Track →
   Node → Mini-node → Source) with expansion state persisted in UI state and active
   selection tied into reader/LM updates.
 - Added exported contract helpers for the static artifact flow:
@@ -421,14 +424,6 @@ exist to make the public reader story reviewable before production promotion.
   update `CHANGELOG.md`.
 - Added the Swift bridge candidate audit, narrowing the future native bridge to
   the five foundation runtime commands and keeping TypeScript as state owner.
-- Mission docs: added the v0.1 Build-to-Learn mission pack covering specs 01-10, internal
-  pedagogy evals, bounded LLM signal generation, and the Swift study panel UI.
-- Mission docs: added mission orchestration rules for implementation/verifier agents, Codex
-  model comparison evals, and dataset sizing research gates.
-- Mission docs: added the standalone Swift app audit, iteration, and validation
-  contract for the live study panel host.
-- Mission docs: updated Study Panel UI to require an accessory `NSPanel` host
-  and explicit Graph + Code canvas behavior.
 - Updated the self-hosted evaluation contract with first freeform evaluator slice
   results, coverage status, and the next expansion target.
 - Documented article reader persistence sequencing: use browser-local notes

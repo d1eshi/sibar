@@ -2,8 +2,7 @@
 
 ## Goal
 
-Define a concrete implementation sequence that can be handed to Droid or another
-agentic worker system.
+Define a concrete implementation sequence for the Deep Ownership Workspace.
 
 The plan favors a visible morning prototype and a real architecture path.
 
@@ -31,8 +30,7 @@ Do not start with:
 
 Outcome:
 
-The spec pack exists and can be used by Droid as a persistent implementation
-source.
+The spec pack exists and can be used as a persistent implementation source.
 
 Tasks:
 
@@ -45,7 +43,7 @@ Verification:
 
 1. spec files exist
 2. open decisions are listed
-3. feature queue can be derived from `08_validation_contract.md`
+3. implementation slices can be derived from `08_validation_contract.md`
 
 ## Phase 1: Deep Ownership Fixture
 
@@ -286,23 +284,6 @@ Verification:
 2. manual editor launch
 3. no dependency on editor for core loop
 
-## Suggested Feature Queue
-
-```text
-F-001 Create deep ownership fixture for Sibi pedagogy loop.
-F-002 Build local Workspace prototype from fixture.
-F-003 Add ThinkingArtifact and WorkspaceSnapshot runtime types.
-F-004 Generate deterministic code slice artifact from artifact boundary.
-F-005 Generate deterministic flow diagram artifact from concept graph/evidence.
-F-006 Add attempt-first hidden-answer gate.
-F-007 Evaluate user attempt into EvidenceCheck and OwnershipGap.
-F-008 Emit scoped ReadinessClaim for one operation.
-F-009 Add study artifact output directory and study mutation guard.
-F-010 Add open-in-editor citation payload.
-F-011 Wrap Workspace in Tauri shell.
-F-012 Connect Swift Lens to active WorkspaceSnapshot.
-```
-
 ## Morning Build Order
 
 If the goal is to have something visible by morning:
@@ -315,4 +296,3 @@ If the goal is to have something visible by morning:
 6. Write a manual review note.
 
 This is more valuable than starting a desktop shell first.
-
