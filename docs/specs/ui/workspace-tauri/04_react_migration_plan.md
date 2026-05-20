@@ -54,6 +54,10 @@ src/
     workspaceReducer.ts
     workspaceProjection.ts
   flows/
+    home/
+      WorkspaceHome.tsx
+      WorkspaceCard.tsx
+      home.module.css
     onboarding/
       OnboardingFlow.tsx
       WorkspacePlanPreview.tsx
@@ -96,14 +100,35 @@ Outcome:
 
 Do not wire runners or compiler commands in this slice.
 
-### Slice 1: Onboarding Flow
+### Slice 1: Workspace Home And Flow Routing
+
+Translate the default `/` screen first if it does not exist yet:
+
+1. workspace list from a static `WorkspaceHomeProjection`
+2. pending session / continue queue
+3. draft or blocked intent attempts
+4. compact `New workspace` action
+5. navigation outcomes for `Open`, `Resume`, and `New workspace`
+
+State rule:
+
+Use a reducer or explicit screen state for `home -> createWorkspace ->
+workspaceOverview -> activeSession`. Do not overload one `overview` state to
+mean both the global home and the selected workspace overview.
+
+Static-first rule:
+
+Home must render from deterministic fixture data before any trace store,
+persistence, or Rust command is connected.
+
+### Slice 2: Onboarding Flow
 
 Translate:
 
 1. workspace intent fields
 2. optional background drawer
 3. workspace plan preview
-4. disabled/enabled open-session transition
+4. disabled/enabled transition to workspace study-path overview
 
 State rule:
 
@@ -115,13 +140,14 @@ Static-first rule:
 The flow must render a deterministic local preview before any Rust compiler
 call is considered.
 
-### Slice 2: Workspace Shell, Overview, And First Session
+### Slice 3: Workspace Shell, Overview, And Active Session
 
 Translate:
 
 1. native top bar
-2. workspace overview with learning nodes and available session entry points
-3. study path rail for the active-session screen
+2. workspace study-path overview with learning nodes and available session
+   entry points
+3. study path rail for the active-session screen only
 4. session workbench
 5. Read / Build / Recall action row
 6. responsive ordering where session appears before the tree on narrow layouts
@@ -130,14 +156,15 @@ State rule:
 
 Use a `workspaceReducer` for selected node, selected mini-node, selected source,
 active action, and drawer visibility. The overview may select a node, but it
-must not imply the user is already inside the active study session. Do not mirror
-the same value in multiple hooks.
+must not imply the user is already inside the active study session. The global
+home must not share this reducer unless it consumes the same projection through
+an explicit boundary. Do not mirror the same value in multiple hooks.
 
 The user-facing label for the artifact action is `Build`. The reducer may keep
 the internal `code` key until state, fixtures, and future artifact hosts migrate
 together.
 
-### Slice 3: Reader / Artifact Host
+### Slice 4: Reader / Artifact Host
 
 Translate the reader area into `ReaderArtifactHost`.
 
@@ -153,7 +180,7 @@ Supported render modes:
 Each renderer owns one mode. The host chooses the renderer from typed projection
 data. It must not recurse through generic wrappers to discover what to render.
 
-### Slice 4: Guide, Attempt, Evidence, Readiness
+### Slice 5: Guide, Attempt, Evidence, Readiness
 
 Translate:
 
@@ -168,7 +195,7 @@ State rule:
 Attempt text may be local input state. Submitted attempt results, readiness, and
 repair state must come from a projection or explicit boundary response.
 
-### Slice 5: Debug Drawers
+### Slice 6: Debug Drawers
 
 Translate:
 
@@ -180,7 +207,7 @@ Translate:
 Debug UI must stay visually and structurally separate from learner-facing state.
 It should be removable without breaking the primary workspace.
 
-### Slice 6: Legacy Removal
+### Slice 7: Legacy Removal
 
 Only after parity is verified:
 
@@ -220,7 +247,8 @@ Each slice must include the smallest meaningful check:
 
 1. typecheck or build when the React toolchain exists
 2. component test for state transitions when the slice owns state
-3. screenshot comparison for onboarding and workspace first viewport
+3. screenshot comparison for workspace home, onboarding, and workspace first
+   viewport
 4. `git diff --check`
 
 Record any visual screenshot under `docs/specs/ui/workspace-tauri/assets/` only
@@ -229,7 +257,8 @@ when it documents a meaningful iteration state.
 ## Acceptance
 
 1. The app can be migrated to React without changing runner semantics.
-2. The first React pass can render onboarding and first session from static data.
+2. The first React pass can render workspace home, onboarding, workspace
+   overview, and active session from static data.
 3. Component boundaries match `01_ui_technology_architecture.md`.
 4. Reader/artifact rendering supports multiple modes by contract.
 5. Legacy JS/HTML/CSS is removed only after parity and verification.

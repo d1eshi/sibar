@@ -18,36 +18,47 @@ then reduce them into the canonical specs in this directory.
 4. `docs/specs/deep-ownership-workspace/18_workspace_ui_reproducibility.md`
    Source for deterministic projection, visible 2-3 next actions, locked nodes,
    and evidence requirements.
-5. `docs/reports/2026-05-20-sibar-research-workspace-ui-ux-report.md`
+5. `docs/specs/deep-ownership-workspace/19_workspace_trace_contract_gate.md`
+   Source for workspace history, intent attempts, failed/blocked creation
+   traces, resume behavior, and the durable state that `Workspace Home`
+   summarizes.
+6. `docs/reports/2026-05-20-sibar-research-workspace-ui-ux-report.md`
    Source for the current static Tauri prototype diagnosis and redesign
    principles.
-6. `docs/reports/2026-05-19-sibar-tauri-second-app-plan.md`
+7. `docs/reports/2026-05-19-sibar-tauri-second-app-plan.md`
    Historical pointer to the second Tauri app plan.
-7. `docs/specs/10_study_panel_ui.md`
+8. `docs/specs/10_study_panel_ui.md`
    Source for the older Swift panel contract. Use only when the Tauri workspace
    needs to align with accessory panel behavior.
 
 ## Extracted Decisions
 
-1. The first user-facing flow is workspace creation, not a dashboard.
-2. Onboarding asks for one bounded intent and source context.
-3. The workspace opens into a workspace overview that shows the planned learning
-   nodes and available sessions before any node is active.
-4. Opening a learning node moves into one active session.
-5. The active-session viewport prioritizes the current study node, next action,
+1. The default user-facing surface is `Workspace Home`, not onboarding and not a
+   generic dashboard.
+2. `Workspace Home` shows existing workspaces, pending sessions, and
+   blocked/draft intent attempts so the user can resume or retry real work.
+3. Workspace creation is a requested action from home, not the only first
+   experience for returning users.
+4. Onboarding asks for one bounded intent and source context.
+5. The workspace opens into a workspace study-path overview that shows planned
+   learning nodes and available sessions before any node is active.
+6. Opening a learning node moves into one active session.
+7. The active-session viewport prioritizes the current study node, next action,
    evidence, and readiness.
-6. Primary next actions are capped at three: Read, Build, Recall.
-7. The guide is bounded by modes. It is not an infinite chat column.
-8. Compiler payloads and low-level debug controls stay collapsed unless the
+8. Primary next actions are capped at three: Read, Build, Recall.
+9. The guide is bounded by modes. It is not an infinite chat column.
+10. Compiler payloads and low-level debug controls stay collapsed unless the
    user is in an implementation/debug surface.
-9. Evidence remains visible as proof of mastery, but it does not dominate the
+11. Evidence remains visible as proof of mastery, but it does not dominate the
    first view.
 
 ## Pending Extraction
 
 1. Convert the Lab component library from `12_ui_reference_components.md` into
    concrete Tauri screen components only when the current prototype needs them.
-2. Add a deterministic `WorkspaceUiProjection` adapter before relying on the
+2. Add a deterministic `WorkspaceHomeProjection` before relying on hand-authored
+   home cards as production resume/history state.
+3. Add a deterministic `WorkspaceUiProjection` adapter before relying on the
    current hand-authored session cards as production navigation.
-3. Decide whether the older Swift `StudyPanelSnapshot` remains a separate Lens
+4. Decide whether the older Swift `StudyPanelSnapshot` remains a separate Lens
    surface or is only historical context for Tauri.

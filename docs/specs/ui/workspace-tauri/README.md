@@ -7,16 +7,17 @@ architecture in `../01_ui_technology_architecture.md` (React + TypeScript + Vite
 Rust/Tauri native boundary, CSS Modules + tokens, static-first behavior).
 
 The active product goal is not a web dashboard in a desktop frame. It is a
-native-feeling study workspace with one bounded onboarding flow and one focused
-workspace session.
+native-feeling workspace home that gives the user continuity, then opens into a
+bounded create flow, study-path overview, and focused active learning node.
 
 ## Canonical Specs
 
 1. `00_source_map.md`
-2. `01_onboarding_workspace_intent.md`
-3. `02_workspace_study_surface.md`
-4. `03_iteration_flow.md`
-5. `04_react_migration_plan.md`
+2. `05_workspace_home.md`
+3. `01_onboarding_workspace_intent.md`
+4. `02_workspace_study_surface.md`
+5. `03_iteration_flow.md`
+6. `04_react_migration_plan.md`
 
 ## Current Prototype
 

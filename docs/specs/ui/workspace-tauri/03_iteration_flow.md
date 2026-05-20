@@ -9,19 +9,37 @@ before implementation changes.
 ## Screen Order
 
 ```text
+0. Workspace Home
 1. Create Workspace
 2. Review Workspace Plan
-3. Workspace Overview
-4. First Session
+3. Workspace Study Path Overview
+4. Active Learning Node
 5. Read Action
 6. Build Action
 7. Recall Action
 8. Evidence / Readiness Review
 ```
 
+## Step 0: Workspace Home
+
+The app opens to the user's workspace home when work already exists. This screen
+answers "what can I continue?" before asking the user to create more work.
+
+Visible elements:
+
+1. continue queue for pending sessions,
+2. existing workspaces with progress and next session,
+3. blocked or draft intent attempts when present,
+4. compact `New workspace` entry.
+
+Success means the user sees tracking, continuity, and resume paths. This screen
+must not show a `Study Path` rail, `Read / Build / Recall`, tutor, readiness
+rail, or compiler payload.
+
 ## Step 1: Create Workspace
 
-The user sees one native-feeling window with:
+The user reaches this screen from `New workspace`. They see one native-feeling
+window with:
 
 1. intent field
 2. source field
@@ -44,22 +62,29 @@ The preview shows:
 
 Success means the user can reject or proceed from a compact summary.
 
-## Step 3: Workspace Overview
+## Step 3: Workspace Study Path Overview
 
 The workspace opens to a bounded study-path overview, not directly to the active
-node session. The visual reference is the three-column study surface:
+node session. This is inside one selected workspace, not the global app home.
+The visual reference language is the study-path surface:
 
 1. left rail with study path progress, nodes, and selected mini-node
-2. center panel with current-study headline, Read / Build / Recall entry cards,
-   and evidence from sources
-3. right tutor rail with focus guidance, readiness, and compact ask input
+2. center panel with current-study headline, next recommended node/session, and
+   evidence from sources
+3. optional right summary rail with focus/readiness context if it does not
+   compete with navigation
 4. no generic dashboard cards or oversized CTA block
-5. a selected action card opens the active node session
+5. one primary `Open node` or `Resume session` action opens the active node
+   session
+
+`Read / Build / Recall` does not belong on the global home. Prefer placing it in
+the active node session. If it appears in this overview for a visual prototype,
+it must read as a selected-node shortcut, not as app-level navigation.
 
 Success means the user understands the route before committing to an active
 study session.
 
-## Step 4: First Session
+## Step 4: Active Learning Node
 
 The selected node opens to the study surface. The session panel is primary even
 on narrow responsive layouts. It should read as the third screen in the same

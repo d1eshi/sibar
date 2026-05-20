@@ -82,23 +82,29 @@ explicit Rust boundary.
 
 The workspace UI must be composed with these bounded sections:
 
-1. **Onboarding**
+1. **Workspace Home**
+   - Default returning-user entry point.
+   - Lists existing workspaces, pending sessions, blocked/draft intents, and a
+     compact `New workspace` action.
+   - Does not render `Study Path`, `Read / Build / Recall`, tutor, or compiler
+     debug state.
+2. **Onboarding**
    - Collects intent, source constraints, and first-session expectation.
    - Produces a workspace preview contract only.
-2. **Workspace Shell**
+3. **Workspace Shell**
    - Topology, shell chrome, rail/navigation scaffolding.
    - Owns global arrangement and mode switching.
-3. **Reader / Artifact Renderers**
+4. **Reader / Artifact Renderers**
    - Dedicated renderer host for artifact consumption and reading tasks.
    - Must support multiple modes (at least `paper`, `artifact`, `code`,
      `diagram`, and `log`).
-4. **Guide**
+5. **Guide**
    - Compact "what should I do now" guidance and prompts.
    - Must not become a second independent narrative or chat surface.
-5. **Evidence / Readiness**
+6. **Evidence / Readiness**
    - Bounded claim rendering.
    - Readiness states are explicit and scoped to the current artifact and action.
-6. **Debug Drawers**
+7. **Debug Drawers**
    - Operational diagnostics for development and verification only.
    - Never mixed with learning state in normal user mode.
 
@@ -132,12 +138,13 @@ handle process lifecycle.
 Before implementation, each UI spec or iteration must name the component
 boundaries it expects. The default boundaries are:
 
-1. `OnboardingFlow`
-2. `WorkspaceShell`
-3. `ReaderArtifactHost`
-4. `GuidePanel`
-5. `EvidenceReadinessPanel`
-6. `DebugDrawer`
+1. `WorkspaceHome`
+2. `OnboardingFlow`
+3. `WorkspaceShell`
+4. `ReaderArtifactHost`
+5. `GuidePanel`
+6. `EvidenceReadinessPanel`
+7. `DebugDrawer`
 
 Renderer-specific components should branch at `ReaderArtifactHost`, not through
 recursive wrapper chains. If a renderer needs its own structure, it should own

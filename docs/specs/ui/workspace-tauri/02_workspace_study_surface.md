@@ -2,9 +2,12 @@
 
 ## Goal
 
-Render the first workspace session as a focused study surface. The user should
-know what they are studying now, why it matters, what evidence is attached, and
-which single next action is recommended.
+Render an active learning node inside a selected workspace as a focused study
+surface. The user should know what they are studying now, why it matters, what
+evidence is attached, and which single next action is recommended.
+
+This is not `Workspace Home`. The user reaches this screen by resuming a
+pending session or by opening a node from the workspace study-path overview.
 
 ## Required Flow
 
@@ -35,6 +38,8 @@ drawer until the product requires a dedicated internal/debug mode.
 3. No endless chat-first interface.
 4. No more than one active session at a time.
 5. No dense memory/readiness management screen in the first viewport.
+6. No global workspace list or blocked-intent queue. Those belong to
+   `Workspace Home`.
 
 ## Acceptance
 
@@ -44,3 +49,4 @@ drawer until the product requires a dedicated internal/debug mode.
 3. Read, Build, and Recall remain the only primary actions.
 4. Evidence is scannable without competing with the current prompt.
 5. The same deterministic fixture can run offline.
+6. The screen only appears after a workspace or session is selected.

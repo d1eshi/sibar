@@ -6,13 +6,16 @@ Help the user create one bounded study workspace from a plain-language intent.
 The screen should answer: what will I study, what source constrains it, and what
 will the first session produce?
 
+This flow is entered from `Workspace Home` through `New workspace`. It is not
+the default returning-user landing screen.
+
 ## Required Flow
 
 1. The user states what they want to study, understand, or build.
 2. The user adds a source, repo, URL, note, or pasted material.
 3. The user may add one constraint, such as time, depth, or expected output.
 4. Sibar proposes a workspace title, first session, and three outputs.
-5. The user opens the workspace overview.
+5. The user opens the workspace study-path overview.
 
 ## UI Contract
 
@@ -32,6 +35,9 @@ the start so the user understands what will be produced.
 3. No broad profile setup.
 4. No feature tour.
 5. No source management system in the first pass.
+6. No list of existing workspaces. That belongs to `Workspace Home`.
+7. No `Read / Build / Recall` action row. Those actions belong to the active
+   learning node.
 
 ## Acceptance
 
@@ -39,5 +45,6 @@ the start so the user understands what will be produced.
 2. The primary button compiles or previews the workspace plan.
 3. The preview shows first session and three outputs.
 4. Optional fields are visually subordinate.
-5. Opening the workspace moves to a bounded workspace overview with planned
-   learning nodes and sessions, not to a generic dashboard.
+5. Opening the workspace moves to a bounded workspace study-path overview with
+   planned learning nodes and sessions, not to `Workspace Home`, an active
+   session, or a generic dashboard.

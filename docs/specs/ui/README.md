@@ -15,9 +15,9 @@ iteration notes, and prototypes.
    Public web surface: landing, public demo, reader/source-ingestion moments,
    and deployable narrative prototypes.
 2. `workspace-tauri/`
-   Direct Tauri workspace surface: workspace-intent onboarding, first study
-   session, native shell layout, bounded guide, evidence ledger, and visual
-   iteration references.
+   Direct Tauri workspace surface: workspace home, workspace-intent onboarding,
+   study-path overview, active learning node, bounded guide, evidence ledger,
+   and visual iteration references.
 
 ## Rules
 
@@ -40,11 +40,12 @@ web
   -> collect feedback
 
 workspace-tauri
-  -> ask what the user will study/build
-  -> compile one bounded workspace
-  -> open one active session
+  -> show existing workspaces, pending sessions, and blocked/draft intents
+  -> create a new bounded workspace from intent when requested
+  -> open the selected workspace study path
+  -> enter one active learning node
   -> migrate the static prototype to React by flow slices
-  -> guide Read / Code / Recall
+  -> guide Read / Build / Recall
   -> show evidence and readiness quietly
 ```
 
