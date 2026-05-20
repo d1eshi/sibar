@@ -1,30 +1,50 @@
 # Sibar UI Specs
 
-This directory is the single UI spec home for the Tauri workspace prototype.
-It owns product-facing screen decisions for the desktop surface. Runtime,
-pedagogy, compiler, and readiness contracts remain in their existing specs.
+This directory is the source of truth for product UI iteration. It collects the
+UI decisions that were previously spread across foundation specs, reports,
+iteration notes, and prototypes.
 
-## Active Screens
+## Surfaces
 
-1. `01_onboarding_workspace_intent.md`
-2. `02_workspace_study_surface.md`
+1. `web/`
+   Public web surface: landing, public demo, reader/source-ingestion moments,
+   and deployable narrative prototypes.
+2. `workspace-tauri/`
+   Direct Tauri workspace surface: workspace-intent onboarding, first study
+   session, native shell layout, bounded guide, evidence ledger, and visual
+   iteration references.
 
-## Principles
+## Rules
 
-1. The app must feel like a native workspace, not a web page inside a window.
-2. Onboarding asks for one bounded study/build intent and source context.
-3. The workspace shows one active session, one study path, and one bounded guide.
-4. The user should see at most three next actions: Read, Build, Recall.
-5. Evidence is visible as proof of learning, but it must not dominate the first
-   view.
-6. Advanced compiler/debug controls can exist, but they stay subordinate to the
-   active session.
+1. New UI iteration starts here before touching app code.
+2. Specs in this directory describe screen flow and product behavior, not
+   runtime pedagogy internals.
+3. Historical docs may stay where they are, but each active UI decision should
+   be summarized or linked from one of these surface directories.
+4. Generated mockups and screenshots are references, not final truth. The spec
+   text owns the intended flow.
+5. Keep the first viewport focused. Sibar should not introduce feature overload
+   just because the runtime can produce more state.
 
-## Visual References
+## Current Canonical Flow
 
-- `assets/onboarding-native-reference.png`
-- `assets/workspace-path-reference.png`
-- `assets/workspace-source-reference.png`
+```text
+web
+  -> explain Sibar publicly
+  -> show one fixture-backed demo
+  -> collect feedback
 
-These are generated UI references, not implementation screenshots. The
-prototype should borrow their structure and restraint, not their sample content.
+workspace-tauri
+  -> ask what the user will study/build
+  -> compile one bounded workspace
+  -> open one active session
+  -> guide Read / Code / Recall
+  -> show evidence and readiness quietly
+```
+
+## Source Map
+
+Use the per-surface source maps when extracting older UI notes:
+
+- `web/00_source_map.md`
+- `workspace-tauri/00_source_map.md`
