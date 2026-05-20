@@ -1,15 +1,17 @@
-# Selfhost Pilot Eval Catalog
+# Workspace Plan Adapter Evals
 
-This directory is the declarative index for selfhost pilot eval intent.
+This directory is the declarative catalog for evals that protect WorkspacePlan
+generation adapters.
 
-`reports/` is generated output. This `evals/` directory answers what each eval
-is for, which adapter or runner it covers, and which product intent it protects.
-That separation keeps LLM-facing validation discoverable without reading a
-generated report first.
+The catalog says what each eval is for, which adapter or runner it covers, and
+which WorkspacePlan boundary it protects. Generated report output lives in this
+tree under `reports/`, so adapter eval intent, fixtures, and run results are
+discoverable together without using historical spec names.
 
 ## Layout
 
 - `index.json`: catalog of eval suites, commands, report outputs, and tags.
+- `reports/`: generated eval reports for the current adapter suites.
 - `workspace-intent-compiler.eval.json`: PR #10 parser/schema/pedagogy adapter
   evals for `WorkspaceIntent` to `WorkspacePlan`.
 - `workspace-runner-adapter.eval.json`: PR #11 Rust runner and Codex runner
@@ -30,13 +32,13 @@ the eval surface:
 The contract now is:
 
 ```text
-evals/selfhost/pilot/*.eval.json
+evals/workspace-plan-adapters/*.eval.json
   declarative intent, case classes, runner/adapter coverage
 
 src/evals/*.ts
   executable adapter that turns declared cases into observations
 
-docs/specs/selfhost/pilot/reports/*.json
+evals/workspace-plan-adapters/reports/*.json
   generated report output only
 ```
 

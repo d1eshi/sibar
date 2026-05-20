@@ -11,8 +11,8 @@ import { parseModelOutput } from "../pedagogoai/workspace-intent/parse-model-out
 import { validateWorkspacePlan } from "../pedagogoai/workspace-intent/validate.ts";
 
 const WORKSPACE_INTENT_COMPILER_VALIDATION_ID = "VAL-EVAL-009-workspace-intent-compiler";
-const DEFAULT_REPORT = "docs/specs/selfhost/pilot/reports/VAL-EVAL-009-workspace-intent-compiler.json";
-const EVAL_SPEC_PATH = "evals/selfhost/pilot/workspace-intent-compiler.eval.json";
+const DEFAULT_REPORT = "evals/workspace-plan-adapters/reports/VAL-EVAL-009-workspace-intent-compiler.json";
+const EVAL_SPEC_PATH = "evals/workspace-plan-adapters/workspace-intent-compiler.eval.json";
 export const WORKSPACE_INTENT_COMPILER_EVAL_GENERATED_AT = "2026-05-20T00:00:00.000Z";
 
 type WorkspaceIntentEvalCaseClass =
