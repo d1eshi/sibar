@@ -149,20 +149,18 @@ Translate:
    entry points
 3. study path rail for the active-session screen only
 4. session workbench
-5. Read / Build / Recall action row
-6. responsive ordering where session appears before the tree on narrow layouts
+5. active material panel surface
+6. static material-mode contract in projection
+7. responsive ordering where session appears before the tree on narrow layouts
 
 State rule:
 
 Use a `workspaceReducer` for selected node, selected mini-node, selected source,
-active action, and drawer visibility. The overview may select a node, but it
+material-render mode (via selected source), and drawer visibility. The overview may
+select a node, but it
 must not imply the user is already inside the active study session. The global
 home must not share this reducer unless it consumes the same projection through
 an explicit boundary. Do not mirror the same value in multiple hooks.
-
-The user-facing label for the artifact action is `Build`. The reducer may keep
-the internal `code` key until state, fixtures, and future artifact hosts migrate
-together.
 
 ### Slice 4: Reader / Artifact Host
 
@@ -172,9 +170,9 @@ Supported render modes:
 
 1. `paper`
 2. `artifact`
-3. `code`
-4. `diagram`
-5. `log`
+3. `note`
+4. `code`
+5. `equation`
 6. `fallback`
 
 Each renderer owns one mode. The host chooses the renderer from typed projection

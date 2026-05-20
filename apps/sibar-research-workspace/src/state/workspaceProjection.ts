@@ -1,14 +1,18 @@
-import {
-  type WorkspaceSessionActionKind,
-  type WorkspaceSessionState,
-} from "./workspaceReducer";
+import type { WorkspaceSessionState } from "./workspaceReducer";
 
-export type SourceType = "paper" | "artifact" | "code";
+export type WorkspaceMaterialMode =
+  | "paper"
+  | "note"
+  | "artifact"
+  | "code"
+  | "equation"
+  | "math"
+  | "fallback";
 
 export type WorkspaceSource = {
   id: string;
   title: string;
-  type: SourceType;
+  type: WorkspaceMaterialMode;
   metadata: string;
   snippet: string;
 };
@@ -45,13 +49,77 @@ export type WorkspaceSessionProjection = {
   selectedNode: WorkspaceStudyNode;
   selectedMiniNode: WorkspaceMiniNode;
   selectedSource: WorkspaceSource;
-  activeAction: WorkspaceSessionActionKind;
+  selectedMaterial: {
+    id: string;
+    mode: WorkspaceMaterialMode;
+    title: string;
+    content: string;
+    modeLabel: string;
+  };
   readinessLabel: string;
+  recallStatus: string;
+};
+
+export type WorkspaceHomeTarget = "overview" | "session";
+
+export type WorkspaceHomeWorkspace = {
+  id: string;
+  title: string;
+  objective: string;
+  sourceBoundary: string;
+  progress: string;
+  nextNode: string;
+  readinessHint: string;
+  status: "active" | "ready" | "draft" | "blocked";
+  openTarget: WorkspaceHomeTarget;
+};
+
+export type WorkspaceHomeProjection = {
+  workspaces: readonly WorkspaceHomeWorkspace[];
+};
+
+export const workspaceHomeProjection: WorkspaceHomeProjection = {
+  workspaces: [
+    {
+      id: "embeddings-probe",
+      title: "Embeddings",
+      objective: "Consolidate nearest-neighbor behavior and failure cases.",
+      sourceBoundary: "Paper excerpt + local notebook",
+      progress: "1 of 5 nodes",
+      nextNode: "Boundary checks",
+      readinessHint: "Ready to resume the current mini-node.",
+      status: "active",
+      openTarget: "session",
+    },
+    {
+      id: "rag-track",
+      title: "RAG",
+      objective: "Evaluate retrieval quality against paraphrase and negation.",
+      sourceBoundary: "Course notes + mini eval corpus",
+      progress: "2 of 6 nodes",
+      nextNode: "Session 03 - compare trade-offs",
+      readinessHint: "Open to continue the study path from the next available session.",
+      status: "ready",
+      openTarget: "overview",
+    },
+    {
+      id: "jax-lab",
+      title: "JAX",
+      objective: "Prototype tiny learning examples and compare baseline outputs.",
+      sourceBoundary: "Draft intent + reference notebook",
+      progress: "Draft",
+      nextNode: "Define source scope",
+      readinessHint: "Draft session needs a fresh workspace source input.",
+      status: "draft",
+      openTarget: "overview",
+    },
+  ],
 };
 
 export const firstWorkspaceSessionFixture: WorkspaceSessionFixture = {
   title: "Focused workspace: embeddings",
-  sessionHint: "Read one compact source slice, draft a practical artifact, then confirm readiness.",
+  sessionHint:
+    "Inspect one compact material slice, draft a grounded artifact, and confirm readiness.",
   nodes: [
     {
       id: "goal-embeddings",
@@ -91,7 +159,7 @@ export const firstWorkspaceSessionFixture: WorkspaceSessionFixture = {
           id: "mn-failure-boundaries",
           name: "Boundary checks",
           question: "When should we stop trusting embeddings alone?",
-          sourceId: "source-note",
+          sourceId: "source-equation",
         },
         {
           id: "mn-readability-evidence",
@@ -166,11 +234,19 @@ export const firstWorkspaceSessionFixture: WorkspaceSessionFixture = {
     },
     {
       id: "source-note",
-      type: "artifact",
+      type: "note",
       title: "Limitations and caveats note",
       metadata: "Sibar workspace note - 2024",
       snippet:
         "Negation, ambiguity, and very short queries are common retrieval failure modes.",
+    },
+    {
+      id: "source-equation",
+      type: "equation",
+      title: "Similarity scoring equation",
+      metadata: "Sibar derivation notebook - 2024",
+      snippet:
+        "cosine_similarity(a, b) = (a · b) / (||a|| · ||b||); edge cases appear when one vector norm is near zero.",
     },
   ],
 };
@@ -183,7 +259,7 @@ function getWorkspaceSourceById(
     sources.find((source) => source.id === sourceId) ??
     sources[0] ?? {
       id: "unresolved-source",
-      type: "artifact",
+      type: "fallback",
       title: "Source unavailable",
       metadata: "No source selected",
       snippet: "Select a source from the study path to load a study context.",
@@ -224,10 +300,45 @@ export function createInitialWorkspaceStateFromFixture(
     selectedNodeId: initialNode?.id ?? "",
     selectedMiniNodeId: firstMini?.id ?? "",
     selectedSourceId: fallbackSourceId,
-    activeAction: "read",
     isReadinessPanelVisible: true,
     ...overrides,
   };
+}
+
+function getMaterialModeLabel(mode: WorkspaceMaterialMode): string {
+  if (mode === "code") {
+    return "Code";
+  }
+
+  if (mode === "paper") {
+    return "Paper";
+  }
+
+  if (mode === "note") {
+    return "Note";
+  }
+
+  if (mode === "artifact") {
+    return "Artifact";
+  }
+
+  if (mode === "equation" || mode === "math") {
+    return "Equation";
+  }
+
+  return "Material";
+}
+
+function getRecallStatus(mode: WorkspaceMaterialMode): string {
+  if (mode === "code" || mode === "artifact") {
+    return "Recall is a pedagogy follow-up: verify implementation and evidence after this node is completed.";
+  }
+
+  if (mode === "equation" || mode === "math") {
+    return "Recall is a pedagogy follow-up: reconstruct the derivation after an explanation attempt.";
+  }
+
+  return "Recall is a pedagogy follow-up after the node is complete and evidence is tied to the source.";
 }
 
 export function projectWorkspaceSession(
@@ -260,10 +371,17 @@ export function projectWorkspaceSession(
     selectedNode,
     selectedMiniNode,
     selectedSource,
-    activeAction: state.activeAction,
+    selectedMaterial: {
+      id: selectedSource.id,
+      mode: selectedSource.type,
+      title: selectedSource.title,
+      content: selectedSource.snippet,
+      modeLabel: getMaterialModeLabel(selectedSource.type),
+    },
     nodes: fixture.nodes,
     sources: fixture.sources,
     sourceCount: fixture.sources.length,
     readinessLabel: "Ready to mark readiness once a source claim is evidenced and one artifact is produced.",
+    recallStatus: getRecallStatus(selectedSource.type),
   };
 }

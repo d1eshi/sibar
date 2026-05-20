@@ -35,11 +35,15 @@ compiler path.
   after local preview generation.
 - Added a workspace overview screen that follows the study-path reference:
   left learning rail, current-study center, source evidence, tutor guidance, and
-  readiness before opening an active node session.
+  readiness before opening a learning node.
+- Added a workspace home screen with existing workspaces and session resume/open
+  actions:
+  - `New workspace`
+  - `Open` / `Resume`
 - Added a static first-session workspace surface with reducer-backed selection state:
   - study path rail
   - session workbench
-  - active action row (`Read` / `Build` / `Recall`)
+  - selected learning-material surface
   - compact readiness/source panel
 - No fetch calls, Tauri invoke calls, compiler integration, runner sidecar, or
   external execution calls were added in this slice.

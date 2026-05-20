@@ -36,8 +36,9 @@ the start so the user understands what will be produced.
 4. No feature tour.
 5. No source management system in the first pass.
 6. No list of existing workspaces. That belongs to `Workspace Home`.
-7. No `Read / Build / Recall` action row. Those actions belong to the active
-   learning node.
+7. No `Read / Build / Recall` user-facing action choices. The active learning
+   node renders the selected material/artifact surface, and recall appears as a
+   system/pedagogy follow-up status.
 
 ## Acceptance
 

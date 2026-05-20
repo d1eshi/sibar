@@ -1,45 +1,7 @@
-import * as React from "react";
 import styles from "./workspace.module.css";
-import type {
-  WorkspaceSessionAction,
-  WorkspaceSessionState,
-} from "../../state/workspaceReducer";
 import type { WorkspaceSessionProjection } from "../../state/workspaceProjection";
 
-const actionItems = [
-  {
-    kind: "read",
-    label: "Read",
-    hint: "Reconstruct the claim before hints.",
-    output: "One source-backed note",
-  },
-  {
-    kind: "code",
-    label: "Build",
-    hint: "Scope the smallest proof artifact.",
-    output: "One bounded artifact",
-  },
-  {
-    kind: "recall",
-    label: "Recall",
-    hint: "Attempt from memory without notes.",
-    output: "One checked answer",
-  },
-] as const;
-
-function getActionLabel(kind: typeof actionItems[number]["kind"]): string {
-  return actionItems.find((action) => action.kind === kind)?.label ?? "Read";
-}
-
-export function SessionWorkbench({
-  projection,
-  state,
-  dispatch,
-}: {
-  projection: WorkspaceSessionProjection;
-  state: WorkspaceSessionState;
-  dispatch: React.Dispatch<WorkspaceSessionAction>;
-}) {
+export function SessionWorkbench({ projection }: { projection: WorkspaceSessionProjection }) {
   return (
     <section className={styles.sessionWorkbench} aria-label="Session workbench">
       <header className={styles.sessionHeader}>
@@ -65,66 +27,34 @@ export function SessionWorkbench({
           <p>{projection.selectedMiniNode.question}</p>
         </article>
 
-        <div className={styles.actionRow} role="radiogroup" aria-label="Session actions">
-          {actionItems.map((action) => (
-            <button
-              key={action.kind}
-              type="button"
-              aria-pressed={state.activeAction === action.kind}
-              className={styles.actionButton}
-              data-action={action.kind}
-              data-active={state.activeAction === action.kind ? "true" : "false"}
-              onClick={() =>
-                dispatch({ type: "set_active_action", action: action.kind })
-              }
-            >
-              <span className={styles.actionIcon} aria-hidden="true" />
-              <span>
-                <strong>{action.label}</strong>
-                <em>{action.hint}</em>
-              </span>
-            </button>
-          ))}
-        </div>
-
-        <article className={styles.sourceWindow}>
+        <article className={styles.sourceWindow} aria-label="Learning material surface">
           <div className={styles.sourceWindowHeader}>
             <div>
-              <p className={styles.kicker}>Source / evidence</p>
-              <h3>{projection.selectedSource.title}</h3>
+              <p className={styles.kicker}>Learning material</p>
+              <h3>{projection.selectedMaterial.title}</h3>
             </div>
-            <button
-              type="button"
-              className={styles.sourceButton}
-              onClick={() =>
-                dispatch({
-                  type: "select_source",
-                  sourceId: projection.selectedSource.id,
-                })
-              }
-            >
-              Use source
-            </button>
+            <span className={styles.sourceTypeBadge}>
+              {projection.selectedMaterial.modeLabel}
+            </span>
           </div>
-          <q>{projection.selectedSource.snippet}</q>
+          <p className={styles.materialBody}>{projection.selectedMaterial.content}</p>
           <footer className={styles.sourceLedger}>
             <span>{projection.selectedSource.metadata}</span>
-            <strong>{getActionLabel(state.activeAction)} output</strong>
+            <strong>{projection.selectedMaterial.modeLabel} source</strong>
           </footer>
         </article>
 
         <article className={styles.outputContract}>
-          <p className={styles.kicker}>Session output contract</p>
+          <p className={styles.kicker}>Pedagogy status</p>
           <ul>
-            {actionItems.map((action) => (
-              <li
-                key={action.kind}
-                data-active={state.activeAction === action.kind ? "true" : "false"}
-              >
-                <strong>{action.label}</strong>
-                <span>{action.output}</span>
-              </li>
-            ))}
+            <li>
+              <strong>Recall follow-up</strong>
+              <span>{projection.recallStatus}</span>
+            </li>
+            <li>
+              <strong>Readiness</strong>
+              <span>{projection.readinessLabel}</span>
+            </li>
           </ul>
         </article>
       </section>

@@ -43,9 +43,10 @@ then reduce them into the canonical specs in this directory.
 5. The workspace opens into a workspace study-path overview that shows planned
    learning nodes and available sessions before any node is active.
 6. Opening a learning node moves into one active session.
-7. The active-session viewport prioritizes the current study node, next action,
-   evidence, and readiness.
-8. Primary next actions are capped at three: Read, Build, Recall.
+7. The active-session viewport prioritizes the current study node, selected material
+   mode/surface, evidence, and readiness.
+8. Primary follow-up status is readiness-based (including recall/gap follow-up), not
+   a user-chosen `Read` / `Build` / `Recall` action set.
 9. The guide is bounded by modes. It is not an infinite chat column.
 10. Compiler payloads and low-level debug controls stay collapsed unless the
    user is in an implementation/debug surface.

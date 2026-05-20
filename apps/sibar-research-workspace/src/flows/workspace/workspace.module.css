@@ -286,7 +286,6 @@
 
 .currentQuestion p:last-child,
 .currentMiniNode p,
-.sourceWindow q,
 .sourceLedger,
 .outputContract span {
   color: var(--text-muted);
@@ -320,136 +319,6 @@
   line-height: 1.45;
 }
 
-.actionRow {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(150px, 1fr));
-  gap: 18px;
-}
-
-.actionButton {
-  min-height: 108px;
-  display: grid;
-  grid-template-columns: 42px minmax(0, 1fr);
-  gap: 16px;
-  align-items: center;
-  padding: 20px;
-  border: 1px solid var(--divider-strong);
-  border-radius: var(--radius);
-  color: var(--text-primary);
-  background: var(--surface-panel);
-  text-align: left;
-}
-
-.actionButton[data-active="true"] {
-  border-color: var(--olive);
-  background: var(--olive-soft);
-}
-
-.actionButton[data-action="code"][data-active="true"] {
-  border-color: var(--sienna);
-}
-
-.actionButton:hover,
-.actionButton:focus-visible {
-  box-shadow: var(--shadow-lift);
-  transform: translateY(-1px);
-}
-
-.actionButton strong,
-.actionButton em {
-  display: block;
-}
-
-.actionButton strong {
-  font-size: 18px;
-  line-height: 1.1;
-}
-
-.actionButton em {
-  margin-top: 6px;
-  color: var(--text-muted);
-  font-style: normal;
-  line-height: 1.35;
-}
-
-.actionIcon {
-  position: relative;
-  width: 38px;
-  height: 38px;
-  color: var(--olive);
-}
-
-.actionIcon::before,
-.actionIcon::after {
-  content: "";
-  position: absolute;
-  box-sizing: border-box;
-}
-
-.actionButton[data-action="read"] .actionIcon::before,
-.actionButton[data-action="read"] .actionIcon::after {
-  top: 7px;
-  width: 16px;
-  height: 24px;
-  border: 3px solid currentColor;
-  border-radius: 3px 0 0 3px;
-}
-
-.actionButton[data-action="read"] .actionIcon::before {
-  left: 3px;
-}
-
-.actionButton[data-action="read"] .actionIcon::after {
-  right: 3px;
-  transform: scaleX(-1);
-}
-
-.actionButton[data-action="code"] .actionIcon {
-  color: var(--accent);
-}
-
-.actionButton[data-action="code"] .actionIcon::before {
-  left: 13px;
-  top: 4px;
-  width: 13px;
-  height: 13px;
-  border: 3px solid currentColor;
-  box-shadow:
-    -15px 18px 0 -3px var(--surface-panel),
-    -15px 18px 0 0 currentColor,
-    0 18px 0 -3px var(--surface-panel),
-    0 18px 0 0 currentColor,
-    15px 18px 0 -3px var(--surface-panel),
-    15px 18px 0 0 currentColor;
-}
-
-.actionButton[data-action="code"] .actionIcon::after {
-  left: 19px;
-  top: 17px;
-  width: 3px;
-  height: 12px;
-  background: currentColor;
-}
-
-.actionButton[data-action="recall"] .actionIcon::before {
-  left: 6px;
-  top: 6px;
-  width: 26px;
-  height: 26px;
-  border: 3px solid currentColor;
-  border-radius: 50%;
-}
-
-.actionButton[data-action="recall"] .actionIcon::after {
-  left: 18px;
-  top: 20px;
-  width: 10px;
-  height: 10px;
-  border-left: 3px solid currentColor;
-  border-bottom: 3px solid currentColor;
-  transform: rotate(-45deg);
-}
-
 .sourceWindow {
   padding: 26px 30px 24px;
 }
@@ -459,6 +328,17 @@
   grid-template-columns: minmax(0, 1fr) auto;
   gap: 18px;
   align-items: start;
+}
+
+.sourceTypeBadge {
+  height: fit-content;
+  display: inline-grid;
+  align-items: center;
+  padding: 10px 14px;
+  border: 1px solid var(--divider);
+  border-radius: 999px;
+  color: var(--text-secondary);
+  font-size: 13px;
 }
 
 .sourceWindow h3 {
@@ -478,12 +358,11 @@
   font-size: 13px;
 }
 
-.sourceWindow q {
-  display: block;
-  margin-top: 22px;
-  color: var(--accent-strong);
+.materialBody {
+  margin: 22px 0 0;
+  color: var(--text-muted);
   font-family: var(--font-serif);
-  font-size: 20px;
+  font-size: 18px;
   line-height: 1.45;
 }
 
@@ -507,7 +386,7 @@
 
 .outputContract ul {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 0;
   margin: 22px 0 0;
   padding: 0;
@@ -639,7 +518,6 @@
   }
 
   .currentMiniNode,
-  .actionRow,
   .sourceWindowHeader,
   .outputContract ul {
     grid-template-columns: 1fr;

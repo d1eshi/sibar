@@ -14,10 +14,8 @@ before implementation changes.
 2. Review Workspace Plan
 3. Workspace Study Path Overview
 4. Active Learning Node
-5. Read Action
-6. Build Action
-7. Recall Action
-8. Evidence / Readiness Review
+5. Active Learning Material Surface
+6. Evidence / Readiness Review
 ```
 
 ## Step 0: Workspace Home
@@ -77,9 +75,8 @@ The visual reference language is the study-path surface:
 5. one primary `Open node` or `Resume session` action opens the active node
    session
 
-`Read / Build / Recall` does not belong on the global home. Prefer placing it in
-the active node session. If it appears in this overview for a visual prototype,
-it must read as a selected-node shortcut, not as app-level navigation.
+Recall and its checks are not app-level actions. They are internal pedagogy
+follow-up states that appear in session guidance and readiness.
 
 Success means the user understands the route before committing to an active
 study session.
@@ -94,30 +91,20 @@ dividers and low-radius surfaces.
 
 Visible elements:
 
-1. current source
-2. current study node
-3. objective
-4. session output contract
-5. Read / Build / Recall
-6. guide state
-7. compact evidence/artifact ledger
+1. current study node
+2. current mini-node
+3. current material mode and surface content
+4. guide state
+5. compact evidence/artifact ledger
+6. recall/gap status
 
-## Step 5: Read Action
+## Step 5: Active Learning Material Surface
 
-The `Read` action focuses the smallest source slice and asks for reconstruction
-before hints.
+The selected node opens to the active material panel in a bounded layout.
+The surface shows the selected material by render mode (paper / note / artifact / code / equation)
+with source context in the same railed layout.
 
-## Step 6: Build Action
-
-The `Build` action scopes the artifact to produce. The UI should not imply a full
-editor until a patch/readiness flow exists.
-
-## Step 7: Recall Action
-
-The `Recall` action tests memory without notes. It should route to attempt-first
-behavior rather than showing an explanation first.
-
-## Step 8: Evidence / Readiness Review
+## Step 6: Evidence / Readiness Review
 
 Evidence and readiness summarize what the session proved. They should not claim
 global mastery.

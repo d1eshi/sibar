@@ -2,7 +2,6 @@ import * as React from "react";
 import styles from "./workspaceOverview.module.css";
 import type {
   WorkspaceSessionAction,
-  WorkspaceSessionActionKind,
   WorkspaceSessionState,
 } from "../../state/workspaceReducer";
 import type {
@@ -16,16 +15,6 @@ interface WorkspaceOverviewProps {
   dispatch: React.Dispatch<WorkspaceSessionAction>;
   onOpenSelectedNode: () => void;
 }
-
-const overviewActions: ReadonlyArray<{
-  kind: WorkspaceSessionActionKind;
-  label: string;
-  hint: string;
-}> = [
-  { kind: "read", label: "Read", hint: "Study source" },
-  { kind: "code", label: "Build", hint: "Create evidence" },
-  { kind: "recall", label: "Recall", hint: "Test memory" },
-];
 
 function getStudyHeadline(node: WorkspaceStudyNode): string {
   if (node.id === "goal-correctness") {
@@ -63,9 +52,8 @@ export function WorkspaceOverview({
     });
   }
 
-  function openAction(action: WorkspaceSessionActionKind) {
+  function openSelectedNode() {
     dispatch({ type: "select_source", sourceId: projection.selectedMiniNode.sourceId });
-    dispatch({ type: "set_active_action", action });
     onOpenSelectedNode();
   }
 
@@ -160,24 +148,25 @@ export function WorkspaceOverview({
 
         <div className={styles.overviewDivider} />
 
-        <section className={styles.overviewActionSection} aria-label="Choose your first session">
-          <h2>Choose your first session</h2>
-          <div className={styles.overviewActionGrid}>
-            {overviewActions.map((action) => (
-              <button
-                key={action.kind}
-                type="button"
-                className={styles.overviewActionCard}
-                data-action={action.kind}
-                onClick={() => openAction(action.kind)}
-              >
-                <span className={styles.overviewActionIcon} aria-hidden="true" />
-                <span>
-                  <strong>{action.label}</strong>
-                  <em>{action.hint}</em>
-                </span>
-              </button>
-            ))}
+        <section
+          className={styles.overviewActionSection}
+          aria-label="Open selected learning node"
+        >
+          <h2>Selected learning node</h2>
+          <div className={styles.overviewOpenSessionGrid}>
+            <button
+              type="button"
+              className={styles.overviewOpenSessionButton}
+              onClick={openSelectedNode}
+            >
+              <span>
+                <strong>{projection.selectedNode.name}</strong>
+                <em>
+                  Resume with{" "}
+                  <strong>{projection.selectedMaterial.modeLabel}</strong> material in this session.
+                </em>
+              </span>
+            </button>
           </div>
         </section>
 
@@ -260,7 +249,7 @@ export function WorkspaceOverview({
             <span className={styles.readinessMeter}>78%</span>
             <span>
               <strong>Good readiness</strong>
-              <p>Review the evidence, then choose an action.</p>
+              <p>Open the selected learning node to continue this study material.</p>
             </span>
           </div>
         </section>

@@ -43,9 +43,9 @@ workspace-tauri
   -> show existing workspaces, pending sessions, and blocked/draft intents
   -> create a new bounded workspace from intent when requested
   -> open the selected workspace study path
-  -> enter one active learning node
+  -> enter one active learning node material surface
   -> migrate the static prototype to React by flow slices
-  -> guide Read / Build / Recall
+  -> guide readiness and follow-up status
   -> show evidence and readiness quietly
 ```
 

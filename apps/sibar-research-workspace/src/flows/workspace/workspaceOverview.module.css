@@ -371,127 +371,39 @@
   gap: 26px;
 }
 
-.overviewActionGrid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(160px, 1fr));
-  gap: 28px;
+.overviewOpenSessionGrid {
+  max-width: 640px;
 }
 
-.overviewActionCard {
-  min-height: 120px;
-  display: grid;
-  grid-template-columns: 54px minmax(0, 1fr);
-  gap: 20px;
-  align-items: center;
-  padding: 24px;
+.overviewOpenSessionButton {
+  width: 100%;
+  min-height: 96px;
+  padding: 22px 24px;
   border: 1px solid var(--divider-strong);
-  border-radius: 6px;
+  border-radius: var(--radius);
   color: var(--text-primary);
   background: var(--surface-panel);
   text-align: left;
 }
 
-.overviewActionCard[data-action="code"] {
-  border-color: var(--sienna);
-}
-
-.overviewActionCard:hover,
-.overviewActionCard:focus-visible {
+.overviewOpenSessionButton:hover,
+.overviewOpenSessionButton:focus-visible {
   box-shadow: var(--shadow-lift);
   transform: translateY(-1px);
 }
 
-.overviewActionCard span:last-child {
-  display: grid;
-  gap: 5px;
+.overviewOpenSessionButton strong {
+  display: block;
+  font-size: 19px;
+  line-height: 1.2;
 }
 
-.overviewActionCard strong {
-  font-size: 18px;
-  line-height: 1.1;
-}
-
-.overviewActionCard em {
+.overviewOpenSessionButton em {
+  display: block;
+  margin-top: 8px;
   color: var(--text-muted);
   font-style: normal;
-}
-
-.overviewActionIcon {
-  position: relative;
-  width: 46px;
-  height: 46px;
-  color: var(--olive);
-}
-
-.overviewActionIcon::before,
-.overviewActionIcon::after {
-  content: "";
-  position: absolute;
-  box-sizing: border-box;
-}
-
-.overviewActionCard[data-action="read"] .overviewActionIcon::before,
-.overviewActionCard[data-action="read"] .overviewActionIcon::after {
-  top: 8px;
-  width: 18px;
-  height: 28px;
-  border: 3px solid currentColor;
-  border-radius: 3px 0 0 3px;
-}
-
-.overviewActionCard[data-action="read"] .overviewActionIcon::before {
-  left: 4px;
-}
-
-.overviewActionCard[data-action="read"] .overviewActionIcon::after {
-  right: 4px;
-  transform: scaleX(-1);
-}
-
-.overviewActionCard[data-action="code"] .overviewActionIcon {
-  color: var(--accent);
-}
-
-.overviewActionCard[data-action="code"] .overviewActionIcon::before {
-  left: 16px;
-  top: 5px;
-  width: 15px;
-  height: 15px;
-  border: 3px solid currentColor;
-  box-shadow:
-    -18px 22px 0 -3px var(--surface-panel),
-    -18px 22px 0 0 currentColor,
-    0 22px 0 -3px var(--surface-panel),
-    0 22px 0 0 currentColor,
-    18px 22px 0 -3px var(--surface-panel),
-    18px 22px 0 0 currentColor;
-}
-
-.overviewActionCard[data-action="code"] .overviewActionIcon::after {
-  left: 23px;
-  top: 20px;
-  width: 3px;
-  height: 14px;
-  background: currentColor;
-}
-
-.overviewActionCard[data-action="recall"] .overviewActionIcon::before {
-  left: 8px;
-  top: 8px;
-  width: 30px;
-  height: 30px;
-  border: 3px solid var(--olive);
-  border-radius: 50%;
-}
-
-.overviewActionCard[data-action="recall"] .overviewActionIcon::after {
-  left: 22px;
-  top: 24px;
-  width: 10px;
-  height: 10px;
-  border-left: 3px solid var(--olive);
-  border-bottom: 3px solid var(--olive);
-  transform: rotate(-45deg);
+  line-height: 1.35;
 }
 
 .overviewEvidenceSection {

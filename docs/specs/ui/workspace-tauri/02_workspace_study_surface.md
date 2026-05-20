@@ -4,7 +4,7 @@
 
 Render an active learning node inside a selected workspace as a focused study
 surface. The user should know what they are studying now, why it matters, what
-evidence is attached, and which single next action is recommended.
+material is active, and how any recall/gap follow-up is handled.
 
 This is not `Workspace Home`. The user reaches this screen by resuming a
 pending session or by opening a node from the workspace study-path overview.
@@ -13,7 +13,7 @@ pending session or by opening a node from the workspace study-path overview.
 
 1. The left rail shows the study path and current node.
 2. The center surface shows the active source/session prompt.
-3. The user chooses among Read, Build, and Recall.
+3. The user opens the selected node/session and sees the active node material surface.
 4. The guide panel shows scoped guidance and readiness, not an open-ended chat
    as the dominant object.
 5. Evidence and artifacts stay visible as a compact ledger.
@@ -23,7 +23,7 @@ pending session or by opening a node from the workspace study-path overview.
 The first viewport should prioritize:
 
 1. Current study question or node
-2. Three next actions
+2. Active node material surface by render mode (paper / note / artifact / code / equation)
 3. Evidence from sources
 4. Readiness/gap status
 5. Attempt composer
@@ -46,7 +46,8 @@ drawer until the product requires a dedicated internal/debug mode.
 1. The UI reads as a native Tauri workspace, not a web layout boxed inside the
    shell.
 2. The guide has bounded modes.
-3. Read, Build, and Recall remain the only primary actions.
+3. The node material surface is the primary action. Recall is a status in the
+   readiness/gap guidance, not a selectable action button.
 4. Evidence is scannable without competing with the current prompt.
 5. The same deterministic fixture can run offline.
 6. The screen only appears after a workspace or session is selected.
