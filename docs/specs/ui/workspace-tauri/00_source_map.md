@@ -31,14 +31,16 @@ then reduce them into the canonical specs in this directory.
 
 1. The first user-facing flow is workspace creation, not a dashboard.
 2. Onboarding asks for one bounded intent and source context.
-3. The workspace opens into one active session.
-4. The first viewport prioritizes the current study node, next action, evidence,
-   and readiness.
-5. Primary next actions are capped at three: Read, Code, Recall.
-6. The guide is bounded by modes. It is not an infinite chat column.
-7. Compiler payloads and low-level debug controls stay collapsed unless the
+3. The workspace opens into a workspace overview that shows the planned learning
+   nodes and available sessions before any node is active.
+4. Opening a learning node moves into one active session.
+5. The active-session viewport prioritizes the current study node, next action,
+   evidence, and readiness.
+6. Primary next actions are capped at three: Read, Build, Recall.
+7. The guide is bounded by modes. It is not an infinite chat column.
+8. Compiler payloads and low-level debug controls stay collapsed unless the
    user is in an implementation/debug surface.
-8. Evidence remains visible as proof of mastery, but it does not dominate the
+9. Evidence remains visible as proof of mastery, but it does not dominate the
    first view.
 
 ## Pending Extraction

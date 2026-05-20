@@ -11,11 +11,12 @@ before implementation changes.
 ```text
 1. Create Workspace
 2. Review Workspace Plan
-3. First Session
-4. Read Action
-5. Code Action
-6. Recall Action
-7. Evidence / Readiness Review
+3. Workspace Overview
+4. First Session
+5. Read Action
+6. Build Action
+7. Recall Action
+8. Evidence / Readiness Review
 ```
 
 ## Step 1: Create Workspace
@@ -39,14 +40,28 @@ The preview shows:
 2. first session
 3. three expected outputs
 4. plan status
-5. `Open first session`
+5. `Open workspace`
 
 Success means the user can reject or proceed from a compact summary.
 
-## Step 3: First Session
+## Step 3: Workspace Overview
 
-The session opens directly to the study surface. The session panel is primary
-even on narrow responsive layouts.
+The workspace opens to a bounded overview, not directly to a node. This screen
+shows:
+
+1. workspace title and scope
+2. planned learning nodes
+3. available first-session entry points
+4. source/evidence readiness summary
+5. a clear action to enter the selected learning node
+
+Success means the user understands the route before committing to an active
+study session.
+
+## Step 4: First Session
+
+The selected node opens to the study surface. The session panel is primary even
+on narrow responsive layouts.
 
 Visible elements:
 
@@ -54,26 +69,26 @@ Visible elements:
 2. current study node
 3. objective
 4. session output contract
-5. Read / Code / Recall
+5. Read / Build / Recall
 6. guide state
 7. compact evidence/artifact ledger
 
-## Step 4: Read Action
+## Step 5: Read Action
 
 The `Read` action focuses the smallest source slice and asks for reconstruction
 before hints.
 
-## Step 5: Code Action
+## Step 6: Build Action
 
-The `Code` action scopes the artifact to build. The UI should not imply a full
+The `Build` action scopes the artifact to produce. The UI should not imply a full
 editor until a patch/readiness flow exists.
 
-## Step 6: Recall Action
+## Step 7: Recall Action
 
 The `Recall` action tests memory without notes. It should route to attempt-first
 behavior rather than showing an explanation first.
 
-## Step 7: Evidence / Readiness Review
+## Step 8: Evidence / Readiness Review
 
 Evidence and readiness summarize what the session proved. They should not claim
 global mastery.

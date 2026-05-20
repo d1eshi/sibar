@@ -115,21 +115,27 @@ Static-first rule:
 The flow must render a deterministic local preview before any Rust compiler
 call is considered.
 
-### Slice 2: Workspace Shell And First Session
+### Slice 2: Workspace Shell, Overview, And First Session
 
 Translate:
 
 1. native top bar
-2. study path rail
-3. session workbench
-4. Read / Code / Recall action row
-5. responsive ordering where session appears before the tree on narrow layouts
+2. workspace overview with learning nodes and available session entry points
+3. study path rail for the active-session screen
+4. session workbench
+5. Read / Build / Recall action row
+6. responsive ordering where session appears before the tree on narrow layouts
 
 State rule:
 
 Use a `workspaceReducer` for selected node, selected mini-node, selected source,
-active action, and drawer visibility. Do not mirror the same value in multiple
-hooks.
+active action, and drawer visibility. The overview may select a node, but it
+must not imply the user is already inside the active study session. Do not mirror
+the same value in multiple hooks.
+
+The user-facing label for the artifact action is `Build`. The reducer may keep
+the internal `code` key until state, fixtures, and future artifact hosts migrate
+together.
 
 ### Slice 3: Reader / Artifact Host
 

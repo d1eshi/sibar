@@ -2,6 +2,7 @@ import * as React from "react";
 import styles from "./App.module.css";
 import { OnboardingFlow } from "./flows/onboarding/OnboardingFlow";
 import { WorkspaceShell } from "./flows/workspace/WorkspaceShell";
+import { WorkspaceOverview } from "./flows/workspace/WorkspaceOverview";
 import { SessionWorkbench } from "./flows/workspace/SessionWorkbench";
 import { StudyPathRail } from "./flows/workspace/StudyPathRail";
 import stylesWorkspace from "./flows/workspace/workspace.module.css";
@@ -13,7 +14,7 @@ import {
 import { workspaceSessionReducer } from "./state/workspaceReducer";
 
 export default function App() {
-  const [flowStep, setFlowStep] = React.useState<"onboarding" | "session">(
+  const [flowStep, setFlowStep] = React.useState<"onboarding" | "overview" | "session">(
     "onboarding",
   );
   const [workspaceState, dispatchWorkspace] = React.useReducer(
@@ -29,7 +30,14 @@ export default function App() {
     <main className={styles.researchShell} data-component="research-workspace-root">
       <WorkspaceShell mode={flowStep}>
         {flowStep === "onboarding" ? (
-          <OnboardingFlow onOpenFirstSession={() => setFlowStep("session")} />
+          <OnboardingFlow onOpenWorkspace={() => setFlowStep("overview")} />
+        ) : flowStep === "overview" ? (
+          <WorkspaceOverview
+            projection={workspaceProjection}
+            state={workspaceState}
+            dispatch={dispatchWorkspace}
+            onOpenSelectedNode={() => setFlowStep("session")}
+          />
         ) : (
           <section
             className={stylesWorkspace.workspaceFrame}

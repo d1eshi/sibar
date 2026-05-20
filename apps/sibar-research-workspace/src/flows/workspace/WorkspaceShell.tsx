@@ -1,7 +1,7 @@
 import * as React from "react";
 import shellStyles from "../../App.module.css";
 
-type WorkspaceShellMode = "onboarding" | "session";
+type WorkspaceShellMode = "onboarding" | "overview" | "session";
 
 interface WorkspaceShellProps {
   mode: WorkspaceShellMode;

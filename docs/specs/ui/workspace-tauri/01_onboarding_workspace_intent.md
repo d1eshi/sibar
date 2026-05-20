@@ -12,7 +12,7 @@ will the first session produce?
 2. The user adds a source, repo, URL, note, or pasted material.
 3. The user may add one constraint, such as time, depth, or expected output.
 4. Sibar proposes a workspace title, first session, and three outputs.
-5. The user opens the first session.
+5. The user opens the workspace overview.
 
 ## UI Contract
 
@@ -39,4 +39,5 @@ the start so the user understands what will be produced.
 2. The primary button compiles or previews the workspace plan.
 3. The preview shows first session and three outputs.
 4. Optional fields are visually subordinate.
-5. Opening the workspace moves to one active session, not to a dashboard.
+5. Opening the workspace moves to a bounded workspace overview with planned
+   learning nodes and sessions, not to a generic dashboard.
