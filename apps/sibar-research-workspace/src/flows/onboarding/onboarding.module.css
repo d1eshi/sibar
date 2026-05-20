@@ -10,7 +10,12 @@
   font-weight: 650;
 }
 
-.openButtonActive {
+.openButton {
   border-color: var(--teal);
   background: var(--teal-bg);
+}
+
+.openButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
