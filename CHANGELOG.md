@@ -75,6 +75,14 @@ release yet.
   `workspace-contract`, `workspace-session`, `workspace-render`, and
   `workspace-app`) while keeping the facade API and behavior stable.
 
+### Docs - Deep Ownership Workspace Rust Execution Specs
+
+- Added new lightweight spec docs for the Rust-native Deep Ownership Workspace path:
+  `15_workspace_intent_compiler.md`, `16_llm_adapter_contract.md`,
+  `17_workspace_execution_pipeline.md`, and `18_workspace_ui_reproducibility.md`.
+- Updated `docs/specs/deep-ownership-workspace/README.md` reading order to
+  reference the new spec sequence and ensure stable implementation handoff.
+
 ### Added - Native Explain A-Z Attempt Bridge
 
 - Added the native Swift live-loop attempt bridge for `Explain this project A-Z`:

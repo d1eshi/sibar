@@ -1,0 +1,3 @@
+[workspace]
+members = ["crates/sibi-workspace-compiler"]
+resolver = "2"
