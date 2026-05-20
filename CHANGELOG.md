@@ -11,6 +11,18 @@ accepted specs and iterations, not by raw commit count.
 Use this section for changes that have landed but are not part of a tagged
 release yet.
 
+### Added - Workspace Intent First Flow
+
+- Added the Workspace Intent spec as the first user-facing Sibar Research
+  Workspace flow, distinguishing global ambition from a bounded workspace and
+  documenting the transition from `WorkspaceIntent` to `WorkspacePlan`,
+  `SessionPlan`, and `EvidencePlan`.
+- Added PedagogoAI Workspace Intent contracts, deterministic builders, and
+  validators under `src/pedagogoai`.
+- Added a minimal `Create Workspace` UI entry in the Sibar research workspace
+  app that compiles the intent through the core contract layer before opening
+  the first session.
+
 ### Changed - Sibar Research Workspace Visual Direction
 
 - Added an image-first UI/UX report and mockup reference for the Sibar research

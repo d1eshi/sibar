@@ -10,7 +10,7 @@
 </head>
 <body>
   <main class="research-shell" data-component="research-workspace-root">
-    <section class="native-window" data-component="today-screen">
+    <section id="workspaceRoot" class="native-window" data-component="today-screen" data-workspace-state="intent">
       <header class="workspace-topbar" aria-label="Workspace toolbar">
         <div class="window-cluster" aria-hidden="true">
           <span class="window-dot red"></span>
@@ -24,7 +24,7 @@
         <button class="icon-button" type="button" aria-label="Back">&lt;</button>
         <div class="topbar-document">
           <span class="document-icon">PDF</span>
-          <span>Backpropagation</span>
+          <span>Create Workspace</span>
           <span aria-hidden="true">v</span>
         </div>
         <div class="topbar-spacer"></div>
@@ -36,6 +36,52 @@
           <span>Discussion</span>
         </div>
       </header>
+
+      <section class="workspace-intent-screen" aria-labelledby="workspace-intent-title" data-component="workspace-intent-flow">
+        <div class="workspace-intent-form">
+          <p class="eyebrow">Create Workspace</p>
+          <h1 id="workspace-intent-title">Create Workspace</h1>
+          <p class="intent-copy">Turn one bounded intent into sessions and evidence before opening the full workspace.</p>
+
+          <label for="workspaceIntentBuild">What are you trying to build or understand?</label>
+          <textarea id="workspaceIntentBuild" rows="3">I want to follow this blog and build a JAX transformer + kernel path</textarea>
+
+          <label for="workspaceIntentSource">Source / playbook</label>
+          <textarea id="workspaceIntentSource" rows="3">URL / pasted text / paper / repo</textarea>
+
+          <label for="workspaceIntentWhy">Why does this matter?</label>
+          <textarea id="workspaceIntentWhy" rows="2">I want evidence for frontier AI researcher preparation</textarea>
+
+          <div class="intent-field-grid">
+            <div>
+              <label for="workspaceIntentKnown">What do you already know?</label>
+              <textarea id="workspaceIntentKnown" rows="3">Python, basic ML, some PyTorch</textarea>
+            </div>
+            <div>
+              <label for="workspaceIntentUnknown">What do you not know yet?</label>
+              <textarea id="workspaceIntentUnknown" rows="3">JAX, Flax, scaling laws, kernels</textarea>
+            </div>
+          </div>
+
+          <label for="workspaceIntentDesiredOutput">Desired output</label>
+          <input id="workspaceIntentDesiredOutput" type="text" value="repo, notes, benchmark, public writeup" />
+
+          <button id="generateWorkspace" class="generate-workspace-button" type="button">Generate workspace</button>
+        </div>
+
+        <aside id="workspaceIntentPreview" class="workspace-intent-preview" aria-live="polite" hidden>
+          <p class="section-kicker">Proposed plan</p>
+          <h2 id="workspaceIntentPreviewTitle">Proposed Workspace: JAX Transformers</h2>
+          <p class="muted">This workspace will produce:</p>
+          <ul id="workspaceIntentOutputs" class="item-list"></ul>
+          <div class="first-session-callout">
+            <span>Start with</span>
+            <strong id="workspaceIntentFirstSession">Session 01 - JAX arrays and autodiff</strong>
+          </div>
+          <p id="workspaceIntentStatus" class="contract-status" role="status"></p>
+          <button id="openWorkspaceSession" type="button" disabled>Open first session</button>
+        </aside>
+      </section>
 
       <div class="workspace-frame">
         <aside class="library-sidebar" aria-labelledby="library-title" data-component="roadmap-panel">

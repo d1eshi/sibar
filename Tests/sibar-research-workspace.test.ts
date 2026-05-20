@@ -99,6 +99,9 @@ function createHtmlAwareElement(tagName) {
     setAttribute(name, value) {
       this.attributes[name] = String(value);
     },
+    removeAttribute(name) {
+      delete this.attributes[name];
+    },
     getAttribute(name) {
       return this.attributes[name];
     },
@@ -135,12 +138,22 @@ function createHtmlAwareElement(tagName) {
 
 function makeSimpleNode() {
   return {
+    attributes: {},
     innerHTML: "",
     textContent: "",
     value: "",
     disabled: false,
+    hidden: false,
     addEventListener: () => {},
-    setAttribute: () => {},
+    setAttribute(name, value) {
+      this.attributes[name] = String(value);
+    },
+    removeAttribute(name) {
+      delete this.attributes[name];
+    },
+    getAttribute(name) {
+      return this.attributes[name];
+    },
     querySelectorAll: () => [],
   };
 }
@@ -163,6 +176,9 @@ function makeInteractiveNode(dataset = {}) {
     },
     setAttribute(name, value) {
       this.attributes[name] = String(value);
+    },
+    removeAttribute(name) {
+      delete this.attributes[name];
     },
     getAttribute(name) {
       return this.attributes[name];
@@ -188,6 +204,9 @@ function createElementSpy(tagName) {
     addEventListener: () => {},
     setAttribute(name, value) {
       this.attributes[name] = value;
+    },
+    removeAttribute(name) {
+      delete this.attributes[name];
     },
     getAttribute(name) {
       return this.attributes[name];
@@ -220,11 +239,112 @@ test("second app exposes the research workspace screen contract", () => {
   assert.match(workspaceHtml, /Apply generated artifact/);
   assert.match(workspaceHtml, /Apply validated sample artifact/);
   assert.match(workspaceHtml, /Attempt reconstruction first/);
+  assert.match(workspaceHtml, /Create Workspace/);
+  assert.match(workspaceHtml, /What are you trying to build or understand\?/);
+  assert.match(workspaceHtml, /Generate workspace/);
+  assert.match(workspaceHtml, /Proposed Workspace: JAX Transformers/);
   assert.match(workspaceHtml, /Ask/);
   assert.match(workspaceHtml, /Key insight/);
   assert.doesNotMatch(workspaceHtml, /LM GUIDE/);
   assert.doesNotMatch(workspaceHtml, /Slash command/i);
   assert.doesNotMatch(workspaceHtml, /data-mode="\/map"/);
+});
+
+test("create workspace intent compiles a core WorkspacePlan before opening the session", async () => {
+  const workspaceModule = await import(moduleUrl);
+  assert.equal(workspaceModule.WORKSPACE_INTENT_CORE_ENTRYPOINT, "src/pedagogoai/workspace-intent.ts");
+  assert.equal(workspaceModule.WORKSPACE_INTENT_ADAPTER_KIND, "workspace-intent-ui-adapter");
+
+  const ids = [
+    "workspaceRoot",
+    "workspaceIntentBuild",
+    "workspaceIntentSource",
+    "workspaceIntentWhy",
+    "workspaceIntentKnown",
+    "workspaceIntentUnknown",
+    "workspaceIntentDesiredOutput",
+    "generateWorkspace",
+    "workspaceIntentPreview",
+    "workspaceIntentPreviewTitle",
+    "workspaceIntentOutputs",
+    "workspaceIntentFirstSession",
+    "workspaceIntentStatus",
+    "openWorkspaceSession",
+    "todayMission",
+    "todayMissionField",
+    "todayArc",
+    "todayArcField",
+    "roadmapList",
+    "artifactList",
+    "evidenceList",
+    "lmModeStatus",
+    "modeActionLog",
+    "attemptHistory",
+    "sourceText",
+    "compileSource",
+    "compilerResult",
+    "attemptInput",
+    "submitAttempt",
+    "requestHint",
+    "attemptBadge",
+    "attemptFeedback",
+    "activeNodeTitle",
+    "activeNodeFocus",
+    "activeNodeSource",
+    "miniNodeList",
+    "readerInstruction",
+    "readerResourceList",
+    "evidenceChecklist",
+    "readinessSummary",
+    "gapSummary",
+    "repairActionText",
+    "lmActiveNode",
+    "lmActiveMiniNode",
+    "lmRecommendedDecision",
+    "lmDecisionAlternatives",
+    "lmDecisionLockedReasons",
+    "lmReaderMove",
+  ];
+  const nodesById = new Map(ids.map((id) => [id, createHtmlAwareElement(id)]));
+  nodesById.set("generateWorkspace", makeInteractiveNode());
+  nodesById.set("openWorkspaceSession", makeInteractiveNode());
+
+  nodesById.get("workspaceIntentBuild").value = "I want to follow this blog and build a JAX transformer + kernel path";
+  nodesById.get("workspaceIntentSource").value = "https://example.com/jax-transformer-playbook plus repo notes";
+  nodesById.get("workspaceIntentWhy").value = "I want evidence for frontier AI researcher preparation";
+  nodesById.get("workspaceIntentKnown").value = "Python, basic ML, some PyTorch";
+  nodesById.get("workspaceIntentUnknown").value = "JAX, Flax, scaling laws, kernels";
+  nodesById.get("workspaceIntentDesiredOutput").value = "repo, notes, benchmark, public writeup";
+
+  const previousDocument = globalThis.document;
+  const previousWindow = globalThis.window;
+
+  try {
+    // @ts-expect-error test shim
+    globalThis.document = { getElementById: (id) => nodesById.get(id) || null };
+    // @ts-expect-error test shim
+    globalThis.window = { addEventListener: () => {} };
+
+    const workspace = workspaceModule.initResearchWorkspace({});
+    nodesById.get("generateWorkspace")?.click();
+
+    assert.equal(workspace.state.workspaceIntentPlan.schema, "WorkspacePlan");
+    assert.equal(workspace.state.todayArc, "JAX Transformers");
+    assert.equal(workspace.state.todayMission, "Convertirme en AI researcher-builder");
+    assert.equal(workspace.state.roadmap[0].id, "jax-arrays-autodiff");
+    assert.match(nodesById.get("workspaceIntentOutputs")?.innerHTML || "", /toy transformer in JAX/);
+    assert.match(nodesById.get("workspaceIntentFirstSession")?.textContent || "", /Session 01 - JAX arrays and autodiff/);
+    assert.equal(nodesById.get("openWorkspaceSession")?.disabled, false);
+    assert.equal(nodesById.get("workspaceRoot")?.getAttribute("data-workspace-state"), "preview");
+
+    nodesById.get("openWorkspaceSession")?.click();
+    assert.equal(nodesById.get("workspaceRoot")?.getAttribute("data-workspace-state"), "session");
+    assert.match(nodesById.get("activeNodeTitle")?.textContent || "", /JAX arrays and autodiff/);
+    assert.match(nodesById.get("readerInstruction")?.textContent || "", /shape trace|JAX array/);
+  } finally {
+    globalThis.document = previousDocument;
+    globalThis.window = previousWindow;
+  }
 });
 
 test("next actions are declared and wired to read, code, and explain actions", async () => {
