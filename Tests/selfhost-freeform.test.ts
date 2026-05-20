@@ -198,7 +198,7 @@ test("freeform evaluator enforces bounded readiness labels (VAL-EVAL-010)", () =
     masteryCheck: masteryCheckFixture({
       minimum_readiness: "ready to explain",
     }),
-    user_answer: "I would trace boundary control in sibar.selfhost.manifest.json and src/runtime-concept-graph.ts, citing src/runtime-support.ts as an included path.",
+    user_answer: "I would trace boundary control in evals/attempt-readiness/manifest.json and src/runtime-concept-graph.ts, citing src/runtime-support.ts as an included path.",
     declared_confidence: "high",
     bounded_repo_evidence: validRepoEvidence(),
   });
@@ -360,7 +360,7 @@ test("freeform evaluator detects duplicate/partial case coverage and fails with 
   const indexPath = join(tempDir, "coverage-index.json");
   const manifestPath = join(tempDir, "manifest.json");
 
-  const duplicateCasePath = resolve("docs/specs/selfhost/pilot/gold-cases/cases/GC-001-artifact-boundary-correct-grounded.json");
+  const duplicateCasePath = resolve("evals/attempt-readiness/gold-cases/cases/GC-001-artifact-boundary-correct-grounded.json");
 
   const indexPayload = {
     cases: [
@@ -416,7 +416,7 @@ test("freeform evaluator enforces manifest boundaries for required repo evidence
   const indexPath = join(tempDir, "index.json");
   const manifestPath = join(tempDir, "manifest.json");
 
-  const casePath = resolve("docs/specs/selfhost/pilot/gold-cases/cases/GC-001-artifact-boundary-correct-grounded.json");
+  const casePath = resolve("evals/attempt-readiness/gold-cases/cases/GC-001-artifact-boundary-correct-grounded.json");
   const indexPayload = {
     cases: [
       {
@@ -456,7 +456,7 @@ test("eval:selfhost-freeform CLI exits nonzero for observed-vs-expected mismatch
   const reportPath = join(tempDir, "report.json");
   const casePath = join(tempDir, "GC-001-mutated.json");
   const indexPath = join(tempDir, "index.json");
-  const originalCase = JSON.parse(readFileSync(resolve("docs/specs/selfhost/pilot/gold-cases/cases/GC-001-artifact-boundary-correct-grounded.json"), "utf8")) as Record<string, unknown>;
+  const originalCase = JSON.parse(readFileSync(resolve("evals/attempt-readiness/gold-cases/cases/GC-001-artifact-boundary-correct-grounded.json"), "utf8")) as Record<string, unknown>;
 
   originalCase.expected_gap_present = true;
   originalCase.expected_gap_type = "evidence_gap";
@@ -488,7 +488,7 @@ test("freeform evaluator rejects invalid expected metadata instead of defaulting
   const tempDir = mkdtempSync(join(tmpdir(), "sibar-selfhost-freeform-invalid-meta-"));
   const casePath = join(tempDir, "GC-001-invalid-meta.json");
   const indexPath = join(tempDir, "index.json");
-  const originalCase = JSON.parse(readFileSync(resolve("docs/specs/selfhost/pilot/gold-cases/cases/GC-001-artifact-boundary-correct-grounded.json"), "utf8")) as Record<string, unknown>;
+  const originalCase = JSON.parse(readFileSync(resolve("evals/attempt-readiness/gold-cases/cases/GC-001-artifact-boundary-correct-grounded.json"), "utf8")) as Record<string, unknown>;
 
   originalCase.expected_gap_present = true;
   originalCase.expected_gap_type = "not_a_contract_gap";
@@ -647,7 +647,7 @@ test("VAL-LOOP-003: issue candidate type follows evidence", () => {
   // Readiness gets none
   const readinessFinding = evaluateFreeformOwnershipAnswer({
     masteryCheck: masteryCheckFixture(),
-    user_answer: "I would trace boundary control in `sibar.selfhost.manifest.json` and `src/runtime-concept-graph.ts`, citing `src/runtime-support.ts` as included path evidence.",
+    user_answer: "I would trace boundary control in `evals/attempt-readiness/manifest.json` and `src/runtime-concept-graph.ts`, citing `src/runtime-support.ts` as included path evidence.",
     declared_confidence: "high",
     bounded_repo_evidence: validRepoEvidence(),
   });
@@ -751,7 +751,7 @@ test("VAL-LOOP-006: repeated failed answers do not count as repaired understandi
   const originalAnswer = "Boundary checks are based on manifest paths and should include src and Tests.";
   const repeatedAnswer = "Boundary checks are based on manifest paths and should include src and Tests."; // verbatim repeat
   const similarAnswer = "Boundary checks rely on manifest paths and include src and Tests folders.";
-  const differentAnswer = "I would trace boundary control in sibar.selfhost.manifest.json, citing src/runtime-concept-graph.ts for include logic and noting that Tests/ is within the manifest included_paths.";
+  const differentAnswer = "I would trace boundary control in evals/attempt-readiness/manifest.json, citing src/runtime-concept-graph.ts for include logic and noting that Tests/ is within the manifest included_paths.";
 
   assert.equal(isRepeatedAnswer(originalAnswer, repeatedAnswer), true,
     "verbatim repeat must be detected");
@@ -866,7 +866,7 @@ test("VAL-LOOP-009: successful re-evaluation updates readiness but remains bound
 
   const result = simulateReevaluation(
     gapFinding,
-    "I would trace boundary control using src/runtime-concept-graph.ts and sibar.selfhost.manifest.json, citing included paths and rejecting excluded-path claims. Readiness is bounded to the traced evidence only.",
+    "I would trace boundary control using src/runtime-concept-graph.ts and evals/attempt-readiness/manifest.json, citing included paths and rejecting excluded-path claims. Readiness is bounded to the traced evidence only.",
     "high",
   );
 

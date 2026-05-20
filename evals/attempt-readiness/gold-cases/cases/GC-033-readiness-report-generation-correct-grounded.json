@@ -1,0 +1,36 @@
+{
+  "id": "GC-033",
+  "mastery_check_id": "SC-005-readiness-report-generation",
+  "concept_id": "readiness_report_generation",
+  "operation": "transfer",
+  "answer_class": "correct_grounded",
+  "simulated_user_answer": "I would transfer readiness logic by showing how one open gap blocks `ready` claims, while confirmed evidence supports verified concepts with evidence ids and `summary.readiness` reflects open gaps.",
+  "declared_confidence": "high",
+  "expected_gap_type": null,
+  "expected_layer": 4,
+  "expected_severity": "later",
+  "expected_confidence": "high",
+  "required_repo_evidence": [
+    {
+      "path": "src/runtime-readiness.ts",
+      "rationale": "Defines summary readiness rules and open-gaps influence on readyness."
+    },
+    {
+      "path": "src/runtime-memory.ts",
+      "rationale": "Constructs memory views consumed by the readiness report."
+    },
+    {
+      "path": "Tests/readiness-report.test.ts",
+      "rationale": "Verifies supported claims and evidence index behavior."
+    }
+  ],
+  "forbidden_claims": [
+    "Claiming one confirmed concept implies full ownership.",
+    "Removing evidence_id requirement from ready/blocked claims."
+  ],
+  "acceptable_repair_task": "No repair task; answer is correctly grounded and transfer-ready.",
+  "acceptable_issue_candidate_type": "none",
+  "expected_readiness": "ready to modify with guardrails",
+  "notes": "Reference transfer to a neighboring artifact slice should preserve constraints.",
+  "expected_gap_present": false
+}

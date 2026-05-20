@@ -10,10 +10,10 @@ function toRepoRelative(filePath: string): string {
   return rel || ".";
 }
 
-const DEFAULT_GOLD_CASE_INDEX = "docs/specs/selfhost/pilot/gold-cases/index.json";
-const DEFAULT_MASTERY_CHECK_DIR = "docs/specs/selfhost/pilot/mastery-checks";
+const DEFAULT_GOLD_CASE_INDEX = "evals/attempt-readiness/gold-cases/index.json";
+const DEFAULT_MASTERY_CHECK_DIR = "evals/attempt-readiness/mastery-checks";
 const FREEFORM_VALIDATION_ID = "VAL-EVAL-008-selfhost-freeform";
-const DEFAULT_SELFHOST_MANIFEST_PATH = "sibar.selfhost.manifest.json";
+const DEFAULT_SELFHOST_MANIFEST_PATH = "evals/attempt-readiness/manifest.json";
 const EXPECTED_CASE_COUNT = 40;
 
 const ALL_GAP_LABELS = [

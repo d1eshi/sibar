@@ -1,0 +1,36 @@
+{
+  "id": "GC-021",
+  "mastery_check_id": "SC-003-gap-detection",
+  "concept_id": "gap_detection",
+  "operation": "debug",
+  "answer_class": "wrong_flow",
+  "simulated_user_answer": "I traced quality labels first, then evidence, and only at the end checked branch severity, which is not the runtime order.",
+  "declared_confidence": "medium",
+  "expected_gap_type": "flow_gap",
+  "expected_layer": 4,
+  "expected_severity": "important",
+  "expected_confidence": "medium",
+  "required_repo_evidence": [
+    {
+      "path": "src/runtime-gap-detection.ts",
+      "rationale": "Reveals true branch and layer order in detectLearningGapFromAnswer."
+    },
+    {
+      "path": "src/runtime-support.ts",
+      "rationale": "Defines fields updated by branch order."
+    },
+    {
+      "path": "Tests/gap-detection.test.ts",
+      "rationale": "Verifies expected order by observed result quality assertions."
+    }
+  ],
+  "forbidden_claims": [
+    "Describing an incorrect flow order as acceptable.",
+    "Skipping how expected_layer is established before severity."
+  ],
+  "acceptable_repair_task": "Repair with an explicit stage-ordered trace from answer quality to gap output.",
+  "acceptable_issue_candidate_type": "LearningGap",
+  "expected_readiness": "not ready yet",
+  "notes": "Wrong flow should be repairable via exact branch ordering with citations.",
+  "expected_gap_present": true
+}

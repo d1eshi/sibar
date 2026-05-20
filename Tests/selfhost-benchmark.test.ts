@@ -7,8 +7,8 @@ import assert from "node:assert/strict";
 
 import { runSelfhostBenchmark } from "../src/evals/selfhost-benchmark.ts";
 
-const DEFAULT_MANIFEST_PATH = "sibar.selfhost.manifest.json";
-const DEFAULT_GOLD_CASE_INDEX = "docs/specs/selfhost/pilot/gold-cases/index.json";
+const DEFAULT_MANIFEST_PATH = "evals/attempt-readiness/manifest.json";
+const DEFAULT_GOLD_CASE_INDEX = "evals/attempt-readiness/gold-cases/index.json";
 
 function withMutatedGoldIndex(
   mutator: (args: {
@@ -24,7 +24,7 @@ function withMutatedGoldIndex(
   };
   const workingIndex = structuredClone(rootIndex);
   const tempDir = mkdtempSync(join(tmpdir(), "sibar-selfhost-benchmark-"));
-  const casesSource = resolve("docs/specs/selfhost/pilot/gold-cases/cases");
+  const casesSource = resolve("evals/attempt-readiness/gold-cases/cases");
   const casesDestination = join(tempDir, "cases");
   cpSync(casesSource, casesDestination, { recursive: true });
   const tempPath = join(tempDir, "index.json");

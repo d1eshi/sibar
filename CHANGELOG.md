@@ -38,6 +38,9 @@ release yet.
 - Added a root-level Workspace Plan Adapter eval catalog that groups eval
   intent, fixtures, and generated reports by the WorkspacePlan adapter boundary,
   identifying Workspace Intent, Rust fixture, and `codex-exec` adapter coverage.
+- Moved attempt-readiness eval manifests, gold cases, mastery checks, generated
+  reports, and prototypes out of `docs/specs/selfhost/` into `evals/` and
+  `prototypes/` so docs stay Markdown-only.
 - Added `VAL-EVAL-010-workspace-runner-adapter` for offline runner adapter
   checks across Rust fixture execution, missing-fixture fallback, and blocked
   Codex command metadata.

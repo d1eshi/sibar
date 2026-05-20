@@ -1,0 +1,36 @@
+{
+  "id": "GC-039",
+  "mastery_check_id": "SC-005-readiness-report-generation",
+  "concept_id": "readiness_report_generation",
+  "operation": "transfer",
+  "answer_class": "declared_uncertainty",
+  "simulated_user_answer": "I am not fully sure how unsupported claims should be represented, so I am avoiding hard statements in my transfer explanation.",
+  "declared_confidence": "low",
+  "expected_gap_type": "surface_gap",
+  "expected_layer": 4,
+  "expected_severity": "important",
+  "expected_confidence": "medium",
+  "required_repo_evidence": [
+    {
+      "path": "src/runtime-readiness.ts",
+      "rationale": "Contains unsupported claim handling in sections and evidence index."
+    },
+    {
+      "path": "src/runtime-memory.ts",
+      "rationale": "Defines what has evidence and what remains unseen."
+    },
+    {
+      "path": "Tests/readiness-report.test.ts",
+      "rationale": "Tests include evidence-backed and unsupported claim formatting."
+    }
+  ],
+  "forbidden_claims": [
+    "Avoiding explicit unsupported handling in readiness transfer.",
+    "Confusing uncertainty for completed readiness."
+  ],
+  "acceptable_repair_task": "Repair by requiring an explicit explanation of unsupported claims and required evidence IDs.",
+  "acceptable_issue_candidate_type": "LearningGap",
+  "expected_readiness": "not ready yet",
+  "notes": "Declared uncertainty should still result in a concrete repair around unsupported handling.",
+  "expected_gap_present": true
+}

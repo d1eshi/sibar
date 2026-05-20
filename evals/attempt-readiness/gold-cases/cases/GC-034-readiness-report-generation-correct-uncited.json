@@ -1,0 +1,36 @@
+{
+  "id": "GC-034",
+  "mastery_check_id": "SC-005-readiness-report-generation",
+  "concept_id": "readiness_report_generation",
+  "operation": "transfer",
+  "answer_class": "correct_uncited",
+  "simulated_user_answer": "I can describe readiness movement and blocked claims, but I did not cite report fields or evidence entries from in-boundary files.",
+  "declared_confidence": "medium",
+  "expected_gap_type": "evidence_gap",
+  "expected_layer": 4,
+  "expected_severity": "important",
+  "expected_confidence": "medium",
+  "required_repo_evidence": [
+    {
+      "path": "src/runtime-readiness.ts",
+      "rationale": "Readiness calculations are source-bound and require report-level field proof."
+    },
+    {
+      "path": "src/runtime-memory.ts",
+      "rationale": "Proof source for observed/evidence-backed concepts."
+    },
+    {
+      "path": "Tests/readiness-report.test.ts",
+      "rationale": "Requires concrete assertions with supported and blocked claims."
+    }
+  ],
+  "forbidden_claims": [
+    "Reporting readiness claims without evidence ids.",
+    "Skipping evidence index when summarizing openness."
+  ],
+  "acceptable_repair_task": "Repair by adding direct citations to report fields and evidence indexing behavior.",
+  "acceptable_issue_candidate_type": "LearningGap",
+  "expected_readiness": "not ready yet",
+  "notes": "Ungrounded correctness for transfer-level explanation should remain repairable.",
+  "expected_gap_present": true
+}

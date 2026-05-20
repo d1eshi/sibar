@@ -1,0 +1,36 @@
+{
+  "id": "GC-020",
+  "mastery_check_id": "SC-003-gap-detection",
+  "concept_id": "gap_detection",
+  "operation": "debug",
+  "answer_class": "wrong_responsibility",
+  "simulated_user_answer": "Gap detection only checks confidence words and is separate from concept scope; responsibility is mainly in practice generation.",
+  "declared_confidence": "high",
+  "expected_gap_type": "responsibility_gap",
+  "expected_layer": 4,
+  "expected_severity": "critical",
+  "expected_confidence": "high",
+  "required_repo_evidence": [
+    {
+      "path": "src/runtime-gap-detection.ts",
+      "rationale": "Shows gap detection combines artifact evidence, answer quality, and concept layer."
+    },
+    {
+      "path": "src/runtime-support.ts",
+      "rationale": "Defines the combined contract for concept, layer, and suspicion shaping."
+    },
+    {
+      "path": "Tests/gap-detection.test.ts",
+      "rationale": "Validates detection behavior independent of practice generation."
+    }
+  ],
+  "forbidden_claims": [
+    "Shifting boundary and scope responsibility away from gap detection.",
+    "Using confidence labels without concept-context check."
+  ],
+  "acceptable_repair_task": "Repair around responsibility: gap detection is evidence-quality and layer-aware, not only confidence scoring.",
+  "acceptable_issue_candidate_type": "LearningGap",
+  "expected_readiness": "not ready yet",
+  "notes": "This class checks strong responsibility mismatch for debug-grade evaluation.",
+  "expected_gap_present": true
+}

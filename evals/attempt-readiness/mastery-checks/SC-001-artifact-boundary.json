@@ -1,0 +1,54 @@
+{
+  "id": "SC-001-artifact-boundary",
+  "concept_id": "artifact_boundary",
+  "concept_label": "Artifact boundary",
+  "operation": "trace",
+  "prompt": "Trace the artifact boundary check path for this slice: from included/excluded path declarations through file selection and citation emission. Name one included file path and one excluded path and explain, with citation anchors, why each is allowed or blocked.",
+  "expected_answer_shape": {
+    "format": "object",
+    "required_fields": [
+      "allowed_path",
+      "forbidden_path",
+      "selection_reason",
+      "file_evidence_reference"
+    ],
+    "validation_rule": "Answer must include explicit path-level reasoning from repo files and identify at least one boundary enforcement function."
+  },
+  "required_repo_evidence": [
+    {
+      "path": "src/runtime-concept-graph.ts",
+      "rationale": "Boundary traversal logic (included/excluded checks and inventory walk) defines what is in-scope for concept graph evidence."
+    },
+    {
+      "path": "src/runtime-support.ts",
+      "rationale": "Core types and shared session metadata describe the boundary contract used when reading sessions and sessions' path fields."
+    },
+    {
+      "path": "Tests/concept-graph.test.ts",
+      "rationale": "Tests show boundary expectations, especially evidence filtering and exclusion behavior."
+    }
+  ],
+  "forbidden_claims": [
+    "Claiming that excluded paths can be cited as authoritative evidence.",
+    "Claiming repository-wide readiness from boundary tracing alone.",
+    "Giving only a conceptual answer with no path-specific references."
+  ],
+  "minimum_readiness": "ready to inspect",
+  "repair_when_failed": {
+    "issue_type": "LearningGap",
+    "required_action": "Ask the user to restate the boundary walk with one explicit allowed file and one explicit blocked file from the repo evidence.",
+    "guardrails": [
+      "Require evidence path references to come only from included_paths.",
+      "Reject claims that use excluded directories or files."
+    ],
+    "must_repair_issue_candidate_types": [
+      "LearningGap",
+      "DesignIssue"
+    ]
+  },
+  "reevaluation_prompt": "Using the same trace operation, evaluate boundary behavior when only `Tests/` is included and `src/` is excluded; explain how this changes evidence admissibility.",
+  "acceptable_issue_candidate_types": [
+    "LearningGap",
+    "DesignIssue"
+  ]
+}

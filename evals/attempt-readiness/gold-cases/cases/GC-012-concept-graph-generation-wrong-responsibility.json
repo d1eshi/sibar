@@ -1,0 +1,36 @@
+{
+  "id": "GC-012",
+  "mastery_check_id": "SC-002-concept-graph-generation",
+  "concept_id": "concept_graph_generation",
+  "operation": "explain",
+  "answer_class": "wrong_responsibility",
+  "simulated_user_answer": "Readiness generation is responsible for node and edge construction, so concept graph only needs names and then calls are inferred later.",
+  "declared_confidence": "high",
+  "expected_gap_type": "responsibility_gap",
+  "expected_layer": 4,
+  "expected_severity": "critical",
+  "expected_confidence": "high",
+  "required_repo_evidence": [
+    {
+      "path": "src/runtime-concept-graph.ts",
+      "rationale": "Shows graph generation responsibility in runtime layer."
+    },
+    {
+      "path": "src/runtime-support.ts",
+      "rationale": "Defines graph types used by generation, not readiness."
+    },
+    {
+      "path": "Tests/concept-graph.test.ts",
+      "rationale": "Verifies generation responsibility separately from report readiness."
+    }
+  ],
+  "forbidden_claims": [
+    "Assigning graph construction to the readiness module.",
+    "Claiming readiness policy is the same as edge inference."
+  ],
+  "acceptable_repair_task": "Repair by restating responsibility boundaries between graph generation and readiness report building.",
+  "acceptable_issue_candidate_type": "LearningGap",
+  "expected_readiness": "not ready yet",
+  "notes": "Misattributed responsibility is high-severity for explain operation.",
+  "expected_gap_present": true
+}
