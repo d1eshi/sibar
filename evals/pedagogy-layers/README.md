@@ -6,6 +6,7 @@ This suite keeps the deterministic pedagogy dataset and coverage reports under
 ## Layout
 
 - `dataset/`: migrated E01 deterministic pedagogy cases.
+- `docs/`: evaluation contract and dataset sizing rationale for this suite.
 - `reports/`: generated reports for deterministic pedagogy and coverage.
 - `eval-suite.json`: catalog entry for commands, inputs, and reports.
 

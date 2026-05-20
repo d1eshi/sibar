@@ -227,7 +227,7 @@ export function loadAndValidateFixture(fixturePath?: string): {
   fixture: DeepOwnershipFixture | null;
   validation: ValidationResult;
 } {
-  const path = fixturePath ?? "docs/specs/deep-ownership-workspace/fixtures/sibi-pedagogy-loop.json";
+  const path = fixturePath ?? "evals/deep-ownership-workspace/fixtures/sibi-pedagogy-loop.json";
   if (!existsSync(path)) {
     return {
       fixture: null,

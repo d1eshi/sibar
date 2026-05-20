@@ -11,9 +11,9 @@
     "readiness labels are scoped to the evaluated attempt instead of repo-wide mastery"
   ],
   "docs": [
-    "docs/specs/selfhost/01_selfhost_boundary.md",
-    "docs/specs/selfhost/02_evaluation_contract.md",
-    "docs/specs/selfhost/04_selfhost_gap_detection_benchmark.md"
+    "evals/attempt-readiness/docs/01_selfhost_boundary.md",
+    "evals/attempt-readiness/docs/02_evaluation_contract.md",
+    "evals/attempt-readiness/docs/04_selfhost_gap_detection_benchmark.md"
   ],
   "artifacts": [
     {

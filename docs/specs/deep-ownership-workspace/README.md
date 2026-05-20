@@ -178,14 +178,14 @@ and terminal (`cancelled`) through job control.
 For deterministic developer verification of the live ownership loop (no external LLM call),
 use the committed fixture:
 
-- `docs/specs/deep-ownership-workspace/fixtures/live-workspace-session.json`
+- `evals/deep-ownership-workspace/fixtures/live-workspace-session.json`
 
 Native app:
 
 Run:
 
 - `cd /path/to/repo`
-- `SIBI_WORKSPACE_FIXTURE_MODEL_RESPONSE_PATH=docs/specs/deep-ownership-workspace/fixtures/live-workspace-session.json swift run SibiStudyApp`
+- `SIBI_WORKSPACE_FIXTURE_MODEL_RESPONSE_PATH=evals/deep-ownership-workspace/fixtures/live-workspace-session.json swift run SibiStudyApp`
 
 `Start` uses the current working directory as the repo root.
 
@@ -196,8 +196,8 @@ path for this architecture.
 
 For direct CLI checks:
 
-- `node --experimental-strip-types src/sibi.ts start-workspace-session --goal "Explain this project A-Z" --root /path/to/repo --fixture-model-response-path docs/specs/deep-ownership-workspace/fixtures/live-workspace-session.json`
-- `node --experimental-strip-types src/sibi.ts explain "Explain this project A-Z" --root /path/to/repo --fixture-model-response-path docs/specs/deep-ownership-workspace/fixtures/live-workspace-session.json`
+- `node --experimental-strip-types src/sibi.ts start-workspace-session --goal "Explain this project A-Z" --root /path/to/repo --fixture-model-response-path evals/deep-ownership-workspace/fixtures/live-workspace-session.json`
+- `node --experimental-strip-types src/sibi.ts explain "Explain this project A-Z" --root /path/to/repo --fixture-model-response-path evals/deep-ownership-workspace/fixtures/live-workspace-session.json`
 
 ## Relationship To Existing Specs
 

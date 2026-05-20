@@ -12,9 +12,9 @@
     "provider-neutral model output must normalize to CandidatePlan before WorkspacePlan state"
   ],
   "docs": [
-    "docs/specs/deep-ownership-workspace/15_workspace_intent_compiler.md",
-    "docs/specs/deep-ownership-workspace/16_llm_adapter_contract.md",
-    "docs/specs/deep-ownership-workspace/19_workspace_trace_contract_gate.md"
+    "evals/workspace-plan-adapters/docs/15_workspace_intent_compiler.md",
+    "evals/workspace-plan-adapters/docs/16_llm_adapter_contract.md",
+    "evals/workspace-plan-adapters/docs/19_workspace_trace_contract_gate.md"
   ],
   "artifacts": [
     {

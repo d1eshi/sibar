@@ -10,7 +10,10 @@
     "coverage gaps are explicit even when report-only for the current slice"
   ],
   "docs": [
-    "evals/pedagogy-layers/README.md"
+    "evals/pedagogy-layers/README.md",
+    "evals/pedagogy-layers/docs/01_dataset_contract.md",
+    "evals/pedagogy-layers/docs/02_deterministic_pedagogy_evals.md",
+    "evals/pedagogy-layers/docs/dataset_sizing_research.md"
   ],
   "artifacts": [
     {
