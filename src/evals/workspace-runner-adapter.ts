@@ -10,8 +10,8 @@ import { buildWorkspaceIntent, type WorkspaceIntent } from "../pedagogoai/worksp
 
 const WORKSPACE_RUNNER_ADAPTER_VALIDATION_ID = "VAL-EVAL-010-workspace-runner-adapter";
 const DEFAULT_REPORT = "docs/specs/selfhost/pilot/reports/VAL-EVAL-010-workspace-runner-adapter.json";
-const EVAL_SPEC_PATH = "docs/specs/selfhost/pilot/evals/workspace-runner-adapter.eval.json";
-const RUST_FIXTURE_PATH = "docs/specs/selfhost/pilot/evals/fixtures/rust_workspace_plan_fixture.json";
+const EVAL_SPEC_PATH = "evals/selfhost/pilot/workspace-runner-adapter.eval.json";
+const RUST_FIXTURE_PATH = "evals/selfhost/pilot/fixtures/rust_workspace_plan_fixture.json";
 export const WORKSPACE_RUNNER_ADAPTER_EVAL_GENERATED_AT = "2026-05-20T00:00:00.000Z";
 
 type WorkspaceRunnerAdapterCaseClass =

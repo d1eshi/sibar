@@ -1,0 +1,77 @@
+{
+  "schema": "SibarEvalManifest",
+  "version": 1,
+  "validation": "VAL-EVAL-010-workspace-runner-adapter",
+  "title": "Workspace runner adapter eval",
+  "purpose": "Verify the PR #11 runner adapter boundary between TypeScript, the Rust workspace compiler process, fixture execution, and Codex command metadata without requiring live LLM execution.",
+  "source_prs": [
+    "#11 codex/rust-workspace-compiler"
+  ],
+  "runner": {
+    "command": "pnpm eval:workspace-runner-adapter",
+    "implementation": "src/evals/workspace-runner-adapter.ts",
+    "report_path": "docs/specs/selfhost/pilot/reports/VAL-EVAL-010-workspace-runner-adapter.json",
+    "llm_execution": "disabled",
+    "fixture_path": "fixtures/rust_workspace_plan_fixture.json"
+  },
+  "contract_refs": [
+    "docs/specs/deep-ownership-workspace/15_workspace_intent_compiler.md",
+    "docs/specs/deep-ownership-workspace/16_llm_adapter_contract.md",
+    "docs/specs/deep-ownership-workspace/19_workspace_trace_contract_gate.md"
+  ],
+  "adapter_coverage": [
+    {
+      "adapter": "fixture",
+      "coverage": "Rust process execution, stdout parsing, Rust plan projection, deterministic fallback on missing fixture"
+    },
+    {
+      "adapter": "codex-exec",
+      "coverage": "command metadata and blocked offline status when live Codex execution is disabled"
+    }
+  ],
+  "cases": [
+    {
+      "id": "WRA-001-RUST-FIXTURE-COMPLETED",
+      "case_class": "rust_fixture_completed",
+      "adapter": "fixture",
+      "intent": "Rust fixture adapter executes and maps a compiler plan into Pedagogo WorkspacePlan",
+      "expectation": {
+        "runner_status": "completed",
+        "validation_valid": true,
+        "compiled_by": "llm",
+        "rust_plan_present": true,
+        "command_includes": [
+          "sibi-workspace-compiler",
+          "--adapter",
+          "fixture"
+        ]
+      }
+    },
+    {
+      "id": "WRA-002-RUST-FIXTURE-MISSING",
+      "case_class": "rust_fixture_missing",
+      "adapter": "fixture",
+      "intent": "missing Rust fixture path fails as an auditable adapter result with deterministic fallback",
+      "expectation": {
+        "runner_status": "failed",
+        "validation_valid": true,
+        "compiled_by": "deterministic-builder",
+        "rust_plan_present": false,
+        "blocked_reason_includes": "fixture adapter requires --fixture path"
+      }
+    },
+    {
+      "id": "WRA-003-CODEX-EXEC-BLOCKED",
+      "case_class": "codex_exec_blocked",
+      "adapter": "codex-exec",
+      "intent": "Codex runner adapter exposes command metadata but stays disabled for offline evals",
+      "expectation": {
+        "runner_status": "blocked",
+        "validation_valid": true,
+        "compiled_by": "deterministic-builder",
+        "rust_plan_present": false,
+        "blocked_reason_includes": "codex-exec execution is disabled"
+      }
+    }
+  ]
+}

@@ -1,0 +1,56 @@
+{
+  "schema": "SibarSelfhostPilotEvalCatalog",
+  "version": 1,
+  "generated_for": "selfhost pilot workspace adapter evals",
+  "reports_directory": "docs/specs/selfhost/pilot/reports",
+  "evals": [
+    {
+      "validation": "VAL-EVAL-009-workspace-intent-compiler",
+      "title": "Workspace Intent compiler adapter eval",
+      "manifest_path": "workspace-intent-compiler.eval.json",
+      "report_path": "docs/specs/selfhost/pilot/reports/VAL-EVAL-009-workspace-intent-compiler.json",
+      "command": "pnpm eval:workspace-intent",
+      "source_prs": [
+        "#10 codex/workspace-intent-evals"
+      ],
+      "intent_tags": [
+        "workspace-intent",
+        "llm-adapter",
+        "parser",
+        "schema-validation",
+        "pedagogy-invariants"
+      ],
+      "case_classes": [
+        "fixture_adapter",
+        "raw_model_json",
+        "raw_model_markdown",
+        "raw_model_prose",
+        "parse_rejection",
+        "schema_rejection",
+        "pedagogy_rejection"
+      ]
+    },
+    {
+      "validation": "VAL-EVAL-010-workspace-runner-adapter",
+      "title": "Workspace runner adapter eval",
+      "manifest_path": "workspace-runner-adapter.eval.json",
+      "report_path": "docs/specs/selfhost/pilot/reports/VAL-EVAL-010-workspace-runner-adapter.json",
+      "command": "pnpm eval:workspace-runner-adapter",
+      "source_prs": [
+        "#11 codex/rust-workspace-compiler"
+      ],
+      "intent_tags": [
+        "rust-runner",
+        "codex-exec",
+        "adapter-selection",
+        "fallback-audit",
+        "workspace-plan-projection"
+      ],
+      "case_classes": [
+        "rust_fixture_completed",
+        "rust_fixture_missing",
+        "codex_exec_blocked"
+      ]
+    }
+  ]
+}
