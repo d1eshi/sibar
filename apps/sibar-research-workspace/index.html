@@ -21,65 +21,79 @@
           <span class="brand-symbol">S</span>
           <strong>Sibar</strong>
         </div>
-        <button class="icon-button" type="button" aria-label="Back">&lt;</button>
         <div class="topbar-document">
-          <span class="document-icon">PDF</span>
           <span>Create Workspace</span>
-          <span aria-hidden="true">v</span>
+          <span aria-hidden="true">/</span>
+          <span>Focused Study</span>
         </div>
         <div class="topbar-spacer"></div>
-        <button class="icon-button" type="button" aria-label="Search">?</button>
-        <button class="icon-button" type="button" aria-label="Toggle notes">[]</button>
-        <button class="icon-button" type="button" aria-label="More">...</button>
+        <button class="icon-button" type="button" aria-label="Search">S</button>
+        <button class="icon-button" type="button" aria-label="Toggle notes">N</button>
         <div class="topbar-discussion">
           <span aria-hidden="true">*</span>
-          <span>Discussion</span>
+          <span>Local workspace</span>
         </div>
       </header>
 
       <section class="workspace-intent-screen" aria-labelledby="workspace-intent-title" data-component="workspace-intent-flow">
+        <aside class="intent-rail" aria-label="Workspace creation steps">
+          <span class="intent-rail-mark">S</span>
+          <ol>
+            <li class="active">Define</li>
+            <li>Review</li>
+            <li>Create</li>
+          </ol>
+        </aside>
+
         <div class="workspace-intent-form">
-          <p class="eyebrow">Create Workspace</p>
-          <h1 id="workspace-intent-title">Create Workspace</h1>
-          <p class="intent-copy">Turn one bounded intent into sessions and evidence before opening the full workspace.</p>
+          <p class="eyebrow">New workspace</p>
+          <h1 id="workspace-intent-title">What do you want to study or build?</h1>
+          <p class="intent-copy">Turn one question and its sources into a focused first session.</p>
 
           <label for="workspaceIntentBuild">What are you trying to build or understand?</label>
           <textarea id="workspaceIntentBuild" rows="3" placeholder="quiero aprender embeddings, a no mas poder"></textarea>
 
-          <label for="workspaceIntentSource">Source / playbook</label>
-          <textarea id="workspaceIntentSource" rows="3" placeholder="URL / pasted text / paper / repo"></textarea>
+          <label for="workspaceIntentSource">Source, repo, paper, or note</label>
+          <textarea id="workspaceIntentSource" rows="1" placeholder="URL / pasted text / paper / repo"></textarea>
 
-          <label for="workspaceIntentWhy">Why does this matter?</label>
-          <textarea id="workspaceIntentWhy" rows="2" placeholder="Why this workspace matters now"></textarea>
+          <label for="workspaceIntentWhy">Constraint or reason</label>
+          <textarea id="workspaceIntentWhy" rows="2" placeholder="time, scope, depth, or why this matters now"></textarea>
 
-          <div class="intent-field-grid">
-            <div>
-              <label for="workspaceIntentKnown">What do you already know?</label>
-              <textarea id="workspaceIntentKnown" rows="3" placeholder="What background can the plan assume?"></textarea>
+          <details class="intent-secondary-fields">
+            <summary>Optional background</summary>
+            <div class="intent-field-grid">
+              <div>
+                <label for="workspaceIntentKnown">What do you already know?</label>
+                <textarea id="workspaceIntentKnown" rows="3" placeholder="What background can the plan assume?"></textarea>
+              </div>
+              <div>
+                <label for="workspaceIntentUnknown">What do you not know yet?</label>
+                <textarea id="workspaceIntentUnknown" rows="3" placeholder="What should stay explicit or locked?"></textarea>
+              </div>
             </div>
-            <div>
-              <label for="workspaceIntentUnknown">What do you not know yet?</label>
-              <textarea id="workspaceIntentUnknown" rows="3" placeholder="What should stay explicit or locked?"></textarea>
-            </div>
-          </div>
 
-          <label for="workspaceIntentDesiredOutput">Desired output</label>
-          <input id="workspaceIntentDesiredOutput" type="text" placeholder="repo, notes, benchmark, public writeup" />
+            <label for="workspaceIntentDesiredOutput">Desired output</label>
+            <input id="workspaceIntentDesiredOutput" type="text" placeholder="repo, notes, benchmark, public writeup" />
+          </details>
 
           <div class="workspace-intent-actions">
-            <button id="generateWorkspace" class="generate-workspace-button" type="button">Generate workspace</button>
+            <button id="generateWorkspace" class="generate-workspace-button" type="button">Review workspace plan</button>
           </div>
         </div>
 
-        <aside id="workspaceIntentPreview" class="workspace-intent-preview" aria-live="polite" hidden>
+        <aside id="workspaceIntentPreview" class="workspace-intent-preview" aria-live="polite">
           <p class="section-kicker">Proposed plan</p>
-          <h2 id="workspaceIntentPreviewTitle">Proposed Workspace</h2>
-          <p class="muted">This workspace will produce:</p>
-          <ul id="workspaceIntentOutputs" class="item-list"></ul>
+          <h2 id="workspaceIntentPreviewTitle">One bounded workspace</h2>
           <div class="first-session-callout">
-            <span>Start with</span>
-            <strong id="workspaceIntentFirstSession">First focused session</strong>
+            <span>First session</span>
+            <strong id="workspaceIntentFirstSession">Read one source slice, build one artifact, recall once.</strong>
           </div>
+          <p class="muted">This workspace will produce:</p>
+          <ul id="workspaceIntentOutputs" class="item-list">
+            <li>One source-backed study path</li>
+            <li>One session artifact</li>
+            <li>One readiness signal</li>
+          </ul>
           <p id="workspaceIntentStatus" class="contract-status" role="status"></p>
           <button id="openWorkspaceSession" type="button" disabled>Open first session</button>
         </aside>
@@ -88,8 +102,9 @@
       <div class="workspace-frame">
         <aside class="library-sidebar" aria-labelledby="library-title" data-component="roadmap-panel">
           <div class="sidebar-block session-meta">
-            <p class="sidebar-label">SESSION</p>
-            <p>May 19, 2026 - 42m</p>
+            <p class="sidebar-label">Study path</p>
+            <h2>Neural Nets from Scratch</h2>
+            <p>Session 1 of 1 active</p>
           </div>
 
           <div class="sidebar-search">
@@ -147,9 +162,7 @@
 
             <div class="mission-fields" aria-label="Current mission">
               <p><span>Mission</span><strong id="todayMission" data-field="ambition">Frontier AI researcher</strong></p>
-              <p><span>Arc</span><strong id="todayArc" data-field="arc">Neural Nets from Scratch</strong></p>
-              <p><span>Ambition</span><strong id="todayMissionField" data-field="ambition">Frontier AI researcher</strong></p>
-              <p><span>Path</span><strong id="todayArcField" data-field="arc">Neural Nets from Scratch</strong></p>
+              <p><span>Path</span><strong id="todayArc" data-field="arc">Neural Nets from Scratch</strong></p>
             </div>
 
             <section class="objective-block" aria-labelledby="objective-title">
@@ -163,7 +176,7 @@
               <ol class="session-tasks" aria-label="Session output contract">
                 <li><strong>Read</strong><span>one source slice</span></li>
                 <li><strong>Code</strong><span>one artifact</span></li>
-                <li><strong>Explain</strong><span>from memory</span></li>
+                <li><strong>Recall</strong><span>from memory</span></li>
               </ol>
             </section>
 
@@ -176,8 +189,8 @@
                 <span>Code</span>
                 <strong>Build the gradient trace</strong>
               </button>
-              <button id="studyChoiceExplain" class="next-action" type="button" data-study-choice="explain" data-action-mode="/explain">
-                <span>Explain</span>
+              <button id="studyChoiceExplain" class="next-action" type="button" data-study-choice="explain" data-action-mode="/test">
+                <span>Recall</span>
                 <strong>Defend without notes</strong>
               </button>
             </section>
@@ -258,54 +271,25 @@
         <aside class="discussion-panel" aria-labelledby="discussion-title" data-component="discussion-panel">
           <header class="discussion-header">
             <div>
-              <h2 id="discussion-title">Discussion</h2>
+              <h2 id="discussion-title">Guide</h2>
               <p id="lmModeStatus" class="discussion-state" aria-live="polite">Context: Roadmap</p>
             </div>
-            <button class="icon-button" type="button" aria-label="Pin discussion">Pin</button>
+            <button class="icon-button" type="button" aria-label="Pin guide">Pin</button>
           </header>
+
+          <ul id="lmModes" class="lm-mode-list" aria-label="Guide modes">
+            <li><button type="button" data-mode="/map">Map</button></li>
+            <li><button type="button" data-mode="/read">Read</button></li>
+            <li><button type="button" data-mode="/test">Recall</button></li>
+            <li><button type="button" data-mode="/critic">Critic</button></li>
+            <li><button type="button" data-mode="/repair">Repair</button></li>
+            <li><button type="button" data-mode="/build">Build</button></li>
+          </ul>
 
           <div class="scope-banner">
             <span>Scope: Selected fragment in "Backpropagation"</span>
             <button type="button">Change</button>
           </div>
-
-          <section class="conversation" aria-label="Contextual tutor conversation">
-            <article class="message user-message">
-              <span class="avatar">DS</span>
-              <div>
-                <p class="message-meta">You - 10:42 AM</p>
-                <p>Why do we propagate local derivatives from outputs to parameters instead of the other way around?</p>
-              </div>
-            </article>
-            <article class="message sibi-message">
-              <span class="avatar sibi-avatar">S</span>
-              <div>
-                <p class="message-meta">Sibar - 10:43 AM</p>
-                <p>Good question. Backpropagation follows the reverse mode of automatic differentiation. Starting from the loss, each node reuses intermediate gradients and avoids redundant computation.</p>
-              </div>
-            </article>
-            <article class="message user-message">
-              <span class="avatar">DS</span>
-              <div>
-                <p class="message-meta">You - 10:44 AM</p>
-                <p>Can you give a concrete example with a 2-layer MLP?</p>
-              </div>
-            </article>
-            <article class="message sibi-message">
-              <span class="avatar sibi-avatar">S</span>
-              <div>
-                <p class="message-meta">Sibar - 10:45 AM</p>
-                <p>Sure. Sketch the gradient flow from loss to weights first, then write the local chain link for one layer.</p>
-                <div class="inline-artifact">
-                  <span aria-hidden="true">[]</span>
-                  <div>
-                    <strong>2-layer MLP gradient flow</strong>
-                    <small>Diagram - PNG</small>
-                  </div>
-                </div>
-              </div>
-            </article>
-          </section>
 
           <section class="insight-note" aria-labelledby="insight-title">
             <p class="section-kicker" id="insight-title">Key insight</p>
@@ -329,6 +313,26 @@
           </section>
 
           <ul id="modeActionLog" class="mode-log" aria-live="polite"></ul>
+
+          <details class="conversation-drawer">
+            <summary>Transcript</summary>
+            <section class="conversation" aria-label="Contextual tutor conversation">
+              <article class="message user-message">
+                <span class="avatar">DS</span>
+                <div>
+                  <p class="message-meta">You - 10:42 AM</p>
+                  <p>Why do we propagate local derivatives from outputs to parameters instead of the other way around?</p>
+                </div>
+              </article>
+              <article class="message sibi-message">
+                <span class="avatar sibi-avatar">S</span>
+                <div>
+                  <p class="message-meta">Sibar - 10:43 AM</p>
+                  <p>Backpropagation follows reverse-mode autodiff. Start from the loss, then reuse intermediate gradients.</p>
+                </div>
+              </article>
+            </section>
+          </details>
 
           <div class="discussion-input">
             <label class="sr-only" for="discussionInput">Ask about the selected fragment</label>
