@@ -86,32 +86,71 @@
   padding: 0;
 }
 
-.roadmap-list li {
-  display: grid;
-  grid-template-columns: 1fr 84px;
-  gap: 8px;
-  align-items: center;
-  padding: 8px 4px;
-  border-bottom: 1px dashed var(--divider);
+.roadmap-list > li,
+.roadmap-tree-children li {
+  list-style: none;
+  margin: 0;
+  padding: 0;
 }
 
 .roadmap-list button {
-  display: grid;
-  grid-template-columns: 24px 1fr;
-  gap: 8px;
-  align-items: center;
   width: 100%;
-  padding: 4px;
+  padding: 6px 4px;
   border: 0;
   background: transparent;
-  color: inherit;
   text-align: left;
 }
 
-.roadmap-list button[aria-pressed="true"] {
+.roadmap-tree-children {
+  list-style: none;
+  margin: 0 0 0 10px;
+  padding: 0;
+}
+
+.roadmap-tree-item {
+  margin: 1px 0;
+}
+
+.roadmap-tree-node {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+}
+
+.roadmap-tree-node[aria-pressed="true"] {
   outline: 2px solid var(--blue);
   outline-offset: 2px;
   background: var(--blue-bg);
+}
+
+.roadmap-tree-node.ready {
+  color: var(--green);
+}
+
+.roadmap-tree-node.building {
+  color: var(--teal);
+}
+
+.roadmap-tree-node.locked {
+  opacity: 0.76;
+}
+
+.roadmap-tree-node.active {
+  background: var(--blue-bg);
+  color: var(--blue);
+}
+
+.roadmap-tree-node.active-mini {
+  box-shadow: inset 0 0 0 1px var(--blue);
+}
+
+.tree-hint,
+.roadmap-hint {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 12px;
 }
 
 .roadmap-status {
@@ -120,20 +159,30 @@
   color: var(--text-secondary);
 }
 
-.roadmap-list li.locked {
-  color: var(--text-muted);
-}
-
-.roadmap-list li.ready {
-  color: var(--green);
-}
-
-.roadmap-list li.building {
-  color: var(--teal);
-}
-
 .roadmap-path {
   margin-top: 0;
+}
+
+.contract-actions {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.contract-payload {
+  width: 100%;
+  font-family: var(--font-mono);
+  font-size: 11px;
+}
+
+.contract-status {
+  margin: 0;
+  color: var(--text-secondary);
+  min-height: 20px;
+}
+
+.contract-payload[readonly] {
+  background: var(--surface-soft);
 }
 
 .session-tasks {
