@@ -1,27 +1,24 @@
 .researchShell {
-  min-height: 100vh;
-  padding: 10px;
-  display: flex;
-  justify-content: center;
-  align-items: stretch;
-  max-width: 1640px;
-  margin: 0 auto;
+  min-height: 100dvh;
+  width: 100%;
+  display: block;
+  background: #fbf8f1;
 }
 
 .nativeWindow {
-  min-height: min(940px, calc(100vh - 20px));
+  min-height: 100dvh;
   width: 100%;
   overflow: hidden;
   display: grid;
-  grid-template-rows: 48px minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr);
   background: var(--surface-raised);
-  border: 1px solid rgba(36, 31, 26, 0.18);
-  border-radius: 10px;
-  box-shadow: 0 28px 80px rgba(0, 0, 0, 0.38);
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
 }
 
 .shellSurface {
-  min-height: 0;
+  min-height: 100dvh;
   display: block;
 }
 
@@ -132,9 +129,9 @@
 }
 
 .intentScreen {
-  min-height: 0;
+  min-height: 100dvh;
   display: grid;
-  grid-template-columns: 96px minmax(420px, 620px) minmax(340px, 1fr);
+  grid-template-columns: minmax(420px, 0.9fr) minmax(520px, 1.1fr);
   overflow: auto;
   background: #fbf8f1;
 }
@@ -217,8 +214,9 @@
 }
 
 .intentForm {
-  max-width: 640px;
-  padding: 34px 70px 32px;
+  align-content: start;
+  max-width: none;
+  padding: 64px 72px 56px;
   border-right: 1px solid var(--divider);
 }
 
@@ -228,11 +226,12 @@
 }
 
 .intentForm h1 {
-  max-width: 11ch;
+  max-width: 18ch;
   font-family: Georgia, "Times New Roman", serif;
-  font-size: 38px;
-  line-height: 1.08;
+  font-size: 46px;
+  line-height: 1;
   font-weight: 500;
+  text-wrap: balance;
 }
 
 .eyebrow {
@@ -244,7 +243,7 @@
 }
 
 .intentCopy {
-  max-width: 560px;
+  max-width: 52ch;
   color: var(--text-secondary);
 }
 
@@ -256,6 +255,7 @@
 
 .intentForm textarea,
 .intentForm input {
+  max-width: 620px;
   padding: 12px 14px;
   background: #fffdf8;
 }
@@ -311,8 +311,9 @@
 }
 
 .intentPreview {
-  padding: 62px min(7vw, 90px) 42px;
-  background: linear-gradient(120deg, #f8f2e9, #fffaf3);
+  align-content: start;
+  padding: 74px 80px 64px;
+  background: #f5f0e6;
   border: 0;
 }
 
@@ -326,11 +327,12 @@
 }
 
 .intentPreview h2 {
-  max-width: 12ch;
+  max-width: 22ch;
   font-family: Georgia, "Times New Roman", serif;
-  font-size: 38px;
-  line-height: 1.1;
+  font-size: 52px;
+  line-height: 1;
   font-weight: 500;
+  text-wrap: balance;
 }
 
 .firstSessionCallout {
@@ -379,20 +381,11 @@
 }
 
 @media (max-width: 1180px) {
-  .researchShell {
-    justify-content: flex-start;
-  }
-
-  .nativeWindow {
-    min-height: calc(100vh - 24px);
-  }
-
   .intentScreen {
-    grid-template-columns: 82px 1fr;
+    grid-template-columns: 1fr;
   }
 
   .intentPreview {
-    grid-column: 2;
     padding: 32px 48px 48px;
     border-top: 1px solid var(--divider);
   }
@@ -404,15 +397,6 @@
 }
 
 @media (max-width: 840px) {
-  .researchShell {
-    padding: 0;
-  }
-
-  .nativeWindow {
-    min-height: 100vh;
-    border-radius: 0;
-  }
-
   .topbar {
     gap: 8px;
   }
@@ -437,7 +421,7 @@
   }
 
   .intentForm h1 {
-    max-width: 12ch;
+    max-width: 16ch;
     font-size: 36px;
   }
 

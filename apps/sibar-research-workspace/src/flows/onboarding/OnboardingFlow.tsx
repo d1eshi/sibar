@@ -76,7 +76,7 @@ const initialState: FlowState = {
   },
   isOptionalOpen: false,
   preview: {
-    title: "Ready workspace shell",
+    title: "Workspace preview",
     firstSession: "Add an intent and a source, then generate your workspace plan.",
     outputs: [
       "One bounded study path",
@@ -123,24 +123,22 @@ function splitOutputList(raw: string): string[] {
 }
 
 function makeWorkspacePreview(values: OnboardingIntent): WorkspacePlanPreview {
-  const intentSummary = textPreviewFrom(values.intent || fieldDefaults.intent, 8);
-  const sourceSummary = normalizeText(values.source || fieldDefaults.source);
-  const constraintSummary = normalizeText(values.constraint || fieldDefaults.constraint);
-  const knownSummary = normalizeText(values.known || fieldDefaults.known);
-  const unknownSummary = normalizeText(values.unknown || fieldDefaults.unknown);
-  const desiredOutputList = splitOutputList(values.desiredOutput || fieldDefaults.desiredOutput);
+  const intentSummary = textPreviewFrom(values.intent, 10);
+  const sourceSummary = normalizeText(values.source);
+  const constraintSummary = normalizeText(values.constraint);
+  const knownSummary = normalizeText(values.known);
+  const unknownSummary = normalizeText(values.unknown);
+  const desiredOutputList = splitOutputList(values.desiredOutput);
 
-  const title = normalizeText(
-    `Bounded workspace on ${intentSummary || "the chosen intent"}`,
-  );
+  const title = "One focused session";
   const fallbackSourceLine =
     sourceSummary.length > 78
       ? `${sourceSummary.slice(0, 75).trim()}...`
-      : sourceSummary;
-  const firstSession = `Read one source slice from ${fallbackSourceLine}, then produce one artifact scoped by ${constraintSummary.toLowerCase() || "the stated constraint"}, and mark readiness once.`;
+      : sourceSummary || "the first source you add";
+  const firstSession = `Read one source slice from ${fallbackSourceLine}, produce one artifact scoped by ${constraintSummary.toLowerCase() || "the stated scope"}, and mark readiness once.`;
   const fallbackOutputs = [
-    `One source-backed study path for ${intentSummary || "the topic"}`,
-    `One ${desiredOutputList[0] || "artifact"} proving what changed`,
+    `One source-backed study path for ${intentSummary || "the chosen topic"}`,
+    "One first-session artifact proving what changed",
     `One readiness checkpoint tied to ${unknownSummary || knownSummary || "the topic"}`,
   ];
   const outputs = [
@@ -189,19 +187,6 @@ function reducer(state: FlowState, action: FlowAction): FlowState {
 
 function hasReviewedPlan(state: FlowState): boolean {
   return state.reviewedSignature !== null;
-}
-
-function IntentRail() {
-  return (
-    <aside className={shellStyles.intentRail} aria-label="Workspace creation steps">
-      <span className={shellStyles.intentRailMark}>S</span>
-      <ol>
-        <li className={shellStyles.intentStepActive}>Define</li>
-        <li>Review</li>
-        <li>Create</li>
-      </ol>
-    </aside>
-  );
 }
 
 function IntentForm({
@@ -376,7 +361,6 @@ export function OnboardingFlow({ onOpenFirstSession }: OnboardingFlowProps) {
         className={shellStyles.intentScreen}
         id="workspace-intent-view"
       >
-        <IntentRail />
         <IntentForm state={state} dispatch={dispatch} />
         <IntentPreview
           state={state}

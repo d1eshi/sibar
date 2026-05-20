@@ -15,7 +15,7 @@ body,
 body {
   margin: 0;
   font-family: var(--font-sans);
-  background: #201d18;
+  background: #fbf8f1;
   color: var(--text-primary);
   line-height: 1.45;
   font-variant-numeric: tabular-nums;
