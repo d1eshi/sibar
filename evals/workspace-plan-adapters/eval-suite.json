@@ -1,0 +1,71 @@
+{
+  "schema": "SibarEvalSuite",
+  "version": 1,
+  "suite_id": "workspace-plan-adapters",
+  "title": "WorkspacePlan adapter evals",
+  "purpose": "Show whether LLM and runner adapter outputs can safely become WorkspacePlan state through parsing, schema validation, pedagogy checks, Rust fixture execution, and offline Codex runner metadata.",
+  "protects": [
+    "raw LLM text cannot bypass JSON extraction, schema validation, or pedagogy invariants",
+    "fixture adapters remain deterministic and offline",
+    "Rust workspace compiler process output maps into the Pedagogo WorkspacePlan contract",
+    "Codex runner execution is represented as auditable metadata when live execution is disabled"
+  ],
+  "docs": [
+    "docs/specs/deep-ownership-workspace/15_workspace_intent_compiler.md",
+    "docs/specs/deep-ownership-workspace/16_llm_adapter_contract.md",
+    "docs/specs/deep-ownership-workspace/19_workspace_trace_contract_gate.md"
+  ],
+  "artifacts": [
+    {
+      "kind": "legacy-suite-index",
+      "path": "evals/workspace-plan-adapters/index.json",
+      "description": "Historical PR-oriented catalog kept for compatibility with existing report metadata."
+    },
+    {
+      "kind": "eval-manifest",
+      "path": "evals/workspace-plan-adapters/workspace-intent-compiler.eval.json",
+      "description": "Case declarations for WorkspaceIntent parser, schema, and pedagogy adapter coverage."
+    },
+    {
+      "kind": "eval-manifest",
+      "path": "evals/workspace-plan-adapters/workspace-runner-adapter.eval.json",
+      "description": "Case declarations for Rust fixture and offline Codex runner adapter coverage."
+    },
+    {
+      "kind": "rust-fixture",
+      "path": "evals/workspace-plan-adapters/fixtures/rust_workspace_plan_fixture.json",
+      "description": "Deterministic Rust compiler fixture used by the runner adapter eval."
+    }
+  ],
+  "evaluations": [
+    {
+      "validation": "VAL-EVAL-009-workspace-intent-compiler",
+      "title": "Workspace Intent compiler adapter eval",
+      "command": "pnpm eval:workspace-intent",
+      "implementation": "src/evals/workspace-intent-compiler.ts",
+      "llm_execution": "disabled",
+      "inputs": [
+        "evals/workspace-plan-adapters/workspace-intent-compiler.eval.json"
+      ],
+      "reports": [
+        "evals/workspace-plan-adapters/reports/VAL-EVAL-009-workspace-intent-compiler.json"
+      ],
+      "answers": "Can fixture and raw model outputs be parsed, validated, and rejected before becoming WorkspacePlan state?"
+    },
+    {
+      "validation": "VAL-EVAL-010-workspace-runner-adapter",
+      "title": "Workspace runner adapter eval",
+      "command": "pnpm eval:workspace-runner-adapter",
+      "implementation": "src/evals/workspace-runner-adapter.ts",
+      "llm_execution": "disabled",
+      "inputs": [
+        "evals/workspace-plan-adapters/workspace-runner-adapter.eval.json",
+        "evals/workspace-plan-adapters/fixtures/rust_workspace_plan_fixture.json"
+      ],
+      "reports": [
+        "evals/workspace-plan-adapters/reports/VAL-EVAL-010-workspace-runner-adapter.json"
+      ],
+      "answers": "Does the Rust fixture path execute and project correctly while Codex execution remains blocked and auditable offline?"
+    }
+  ]
+}

@@ -158,7 +158,7 @@ This spec owns three feature outcomes:
 ## Manual Harness
 
 Use the current report at
-`evals/attempt-readiness/reports/VAL-EVAL-006-selfhost-benchmark.json` and
+`evals/attempt-readiness/reports/VAL-EVAL-007-selfhost-benchmark.json` and
 confirm:
 
 1. all 40 cases load
