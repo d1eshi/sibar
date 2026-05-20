@@ -2,7 +2,7 @@
   "report_id": "VAL-EVAL-010-workspace-runner-adapter-2026-05-20T00:00:00.000Z",
   "generated_at": "2026-05-20T00:00:00.000Z",
   "validation": "VAL-EVAL-010-workspace-runner-adapter",
-  "eval_spec_path": "docs/specs/selfhost/pilot/evals/workspace-runner-adapter.eval.json",
+  "eval_spec_path": "evals/selfhost/pilot/workspace-runner-adapter.eval.json",
   "no_llm": true,
   "aggregate": {
     "total_cases": 3,
@@ -24,7 +24,7 @@
       "observations": {
         "adapter": "fixture",
         "runner_status": "completed",
-        "command": "cargo run --quiet -p sibi-workspace-compiler -- --adapter fixture --fixture docs/specs/selfhost/pilot/evals/fixtures/rust_workspace_plan_fixture.json",
+        "command": "cargo run --quiet -p sibi-workspace-compiler -- --adapter fixture --fixture evals/selfhost/pilot/fixtures/rust_workspace_plan_fixture.json",
         "exit_code": 0,
         "blocked_reason": null,
         "rust_plan_present": true,

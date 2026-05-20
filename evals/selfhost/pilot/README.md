@@ -30,7 +30,7 @@ the eval surface:
 The contract now is:
 
 ```text
-docs/specs/selfhost/pilot/evals/*.eval.json
+evals/selfhost/pilot/*.eval.json
   declarative intent, case classes, runner/adapter coverage
 
 src/evals/*.ts

@@ -2,13 +2,13 @@
   "schema": "SibarSelfhostPilotEvalCatalog",
   "version": 1,
   "generated_for": "selfhost pilot workspace adapter evals",
-  "reports_directory": "../reports",
+  "reports_directory": "docs/specs/selfhost/pilot/reports",
   "evals": [
     {
       "validation": "VAL-EVAL-009-workspace-intent-compiler",
       "title": "Workspace Intent compiler adapter eval",
       "manifest_path": "workspace-intent-compiler.eval.json",
-      "report_path": "../reports/VAL-EVAL-009-workspace-intent-compiler.json",
+      "report_path": "docs/specs/selfhost/pilot/reports/VAL-EVAL-009-workspace-intent-compiler.json",
       "command": "pnpm eval:workspace-intent",
       "source_prs": [
         "#10 codex/workspace-intent-evals"
@@ -34,7 +34,7 @@
       "validation": "VAL-EVAL-010-workspace-runner-adapter",
       "title": "Workspace runner adapter eval",
       "manifest_path": "workspace-runner-adapter.eval.json",
-      "report_path": "../reports/VAL-EVAL-010-workspace-runner-adapter.json",
+      "report_path": "docs/specs/selfhost/pilot/reports/VAL-EVAL-010-workspace-runner-adapter.json",
       "command": "pnpm eval:workspace-runner-adapter",
       "source_prs": [
         "#11 codex/rust-workspace-compiler"

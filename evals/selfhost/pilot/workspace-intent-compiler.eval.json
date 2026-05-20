@@ -10,7 +10,7 @@
   "runner": {
     "command": "pnpm eval:workspace-intent",
     "implementation": "src/evals/workspace-intent-compiler.ts",
-    "report_path": "../reports/VAL-EVAL-009-workspace-intent-compiler.json",
+    "report_path": "docs/specs/selfhost/pilot/reports/VAL-EVAL-009-workspace-intent-compiler.json",
     "llm_execution": "disabled"
   },
   "adapter_coverage": [

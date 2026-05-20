@@ -10,7 +10,7 @@
   "runner": {
     "command": "pnpm eval:workspace-runner-adapter",
     "implementation": "src/evals/workspace-runner-adapter.ts",
-    "report_path": "../reports/VAL-EVAL-010-workspace-runner-adapter.json",
+    "report_path": "docs/specs/selfhost/pilot/reports/VAL-EVAL-010-workspace-runner-adapter.json",
     "llm_execution": "disabled",
     "fixture_path": "fixtures/rust_workspace_plan_fixture.json"
   },

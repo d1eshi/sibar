@@ -35,9 +35,9 @@ release yet.
   `compiled_by` as `llm` when a runner plan is successfully applied.
 - Added tests that verify fixture execution path, mapped audit payload, and
   `trying_to_build_or_understand` + evidence inclusion in the generated Rust intent.
-- Added a declarative selfhost pilot eval catalog that separates eval intent
-  from generated reports and identifies Workspace Intent, Rust fixture, and
-  `codex-exec` adapter coverage.
+- Added a root-level declarative selfhost pilot eval catalog that separates eval
+  intent and fixtures from generated documentation reports, identifying
+  Workspace Intent, Rust fixture, and `codex-exec` adapter coverage.
 - Added `VAL-EVAL-010-workspace-runner-adapter` for offline runner adapter
   checks across Rust fixture execution, missing-fixture fallback, and blocked
   Codex command metadata.
