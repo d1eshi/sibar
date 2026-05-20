@@ -74,7 +74,15 @@ understanding.
 15. `13_tauri_second_app_product_plan.md` is the derived/historical plan for this workspace.
 16. `14_workspace_intent_flow.md` defines Workspace Intent as the first
     user-facing create-workspace flow before a pre-filled workspace appears.
-17. `features.json` translates the spec pack into an implementation queue.
+17. `15_workspace_intent_compiler.md` defines the Rust `WorkspaceIntentCompiler`
+    contract for `user_intent + source_bundle + existing_state -> WorkspacePlan`.
+18. `16_llm_adapter_contract.md` defines external LLM adapter behavior:
+    fixture first, then `codex-exec`, then `openai-api`/`opencode`/local.
+19. `17_workspace_execution_pipeline.md` defines source bundle prep, adapter calls,
+    validation/repair/block, and projection emission (`WorkspacePlan` + snapshot).
+20. `18_workspace_ui_reproducibility.md` defines stable UI projection fields, 2–3
+    visible next actions, evidence/artifact requirements, and locked advanced nodes.
+21. `features.json` translates the spec pack into an implementation queue.
 
 ## Naming Decision
 
