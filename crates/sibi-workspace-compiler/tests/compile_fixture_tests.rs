@@ -122,8 +122,7 @@ fn valid_plan_json(with_questions: bool, source_link: &str, advanced_locked: boo
         "next_actions": [
             {"label": "inspeccionar flujo", "target_node_id": "node-1", "visible": true},
             {"label": "pedir evidencia", "target_node_id": "node-1", "visible": true},
-            {"label": "revisar pruebas", "target_node_id": "node-1", "visible": true},
-            {"label": "opcion-extra", "target_node_id": "node-1", "visible": false}
+            {"label": "revisar pruebas", "target_node_id": "node-1", "visible": true}
         ],
         "artifact_requirements": [{
             "id": "artifact-1",
@@ -164,8 +163,38 @@ fn fixture_happy_path_is_accepted() {
 
     let plan = compile_workspace_intent(&intent, adapter.as_ref()).unwrap();
     assert_eq!(plan.nodes.len(), 1);
-    assert_eq!(plan.next_actions.len(), 4);
+    assert_eq!(plan.next_actions.len(), 3);
     assert_eq!(plan.ui_projection.as_ref().unwrap().title, "Workspace plan");
+    drop(dir);
+}
+
+#[test]
+fn rejects_next_action_counts_outside_ui_contract() {
+    let mut plan =
+        serde_json::from_str::<serde_json::Value>(&valid_plan_json(false, "", true)).unwrap();
+    plan["next_actions"] = serde_json::json!([
+        {"label": "solo una accion", "target_node_id": "node-1", "visible": true}
+    ]);
+    let (dir, plan_path) = write_temp_plan(&serde_json::to_string_pretty(&plan).unwrap());
+    let intent: WorkspaceIntent = parse_workspace_intent(&fixture_intent()).unwrap();
+    let adapter = build_adapter(LlmAdapterConfig {
+        kind: LlmAdapterKind::Fixture,
+        fixture_path: Some(plan_path),
+        schema_path: None,
+        codex_binary: None,
+    })
+    .unwrap();
+
+    let result = compile_workspace_intent(&intent, adapter.as_ref());
+    match result {
+        Err(CompileError::Validation(err)) => {
+            assert!(err
+                .1
+                .iter()
+                .any(|issue| issue.code == "next_actions_count_out_of_range"));
+        }
+        _ => panic!("expected validation error"),
+    }
     drop(dir);
 }
 

@@ -369,6 +369,7 @@ test("create workspace intent can compile through native Tauri invoke", async ()
               payload.payload.input.tryingToBuildOrUnderstand,
               "quiero aprender embeddings, a no mas poder",
             );
+            assert.equal(payload.payload.fixturePath, "/tmp/workspace-plan.fixture.json");
             return {
               job: {
                 id: "job-test",
@@ -443,7 +444,7 @@ test("create workspace intent can compile through native Tauri invoke", async ()
         tryingToBuildOrUnderstand: "quiero aprender embeddings, a no mas poder",
         sourceInput: "",
       },
-      { adapter: "fixture", runCodex: true },
+      { adapter: "fixture", runCodex: true, fixturePath: "/tmp/workspace-plan.fixture.json" },
     );
 
     assert.equal(calls.length, 1);
@@ -454,6 +455,39 @@ test("create workspace intent can compile through native Tauri invoke", async ()
     assert.match(compiled.preview.first_session, /Embeddings foundations/);
   } finally {
     globalThis.window = previousWindow;
+  }
+});
+
+test("create workspace intent does not call the web compiler without a native host", async () => {
+  const workspaceModule = await import(moduleUrl);
+  const previousWindow = globalThis.window;
+  const previousFetch = globalThis.fetch;
+  let fetchCalls = 0;
+
+  try {
+    // @ts-expect-error test shim
+    globalThis.window = { addEventListener: () => {} };
+    // @ts-expect-error test shim
+    globalThis.fetch = async () => {
+      fetchCalls += 1;
+      throw new Error("network should not be called");
+    };
+
+    const compiled = await workspaceModule.compileWorkspaceIntentWithRunner(
+      {
+        tryingToBuildOrUnderstand: "quiero aprender embeddings, a no mas poder",
+        sourceInput: "",
+      },
+      { adapter: "codex-exec", runCodex: true },
+    );
+
+    assert.equal(fetchCalls, 0);
+    assert.equal(compiled.runner.status, "blocked");
+    assert.match(compiled.runner.blocked_reason, /without network calls/);
+    assert.match(compiled.workspace_plan.workspace.title, /Embeddings/i);
+  } finally {
+    globalThis.window = previousWindow;
+    globalThis.fetch = previousFetch;
   }
 });
 

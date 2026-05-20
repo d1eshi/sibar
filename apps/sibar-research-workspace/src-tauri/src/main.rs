@@ -70,7 +70,44 @@ struct NativeCompilerRunner {
 }
 
 #[tauri::command]
-fn compile_workspace_intent(
+async fn compile_workspace_intent(
+    payload: CompileWorkspaceIntentPayload,
+) -> CompileWorkspaceIntentResult {
+    let fallback_adapter = payload
+        .adapter
+        .clone()
+        .unwrap_or_else(|| "codex-exec".to_string());
+    let fallback_intent = build_rust_intent(&payload.input);
+
+    tauri::async_runtime::spawn_blocking(move || compile_workspace_intent_blocking(payload))
+        .await
+        .unwrap_or_else(|error| {
+            let request_id = format!("workspace-intent-{}", timestamp_millis());
+            CompileWorkspaceIntentResult {
+                job: build_job(
+                    &request_id,
+                    "failed",
+                    vec![
+                        "queued".to_string(),
+                        "running".to_string(),
+                        "failed".to_string(),
+                    ],
+                    Some("native_join_error"),
+                ),
+                runner: NativeCompilerRunner {
+                    status: "failed".to_string(),
+                    adapter: fallback_adapter,
+                    command: "sibi-workspace-compiler".to_string(),
+                    args: vec![],
+                    blocked_reason: Some(error.to_string()),
+                },
+                rust_intent: fallback_intent,
+                rust_workspace_plan: None,
+            }
+        })
+}
+
+fn compile_workspace_intent_blocking(
     payload: CompileWorkspaceIntentPayload,
 ) -> CompileWorkspaceIntentResult {
     let adapter = payload.adapter.unwrap_or_else(|| "codex-exec".to_string());

@@ -5,6 +5,8 @@ use thiserror::Error;
 use crate::types::{CandidatePlan, SourceBundle, WorkspaceIntent, WorkspaceNode};
 
 const MAX_OBJECTIVE_CHARS: usize = 280;
+const MIN_NEXT_ACTIONS: usize = 2;
+const MAX_NEXT_ACTIONS: usize = 3;
 const MAX_VISIBLE_NEXT_ACTIONS: usize = 3;
 
 #[derive(Debug)]
@@ -113,6 +115,16 @@ fn validate_plan_structure(plan: &CandidatePlan, issues: &mut Vec<ValidationIssu
 }
 
 fn validate_visibility(plan: &CandidatePlan, issues: &mut Vec<ValidationIssue>) {
+    let action_count = plan.next_actions.len();
+    if !(MIN_NEXT_ACTIONS..=MAX_NEXT_ACTIONS).contains(&action_count) {
+        issues.push(ValidationIssue {
+            code: "next_actions_count_out_of_range",
+            detail: format!(
+                "El WorkspacePlan debe incluir entre {MIN_NEXT_ACTIONS} y {MAX_NEXT_ACTIONS} next_actions. Encontradas {action_count}."
+            ),
+        });
+    }
+
     let visible_count = plan
         .next_actions
         .iter()
