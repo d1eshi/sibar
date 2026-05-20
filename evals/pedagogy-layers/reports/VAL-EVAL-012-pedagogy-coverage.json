@@ -11,8 +11,15 @@
   "no_llm": true,
   "coverage_passed": false,
   "policy": {
-    "fail_closed_dimensions": [],
-    "note": "This slice reports missing semantic coverage without failing the command; no dimensions are fail-closed yet."
+    "fail_closed_dimensions": [
+      "layers",
+      "operations",
+      "gap_labels",
+      "evidence_conditions",
+      "loop_stages",
+      "answer_classes"
+    ],
+    "note": "Missing semantic coverage in critical dimensions is fail-closed by default; use --allow-coverage-gaps for exploration/reporting."
   },
   "aggregate": {
     "total_cases": 7,
@@ -169,7 +176,7 @@
     {
       "dimension": "gap_labels",
       "label": "observed_L5_gap",
-      "severity": "report_only"
+      "severity": "fail_closed"
     }
   ],
   "cases": [

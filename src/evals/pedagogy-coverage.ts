@@ -74,6 +74,7 @@ export type PedagogyCoverageOptions = {
   reportPath?: string;
   generatedAt?: string;
   reportId?: string;
+  allowCoverageGaps?: boolean;
 };
 
 const REQUIRED: Record<CoverageDimension, string[]> = {
@@ -129,7 +130,14 @@ const REQUIRED: Record<CoverageDimension, string[]> = {
   ],
 };
 
-const FAIL_CLOSED_DIMENSIONS: CoverageDimension[] = [];
+const DEFAULT_FAIL_CLOSED_DIMENSIONS: CoverageDimension[] = [
+  "layers",
+  "operations",
+  "gap_labels",
+  "evidence_conditions",
+  "loop_stages",
+  "answer_classes",
+];
 
 function add(values: Set<string>, value: string | null | undefined): void {
   if (value) values.add(value);
@@ -223,6 +231,7 @@ export function runPedagogyCoverageEval(options: PedagogyCoverageOptions = {}): 
   const indexPath = resolve(options.indexPath ?? DEFAULT_INDEX);
   const { index, cases } = loadEvalDataset(indexPath);
   const caseCoverage = cases.map(labelsForCase);
+  const failClosedDimensions = options.allowCoverageGaps ? [] : DEFAULT_FAIL_CLOSED_DIMENSIONS;
 
   const gapLabels = new Set<string>();
   for (const testCase of cases) {
@@ -247,10 +256,10 @@ export function runPedagogyCoverageEval(options: PedagogyCoverageOptions = {}): 
     dimension.missing.map((label) => ({
       dimension: dimension.dimension,
       label,
-      severity: FAIL_CLOSED_DIMENSIONS.includes(dimension.dimension) ? "fail_closed" as const : "report_only" as const,
+      severity: failClosedDimensions.includes(dimension.dimension) ? "fail_closed" as const : "report_only" as const,
     }))
   );
-  const coveragePassed = gaps.every((gap) => gap.severity !== "fail_closed") && gaps.length === 0;
+  const coveragePassed = gaps.every((gap) => gap.severity !== "fail_closed");
   const generatedAt = options.generatedAt ?? PEDAGOGY_COVERAGE_EVAL_GENERATED_AT;
   const reportId = options.reportId ?? `${PEDAGOGY_COVERAGE_VALIDATION_ID}-${generatedAt}`;
   const report: PedagogyCoverageReport = {
@@ -266,8 +275,10 @@ export function runPedagogyCoverageEval(options: PedagogyCoverageOptions = {}): 
     no_llm: true,
     coverage_passed: coveragePassed,
     policy: {
-      fail_closed_dimensions: FAIL_CLOSED_DIMENSIONS,
-      note: "This slice reports missing semantic coverage without failing the command; no dimensions are fail-closed yet.",
+      fail_closed_dimensions: failClosedDimensions,
+      note: options.allowCoverageGaps
+        ? "Explicit --allow-coverage-gaps override enabled; missing semantic coverage is reported without fail-closed enforcement."
+        : "Missing semantic coverage in critical dimensions is fail-closed by default; use --allow-coverage-gaps for exploration/reporting.",
     },
     aggregate: {
       total_cases: cases.length,
@@ -289,14 +300,15 @@ export function runPedagogyCoverageEval(options: PedagogyCoverageOptions = {}): 
 if (import.meta.url === `file://${process.argv[1]}`) {
   const indexArg = getFlagValue(process.argv, "index");
   const reportArg = getFlagValue(process.argv, "report");
-  const report = runPedagogyCoverageEval({ indexPath: indexArg, reportPath: reportArg });
+  const allowCoverageGaps = process.argv.includes("--allow-coverage-gaps");
+  const report = runPedagogyCoverageEval({ indexPath: indexArg, reportPath: reportArg, allowCoverageGaps });
   process.stdout.write(JSON.stringify({
     coverage_passed: report.coverage_passed,
     aggregate: report.aggregate,
     gaps: report.gaps,
   }, null, 2));
   process.stdout.write("\n");
-  if (!existsSync(resolve(reportArg ?? DEFAULT_REPORT))) {
+  if (!existsSync(resolve(reportArg ?? DEFAULT_REPORT)) || !report.coverage_passed) {
     process.exitCode = 1;
   }
 }

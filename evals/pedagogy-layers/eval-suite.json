@@ -7,7 +7,7 @@
   "protects": [
     "deterministic pedagogy evals stay executable without LLM calls",
     "pedagogy dataset and generated reports live under evals instead of docs",
-    "coverage gaps are explicit even when report-only for the current slice"
+    "coverage gaps in critical semantic dimensions fail closed unless explicitly allowed for exploration"
   ],
   "docs": [
     "evals/pedagogy-layers/README.md",
