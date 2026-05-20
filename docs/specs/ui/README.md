@@ -43,6 +43,7 @@ workspace-tauri
   -> ask what the user will study/build
   -> compile one bounded workspace
   -> open one active session
+  -> migrate the static prototype to React by flow slices
   -> guide Read / Code / Recall
   -> show evidence and readiness quietly
 ```

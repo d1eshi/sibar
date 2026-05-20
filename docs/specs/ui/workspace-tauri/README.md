@@ -16,6 +16,7 @@ workspace session.
 2. `01_onboarding_workspace_intent.md`
 3. `02_workspace_study_surface.md`
 4. `03_iteration_flow.md`
+5. `04_react_migration_plan.md`
 
 ## Current Prototype
 
