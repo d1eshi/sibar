@@ -10,7 +10,7 @@
     "frontendDist": "../"
   },
   "app": {
-    "withGlobalTauri": false,
+    "withGlobalTauri": true,
     "windows": [
       {
         "title": "Sibar Research Workspace",

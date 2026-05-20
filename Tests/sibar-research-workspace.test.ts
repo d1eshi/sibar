@@ -242,7 +242,8 @@ test("second app exposes the research workspace screen contract", () => {
   assert.match(workspaceHtml, /Create Workspace/);
   assert.match(workspaceHtml, /What are you trying to build or understand\?/);
   assert.match(workspaceHtml, /Generate workspace/);
-  assert.match(workspaceHtml, /Proposed Workspace: JAX Transformers/);
+  assert.doesNotMatch(workspaceHtml, /Run Codex runner/);
+  assert.match(workspaceHtml, /Proposed Workspace/);
   assert.match(workspaceHtml, /Ask/);
   assert.match(workspaceHtml, /Key insight/);
   assert.doesNotMatch(workspaceHtml, /LM GUIDE/);
@@ -253,7 +254,9 @@ test("second app exposes the research workspace screen contract", () => {
 test("create workspace intent compiles a core WorkspacePlan before opening the session", async () => {
   const workspaceModule = await import(moduleUrl);
   assert.equal(workspaceModule.WORKSPACE_INTENT_CORE_ENTRYPOINT, "src/pedagogoai/workspace-intent.ts");
+  assert.equal(workspaceModule.WORKSPACE_INTENT_RUNNER_ENTRYPOINT, "src/pedagogoai/workspace-compiler-runner.ts");
   assert.equal(workspaceModule.WORKSPACE_INTENT_ADAPTER_KIND, "workspace-intent-ui-adapter");
+  assert.equal(typeof workspaceModule.compileWorkspaceIntentWithRunner, "function");
 
   const ids = [
     "workspaceRoot",
@@ -309,12 +312,12 @@ test("create workspace intent compiles a core WorkspacePlan before opening the s
   nodesById.set("generateWorkspace", makeInteractiveNode());
   nodesById.set("openWorkspaceSession", makeInteractiveNode());
 
-  nodesById.get("workspaceIntentBuild").value = "I want to follow this blog and build a JAX transformer + kernel path";
-  nodesById.get("workspaceIntentSource").value = "https://example.com/jax-transformer-playbook plus repo notes";
-  nodesById.get("workspaceIntentWhy").value = "I want evidence for frontier AI researcher preparation";
-  nodesById.get("workspaceIntentKnown").value = "Python, basic ML, some PyTorch";
-  nodesById.get("workspaceIntentUnknown").value = "JAX, Flax, scaling laws, kernels";
-  nodesById.get("workspaceIntentDesiredOutput").value = "repo, notes, benchmark, public writeup";
+  nodesById.get("workspaceIntentBuild").value = "quiero aprender embeddings, a no mas poder";
+  nodesById.get("workspaceIntentSource").value = "";
+  nodesById.get("workspaceIntentWhy").value = "";
+  nodesById.get("workspaceIntentKnown").value = "";
+  nodesById.get("workspaceIntentUnknown").value = "";
+  nodesById.get("workspaceIntentDesiredOutput").value = "";
 
   const previousDocument = globalThis.document;
   const previousWindow = globalThis.window;
@@ -327,23 +330,164 @@ test("create workspace intent compiles a core WorkspacePlan before opening the s
 
     const workspace = workspaceModule.initResearchWorkspace({});
     nodesById.get("generateWorkspace")?.click();
+    await new Promise((resolve) => setTimeout(resolve, 0));
 
     assert.equal(workspace.state.workspaceIntentPlan.schema, "WorkspacePlan");
-    assert.equal(workspace.state.todayArc, "JAX Transformers");
+    assert.match(workspace.state.todayArc, /Embeddings/i);
     assert.equal(workspace.state.todayMission, "Convertirme en AI researcher-builder");
-    assert.equal(workspace.state.roadmap[0].id, "jax-arrays-autodiff");
-    assert.match(nodesById.get("workspaceIntentOutputs")?.innerHTML || "", /toy transformer in JAX/);
-    assert.match(nodesById.get("workspaceIntentFirstSession")?.textContent || "", /Session 01 - JAX arrays and autodiff/);
+    assert.match(workspace.state.roadmap[0].id, /embeddings/i);
+    assert.match(nodesById.get("workspaceIntentOutputs")?.innerHTML || "", /embeddings artifact/i);
+    assert.match(nodesById.get("workspaceIntentFirstSession")?.textContent || "", /Session 01/);
     assert.equal(nodesById.get("openWorkspaceSession")?.disabled, false);
     assert.equal(nodesById.get("workspaceRoot")?.getAttribute("data-workspace-state"), "preview");
 
     nodesById.get("openWorkspaceSession")?.click();
     assert.equal(nodesById.get("workspaceRoot")?.getAttribute("data-workspace-state"), "session");
-    assert.match(nodesById.get("activeNodeTitle")?.textContent || "", /JAX arrays and autodiff/);
-    assert.match(nodesById.get("readerInstruction")?.textContent || "", /shape trace|JAX array/);
+    assert.match(nodesById.get("activeNodeTitle")?.textContent || "", /Embeddings|embeddings/);
+    assert.match(nodesById.get("readerInstruction")?.textContent || "", /scope map|constraints|success criteria|Read/);
   } finally {
     globalThis.document = previousDocument;
     globalThis.window = previousWindow;
+  }
+});
+
+test("create workspace intent can compile through native Tauri invoke", async () => {
+  const workspaceModule = await import(moduleUrl);
+  const previousWindow = globalThis.window;
+  const calls = [];
+
+  try {
+    // @ts-expect-error test shim
+    globalThis.window = {
+      addEventListener: () => {},
+      __TAURI__: {
+        core: {
+          invoke: async (command, payload) => {
+            calls.push({ command, payload });
+            assert.equal(command, "compile_workspace_intent");
+            assert.equal(
+              payload.payload.input.tryingToBuildOrUnderstand,
+              "quiero aprender embeddings, a no mas poder",
+            );
+            assert.equal(payload.payload.fixturePath, "/tmp/workspace-plan.fixture.json");
+            return {
+              job: {
+                id: "job-test",
+                request_id: "workspace-intent-test",
+                status: "completed",
+                status_history: ["queued", "running", "validating", "completed"],
+                reason_code: null,
+              },
+              runner: {
+                status: "completed",
+                adapter: "fixture",
+                command: "sibi-workspace-compiler",
+                args: [],
+                blocked_reason: null,
+              },
+              rust_intent: {
+                user_intent: "quiero aprender embeddings, a no mas poder",
+                source_bundle: {
+                  paths: ["inline://workspace-intent-source"],
+                  evidence: [],
+                },
+              },
+              rust_workspace_plan: {
+                objective: "Entender embeddings con un primer artifact reproducible.",
+                bounded_objective: true,
+                nodes: [
+                  {
+                    id: "embeddings-foundations",
+                    title: "Embeddings foundations",
+                    prerequisites: [],
+                    concepts: ["embeddings"],
+                    source_links: [
+                      {
+                        evidence_id: "evidence-workspace-intent-source",
+                        rationale: "Intent inline evidence",
+                      },
+                    ],
+                    artifact_requirement: {
+                      id: "embedding-note",
+                      path: "inline://workspace-intent-source",
+                      requires: "Explain embeddings from the supplied intent.",
+                      optional: false,
+                      confidence: "high",
+                    },
+                    is_advanced: false,
+                    locked: null,
+                  },
+                ],
+                next_actions: [
+                  {
+                    label: "Start embeddings",
+                    target_node_id: "embeddings-foundations",
+                    visible: true,
+                  },
+                ],
+                artifact_requirements: [],
+                questions_if_blocked: [],
+                ui_projection: {
+                  title: "Embeddings",
+                  summary: "First bounded embeddings session.",
+                  badges: ["embeddings"],
+                },
+              },
+            };
+          },
+        },
+      },
+    };
+
+    const compiled = await workspaceModule.compileWorkspaceIntentWithRunner(
+      {
+        tryingToBuildOrUnderstand: "quiero aprender embeddings, a no mas poder",
+        sourceInput: "",
+      },
+      { adapter: "fixture", runCodex: true, fixturePath: "/tmp/workspace-plan.fixture.json" },
+    );
+
+    assert.equal(calls.length, 1);
+    assert.equal(compiled.runner.status, "completed");
+    assert.equal(compiled.job.status, "completed");
+    assert.equal(compiled.workspace_plan.compiled_by, "llm");
+    assert.equal(compiled.workspace_plan.nodes[0].node_id, "embeddings-foundations");
+    assert.match(compiled.preview.first_session, /Embeddings foundations/);
+  } finally {
+    globalThis.window = previousWindow;
+  }
+});
+
+test("create workspace intent does not call the web compiler without a native host", async () => {
+  const workspaceModule = await import(moduleUrl);
+  const previousWindow = globalThis.window;
+  const previousFetch = globalThis.fetch;
+  let fetchCalls = 0;
+
+  try {
+    // @ts-expect-error test shim
+    globalThis.window = { addEventListener: () => {} };
+    // @ts-expect-error test shim
+    globalThis.fetch = async () => {
+      fetchCalls += 1;
+      throw new Error("network should not be called");
+    };
+
+    const compiled = await workspaceModule.compileWorkspaceIntentWithRunner(
+      {
+        tryingToBuildOrUnderstand: "quiero aprender embeddings, a no mas poder",
+        sourceInput: "",
+      },
+      { adapter: "codex-exec", runCodex: true },
+    );
+
+    assert.equal(fetchCalls, 0);
+    assert.equal(compiled.runner.status, "blocked");
+    assert.match(compiled.runner.blocked_reason, /without network calls/);
+    assert.match(compiled.workspace_plan.workspace.title, /Embeddings/i);
+  } finally {
+    globalThis.window = previousWindow;
+    globalThis.fetch = previousFetch;
   }
 });
 

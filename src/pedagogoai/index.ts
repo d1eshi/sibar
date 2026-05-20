@@ -18,5 +18,6 @@ export * as PedagogoAIEvidenceArtifacts from "./evidence-artifacts.ts";
 export * as PedagogoAIReadinessMastery from "./readiness-mastery.ts";
 export * as PedagogoAIGapRepair from "./gap-repair.ts";
 export * as PedagogoAIRecallReview from "./recall-review.ts";
+export * as PedagogoAIWorkspaceCompilerRunner from "./workspace-compiler-runner.ts";
 export * as PedagogoAISourceToRoadmapSession from "./source-to-roadmap-session.ts";
 export * as PedagogoAITracks from "./tracks/index.ts";
