@@ -12,6 +12,9 @@ use thiserror::Error;
 
 use crate::types::{CandidatePlan, WorkspaceIntent};
 
+const DEFAULT_CODEX_MODEL: &str = "gpt-5.4";
+const DEFAULT_CODEX_REASONING_EFFORT: &str = "medium";
+
 #[derive(Debug, Clone, ValueEnum)]
 pub enum CliAdapterKind {
     Fixture,
@@ -128,10 +131,19 @@ impl LlmAdapter for CodexExecRunner {
         let args = build_codex_exec_args(&schema_path, &output_path_arg, root_path.as_deref());
 
         let mut command = Command::new(&self.codex_binary);
+        eprintln!(
+            "[sibi-workspace-compiler] starting codex-exec model={DEFAULT_CODEX_MODEL} effort={DEFAULT_CODEX_REASONING_EFFORT} output={output_path}",
+            output_path = output_path.display()
+        );
+        eprintln!(
+            "[sibi-workspace-compiler] command: {} {}",
+            self.codex_binary,
+            args.join(" ")
+        );
         command.args(args);
         command.stdin(Stdio::piped());
-        command.stdout(Stdio::piped());
-        command.stderr(Stdio::piped());
+        command.stdout(Stdio::inherit());
+        command.stderr(Stdio::inherit());
 
         let mut child = command.spawn().map_err(|error| {
             LlmAdapterError::CommandFailure(format!(
@@ -150,11 +162,13 @@ impl LlmAdapter for CodexExecRunner {
                 .map_err(|error| LlmAdapterError::CommandFailure(error.to_string()))?;
         }
 
-        let output = child
-            .wait_with_output()
+        let status = child
+            .wait()
             .map_err(|error| LlmAdapterError::CommandFailure(error.to_string()))?;
 
-        let result = if output.status.success() {
+        eprintln!("[sibi-workspace-compiler] codex-exec finished with {status}");
+
+        let result = if status.success() {
             let raw_output = fs::read_to_string(&output_path)
                 .map_err(|error| LlmAdapterError::FixtureIo(error))?;
             let parsed = crate::parse_runner_output(&raw_output)
@@ -162,9 +176,7 @@ impl LlmAdapter for CodexExecRunner {
             Ok(parsed)
         } else {
             Err(LlmAdapterError::CommandFailure(format!(
-                "codex exited with {}: {}",
-                output.status,
-                String::from_utf8_lossy(&output.stderr)
+                "codex exited with {status}; see terminal logs for stdout/stderr"
             )))
         };
 
@@ -199,17 +211,22 @@ pub fn build_codex_prompt(
         concat!(
             "You are the Sibi/Pedagogy Workspace Compiler.\n",
             "Your task: generate a WorkspacePlan candidate from the provided intent.\n",
+            "Do not run shell commands, inspect files, call tools, or read the schema file; use only this prompt payload.\n",
             "Return ONLY a single JSON object and nothing else.\n",
             "No markdown fences, no explanations, and no extra text.\n",
             "Output must exactly match the schema at '{schema_path}'.\n",
             "Write to the output path '{output_path}' via codex's -o flag.\n",
             "Use evidence_id values strictly from source_bundle.evidence.\n",
             "Do not invent paths, node ids, source ids, or other fields.\n",
-            "At most 3 next_actions may have visible=true.\n\n",
+            "bounded_objective MUST be true.\n",
+            "Generate exactly 2 or 3 next_actions total, all visible=true unless there is a clear blocked action.\n",
+            "Generate 1 to 3 nodes. Do not create a mega-workspace.\n\n",
             "Every node must include at least one prerequisite, one concept, one source_link, and one artifact requirement.\n",
-            "If a beginner node has no prior prerequisite, use a concrete prerequisite like 'read e-embedding-definition first'.\n\n",
+            "If a beginner node has no prior prerequisite, use a concrete prerequisite like 'read evidence-workspace-intent-source first'.\n\n",
             "For onboarding intents, prefer a small beginner path with is_advanced=false.\n",
-            "If any node has is_advanced=true, locked MUST be an object with a clear non-empty reason, and that node must not be the first visible action.\n\n",
+            "For this first workspace, avoid advanced nodes unless the user supplied enough source context.\n",
+            "If any node has is_advanced=true, locked MUST be an object with a clear non-empty reason, and that node must not be the first visible action.\n",
+            "If there is enough intent to begin, questions_if_blocked MUST be an empty array.\n\n",
             "WorkspaceIntent (normalized_user_intent):\n",
             "{normalized}\n\n",
             "Source paths:\n",
@@ -247,9 +264,14 @@ pub fn build_codex_exec_args(
         args.push(root_path.to_string());
     }
     args.extend([
+        "-m".to_string(),
+        DEFAULT_CODEX_MODEL.to_string(),
+        "-c".to_string(),
+        format!("model_reasoning_effort=\"{DEFAULT_CODEX_REASONING_EFFORT}\""),
         "--sandbox".to_string(),
         "read-only".to_string(),
         "--ephemeral".to_string(),
+        "--ignore-user-config".to_string(),
         "--ignore-rules".to_string(),
         "--output-schema".to_string(),
         schema_path.to_string(),
@@ -319,8 +341,10 @@ mod tests {
         let prompt = build_codex_prompt(&intent, "/tmp/schema.json", "/tmp/plan.json")
             .expect("prompt build");
         assert!(prompt.contains("ONLY a single JSON object"));
+        assert!(prompt.contains("Do not run shell commands"));
         assert!(prompt.contains("schema at '/tmp/schema.json'"));
-        assert!(prompt.contains("At most 3 next_actions"));
+        assert!(prompt.contains("bounded_objective MUST be true"));
+        assert!(prompt.contains("Generate exactly 2 or 3 next_actions"));
         assert!(prompt.contains("e-1"));
     }
 
@@ -338,5 +362,10 @@ mod tests {
         assert!(cd_index < sandbox_index);
         assert_eq!(args[cd_index + 1], "/repo/root");
         assert!(args[1] == "--cd");
+        assert!(args.windows(2).any(|entry| entry == ["-m", "gpt-5.4"]));
+        assert!(args
+            .windows(2)
+            .any(|entry| entry == ["-c", "model_reasoning_effort=\"medium\""]));
+        assert!(args.iter().any(|entry| entry == "--ignore-user-config"));
     }
 }

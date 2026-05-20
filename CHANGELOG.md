@@ -61,6 +61,9 @@ release yet.
   forwarded when configured, static HTML no longer attempts the web compiler by
   default, Tauri runs the compiler on a blocking worker, and Rust validates the
   2-3 `next_actions` UI contract.
+- Added visible native compiler progress for the onboarding flow and configured
+  the Codex runner to use `gpt-5.4` with medium reasoning, terminal logs, and a
+  stricter no-tool prompt for first workspace generation.
 
 ### Fixed - Codex Workspace Output Schema Strictness
 
