@@ -18,7 +18,7 @@ test("WorkspaceIntent compiler eval runs deterministic golden cases without an L
     const report = runWorkspaceIntentCompilerEval({ reportPath });
 
     assert.equal(report.validation, "VAL-EVAL-009-workspace-intent-compiler");
-    assert.equal(report.eval_spec_path, "evals/selfhost/pilot/workspace-intent-compiler.eval.json");
+    assert.equal(report.eval_spec_path, "evals/workspace-plan-adapters/workspace-intent-compiler.eval.json");
     assert.equal(report.generated_at, WORKSPACE_INTENT_COMPILER_EVAL_GENERATED_AT);
     assert.equal(report.report_id, `VAL-EVAL-009-workspace-intent-compiler-${WORKSPACE_INTENT_COMPILER_EVAL_GENERATED_AT}`);
     assert.equal(report.no_llm, true);

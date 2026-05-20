@@ -18,7 +18,7 @@ test("Workspace runner adapter eval covers Rust fixture and offline Codex runner
     const report = runWorkspaceRunnerAdapterEval({ reportPath });
 
     assert.equal(report.validation, "VAL-EVAL-010-workspace-runner-adapter");
-    assert.equal(report.eval_spec_path, "evals/selfhost/pilot/workspace-runner-adapter.eval.json");
+    assert.equal(report.eval_spec_path, "evals/workspace-plan-adapters/workspace-runner-adapter.eval.json");
     assert.equal(report.generated_at, WORKSPACE_RUNNER_ADAPTER_EVAL_GENERATED_AT);
     assert.equal(report.report_id, `VAL-EVAL-010-workspace-runner-adapter-${WORKSPACE_RUNNER_ADAPTER_EVAL_GENERATED_AT}`);
     assert.equal(report.no_llm, true);

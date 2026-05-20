@@ -1,0 +1,74 @@
+{
+  "report_id": "VAL-EVAL-010-workspace-runner-adapter-2026-05-20T00:00:00.000Z",
+  "generated_at": "2026-05-20T00:00:00.000Z",
+  "validation": "VAL-EVAL-010-workspace-runner-adapter",
+  "eval_spec_path": "evals/workspace-plan-adapters/workspace-runner-adapter.eval.json",
+  "no_llm": true,
+  "aggregate": {
+    "total_cases": 3,
+    "passed_cases": 3,
+    "failed_cases": 0,
+    "completed_runner_cases": 1,
+    "blocked_runner_cases": 1,
+    "failed_runner_cases": 1,
+    "rust_fixture_cases": 2,
+    "codex_exec_cases": 1,
+    "total_mismatches": 0
+  },
+  "cases": [
+    {
+      "id": "WRA-001-RUST-FIXTURE-COMPLETED",
+      "title": "Rust fixture adapter executes and maps a compiler plan into Pedagogo WorkspacePlan.",
+      "case_class": "rust_fixture_completed",
+      "passed": true,
+      "observations": {
+        "adapter": "fixture",
+        "runner_status": "completed",
+        "command": "cargo run --quiet -p sibi-workspace-compiler -- --adapter fixture --fixture evals/workspace-plan-adapters/fixtures/rust_workspace_plan_fixture.json",
+        "exit_code": 0,
+        "blocked_reason": null,
+        "rust_plan_present": true,
+        "rust_intent_evidence_count": 1,
+        "validation_valid": true,
+        "compiled_by": "llm"
+      },
+      "mismatches": []
+    },
+    {
+      "id": "WRA-002-RUST-FIXTURE-MISSING",
+      "title": "Missing Rust fixture path fails as an auditable adapter result with deterministic fallback.",
+      "case_class": "rust_fixture_missing",
+      "passed": true,
+      "observations": {
+        "adapter": "fixture",
+        "runner_status": "failed",
+        "command": "cargo run --quiet -p sibi-workspace-compiler -- --adapter fixture --fixture <missing fixturePath>",
+        "exit_code": null,
+        "blocked_reason": "fixture adapter requires --fixture path.",
+        "rust_plan_present": false,
+        "rust_intent_evidence_count": 1,
+        "validation_valid": true,
+        "compiled_by": "deterministic-builder"
+      },
+      "mismatches": []
+    },
+    {
+      "id": "WRA-003-CODEX-EXEC-BLOCKED",
+      "title": "Codex runner adapter exposes command metadata but stays disabled for offline evals.",
+      "case_class": "codex_exec_blocked",
+      "passed": true,
+      "observations": {
+        "adapter": "codex-exec",
+        "runner_status": "blocked",
+        "command": "cargo run --quiet -p sibi-workspace-compiler -- --adapter codex-exec",
+        "exit_code": null,
+        "blocked_reason": "codex-exec execution is disabled by default in this test slice.",
+        "rust_plan_present": false,
+        "rust_intent_evidence_count": 1,
+        "validation_valid": true,
+        "compiled_by": "deterministic-builder"
+      },
+      "mismatches": []
+    }
+  ]
+}
