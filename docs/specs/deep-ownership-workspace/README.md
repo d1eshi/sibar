@@ -72,7 +72,9 @@ understanding.
 14. `12_ui_reference_components.md` extracts reproducible UI components from
     the Sibi Lens + Lab iteration references.
 15. `13_tauri_second_app_product_plan.md` is the derived/historical plan for this workspace.
-16. `features.json` translates the spec pack into an implementation queue.
+16. `14_workspace_intent_flow.md` defines Workspace Intent as the first
+    user-facing create-workspace flow before a pre-filled workspace appears.
+17. `features.json` translates the spec pack into an implementation queue.
 
 ## Naming Decision
 

@@ -9,6 +9,37 @@ This loop generalizes the current Build-to-Learn flow. Code remains a primary
 artifact, but the loop must also support papers, formulas, notebooks, tests,
 benchmarks, diagrams, and experiments.
 
+## Workspace Intent Entry
+
+The first user-facing flow for Sibar Research Workspace starts with
+`WorkspaceIntent`, not global intent. Global ambition is durable context; a
+workspace is a bounded program under that ambition.
+
+```text
+User Ambition
+  -> WorkspaceIntent
+  -> WorkspacePlan
+  -> SessionPlan
+  -> EvidencePlan
+  -> DeepOwnershipLoop
+```
+
+Example:
+
+```text
+Global ambition:
+  Convertirme en AI researcher-builder
+
+Workspace intent:
+  JAX Transformers from scratch
+
+Session:
+  Implement single-head attention in JAX
+```
+
+See `14_workspace_intent_flow.md` for the create-workspace UX, contract order,
+and the transition from user input to the first session.
+
 ## Loop
 
 ```text
@@ -358,4 +389,3 @@ or:
 You are not ready to modify readiness scoring yet. You skipped the gap evidence
 that blocks the claim.
 ```
-
