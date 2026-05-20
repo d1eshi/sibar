@@ -10,186 +10,305 @@
 </head>
 <body>
   <main class="research-shell" data-component="research-workspace-root">
-    <section class="today-banner" data-component="today-screen">
-      <p class="eyebrow">Sibar / Research Workspace</p>
-      <h1>Researcher Workspace</h1>
-      <p class="mission-line">
-        Mission status:
-        <span id="todayMission" data-field="ambition">Frontier AI researcher</span>
-        ·
-        <span id="todayArc" data-field="arc">Neural Nets from Scratch</span>
-      </p>
-
-      <div class="today-grid">
-        <article class="tile">
-          <h2>TODAY</h2>
-          <div class="field-group">
-            <strong>Current ambition</strong>
-            <span id="todayMissionField" data-field="ambition">Frontier AI researcher</span>
-          </div>
-          <div class="field-group">
-            <strong>Current arc</strong>
-            <span id="todayArcField" data-field="arc">Neural Nets from Scratch</span>
-          </div>
-          <div class="field-group">
-            <strong>Session objective</strong>
-            <span data-field="objective">Build a minimal backprop artifact and explain it without notes.</span>
-          </div>
-          <ul class="checklist" aria-label="Today's required output">
-            <li>1 notebook / explanation pair</li>
-            <li>1 recall card</li>
-            <li>1 evidence commit stub</li>
-          </ul>
-        </article>
-        <article class="tile">
-          <h2>CURRENT STATE</h2>
-          <ul class="state-list">
-            <li><span aria-label="understood">●</span> Neural Nets foundations</li>
-            <li><span aria-label="in-progress">◐</span> Micrograd reconstruction</li>
-            <li><span aria-label="locked">○</span> Scaling intuition and systems</li>
-          </ul>
-        </article>
-      </div>
-    </section>
-
-    <section class="trinity-grid" data-component="workspace-trinity">
-      <section class="panel roadmap-panel" aria-labelledby="roadmap-title" data-component="roadmap-panel">
-        <header>
-          <h2 id="roadmap-title">ROADMAP</h2>
-          <small>Evidence-ready readiness graph</small>
-        </header>
-        <ul id="roadmapList" class="roadmap-list"></ul>
-        <p class="tree-hint" id="treeHint">Expand nodes to open mission/arc/track structure.</p>
-      </section>
-
-      <section class="panel session-panel" aria-labelledby="session-title" data-component="session-reader-panel">
-        <header>
-          <h2 id="session-title">SESSION / READER</h2>
-          <small>Session loop: Active reconstruction lane</small>
-        </header>
-
-        <label class="sr-only" for="sourceText">Source input</label>
-        <textarea
-          id="sourceText"
-          rows="4"
-          placeholder="Paste a URL, paper note, or article excerpt. Sibar extracts claims and maps them to roadmap nodes."
-        ></textarea>
-        <button id="compileSource" type="button">Compile source to roadmap</button>
-        <div class="contract-actions">
-          <button id="buildContractPayload" type="button">Generate compiler contract payload</button>
-          <button id="applyGeneratedArtifact" type="button">Apply generated artifact</button>
-          <button id="applySampleArtifact" type="button">Apply validated sample artifact</button>
+    <section class="native-window" data-component="today-screen">
+      <header class="workspace-topbar" aria-label="Workspace toolbar">
+        <div class="window-cluster" aria-hidden="true">
+          <span class="window-dot red"></span>
+          <span class="window-dot amber"></span>
+          <span class="window-dot green"></span>
         </div>
-        <textarea
-          id="contractPayload"
-          rows="7"
-          class="contract-payload"
-          readonly
-          placeholder='{"request": {...}, "artifact": {...}}'
-        ></textarea>
-        <p id="contractStatus" class="contract-status" role="status" aria-live="polite"></p>
-        <p id="compilerResult" class="compiler-result" role="status" aria-live="polite"></p>
-        <section id="sourceCard" class="source-card">
-          <h3>Source card</h3>
-          <p id="sourceCardTitle"></p>
-          <ul id="sourceClaims" class="item-list-inline"></ul>
-          <p class="muted">Suggested nodes</p>
-          <ul id="sourceSuggested" class="item-list-inline"></ul>
-          <p class="muted">Next session outputs</p>
-          <ul id="sourceNextSession" class="item-list-inline"></ul>
-        </section>
+        <div class="brand-mark" aria-label="Sibar">
+          <span class="brand-symbol">S</span>
+          <strong>Sibar</strong>
+        </div>
+        <button class="icon-button" type="button" aria-label="Back">&lt;</button>
+        <div class="topbar-document">
+          <span class="document-icon">PDF</span>
+          <span>Backpropagation</span>
+          <span aria-hidden="true">v</span>
+        </div>
+        <div class="topbar-spacer"></div>
+        <button class="icon-button" type="button" aria-label="Search">?</button>
+        <button class="icon-button" type="button" aria-label="Toggle notes">[]</button>
+        <button class="icon-button" type="button" aria-label="More">...</button>
+        <div class="topbar-discussion">
+          <span aria-hidden="true">*</span>
+          <span>Discussion</span>
+        </div>
+      </header>
 
-        <div class="session-loop" data-component="active-node-reader">
-          <div class="node-reader-header">
-            <div>
-              <p class="muted">Active node</p>
-              <h3 id="activeNodeTitle">Learning Node: Backpropagation</h3>
+      <div class="workspace-frame">
+        <aside class="library-sidebar" aria-labelledby="library-title" data-component="roadmap-panel">
+          <div class="sidebar-block session-meta">
+            <p class="sidebar-label">SESSION</p>
+            <p>May 19, 2026 - 42m</p>
+          </div>
+
+          <div class="sidebar-search">
+            <label class="sr-only" for="treeSearch">Search learning tree</label>
+            <input id="treeSearch" type="search" placeholder="Search" />
+          </div>
+
+          <section class="sidebar-block">
+            <div class="sidebar-section-title">
+              <p class="sidebar-label">RESEARCH</p>
+              <span aria-hidden="true">+</span>
             </div>
-            <button id="conceptConfusion" type="button">No entiendo este concepto</button>
-          </div>
-          <p id="activeNodeFocus">Reader-ready decomposition for deeper ownership.</p>
-          <p id="activeNodeSource">Source: Karpathy-style backprop walkthrough</p>
-          <ul class="session-tasks">
-            <li>Read</li>
-            <li>Explain</li>
-            <li>Build</li>
-            <li>Critique</li>
-            <li>Repair</li>
-          </ul>
-
-          <section class="mini-node-section" aria-labelledby="mini-node-title">
-            <h4 id="mini-node-title">Deep knowledge mini-nodes</h4>
-            <ul id="miniNodeList" class="mini-node-list"></ul>
+            <ul id="roadmapList" class="roadmap-list learning-tree"></ul>
+            <p class="tree-hint" id="treeHint">Select one fragment. Locked work stays visible, not loud.</p>
           </section>
 
-          <section class="reader-detail" aria-labelledby="reader-focus-title">
-            <h4 id="reader-focus-title">Reader focus</h4>
-            <p id="readerInstruction">Select a roadmap node to load its reading path.</p>
-            <ul id="readerResourceList" class="reader-resource-list"></ul>
+          <nav class="sidebar-utilities" aria-label="Workspace utilities">
+            <button type="button">Artifacts</button>
+            <button type="button">Notes</button>
+            <button type="button">Search</button>
+            <button type="button">Trash</button>
+          </nav>
+
+          <div class="sidebar-footer">
+            <span class="user-pill">DS</span>
+            <span>dleshi</span>
+            <button class="icon-button" type="button" aria-label="Settings">Set</button>
+          </div>
+        </aside>
+
+        <section class="session-panel" aria-labelledby="session-title" data-component="session-reader-panel">
+          <div class="document-toolbar" aria-label="Current source">
+            <div class="source-chip">
+              <span class="document-icon">PDF</span>
+              <div>
+                <strong>Backpropagation: An Algorithmic Perspective</strong>
+                <span>Werbos, 1990</span>
+              </div>
+            </div>
+            <div class="page-controls">
+              <button class="icon-button" type="button" aria-label="Previous page">&lt;</button>
+              <span>12 / 48</span>
+              <button class="icon-button" type="button" aria-label="Next page">&gt;</button>
+            </div>
+          </div>
+
+          <article class="session-loop today-session" data-component="active-node-reader">
+            <div class="today-row">
+              <div>
+                <p class="eyebrow">Today</p>
+                <h1 id="session-title">Backpropagation</h1>
+              </div>
+              <span class="status-pill">Selected fragment</span>
+            </div>
+
+            <div class="mission-fields" aria-label="Current mission">
+              <p><span>Mission</span><strong id="todayMission" data-field="ambition">Frontier AI researcher</strong></p>
+              <p><span>Arc</span><strong id="todayArc" data-field="arc">Neural Nets from Scratch</strong></p>
+              <p><span>Ambition</span><strong id="todayMissionField" data-field="ambition">Frontier AI researcher</strong></p>
+              <p><span>Path</span><strong id="todayArcField" data-field="arc">Neural Nets from Scratch</strong></p>
+            </div>
+
+            <section class="objective-block" aria-labelledby="objective-title">
+              <p class="section-kicker" id="objective-title">Objective</p>
+              <p id="activeNodeFocus" data-field="objective">Build a minimal backprop artifact, defend it from memory, and leave evidence.</p>
+              <p id="activeNodeSource" class="source-line">Source: Karpathy-style backprop walkthrough</p>
+            </section>
+
+            <section class="session-output" aria-labelledby="session-output-title">
+              <p class="section-kicker" id="session-output-title">Session output</p>
+              <ol class="session-tasks" aria-label="Session output contract">
+                <li><strong>Read</strong><span>one source slice</span></li>
+                <li><strong>Code</strong><span>one artifact</span></li>
+                <li><strong>Explain</strong><span>from memory</span></li>
+              </ol>
+            </section>
+
+            <section class="next-actions" aria-label="Next actions">
+              <button id="studyChoiceNow" class="next-action primary-choice" type="button" data-study-choice="read">
+                <span>Read</span>
+                <strong>Open chain rule fragment</strong>
+              </button>
+              <button id="studyChoiceBuild" class="next-action" type="button" data-study-choice="build" data-action-mode="/build">
+                <span>Code</span>
+                <strong>Build the gradient trace</strong>
+              </button>
+              <button id="studyChoiceExplain" class="next-action" type="button" data-study-choice="explain" data-action-mode="/explain">
+                <span>Explain</span>
+                <strong>Defend without notes</strong>
+              </button>
+            </section>
+
+            <div class="node-reader-header">
+              <div>
+                <p class="muted">Learning node</p>
+                <h2 id="activeNodeTitle">Backpropagation</h2>
+              </div>
+              <button id="conceptConfusion" type="button">Ask</button>
+            </div>
+
+            <section class="reader-detail" aria-labelledby="reader-focus-title">
+              <h3 id="reader-focus-title">Selected fragment</h3>
+              <p id="readerInstruction">Select a roadmap node to load its reading path.</p>
+              <ul id="readerResourceList" class="reader-resource-list"></ul>
+            </section>
+
+            <section class="mini-node-section" aria-labelledby="mini-node-title">
+              <h3 id="mini-node-title">Learning tree focus</h3>
+              <ul id="miniNodeList" class="mini-node-list"></ul>
+            </section>
+
+            <section class="attempt-card" aria-labelledby="attempt-title">
+              <label id="attempt-title" for="attemptInput"><strong>Attempt reconstruction first</strong></label>
+              <textarea
+                id="attemptInput"
+                rows="4"
+                placeholder="Write your first reconstruction attempt before requesting a guided hint."
+              ></textarea>
+              <div class="attempt-actions">
+                <button id="submitAttempt" type="button">Submit attempt</button>
+                <button id="requestHint" type="button" disabled>Get next hint</button>
+                <span id="attemptBadge" class="attempt-badge">Attempt 0</span>
+              </div>
+              <p id="attemptFeedback" class="attempt-feedback" aria-live="polite"></p>
+              <div id="attemptHistory" class="attempt-history" aria-live="polite"></div>
+            </section>
+
+            <details class="compiler-drawer">
+              <summary>Source-to-roadmap compiler</summary>
+              <label class="sr-only" for="sourceText">Source input</label>
+              <textarea
+                id="sourceText"
+                rows="4"
+                placeholder="Paste a URL, paper note, or article excerpt. Sibar extracts claims and maps them to roadmap nodes."
+              ></textarea>
+              <div class="compiler-actions">
+                <button id="compileSource" type="button">Compile source to roadmap</button>
+                <button id="buildContractPayload" type="button">Generate compiler contract payload</button>
+              </div>
+              <div class="contract-actions">
+                <button id="applyGeneratedArtifact" type="button">Apply generated artifact</button>
+                <button id="applySampleArtifact" type="button">Apply validated sample artifact</button>
+              </div>
+              <textarea
+                id="contractPayload"
+                rows="7"
+                class="contract-payload"
+                readonly
+                placeholder='{"request": {...}, "artifact": {...}}'
+              ></textarea>
+              <p id="contractStatus" class="contract-status" role="status" aria-live="polite"></p>
+              <p id="compilerResult" class="compiler-result" role="status" aria-live="polite"></p>
+              <section id="sourceCard" class="source-card">
+                <h3>Source card</h3>
+                <p id="sourceCardTitle"></p>
+                <ul id="sourceClaims" class="item-list-inline"></ul>
+                <p class="muted">Suggested nodes</p>
+                <ul id="sourceSuggested" class="item-list-inline"></ul>
+                <p class="muted">Next session outputs</p>
+                <ul id="sourceNextSession" class="item-list-inline"></ul>
+              </section>
+            </details>
+          </article>
+        </section>
+
+        <aside class="discussion-panel" aria-labelledby="discussion-title" data-component="discussion-panel">
+          <header class="discussion-header">
+            <div>
+              <h2 id="discussion-title">Discussion</h2>
+              <p id="lmModeStatus" class="discussion-state" aria-live="polite">Context: Roadmap</p>
+            </div>
+            <button class="icon-button" type="button" aria-label="Pin discussion">Pin</button>
+          </header>
+
+          <div class="scope-banner">
+            <span>Scope: Selected fragment in "Backpropagation"</span>
+            <button type="button">Change</button>
+          </div>
+
+          <section class="conversation" aria-label="Contextual tutor conversation">
+            <article class="message user-message">
+              <span class="avatar">DS</span>
+              <div>
+                <p class="message-meta">You - 10:42 AM</p>
+                <p>Why do we propagate local derivatives from outputs to parameters instead of the other way around?</p>
+              </div>
+            </article>
+            <article class="message sibi-message">
+              <span class="avatar sibi-avatar">S</span>
+              <div>
+                <p class="message-meta">Sibar - 10:43 AM</p>
+                <p>Good question. Backpropagation follows the reverse mode of automatic differentiation. Starting from the loss, each node reuses intermediate gradients and avoids redundant computation.</p>
+              </div>
+            </article>
+            <article class="message user-message">
+              <span class="avatar">DS</span>
+              <div>
+                <p class="message-meta">You - 10:44 AM</p>
+                <p>Can you give a concrete example with a 2-layer MLP?</p>
+              </div>
+            </article>
+            <article class="message sibi-message">
+              <span class="avatar sibi-avatar">S</span>
+              <div>
+                <p class="message-meta">Sibar - 10:45 AM</p>
+                <p>Sure. Sketch the gradient flow from loss to weights first, then write the local chain link for one layer.</p>
+                <div class="inline-artifact">
+                  <span aria-hidden="true">[]</span>
+                  <div>
+                    <strong>2-layer MLP gradient flow</strong>
+                    <small>Diagram - PNG</small>
+                  </div>
+                </div>
+              </div>
+            </article>
           </section>
 
-          <label for="attemptInput"><strong>Attempt reconstruction first</strong></label>
-          <textarea
-            id="attemptInput"
-            rows="5"
-            placeholder="Write your first reconstruction attempt before requesting a guided hint."
-          ></textarea>
-          <div class="attempt-actions">
-            <button id="submitAttempt" type="button">Submit attempt</button>
-            <button id="requestHint" type="button" disabled>Get next hint</button>
-            <span id="attemptBadge" class="attempt-badge">Attempt 0</span>
+          <section class="insight-note" aria-labelledby="insight-title">
+            <p class="section-kicker" id="insight-title">Key insight</p>
+            <p><strong>Touching:</strong> <span id="lmActiveNode">Backpropagation</span></p>
+            <p><strong>Fragment:</strong> <span id="lmActiveMiniNode">Chain rule trace</span></p>
+            <p><strong>Teaching move:</strong> <span id="lmRecommendedDecision">Read the smallest prerequisite, attempt, then repair.</span></p>
+            <p><strong>Reader note:</strong> <span id="lmReaderMove">Open the current mini-node resources.</span></p>
+            <details class="context-note">
+              <summary>Context notes</summary>
+              <p><strong>Alternatives:</strong> <span id="lmDecisionAlternatives">Loading anti-overload alternatives.</span></p>
+              <p><strong>Deferred:</strong> <span id="lmDecisionLockedReasons">No locked alternatives yet.</span></p>
+            </details>
+          </section>
+
+          <section class="workspace-signals" id="workspaceSignals" aria-labelledby="signals-title">
+            <p class="section-kicker" id="signals-title">Evidence state</p>
+            <p><strong>Readiness:</strong> <span id="readinessSummary">No evidence yet</span></p>
+            <p><strong>Detected gap:</strong> <span id="gapSummary">Attempt before gating actions</span></p>
+            <ul id="evidenceChecklist" class="item-list-inline" aria-live="polite"></ul>
+            <p><strong>Repair action:</strong> <span id="repairActionText">None</span></p>
+          </section>
+
+          <ul id="modeActionLog" class="mode-log" aria-live="polite"></ul>
+
+          <div class="discussion-input">
+            <label class="sr-only" for="discussionInput">Ask about the selected fragment</label>
+            <input id="discussionInput" type="text" placeholder="Ask about the selected fragment..." />
+            <button type="button" aria-label="Send">&gt;</button>
           </div>
-          <p id="attemptFeedback" class="attempt-feedback" aria-live="polite"></p>
-          <div id="attemptHistory" class="attempt-history" aria-live="polite"></div>
-        </div>
-        <section id="workspaceSignals" class="workspace-signals">
-          <p><strong>Readiness:</strong> <span id="readinessSummary">No evidence yet</span></p>
-          <p><strong>Detected gap:</strong> <span id="gapSummary">Attempt before gating actions</span></p>
-          <ul id="evidenceChecklist" class="item-list-inline" aria-live="polite"></ul>
-          <p><strong>Repair action:</strong> <span id="repairActionText">None</span></p>
-        </section>
-      </section>
+        </aside>
 
-      <section class="panel lm-panel" aria-labelledby="lm-guide-title" data-component="lm-guide-panel">
-        <header>
-          <h2 id="lm-guide-title">LM GUIDE</h2>
-          <small>Active toolset: /map /read /explain /test /critic /repair /build /publish</small>
-        </header>
-        <ul class="lm-modes" id="lmModes">
-          <li><button type="button" data-mode="/map">/map</button></li>
-          <li><button type="button" data-mode="/read">/read</button></li>
-          <li><button type="button" data-mode="/explain">/explain</button></li>
-          <li><button type="button" data-mode="/test">/test</button></li>
-          <li><button type="button" data-mode="/critic">/critic</button></li>
-          <li><button type="button" data-mode="/repair">/repair</button></li>
-          <li><button type="button" data-mode="/build">/build</button></li>
-          <li><button type="button" data-mode="/publish">/publish</button></li>
-        </ul>
-        <p id="lmModeStatus" class="lm-mode-status" aria-live="polite">Mode: /map</p>
-        <section class="lm-context" aria-label="Active study context">
-          <h3>Active study context</h3>
-          <p><strong>Touching:</strong> <span id="lmActiveNode">Backpropagation</span></p>
-          <p><strong>Mini-node:</strong> <span id="lmActiveMiniNode">Chain rule trace</span></p>
-          <p><strong>Decision:</strong> <span id="lmRecommendedDecision">Read the smallest prerequisite, attempt, then repair.</span></p>
-          <p><strong>Decision alternatives:</strong> <span id="lmDecisionAlternatives">Loading anti-overload alternatives.</span></p>
-          <p><strong>Why not others:</strong> <span id="lmDecisionLockedReasons">No locked alternatives yet.</span></p>
-          <p><strong>Reader move:</strong> <span id="lmReaderMove">Open the current mini-node resources.</span></p>
+        <section class="artifact-strip" data-component="artifacts-evidence-strip" aria-labelledby="artifact-title">
+          <div class="artifact-strip-header">
+            <h2 id="artifact-title">Artifacts / Evidence</h2>
+            <div class="strip-tabs" aria-label="Evidence tabs">
+              <button type="button" aria-pressed="true">Evidence</button>
+              <button type="button">Artifacts</button>
+              <button type="button">Recall</button>
+            </div>
+          </div>
+          <div class="artifact-columns">
+            <div>
+              <h3>Artifacts</h3>
+              <ul id="artifactList" class="item-list"></ul>
+            </div>
+            <div>
+              <h3>Evidence</h3>
+              <ul id="evidenceList" class="item-list"></ul>
+            </div>
+          </div>
         </section>
-        <ul id="modeActionLog" class="mode-log" aria-live="polite"></ul>
-      </section>
-    </section>
-
-    <section class="artifact-strip" data-component="artifacts-evidence-strip">
-      <h2>ARTIFACTS / EVIDENCE</h2>
-      <div class="artifact-columns">
-        <div>
-          <h3>Artifacts</h3>
-          <ul id="artifactList" class="item-list"></ul>
-        </div>
-        <div>
-          <h3>Evidence</h3>
-          <ul id="evidenceList" class="item-list"></ul>
-        </div>
       </div>
     </section>
   </main>

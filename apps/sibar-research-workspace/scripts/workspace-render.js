@@ -1,5 +1,5 @@
 import { escapeHtml } from "./workspace-utils.js";
-import { ARC_ID, MISSION_ID, STATUS, STATUS_CLASS, TRACKS } from "./workspace-data.js";
+import { ARC_ID, MISSION_ID, MODE_SCOPE_LABELS, STATUS, STATUS_CLASS, TRACKS } from "./workspace-data.js";
 import { buildNodeStudyPlan, getNodeById } from "./workspace-study-plans.js";
 import { buildDecisionState, getActiveReaderResource, getStudyContext } from "./workspace-session.js";
 
@@ -189,7 +189,8 @@ export function renderChecklist(el, checklist) {
 
 export function renderModeLog(logEl, entries) {
   if (!logEl) return;
-  logEl.innerHTML = entries.map((entry) => `<li>[${escapeHtml(entry.scope)}] ${escapeHtml(entry.text)}</li>`).join("");
+  const labelForScope = (scope) => MODE_SCOPE_LABELS[scope] || String(scope || "context").replace(/^\//, "");
+  logEl.innerHTML = entries.map((entry) => `<li>[${escapeHtml(labelForScope(entry.scope))}] ${escapeHtml(entry.text)}</li>`).join("");
 }
 
 export function renderContractPanel(root, state) {
@@ -220,7 +221,7 @@ export function renderNodeReader(root, state) {
   state.activeNodeId = context.node?.id || context.plan.nodeId;
   state.activeMiniNodeId = context.miniNode?.id || context.plan.defaultMiniNodeId;
   const selectedResource = getActiveReaderResource(state, context);
-  if (root.activeNodeTitle) root.activeNodeTitle.textContent = `Learning Node: ${context.plan.displayTitle}`;
+  if (root.activeNodeTitle) root.activeNodeTitle.textContent = context.plan.displayTitle;
   if (root.activeNodeFocus) root.activeNodeFocus.textContent = context.plan.focus;
   if (root.activeNodeSource) {
     root.activeNodeSource.textContent = `Source: ${selectedResource?.title || context.plan.source}`;
@@ -228,7 +229,7 @@ export function renderNodeReader(root, state) {
 
   const lockText = context.roadmapLockReasons.length ? ` (locked: ${context.roadmapLockReasons.join(", ")})` : "";
   if (root.activeNodeTitle) {
-    root.activeNodeTitle.textContent = `Learning Node: ${context.plan.displayTitle}${lockText}`;
+    root.activeNodeTitle.textContent = `${context.plan.displayTitle}${lockText}`;
   }
 
   if (root.miniNodeList) {
@@ -421,6 +422,9 @@ export function initRootElements(attemptForm, lmContext) {
     roadmap: document.getElementById("roadmapList"),
     artifacts: document.getElementById("artifactList"),
     evidence: document.getElementById("evidenceList"),
+    studyChoiceNow: document.getElementById("studyChoiceNow"),
+    studyChoiceBuild: document.getElementById("studyChoiceBuild"),
+    studyChoiceExplain: document.getElementById("studyChoiceExplain") || document.getElementById("studyChoiceRecall"),
     compileButton: document.getElementById(attemptForm.compileButton),
     sourceText: document.getElementById(attemptForm.sourceText),
     buildContractPayload: document.getElementById("buildContractPayload"),
