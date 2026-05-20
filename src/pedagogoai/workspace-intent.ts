@@ -18,6 +18,8 @@ export type {
   WorkspacePlanPreview,
 } from "./workspace-intent-types.ts";
 
+export * as WorkspaceIntentCompiler from "./workspace-intent/index.ts";
+
 export {
   DEFAULT_WORKSPACE_INTENT_INPUT,
   WORKSPACE_INTENT_CONTRACT_ORDER,
