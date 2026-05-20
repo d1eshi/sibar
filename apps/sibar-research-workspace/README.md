@@ -33,8 +33,9 @@ compiler path.
   reusable native-style container.
 - `OnboardingFlow` now emits an `onOpenWorkspace` callback from `Open workspace`
   after local preview generation.
-- Added a workspace overview screen that shows planned learning nodes and the
-  available first-session entry point before opening an active node session.
+- Added a workspace overview screen that follows the study-path reference:
+  left learning rail, current-study center, source evidence, tutor guidance, and
+  readiness before opening an active node session.
 - Added a static first-session workspace surface with reducer-backed selection state:
   - study path rail
   - session workbench

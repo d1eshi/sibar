@@ -1,10 +1,14 @@
 import * as React from "react";
-import styles from "./workspace.module.css";
+import styles from "./workspaceOverview.module.css";
 import type {
   WorkspaceSessionAction,
+  WorkspaceSessionActionKind,
   WorkspaceSessionState,
 } from "../../state/workspaceReducer";
-import type { WorkspaceSessionProjection } from "../../state/workspaceProjection";
+import type {
+  WorkspaceSessionProjection,
+  WorkspaceStudyNode,
+} from "../../state/workspaceProjection";
 
 interface WorkspaceOverviewProps {
   projection: WorkspaceSessionProjection;
@@ -13,95 +17,257 @@ interface WorkspaceOverviewProps {
   onOpenSelectedNode: () => void;
 }
 
+const overviewActions: ReadonlyArray<{
+  kind: WorkspaceSessionActionKind;
+  label: string;
+  hint: string;
+}> = [
+  { kind: "read", label: "Read", hint: "Study source" },
+  { kind: "code", label: "Build", hint: "Create evidence" },
+  { kind: "recall", label: "Recall", hint: "Test memory" },
+];
+
+function getStudyHeadline(node: WorkspaceStudyNode): string {
+  if (node.id === "goal-correctness") {
+    return "Where do embeddings fail in real retrieval?";
+  }
+
+  return node.scope;
+}
+
+function getProgressLabel(nodes: readonly WorkspaceStudyNode[]): string {
+  const activeIndex = nodes.findIndex((node) => node.status !== "complete");
+  const currentStep = activeIndex >= 0 ? activeIndex + 1 : nodes.length;
+  return `${currentStep} of ${nodes.length}`;
+}
+
 export function WorkspaceOverview({
   projection,
   state,
   dispatch,
   onOpenSelectedNode,
 }: WorkspaceOverviewProps) {
+  const progressLabel = getProgressLabel(projection.nodes);
+  const progressPercent = `${Math.max(
+    20,
+    Math.round((2 / Math.max(projection.nodes.length, 1)) * 100),
+  )}%`;
+
+  function selectNode(node: WorkspaceStudyNode) {
+    const firstMiniNode = node.miniNodes[0];
+    dispatch({
+      type: "select_node",
+      nodeId: node.id,
+      miniNodeId: firstMiniNode?.id ?? state.selectedMiniNodeId,
+      sourceId: firstMiniNode?.sourceId ?? state.selectedSourceId,
+    });
+  }
+
+  function openAction(action: WorkspaceSessionActionKind) {
+    dispatch({ type: "select_source", sourceId: projection.selectedMiniNode.sourceId });
+    dispatch({ type: "set_active_action", action });
+    onOpenSelectedNode();
+  }
+
   return (
     <section className={styles.workspaceOverview} data-component="workspace-overview">
-      <aside className={styles.overviewRail} aria-label="Workspace learning path">
-        <p className={styles.kicker}>Workspace</p>
-        <h1>{projection.title}</h1>
-        <p>{projection.sessionHint}</p>
+      <aside className={styles.overviewPathRail} aria-label="Workspace study path">
+        <header className={styles.overviewPathHeader}>
+          <div className={styles.overviewRailTitle}>
+            <span className={styles.studyPathGlyph} aria-hidden="true" />
+            <strong>Study Path</strong>
+            <button type="button" className={styles.railUtilityButton} aria-label="Path menu">
+              <span />
+            </button>
+          </div>
+          <h2>{projection.title}</h2>
+          <p>{progressLabel}</p>
+          <span className={styles.overviewProgressTrack} aria-hidden="true">
+            <span style={{ width: progressPercent }} />
+          </span>
+        </header>
 
-        <dl className={styles.overviewStats}>
-          <div>
-            <dt>Nodes</dt>
-            <dd>{projection.nodes.length}</dd>
-          </div>
-          <div>
-            <dt>Sources</dt>
-            <dd>{projection.sourceCount}</dd>
-          </div>
-          <div>
-            <dt>Primary actions</dt>
-            <dd>Read / Build / Recall</dd>
-          </div>
-        </dl>
-      </aside>
-
-      <section className={styles.nodeBoard} aria-label="Available learning nodes">
-        <div className={styles.boardHeader}>
-          <div>
-            <p className={styles.kicker}>Learning path</p>
-            <h2>Choose where to start</h2>
-          </div>
-          <button type="button" className={styles.primaryAction} onClick={onOpenSelectedNode}>
-            Start selected node
-          </button>
-        </div>
-
-        <ol className={styles.nodeCards}>
+        <ol className={styles.overviewPathList}>
           {projection.nodes.map((node, index) => {
             const isSelected = node.id === state.selectedNodeId;
-            const firstMiniNode = node.miniNodes[0];
             return (
-              <li key={node.id}>
+              <li key={node.id} className={styles.overviewPathItem} data-state={node.status}>
                 <button
                   type="button"
-                  className={isSelected ? styles.nodeCardSelected : styles.nodeCard}
-                  onClick={() =>
-                    dispatch({
-                      type: "select_node",
-                      nodeId: node.id,
-                      miniNodeId: firstMiniNode?.id ?? state.selectedMiniNodeId,
-                      sourceId: firstMiniNode?.sourceId ?? state.selectedSourceId,
-                    })
-                  }
+                  className={styles.overviewPathButton}
+                  aria-current={isSelected ? "step" : undefined}
+                  onClick={() => selectNode(node)}
                 >
-                  <span className={styles.nodeIndex}>{index + 1}</span>
-                  <span className={styles.nodeCardBody}>
-                    <strong>{node.name}</strong>
-                    <span>{node.scope}</span>
-                    <em>{node.sessionTitle}</em>
-                  </span>
-                  <span className={styles.nodeStatus} data-status={node.status}>
-                    {node.status}
-                  </span>
+                  <span className={styles.overviewNodeBadge}>{index + 1}</span>
+                  <strong>{index + 1}. {node.name}</strong>
+                  <span className={styles.overviewChevron} aria-hidden="true" />
                 </button>
+
+                {isSelected ? (
+                  <ol className={styles.overviewMiniList}>
+                    {node.miniNodes.map((miniNode, miniIndex) => (
+                      <li key={miniNode.id}>
+                        <button
+                          type="button"
+                          className={styles.overviewMiniButton}
+                          aria-current={
+                            miniNode.id === state.selectedMiniNodeId ? "step" : undefined
+                          }
+                          onClick={() =>
+                            dispatch({
+                              type: "select_mini_node",
+                              miniNodeId: miniNode.id,
+                              sourceId: miniNode.sourceId,
+                            })
+                          }
+                        >
+                          <span>{index + 1}.{miniIndex + 1}</span>
+                          <strong>{miniNode.name}</strong>
+                        </button>
+                      </li>
+                    ))}
+                  </ol>
+                ) : null}
               </li>
             );
           })}
         </ol>
+
+        <footer className={styles.overviewPathFooter}>
+          <span>
+            <strong>Today</strong>
+            <em>45m focused</em>
+          </span>
+          <span>
+            <strong>{projection.sourceCount + projection.nodes.length}</strong>
+            <em>Items</em>
+          </span>
+          <span className={styles.focusFlame} aria-hidden="true" />
+        </footer>
+      </aside>
+
+      <section className={styles.overviewStudyPanel} aria-label="Workspace study overview">
+        <header className={styles.overviewStudyHeader}>
+          <div>
+            <p className={styles.kicker}>Current study</p>
+            <h1>{getStudyHeadline(projection.selectedNode)}</h1>
+          </div>
+          <div className={styles.overviewStudyUtilities} aria-hidden="true">
+            <span>Mark</span>
+            <span />
+          </div>
+        </header>
+
+        <div className={styles.overviewDivider} />
+
+        <section className={styles.overviewActionSection} aria-label="Choose your first session">
+          <h2>Choose your first session</h2>
+          <div className={styles.overviewActionGrid}>
+            {overviewActions.map((action) => (
+              <button
+                key={action.kind}
+                type="button"
+                className={styles.overviewActionCard}
+                data-action={action.kind}
+                onClick={() => openAction(action.kind)}
+              >
+                <span className={styles.overviewActionIcon} aria-hidden="true" />
+                <span>
+                  <strong>{action.label}</strong>
+                  <em>{action.hint}</em>
+                </span>
+              </button>
+            ))}
+          </div>
+        </section>
+
+        <section className={styles.overviewEvidenceSection} aria-label="Evidence from sources">
+          <header className={styles.overviewEvidenceHeader}>
+            <h2>
+              Evidence from sources <span>{projection.sourceCount}</span>
+            </h2>
+            <button type="button">View all</button>
+          </header>
+
+          <ol className={styles.overviewSourceList}>
+            {projection.sources.map((source) => (
+              <li key={source.id}>
+                <button
+                  type="button"
+                  className={styles.overviewSourceButton}
+                  onClick={() => dispatch({ type: "select_source", sourceId: source.id })}
+                >
+                  <span className={styles.overviewSourceIcon} data-source={source.type} />
+                  <span className={styles.overviewSourceText}>
+                    <strong>{source.title}</strong>
+                    <em>{source.metadata}</em>
+                  </span>
+                  <q>{source.snippet}</q>
+                  <span className={styles.sourceMore} aria-hidden="true" />
+                </button>
+              </li>
+            ))}
+          </ol>
+        </section>
       </section>
 
-      <aside className={styles.overviewGuide} aria-label="Workspace guidance">
-        <p className={styles.kicker}>Next step</p>
-        <h2>{projection.selectedNode.name}</h2>
-        <p>{projection.selectedNode.scope}</p>
-        <p className={styles.readinessSummary}>
-          {projection.sourceCount} sources ready. Open one node, produce one artifact, then
-          confirm evidence before readiness.
-        </p>
-        <ul>
-          {projection.selectedNode.miniNodes.map((miniNode) => (
-            <li key={miniNode.id}>{miniNode.name}</li>
-          ))}
-        </ul>
-        <button type="button" className={styles.secondaryAction} onClick={onOpenSelectedNode}>
-          Open node session
+      <aside className={styles.overviewTutorRail} aria-label="Sibar tutor guidance">
+        <header className={styles.tutorHeader}>
+          <span className={styles.tutorGlyph} aria-hidden="true" />
+          <strong>Sibar Tutor</strong>
+          <span className={styles.tutorHeaderDots} aria-hidden="true" />
+        </header>
+
+        <section className={styles.tutorStatusCard}>
+          <span className={styles.seedlingMark} aria-hidden="true" />
+          <div>
+            <strong>You're on track</strong>
+            <p>Keep going with purpose.</p>
+          </div>
+          <span className={styles.tutorProgressTrack} aria-hidden="true">
+            <span />
+          </span>
+        </section>
+
+        <section className={styles.guidanceCard}>
+          <h2>Focus guidance</h2>
+          <article>
+            <span className={styles.guidanceIcon} data-kind="focus" />
+            <div>
+              <strong>Focus</strong>
+              <p>Identify the failure case.</p>
+            </div>
+          </article>
+          <article>
+            <span className={styles.guidanceIcon} data-kind="consider" />
+            <div>
+              <strong>Consider</strong>
+              <p>Compare source claim and artifact.</p>
+            </div>
+          </article>
+          <article>
+            <span className={styles.guidanceIcon} data-kind="produce" />
+            <div>
+              <strong>Produce</strong>
+              <p>Create one evidence-backed note.</p>
+            </div>
+          </article>
+        </section>
+
+        <section className={styles.readinessCard}>
+          <h2>Readiness</h2>
+          <div>
+            <span className={styles.readinessMeter}>78%</span>
+            <span>
+              <strong>Good readiness</strong>
+              <p>Review the evidence, then choose an action.</p>
+            </span>
+          </div>
+        </section>
+
+        <button type="button" className={styles.askTutorButton}>
+          Ask a question...
+          <span>Cmd K</span>
         </button>
       </aside>
     </section>

@@ -121,8 +121,9 @@ release yet.
 - Added reducer-backed workspace session UI state for selected node, mini-node,
   source, and active action (`Read`/`Build`/`Recall`) with a compact
   readiness panel visibility flag.
-- Added a workspace overview between onboarding and the active session so the
-  user sees learning nodes and available sessions before entering a node.
+- Reworked the workspace overview between onboarding and the active session into
+  the study-path reference layout: left learning rail, current-study center,
+  source evidence, tutor guidance, and readiness before entering a node.
 - Added the static active-session workspace view composed of `WorkspaceShell`,
   `StudyPathRail`, and `SessionWorkbench`.
 - Hooked onboarding to open the workspace overview after local preview
