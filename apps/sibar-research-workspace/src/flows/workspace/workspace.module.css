@@ -1,0 +1,238 @@
+.workspaceFrame {
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(230px, 280px) minmax(0, 1fr) minmax(260px, 300px);
+  gap: 0;
+}
+
+.studyPathRail {
+  border-right: 1px solid var(--divider);
+  padding: 14px 0;
+  background: var(--surface);
+  color: var(--text-primary);
+  overflow: auto;
+}
+
+.railHeader {
+  padding: 0 18px 14px;
+}
+
+.kicker {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0;
+}
+
+.studyPathRail h2 {
+  margin: 2px 0 0;
+  color: var(--text-secondary);
+  font-size: 1.25rem;
+}
+
+.pathList {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.pathNode {
+  border-top: 1px solid rgba(232, 220, 204, 0.35);
+}
+
+.pathNodeButton,
+.pathNodeButtonActive,
+.miniNodeButton,
+.miniNodeButtonActive,
+.actionButton,
+.sourceButton {
+  width: 100%;
+  text-align: left;
+  border: 0;
+  border-radius: 0;
+  padding: 10px 14px;
+  background: transparent;
+  color: var(--text-primary);
+}
+
+.pathNodeButtonActive,
+.miniNodeButtonActive,
+.actionButton[data-active="true"] {
+  background: var(--teal-bg);
+  color: #0f1410;
+}
+
+.pathNodeButton:hover,
+.pathNodeButtonActive:hover,
+.miniNodeButton:hover,
+.miniNodeButtonActive:hover,
+.actionButton:hover,
+.sourceButton:hover {
+  background: rgba(255, 250, 241, 0.16);
+}
+
+.pathNodeButton strong,
+.pathNodeButtonActive strong {
+  display: block;
+  color: var(--text-secondary);
+  font-size: 13px;
+}
+
+.pathNodeButton span,
+.pathNodeButtonActive span {
+  display: block;
+  margin-top: 4px;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.miniNodeList {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.miniNodeList li + li {
+  border-top: 1px solid rgba(232, 220, 204, 0.2);
+}
+
+.miniNodeButton,
+.miniNodeButtonActive {
+  padding-left: 26px;
+  font-size: 13px;
+}
+
+.sessionWorkbench,
+.readinessPanel {
+  padding: 16px 20px;
+  overflow: auto;
+}
+
+.sessionWorkbench {
+  min-width: 0;
+  background: linear-gradient(120deg, #fbf8f1, #fefaf2);
+}
+
+.sessionHeader h1 {
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+.currentQuestion,
+.currentMiniNode {
+  border-top: 1px solid var(--divider);
+  border-bottom: 1px solid var(--divider);
+  padding: 12px 0;
+}
+
+.currentQuestion h2,
+.currentMiniNode h3 {
+  margin: 4px 0;
+}
+
+.actionRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 12px 0;
+}
+
+.actionButton {
+  width: auto;
+  border: 1px solid var(--divider);
+  border-radius: 999px;
+  padding: 8px 16px;
+  text-transform: capitalize;
+}
+
+.sourceWindow,
+.readinessPanel {
+  border: 1px solid var(--divider);
+  border-radius: var(--radius);
+  background: #fffdf8;
+}
+
+.sourceWindow {
+  margin-top: 10px;
+}
+
+.sourceWindowHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.sourceWindowHeader h3,
+.readinessPanel h3 {
+  margin: 8px 0;
+}
+
+.sourceWindow h3 {
+  margin: 6px 0;
+}
+
+.sourceWindow p {
+  margin: 6px 0;
+}
+
+.sourceButton {
+  width: auto;
+  border: 1px solid var(--divider);
+  border-radius: 999px;
+  font-size: 12px;
+}
+
+.readinessPanel {
+  margin-left: 1px;
+  background: #fffdfa;
+  border-left: 0;
+}
+
+.panelToggle,
+.panelShow {
+  margin-top: 10px;
+}
+
+.panelShow {
+  align-self: start;
+  margin: 0;
+  border: 1px solid var(--divider);
+  border-radius: 999px;
+  padding: 8px 12px;
+}
+
+.readinessPanel h3 {
+  color: var(--text-secondary);
+}
+
+.readinessPanel ul {
+  margin: 8px 0 0;
+  padding-left: 20px;
+  color: var(--text-primary);
+}
+
+@media (max-width: 1020px) {
+  .workspaceFrame {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "workbench"
+      "rail"
+      "readiness";
+  }
+
+  .sessionWorkbench {
+    grid-area: workbench;
+  }
+
+  .studyPathRail {
+    grid-area: rail;
+  }
+
+  .readinessPanel {
+    grid-area: readiness;
+    border-left: 1px solid var(--divider);
+    margin: 0;
+  }
+}

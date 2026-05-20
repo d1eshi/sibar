@@ -115,6 +115,18 @@ release yet.
   current inputs, and a clear local transition state when `Open first session`
   is pressed.
 
+### Changed - Tauri Workspace Shell (Slice 2)
+
+- Extracted the native topbar into a dedicated `WorkspaceShell` boundary.
+- Added reducer-backed workspace session UI state for selected node, mini-node,
+  source, and active action (`read`/`code`/`recall`) with a compact
+  readiness panel visibility flag.
+- Added the static first-session workspace view composed of `WorkspaceShell`,
+  `StudyPathRail`, and `SessionWorkbench`.
+- Hooked onboarding to open the first session via an `OnboardingFlow` callback
+  after local preview generation, with no fetch/Tauri/runner integrations in this
+  slice.
+
 ### Fixed - Codex Workspace Output Schema Strictness
 
 - Updated the Rust workspace plan JSON Schema and Codex prompt constraints so

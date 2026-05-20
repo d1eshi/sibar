@@ -30,7 +30,6 @@ const onboardingCopy = {
   constraintLabel: "Constraint or reason",
   statusReady: "Workspace plan is ready. You can open the first session.",
   statusWaiting: "Update fields and click Review workspace plan to regenerate the preview.",
-  statusOpened: "First session ready",
 };
 
 type FieldName = keyof typeof fieldDefaults;
@@ -55,13 +54,15 @@ type FlowState = {
   isOptionalOpen: boolean;
   preview: WorkspacePlanPreview;
   reviewedSignature: string | null;
-  isSessionOpen: boolean;
+};
+
+type OnboardingFlowProps = {
+  onOpenFirstSession: () => void;
 };
 
 type FlowAction =
   | { type: "set_field"; field: FieldName; value: string }
   | { type: "review_workspace_plan" }
-  | { type: "open_first_session" }
   | { type: "set_optional_open"; isOpen: boolean };
 
 const initialState: FlowState = {
@@ -84,7 +85,6 @@ const initialState: FlowState = {
     ],
   },
   reviewedSignature: null,
-  isSessionOpen: false,
 };
 
 function normalizeText(value: string): string {
@@ -165,7 +165,6 @@ function reducer(state: FlowState, action: FlowAction): FlowState {
       ...state,
       fields: { ...state.fields, [action.field]: action.value },
       reviewedSignature: null,
-      isSessionOpen: false,
     };
   }
 
@@ -182,17 +181,6 @@ function reducer(state: FlowState, action: FlowAction): FlowState {
       ...state,
       preview: makeWorkspacePreview(values),
       reviewedSignature: buildSignature(values),
-      isSessionOpen: false,
-    };
-  }
-
-  if (action.type === "open_first_session") {
-    if (!state.reviewedSignature) {
-      return state;
-    }
-    return {
-      ...state,
-      isSessionOpen: true,
     };
   }
 
@@ -201,38 +189,6 @@ function reducer(state: FlowState, action: FlowAction): FlowState {
 
 function hasReviewedPlan(state: FlowState): boolean {
   return state.reviewedSignature !== null;
-}
-
-function Topbar() {
-  return (
-    <header className={shellStyles.topbar} aria-label="Workspace toolbar">
-      <div className={shellStyles.windowCluster} aria-hidden="true">
-        <span className={`${shellStyles.windowDot} ${shellStyles.red}`} />
-        <span className={`${shellStyles.windowDot} ${shellStyles.amber}`} />
-        <span className={`${shellStyles.windowDot} ${shellStyles.green}`} />
-      </div>
-      <div className={shellStyles.brandMark} aria-label="Sibar">
-        <span className={shellStyles.brandSymbol}>S</span>
-        <strong>Sibar</strong>
-      </div>
-      <p className={shellStyles.topbarDocument}>
-        <span>Create Workspace</span>
-        <span aria-hidden="true">/</span>
-        <span>Focused Study</span>
-      </p>
-      <span className={shellStyles.topbarSpacer} />
-      <button className={shellStyles.iconButton} type="button" aria-label="Search">
-        S
-      </button>
-      <button className={shellStyles.iconButton} type="button" aria-label="Toggle notes">
-        N
-      </button>
-      <div className={shellStyles.topbarDiscussion}>
-        <span aria-hidden="true">*</span>
-        <span>Local workspace</span>
-      </div>
-    </header>
-  );
 }
 
 function IntentRail() {
@@ -368,17 +324,15 @@ function IntentForm({
 function IntentPreview({
   state,
   reviewReady,
-  dispatch,
+  onOpenFirstSession,
 }: {
   state: FlowState;
   reviewReady: boolean;
-  dispatch: React.Dispatch<FlowAction>;
+  onOpenFirstSession: () => void;
 }) {
-  const statusMessage = state.isSessionOpen
-    ? onboardingCopy.statusOpened
-    : reviewReady
-      ? onboardingCopy.statusReady
-      : onboardingCopy.statusWaiting;
+  const statusMessage = reviewReady
+    ? onboardingCopy.statusReady
+    : onboardingCopy.statusWaiting;
 
   return (
     <aside className={shellStyles.intentPreview} aria-live="polite">
@@ -394,14 +348,14 @@ function IntentPreview({
           <li key={output}>{output}</li>
         ))}
       </ul>
-      <p className={`${styles.contractStatus} ${state.isSessionOpen ? styles.sessionReady : ""}`} role="status" aria-live="polite">
+      <p className={`${styles.contractStatus} ${reviewReady ? styles.sessionReady : ""}`} role="status" aria-live="polite">
         {statusMessage}
       </p>
       <button
         type="button"
         disabled={!reviewReady}
-        className={state.isSessionOpen ? styles.openButtonActive : undefined}
-        onClick={() => dispatch({ type: "open_first_session" })}
+        className={styles.openButton}
+        onClick={onOpenFirstSession}
       >
         {onboardingCopy.openSessionLabel}
       </button>
@@ -409,26 +363,27 @@ function IntentPreview({
   );
 }
 
-export function OnboardingFlow() {
+export function OnboardingFlow({ onOpenFirstSession }: OnboardingFlowProps) {
   const [state, dispatch] = React.useReducer(reducer, initialState);
   const reviewReady = hasReviewedPlan(state);
 
   return (
-    <>
-      <Topbar />
+    <section
+      aria-labelledby="workspace-intent-title"
+      data-component="workspace-intent-flow"
+    >
       <section
         className={shellStyles.intentScreen}
-        aria-labelledby="workspace-intent-title"
-        data-component="workspace-intent-flow"
+        id="workspace-intent-view"
       >
         <IntentRail />
         <IntentForm state={state} dispatch={dispatch} />
         <IntentPreview
           state={state}
           reviewReady={reviewReady}
-          dispatch={dispatch}
+          onOpenFirstSession={onOpenFirstSession}
         />
       </section>
-    </>
+    </section>
   );
 }
