@@ -59,6 +59,8 @@ release yet.
   calls.
 - Moved deep ownership workspace fixtures and pedagogy eval docs under `evals/`
   so `docs/` no longer owns operational eval, fixture, or report paths.
+- Documented that `pnpm eval:pedagogy-coverage` is fail-closed by default and
+  requires `--allow-coverage-gaps` for exploratory report-only runs.
 
 ### Changed - Workspace Intent Onboarding Compiler
 
