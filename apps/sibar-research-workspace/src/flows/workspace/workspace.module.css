@@ -1,7 +1,9 @@
 .workspaceFrame {
-  min-height: 100dvh;
+  height: 100dvh;
+  min-height: 720px;
   display: grid;
   grid-template-columns: clamp(250px, 22vw, 350px) minmax(460px, 1fr) clamp(260px, 24vw, 360px);
+  overflow: hidden;
   color: var(--surface-ink);
   background: var(--surface-page);
 }
@@ -13,7 +15,8 @@
 }
 
 .studyPathRail {
-  min-height: 100dvh;
+  height: 100dvh;
+  min-height: 0;
   display: grid;
   grid-template-rows: auto 1fr;
   overflow: auto;
@@ -217,28 +220,40 @@
 }
 
 .sessionWorkbench {
-  min-height: 100dvh;
-  padding: 48px min(5vw, 76px) 56px;
-  overflow: auto;
+  height: 100dvh;
+  min-height: 0;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: 18px;
+  overflow: hidden;
+  padding: 32px clamp(28px, 4vw, 58px) 34px;
   background: linear-gradient(90deg, var(--surface-panel) 0%, var(--surface-page) 100%);
 }
 
 .sessionHeader {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
-  gap: 28px;
+  gap: 24px;
   align-items: start;
 }
 
 .sessionHeader h1 {
-  max-width: 760px;
-  margin: 24px 0 0;
+  max-width: 820px;
+  margin: 12px 0 0;
   color: var(--surface-ink);
   font-family: var(--font-serif);
-  font-size: clamp(40px, 4vw, 66px);
+  font-size: clamp(34px, 3.1vw, 52px);
   font-weight: 500;
-  line-height: 1.04;
+  line-height: 1;
   letter-spacing: 0;
+}
+
+.sessionHeader p:last-child {
+  max-width: 720px;
+  margin: 10px 0 0;
+  color: var(--text-muted);
+  font-size: 16px;
+  line-height: 1.35;
 }
 
 .sessionMark {
@@ -252,82 +267,96 @@
     var(--surface-panel-warm);
 }
 
-.sessionDivider {
-  height: 1px;
-  margin: 40px 0 30px;
-  background: var(--divider);
-}
-
-.sessionReadingPanel {
+.readerWorkspace {
+  min-height: 0;
   display: grid;
-  gap: 24px;
+  grid-template-columns: minmax(210px, 0.26fr) minmax(0, 1fr);
+  gap: 18px;
 }
 
-.currentQuestion,
-.currentMiniNode,
-.sourceWindow,
-.outputContract {
+.materialTree,
+.readerCanvas {
+  min-height: 0;
   border: 1px solid var(--divider);
   border-radius: var(--radius);
   background: var(--surface-panel);
 }
 
-.currentQuestion {
-  padding: 28px 30px;
-}
-
-.currentQuestion h2 {
-  margin: 18px 0 12px;
-  color: var(--text-primary);
-  font-size: clamp(24px, 2.3vw, 36px);
-  font-weight: 650;
-  line-height: 1.1;
-}
-
-.currentQuestion p:last-child,
-.currentMiniNode p,
-.sourceLedger,
-.outputContract span {
-  color: var(--text-muted);
-}
-
-.currentQuestion p:last-child {
-  max-width: 760px;
-  font-family: var(--font-serif);
-  font-size: 19px;
-  line-height: 1.45;
-}
-
-.currentMiniNode {
+.materialTree {
   display: grid;
-  grid-template-columns: minmax(180px, 0.35fr) minmax(0, 1fr);
-  gap: 24px;
-  align-items: start;
-  padding: 24px 30px;
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: 14px;
+  padding: 18px;
+  overflow: hidden;
 }
 
-.currentMiniNode h3 {
-  margin: 16px 0 0;
+.materialTreeList {
+  min-height: 0;
+  display: grid;
+  align-content: start;
+  gap: 8px;
+  overflow: auto;
+}
+
+.materialTreeItem,
+.materialTreeItemActive {
+  width: 100%;
+  display: grid;
+  gap: 5px;
+  padding: 12px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text-secondary);
+  text-align: left;
+}
+
+.materialTreeItemActive {
+  border-color: var(--divider);
+  background: var(--surface-soft);
+}
+
+.materialTreeItem:hover,
+.materialTreeItemActive:hover {
+  background: var(--surface-soft);
+}
+
+.materialTreeItem span,
+.materialTreeItemActive span {
+  color: var(--olive-muted);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.materialTreeItem strong,
+.materialTreeItemActive strong {
   color: var(--text-primary);
-  font-size: 19px;
+  font-size: 14px;
   line-height: 1.2;
 }
 
-.currentMiniNode p {
-  margin-top: 28px;
-  font-size: 18px;
-  line-height: 1.45;
+.materialTreeItem em,
+.materialTreeItemActive em {
+  color: var(--text-muted);
+  font-size: 12px;
+  font-style: normal;
+  line-height: 1.25;
 }
 
-.sourceWindow {
-  padding: 26px 30px 24px;
+.readerCanvas {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  overflow: hidden;
 }
 
-.sourceWindowHeader {
+.readerHeader {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   gap: 18px;
   align-items: start;
+  padding: 22px 26px 18px;
+  border-bottom: 1px solid var(--divider);
 }
 
 .sourceTypeBadge {
@@ -341,11 +370,17 @@
   font-size: 13px;
 }
 
-.sourceWindow h3 {
+.readerHeader h2 {
   margin: 12px 0 0;
   color: var(--text-primary);
-  font-size: 19px;
+  font-size: clamp(24px, 2.2vw, 34px);
   line-height: 1.2;
+}
+
+.readerHeader p:last-child {
+  margin: 8px 0 0;
+  color: var(--text-muted);
+  font-size: 13px;
 }
 
 .sourceButton,
@@ -358,62 +393,65 @@
   font-size: 13px;
 }
 
-.materialBody {
-  margin: 22px 0 0;
-  color: var(--text-muted);
-  font-family: var(--font-serif);
-  font-size: 18px;
-  line-height: 1.45;
-}
-
-.sourceLedger {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  gap: 12px;
-  margin-top: 24px;
-  padding-top: 18px;
-  border-top: 1px solid var(--divider);
-}
-
-.sourceLedger strong {
+.readerDocument {
+  min-height: 0;
+  overflow: auto;
+  padding: 28px 34px 42px;
   color: var(--text-primary);
+  font-family: var(--font-serif);
+  font-size: 19px;
+  line-height: 1.55;
 }
 
-.outputContract {
-  padding: 24px 30px;
+.readerDocument p {
+  max-width: 76ch;
+  margin: 0 0 18px;
 }
 
-.outputContract ul {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 0;
-  margin: 22px 0 0;
-  padding: 0;
-  list-style: none;
-  border-top: 1px solid var(--divider);
-}
-
-.outputContract li {
-  display: grid;
-  gap: 6px;
-  padding: 18px 18px 0 0;
-}
-
-.outputContract li[data-active="true"] strong {
-  color: var(--olive);
-}
-
-.outputContract strong {
+.codeMaterial {
+  margin: 0;
+  padding: 22px;
+  overflow: auto;
+  border: 1px solid var(--divider);
+  border-radius: 8px;
+  background: var(--surface-panel-warm);
+  color: var(--text-primary);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
   font-size: 16px;
+  line-height: 1.6;
+}
+
+.equationMaterial {
+  display: grid;
+  gap: 14px;
+}
+
+.equationMaterial p {
+  max-width: 82ch;
+  display: grid;
+  grid-template-columns: 32px minmax(0, 1fr);
+  gap: 14px;
+  margin: 0;
+  padding: 16px;
+  border: 1px solid var(--divider);
+  border-radius: 8px;
+  background: var(--surface-panel-warm);
+}
+
+.equationMaterial span {
+  color: var(--olive);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 14px;
 }
 
 .readinessPanel {
-  min-height: 100dvh;
+  height: 100dvh;
+  min-height: 0;
   display: grid;
   align-content: start;
   gap: 20px;
   padding: 38px 28px;
+  overflow: auto;
   border-left: 1px solid var(--divider);
   background: var(--surface-page);
 }
@@ -475,10 +513,12 @@
 @media (max-width: 1080px) {
   .workspaceFrame {
     grid-template-columns: minmax(240px, 30vw) minmax(0, 1fr);
+    overflow: auto;
   }
 
   .readinessPanel {
     grid-column: 1 / -1;
+    height: auto;
     min-height: auto;
     border-top: 1px solid var(--divider);
     border-left: 0;
@@ -493,6 +533,7 @@
   .studyPathRail,
   .sessionWorkbench,
   .readinessPanel {
+    height: auto;
     min-height: auto;
   }
 
@@ -503,6 +544,7 @@
 
   .sessionWorkbench {
     padding: 34px 22px;
+    overflow: visible;
   }
 
   .sessionHeader {
@@ -517,13 +559,13 @@
     font-size: 40px;
   }
 
-  .currentMiniNode,
-  .sourceWindowHeader,
-  .outputContract ul {
+  .readerWorkspace,
+  .readerHeader {
     grid-template-columns: 1fr;
   }
 
-  .currentMiniNode p {
-    margin-top: 0;
+  .readerDocument {
+    overflow: visible;
+    padding: 22px;
   }
 }

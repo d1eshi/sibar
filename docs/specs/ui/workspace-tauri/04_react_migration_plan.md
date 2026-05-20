@@ -148,10 +148,11 @@ Translate:
 2. workspace study-path overview with learning nodes and available session
    entry points
 3. study path rail for the active-session screen only
-4. session workbench
-5. active material panel surface
+4. material/source tree for the selected learning node
+5. central active material reader/artifact canvas
 6. static material-mode contract in projection
-7. responsive ordering where session appears before the tree on narrow layouts
+7. viewport-bounded desktop layout with scroll scoped to the reader canvas
+8. responsive ordering where session appears before the tree on narrow layouts
 
 State rule:
 

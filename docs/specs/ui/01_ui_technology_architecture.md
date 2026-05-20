@@ -78,6 +78,22 @@ explicit Rust boundary.
   with explicit transitions.
 - Never mirror the same value in multiple independent hooks.
 
+### 3) Viewport-bounded visual surfaces
+
+Primary Tauri screens must fit inside the native window viewport. They should
+not behave like long web pages on desktop.
+
+- Shells, rails, and workspace-level panels should use explicit viewport
+  constraints (`height: 100dvh`, `min-height: 0`, fixed grid rows/columns, or
+  equivalent).
+- Only the content region that naturally grows should scroll. For active node
+  sessions, that means the central reader/artifact canvas can scroll while the
+  study path rail and guide/readiness rail stay structurally fixed.
+- If a component cannot fit at the Tauri minimum window size, it must define a
+  responsive fallback where the whole surface becomes scrollable.
+- Do not create oversized hero sections inside app workspaces.
+- Do not hide essential navigation below the first viewport.
+
 ## Section Modularization (Mandatory)
 
 The workspace UI must be composed with these bounded sections:

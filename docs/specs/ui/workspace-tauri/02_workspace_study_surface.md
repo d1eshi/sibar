@@ -22,11 +22,17 @@ pending session or by opening a node from the workspace study-path overview.
 
 The first viewport should prioritize:
 
-1. Current study question or node
-2. Active node material surface by render mode (paper / note / artifact / code / equation)
-3. Evidence from sources
-4. Readiness/gap status
-5. Attempt composer
+1. Study path rail for workspace/node selection
+2. Material selector or source/file tree for the active node
+3. Active node reader/artifact canvas by render mode (paper / note / artifact /
+   code / equation)
+4. Compact readiness/gap status
+5. Evidence or artifact status without competing with the reader
+
+The active node screen must fit the Tauri desktop viewport. The central reader
+or artifact canvas is the only primary scroll region because papers, notes,
+code, and derivations can exceed the viewport. Rails and shell controls should
+remain spatially stable.
 
 Compiler payloads and raw contract debug controls may stay in a collapsible
 drawer until the product requires a dedicated internal/debug mode.
@@ -40,6 +46,7 @@ drawer until the product requires a dedicated internal/debug mode.
 5. No dense memory/readiness management screen in the first viewport.
 6. No global workspace list or blocked-intent queue. Those belong to
    `Workspace Home`.
+7. No long page-style scrolling layout on desktop Tauri.
 
 ## Acceptance
 
@@ -51,3 +58,5 @@ drawer until the product requires a dedicated internal/debug mode.
 4. Evidence is scannable without competing with the current prompt.
 5. The same deterministic fixture can run offline.
 6. The screen only appears after a workspace or session is selected.
+7. The desktop layout fits within the Tauri viewport, with scrolling scoped to
+   the central reader/artifact content.

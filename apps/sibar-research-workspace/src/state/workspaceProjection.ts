@@ -15,6 +15,7 @@ export type WorkspaceSource = {
   type: WorkspaceMaterialMode;
   metadata: string;
   snippet: string;
+  body: readonly string[];
 };
 
 export type WorkspaceMiniNode = {
@@ -53,7 +54,7 @@ export type WorkspaceSessionProjection = {
     id: string;
     mode: WorkspaceMaterialMode;
     title: string;
-    content: string;
+    content: readonly string[];
     modeLabel: string;
   };
   readinessLabel: string;
@@ -70,6 +71,10 @@ export type WorkspaceHomeWorkspace = {
   progress: string;
   nextNode: string;
   readinessHint: string;
+  readinessPercent: number;
+  readinessLevel: string;
+  lastActivity: string;
+  icon: "cluster" | "document" | "code";
   status: "active" | "ready" | "draft" | "blocked";
   openTarget: WorkspaceHomeTarget;
 };
@@ -87,7 +92,11 @@ export const workspaceHomeProjection: WorkspaceHomeProjection = {
       sourceBoundary: "Paper excerpt + local notebook",
       progress: "1 of 5 nodes",
       nextNode: "Boundary checks",
-      readinessHint: "Ready to resume the current mini-node.",
+      readinessHint: "Solid understanding. Continue to the next node.",
+      readinessPercent: 78,
+      readinessLevel: "Good",
+      lastActivity: "Today, 10:24 AM",
+      icon: "cluster",
       status: "active",
       openTarget: "session",
     },
@@ -98,7 +107,11 @@ export const workspaceHomeProjection: WorkspaceHomeProjection = {
       sourceBoundary: "Course notes + mini eval corpus",
       progress: "2 of 6 nodes",
       nextNode: "Session 03 - compare trade-offs",
-      readinessHint: "Open to continue the study path from the next available session.",
+      readinessHint: "Check sources and complete the next node.",
+      readinessPercent: 64,
+      readinessLevel: "Fair",
+      lastActivity: "Yesterday, 6:15 PM",
+      icon: "document",
       status: "ready",
       openTarget: "overview",
     },
@@ -109,7 +122,11 @@ export const workspaceHomeProjection: WorkspaceHomeProjection = {
       sourceBoundary: "Draft intent + reference notebook",
       progress: "Draft",
       nextNode: "Define source scope",
-      readinessHint: "Draft session needs a fresh workspace source input.",
+      readinessHint: "Early draft. Add source context before the first node.",
+      readinessPercent: 32,
+      readinessLevel: "Early",
+      lastActivity: "3 days ago",
+      icon: "code",
       status: "draft",
       openTarget: "overview",
     },
@@ -223,6 +240,11 @@ export const firstWorkspaceSessionFixture: WorkspaceSessionFixture = {
       metadata: "Wu et al. - arXiv:2309.12345 - 2023",
       snippet:
         "Short queries and out-of-domain language often break semantic generalization...",
+      body: [
+        "The useful claim for this node is not that embeddings understand meaning globally. The narrower claim is that they preserve enough local similarity for a bounded retrieval task.",
+        "Short queries and out-of-domain phrasing are the first stress tests. If the vector neighborhood changes when the wording changes slightly, the retrieval layer needs additional evidence before it can be trusted.",
+        "For this session, treat the paper as source material: identify the claim, the boundary condition, and the evidence required before turning it into an implementation artifact.",
+      ],
     },
     {
       id: "source-repo",
@@ -231,6 +253,12 @@ export const firstWorkspaceSessionFixture: WorkspaceSessionFixture = {
       metadata: "Local artifact - Notebook - 2024",
       snippet:
         "Nearest neighbors drift when the query distribution shifts...",
+      body: [
+        "const query = embed(\"what breaks retrieval for tiny queries\");",
+        "const neighbors = index.search(query, { k: 5 });",
+        "const failed = neighbors.filter((item) => item.sourceDomain !== \"retrieval-notes\");",
+        "assert(failed.length === 0, \"nearest neighbors drifted outside the intended boundary\");",
+      ],
     },
     {
       id: "source-note",
@@ -239,6 +267,11 @@ export const firstWorkspaceSessionFixture: WorkspaceSessionFixture = {
       metadata: "Sibar workspace note - 2024",
       snippet:
         "Negation, ambiguity, and very short queries are common retrieval failure modes.",
+      body: [
+        "Negation is the first failure mode to isolate. Similar words can point to opposite operational claims, so a nearest-neighbor match is not enough evidence by itself.",
+        "Ambiguity is the second failure mode. A short query can match many plausible contexts and still fail the user's actual intent.",
+        "The note for this node should produce one boundary rule: when embeddings are allowed to rank candidates, and when another signal must verify the claim.",
+      ],
     },
     {
       id: "source-equation",
@@ -247,6 +280,11 @@ export const firstWorkspaceSessionFixture: WorkspaceSessionFixture = {
       metadata: "Sibar derivation notebook - 2024",
       snippet:
         "cosine_similarity(a, b) = (a · b) / (||a|| · ||b||); edge cases appear when one vector norm is near zero.",
+      body: [
+        "cosine_similarity(a, b) = (a · b) / (||a|| · ||b||)",
+        "If ||a|| is near zero, the score becomes unstable or undefined. That is not a model insight; it is a boundary condition of the scoring function.",
+        "The learning task is to connect this equation to a practical retrieval decision: a similarity score needs input validation, normalization checks, and fallback behavior.",
+      ],
     },
   ],
 };
@@ -263,6 +301,7 @@ function getWorkspaceSourceById(
       title: "Source unavailable",
       metadata: "No source selected",
       snippet: "Select a source from the study path to load a study context.",
+      body: ["Select a source from the study path to load a study context."],
     }
   );
 }
@@ -375,7 +414,7 @@ export function projectWorkspaceSession(
       id: selectedSource.id,
       mode: selectedSource.type,
       title: selectedSource.title,
-      content: selectedSource.snippet,
+      content: selectedSource.body,
       modeLabel: getMaterialModeLabel(selectedSource.type),
     },
     nodes: fixture.nodes,

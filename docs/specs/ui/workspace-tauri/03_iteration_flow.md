@@ -91,11 +91,11 @@ dividers and low-radius surfaces.
 
 Visible elements:
 
-1. current study node
-2. current mini-node
-3. current material mode and surface content
+1. left study path rail
+2. material/source tree for the active learning node
+3. central reader/artifact canvas
 4. guide state
-5. compact evidence/artifact ledger
+5. compact evidence/artifact status
 6. recall/gap status
 
 ## Step 5: Active Learning Material Surface
@@ -103,6 +103,9 @@ Visible elements:
 The selected node opens to the active material panel in a bounded layout.
 The surface shows the selected material by render mode (paper / note / artifact / code / equation)
 with source context in the same railed layout.
+
+The layout must fit the Tauri desktop viewport. The central reader/artifact
+canvas may scroll; the surrounding rails should remain fixed and scannable.
 
 ## Step 6: Evidence / Readiness Review
 
@@ -118,3 +121,4 @@ and record:
 2. state shown
 3. key acceptance check
 4. known rough edges
+5. whether the desktop viewport fits without page-level scroll
