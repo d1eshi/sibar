@@ -2,7 +2,7 @@
   min-height: 100dvh;
   width: 100%;
   display: block;
-  background: #fbf8f1;
+  background: var(--surface-page);
 }
 
 .nativeWindow {
@@ -80,7 +80,7 @@
 .brandSymbol {
   width: 22px;
   height: 22px;
-  color: #fffaf1;
+  color: var(--surface-panel-warm);
   background: var(--accent);
   border-radius: 50%;
   font-family: var(--font-mono);
@@ -133,7 +133,7 @@
   display: grid;
   grid-template-columns: minmax(420px, 0.9fr) minmax(520px, 1.1fr);
   overflow: auto;
-  background: #fbf8f1;
+  background: var(--surface-page);
 }
 
 .intentRail {
@@ -152,7 +152,7 @@
   display: grid;
   place-items: center;
   border-radius: 50%;
-  color: #fffaf1;
+  color: var(--surface-panel-warm);
   background: var(--teal);
   font-family: var(--font-mono);
   font-weight: 800;
@@ -193,7 +193,7 @@
   height: 11px;
   border: 1px solid var(--text-muted);
   border-radius: 50%;
-  background: #fbf8f1;
+  background: var(--surface-page);
 }
 
 .intentStepActive {
@@ -227,7 +227,7 @@
 
 .intentForm h1 {
   max-width: 18ch;
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: var(--font-serif);
   font-size: 46px;
   line-height: 1;
   font-weight: 500;
@@ -257,7 +257,7 @@
 .intentForm input {
   max-width: 620px;
   padding: 12px 14px;
-  background: #fffdf8;
+  background: var(--surface-panel);
 }
 
 .intentForm textarea {
@@ -280,7 +280,7 @@
   padding: 12px;
   border: 1px solid var(--divider);
   border-radius: var(--radius);
-  background: #fffaf3;
+  background: var(--surface-panel-warm);
 }
 
 .intentFieldGrid {
@@ -305,7 +305,7 @@
   justify-self: start;
   min-width: 210px;
   background: var(--teal);
-  color: #fffaf1;
+  color: var(--surface-panel-warm);
   border-color: var(--teal);
   font-weight: 700;
 }
@@ -313,7 +313,7 @@
 .intentPreview {
   align-content: start;
   padding: 74px 80px 64px;
-  background: #f5f0e6;
+  background: var(--surface-soft);
   border: 0;
 }
 
@@ -328,7 +328,7 @@
 
 .intentPreview h2 {
   max-width: 22ch;
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: var(--font-serif);
   font-size: 52px;
   line-height: 1;
   font-weight: 500;

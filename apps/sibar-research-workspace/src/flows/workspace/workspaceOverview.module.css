@@ -2,13 +2,13 @@
   min-height: 100dvh;
   display: grid;
   grid-template-columns: clamp(250px, 22vw, 360px) minmax(460px, 1fr) clamp(260px, 24vw, 360px);
-  color: #151512;
-  background: #fbf8f1;
+  color: var(--surface-ink);
+  background: var(--surface-page);
 }
 
 .kicker {
   margin: 0;
-  color: #747023;
+  color: var(--olive-muted);
   font-size: 14px;
   font-weight: 700;
   letter-spacing: 0;
@@ -19,19 +19,19 @@
 .overviewStudyPanel,
 .overviewTutorRail {
   min-width: 0;
-  border-right: 1px solid #e6ddd0;
+  border-right: 1px solid var(--divider);
 }
 
 .overviewPathRail {
   min-height: 100dvh;
   display: grid;
   grid-template-rows: auto 1fr auto;
-  background: #f8f3eb;
+  background: var(--surface);
 }
 
 .overviewPathHeader {
   padding: 28px 28px 22px;
-  border-bottom: 1px solid #e6ddd0;
+  border-bottom: 1px solid var(--divider);
 }
 
 .overviewRailTitle,
@@ -44,7 +44,7 @@
 
 .overviewRailTitle {
   gap: 10px;
-  color: #20201b;
+  color: var(--text-primary);
   font-size: 16px;
 }
 
@@ -63,7 +63,7 @@
   top: 4px;
   width: 6px;
   height: 16px;
-  border: 2px solid #798122;
+  border: 2px solid var(--olive);
   border-radius: 5px;
 }
 
@@ -82,7 +82,7 @@
   padding: 0;
   display: inline-grid;
   place-items: center;
-  border: 1px solid #d8cfbf;
+  border: 1px solid var(--divider);
   border-radius: 4px;
   background: transparent;
 }
@@ -93,7 +93,7 @@
   width: 10px;
   height: 1px;
   display: block;
-  background: #4e4b43;
+  background: var(--text-secondary);
 }
 
 .railUtilityButton span {
@@ -117,14 +117,14 @@
 
 .overviewPathHeader h2 {
   margin: 34px 0 6px;
-  color: #24231f;
+  color: var(--text-primary);
   font-size: 19px;
   line-height: 1.2;
 }
 
 .overviewPathHeader p {
   margin: 0 0 16px;
-  color: #6f6a5d;
+  color: var(--text-muted);
 }
 
 .overviewProgressTrack,
@@ -133,7 +133,7 @@
   display: block;
   overflow: hidden;
   border-radius: 999px;
-  background: #ddd6cb;
+  background: var(--surface-soft);
 }
 
 .overviewProgressTrack span,
@@ -141,7 +141,7 @@
   height: 100%;
   display: block;
   border-radius: inherit;
-  background: #77801c;
+  background: var(--olive);
 }
 
 .overviewPathList {
@@ -152,7 +152,7 @@
 }
 
 .overviewPathItem {
-  border-bottom: 1px solid #e6ddd0;
+  border-bottom: 1px solid var(--divider);
 }
 
 .overviewPathButton {
@@ -165,13 +165,13 @@
   padding: 0 28px;
   border: 0;
   border-radius: 0;
-  color: #292821;
+  color: var(--text-primary);
   background: transparent;
   text-align: left;
 }
 
 .overviewPathButton[aria-current="step"] {
-  background: #eee9df;
+  background: var(--surface-soft);
 }
 
 .overviewPathButton strong {
@@ -184,18 +184,18 @@
   height: 28px;
   display: inline-grid;
   place-items: center;
-  border: 1px solid #ded6c9;
+  border: 1px solid var(--divider);
   border-radius: 50%;
-  color: #6b675d;
+  color: var(--text-muted);
   font-size: 13px;
   font-weight: 700;
 }
 
 .overviewPathItem[data-state="complete"] .overviewNodeBadge,
 .overviewPathItem[data-state="ready"] .overviewNodeBadge {
-  border-color: #77801c;
-  color: #fffdf7;
-  background: #77801c;
+  border-color: var(--olive);
+  color: var(--surface-panel);
+  background: var(--olive);
 }
 
 .overviewPathItem[data-state="complete"] .overviewNodeBadge {
@@ -207,20 +207,20 @@
   width: 8px;
   height: 4px;
   transform: rotate(-45deg);
-  border-left: 2px solid #fffdf7;
-  border-bottom: 2px solid #fffdf7;
+  border-left: 2px solid var(--surface-panel);
+  border-bottom: 2px solid var(--surface-panel);
 }
 
 .overviewPathItem[data-state="locked"] {
-  color: #8c8679;
+  color: var(--text-faint);
 }
 
 .overviewChevron {
   width: 8px;
   height: 8px;
   transform: rotate(45deg);
-  border-top: 2px solid #4c493f;
-  border-right: 2px solid #4c493f;
+  border-top: 2px solid var(--text-secondary);
+  border-right: 2px solid var(--text-secondary);
 }
 
 .overviewPathButton[aria-current="step"] .overviewChevron {
@@ -243,7 +243,7 @@
   bottom: 8px;
   left: 5px;
   width: 1px;
-  background: #cfc7b8;
+  background: var(--divider-strong);
 }
 
 .overviewMiniButton {
@@ -255,14 +255,14 @@
   padding: 12px 14px;
   border: 0;
   border-radius: 8px;
-  color: #5d594d;
+  color: var(--text-secondary);
   background: transparent;
   text-align: left;
 }
 
 .overviewMiniButton[aria-current="step"] {
-  color: #70791d;
-  background: #e8e3d5;
+  color: var(--olive);
+  background: var(--surface-soft);
 }
 
 .overviewMiniButton span {
@@ -279,7 +279,7 @@
   grid-template-columns: 1fr 1fr 44px;
   gap: 18px;
   padding: 22px 28px;
-  border-top: 1px solid #e6ddd0;
+  border-top: 1px solid var(--divider);
 }
 
 .overviewPathFooter span {
@@ -289,11 +289,11 @@
 }
 
 .overviewPathFooter strong {
-  color: #27261f;
+  color: var(--text-primary);
 }
 
 .overviewPathFooter em {
-  color: #777165;
+  color: var(--text-faint);
   font-style: normal;
 }
 
@@ -302,17 +302,17 @@
   height: 42px;
   align-self: center;
   justify-self: end;
-  border: 1px solid #e1d8ca;
+  border: 1px solid var(--divider);
   border-radius: 50%;
   background:
-    radial-gradient(circle at 50% 66%, transparent 0 6px, #a85f38 7px 8px, transparent 9px),
-    #fffaf3;
+    radial-gradient(circle at 50% 66%, transparent 0 6px, var(--accent) 7px 8px, transparent 9px),
+    var(--surface-panel-warm);
 }
 
 .overviewStudyPanel {
   min-height: 100dvh;
   padding: 48px min(5vw, 76px) 56px;
-  background: linear-gradient(90deg, #fffdf8 0%, #fbf8f1 100%);
+  background: linear-gradient(90deg, var(--surface-panel) 0%, var(--surface-page) 100%);
 }
 
 .overviewStudyHeader {
@@ -325,8 +325,8 @@
 .overviewStudyHeader h1 {
   max-width: 720px;
   margin: 34px 0 0;
-  color: #151512;
-  font-family: Georgia, "Times New Roman", serif;
+  color: var(--surface-ink);
+  font-family: var(--font-serif);
   font-size: clamp(44px, 4.35vw, 72px);
   font-weight: 500;
   line-height: 1.03;
@@ -335,7 +335,7 @@
 
 .overviewStudyUtilities {
   gap: 18px;
-  color: #4d493e;
+  color: var(--text-secondary);
   font-size: 14px;
 }
 
@@ -351,7 +351,7 @@
 .overviewDivider {
   height: 1px;
   margin: 42px 0 32px;
-  background: #e2d8ca;
+  background: var(--divider);
 }
 
 .overviewActionSection h2,
@@ -359,7 +359,7 @@
 .guidanceCard h2,
 .readinessCard h2 {
   margin: 0;
-  color: #6f6a5d;
+  color: var(--text-muted);
   font-size: 14px;
   font-weight: 700;
   letter-spacing: 0;
@@ -384,20 +384,20 @@
   gap: 20px;
   align-items: center;
   padding: 24px;
-  border: 1px solid #c9bfae;
+  border: 1px solid var(--divider-strong);
   border-radius: 6px;
-  color: #25231d;
-  background: #fffdf8;
+  color: var(--text-primary);
+  background: var(--surface-panel);
   text-align: left;
 }
 
 .overviewActionCard[data-action="code"] {
-  border-color: #bd7655;
+  border-color: var(--sienna);
 }
 
 .overviewActionCard:hover,
 .overviewActionCard:focus-visible {
-  box-shadow: 0 10px 22px rgba(61, 50, 35, 0.08);
+  box-shadow: var(--shadow-lift);
   transform: translateY(-1px);
 }
 
@@ -412,7 +412,7 @@
 }
 
 .overviewActionCard em {
-  color: #746e61;
+  color: var(--text-muted);
   font-style: normal;
 }
 
@@ -420,7 +420,7 @@
   position: relative;
   width: 46px;
   height: 46px;
-  color: #7c842f;
+  color: var(--olive);
 }
 
 .overviewActionIcon::before,
@@ -449,7 +449,7 @@
 }
 
 .overviewActionCard[data-action="code"] .overviewActionIcon {
-  color: #b36946;
+  color: var(--accent);
 }
 
 .overviewActionCard[data-action="code"] .overviewActionIcon::before {
@@ -459,11 +459,11 @@
   height: 15px;
   border: 3px solid currentColor;
   box-shadow:
-    -18px 22px 0 -3px #fffdf8,
+    -18px 22px 0 -3px var(--surface-panel),
     -18px 22px 0 0 currentColor,
-    0 22px 0 -3px #fffdf8,
+    0 22px 0 -3px var(--surface-panel),
     0 22px 0 0 currentColor,
-    18px 22px 0 -3px #fffdf8,
+    18px 22px 0 -3px var(--surface-panel),
     18px 22px 0 0 currentColor;
 }
 
@@ -480,7 +480,7 @@
   top: 8px;
   width: 30px;
   height: 30px;
-  border: 3px solid #898b61;
+  border: 3px solid var(--olive);
   border-radius: 50%;
 }
 
@@ -489,15 +489,15 @@
   top: 24px;
   width: 10px;
   height: 10px;
-  border-left: 3px solid #898b61;
-  border-bottom: 3px solid #898b61;
+  border-left: 3px solid var(--olive);
+  border-bottom: 3px solid var(--olive);
   transform: rotate(-45deg);
 }
 
 .overviewEvidenceSection {
   margin-top: 38px;
   padding-top: 30px;
-  border-top: 1px solid #e2d8ca;
+  border-top: 1px solid var(--divider);
 }
 
 .overviewEvidenceHeader {
@@ -513,14 +513,14 @@
   display: inline-grid;
   place-items: center;
   border-radius: 50%;
-  color: #6f6a5d;
-  background: #eee8dd;
+  color: var(--text-muted);
+  background: var(--surface-soft);
   font-size: 12px;
 }
 
 .overviewEvidenceHeader button {
   border: 0;
-  color: #4b473d;
+  color: var(--text-secondary);
   background: transparent;
 }
 
@@ -532,7 +532,7 @@
 }
 
 .overviewSourceList li {
-  border-top: 1px solid #e7ded1;
+  border-top: 1px solid var(--divider);
 }
 
 .overviewSourceButton {
@@ -545,7 +545,7 @@
   padding: 20px 0;
   border: 0;
   border-radius: 0;
-  color: #25231d;
+  color: var(--text-primary);
   background: transparent;
   text-align: left;
 }
@@ -557,14 +557,14 @@
   display: inline-grid;
   place-items: center;
   border-radius: 8px;
-  background: #eee9df;
+  background: var(--surface-soft);
 }
 
 .overviewSourceIcon::before {
   content: "";
   width: 20px;
   height: 26px;
-  border: 2px solid #777c28;
+  border: 2px solid var(--olive);
   border-radius: 2px;
 }
 
@@ -581,8 +581,8 @@
   top: 13px;
   width: 6px;
   height: 6px;
-  border-left: 2px solid #777c28;
-  border-bottom: 2px solid #777c28;
+  border-left: 2px solid var(--olive);
+  border-bottom: 2px solid var(--olive);
 }
 
 .overviewSourceText {
@@ -596,14 +596,14 @@
 }
 
 .overviewSourceText em {
-  color: #777165;
+  color: var(--text-faint);
   font-style: normal;
   line-height: 1.35;
 }
 
 .overviewSourceButton q {
-  color: #9c4f2f;
-  font-family: Georgia, "Times New Roman", serif;
+  color: var(--accent-strong);
+  font-family: var(--font-serif);
   font-size: 16px;
   line-height: 1.35;
 }
@@ -615,7 +615,7 @@
   gap: 20px;
   padding: 38px 28px;
   border-right: 0;
-  background: #fbf8f1;
+  background: var(--surface-page);
 }
 
 .tutorHeader {
@@ -626,7 +626,7 @@
 .tutorGlyph::after {
   content: "";
   position: absolute;
-  border: 2px solid #7a812d;
+  border: 2px solid var(--olive);
 }
 
 .tutorGlyph::before {
@@ -649,16 +649,16 @@
 
 .tutorHeaderDots {
   margin-left: auto;
-  color: #4c493f;
+  color: var(--text-secondary);
 }
 
 .tutorStatusCard,
 .guidanceCard,
 .readinessCard,
 .askTutorButton {
-  border: 1px solid #e0d7ca;
+  border: 1px solid var(--divider);
   border-radius: 8px;
-  background: #fffdf8;
+  background: var(--surface-panel);
 }
 
 .tutorStatusCard {
@@ -673,7 +673,7 @@
   position: relative;
   width: 56px;
   height: 56px;
-  border: 2px solid #e1dacd;
+  border: 2px solid var(--divider);
   border-radius: 50%;
 }
 
@@ -681,7 +681,7 @@
 .seedlingMark::after {
   content: "";
   position: absolute;
-  border: 2px solid #7a812d;
+  border: 2px solid var(--olive);
   border-radius: 50%;
 }
 
@@ -711,7 +711,7 @@
 .guidanceCard p,
 .readinessCard p {
   margin: 6px 0 0;
-  color: #6f6a5d;
+  color: var(--text-muted);
   line-height: 1.45;
 }
 
@@ -753,7 +753,7 @@
   top: 3px;
   width: 22px;
   height: 22px;
-  border: 3px solid #25231d;
+  border: 3px solid var(--text-primary);
   border-radius: 50%;
 }
 
@@ -763,7 +763,7 @@
   width: 14px;
   height: 3px;
   transform: rotate(45deg);
-  background: #25231d;
+  background: var(--text-primary);
 }
 
 .guidanceIcon[data-kind="consider"]::before {
@@ -771,9 +771,9 @@
   top: 8px;
   width: 28px;
   height: 18px;
-  border-bottom: 3px solid #25231d;
-  border-left: 3px solid #25231d;
-  border-right: 3px solid #25231d;
+  border-bottom: 3px solid var(--text-primary);
+  border-left: 3px solid var(--text-primary);
+  border-right: 3px solid var(--text-primary);
 }
 
 .guidanceIcon[data-kind="consider"]::after {
@@ -781,7 +781,7 @@
   top: 2px;
   width: 3px;
   height: 32px;
-  background: #25231d;
+  background: var(--text-primary);
 }
 
 .guidanceIcon[data-kind="produce"]::before {
@@ -790,7 +790,7 @@
   width: 14px;
   height: 30px;
   transform: rotate(42deg);
-  border: 3px solid #25231d;
+  border: 3px solid var(--text-primary);
   border-radius: 4px;
 }
 
@@ -812,11 +812,11 @@
   display: inline-grid;
   place-items: center;
   border-radius: 50%;
-  color: #25231d;
+  color: var(--text-primary);
   font-size: 22px;
   background:
-    radial-gradient(circle, #fffdf8 0 57%, transparent 58%),
-    conic-gradient(#77801c 0 78%, #dfd8ce 78% 100%);
+    radial-gradient(circle, var(--surface-panel) 0 57%, transparent 58%),
+    conic-gradient(var(--olive) 0 78%, var(--surface-soft) 78% 100%);
 }
 
 .askTutorButton {
@@ -825,7 +825,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 0 18px;
-  color: #716b60;
+  color: var(--text-muted);
   text-align: left;
 }
 
@@ -838,7 +838,7 @@
     grid-column: 1 / -1;
     min-height: auto;
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    border-top: 1px solid #e6ddd0;
+    border-top: 1px solid var(--divider);
     border-left: 0;
   }
 
@@ -859,7 +859,7 @@
   .overviewTutorRail {
     min-height: auto;
     border-right: 0;
-    border-bottom: 1px solid #e6ddd0;
+    border-bottom: 1px solid var(--divider);
   }
 
   .overviewStudyPanel {

@@ -60,6 +60,7 @@ export default function App() {
             />
             {workspaceState.isReadinessPanelVisible ? (
               <aside className={stylesWorkspace.readinessPanel}>
+                <p className={stylesWorkspace.kicker}>Guide / readiness</p>
                 <h3>{workspaceProjection.selectedSource.title}</h3>
                 <p>{workspaceProjection.sessionHint}</p>
                 <ul>
@@ -77,6 +78,7 @@ export default function App() {
               </aside>
             ) : (
               <aside className={stylesWorkspace.readinessPanel}>
+                <p className={stylesWorkspace.kicker}>Guide / readiness</p>
                 <button
                   type="button"
                   className={stylesWorkspace.panelShow}

@@ -24,15 +24,18 @@ export function StudyPathRail({
   return (
     <aside className={styles.studyPathRail} aria-label="Study path rail">
       <header className={styles.railHeader}>
-        <p className={styles.kicker}>Study path</p>
-        <h2>Active path</h2>
+        <div className={styles.railTitle}>
+          <span className={styles.studyPathGlyph} aria-hidden="true" />
+          <strong>Study Path</strong>
+        </div>
+        <h2>{projection.title}</h2>
       </header>
 
       <ol className={styles.pathList}>
-        {projection.nodes.map((node) => {
+        {projection.nodes.map((node, index) => {
           const miniNodes = node.miniNodes;
           return (
-            <li key={node.id} className={styles.pathNode}>
+            <li key={node.id} className={styles.pathNode} data-state={node.status}>
               <button
                 type="button"
                 className={
@@ -49,12 +52,15 @@ export function StudyPathRail({
                   });
                 }}
               >
-                <strong>{node.name}</strong>
-                <span>{formatHint(node.scope)}</span>
+                <span className={styles.nodeBadge}>{index + 1}</span>
+                <span>
+                  <strong>{index + 1}. {node.name}</strong>
+                  <em>{formatHint(node.scope)}</em>
+                </span>
               </button>
 
               <ul className={styles.miniNodeList}>
-                {miniNodes.map((miniNode) => (
+                {miniNodes.map((miniNode, miniIndex) => (
                   <li key={miniNode.id}>
                     <button
                       type="button"
@@ -71,7 +77,8 @@ export function StudyPathRail({
                         })
                       }
                     >
-                      {miniNode.name}
+                      <span>{index + 1}.{miniIndex + 1}</span>
+                      <strong>{miniNode.name}</strong>
                     </button>
                   </li>
                 ))}
