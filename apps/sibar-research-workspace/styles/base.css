@@ -12,7 +12,7 @@ body {
 body {
   margin: 0;
   font-family: var(--font-sans);
-  background: #16130f;
+  background: #201d18;
   color: var(--text-primary);
   line-height: 1.45;
   font-variant-numeric: tabular-nums;
@@ -20,11 +20,11 @@ body {
 
 .research-shell {
   min-height: 100vh;
-  padding: 12px;
+  padding: 10px;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  max-width: 1560px;
+  max-width: 1640px;
   margin: 0 auto;
 }
 

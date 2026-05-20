@@ -11,6 +11,16 @@ accepted specs and iterations, not by raw commit count.
 Use this section for changes that have landed but are not part of a tagged
 release yet.
 
+### Docs - Tauri Workspace UI Specs
+
+- Added `docs/specs/ui/` as the single UI spec home for the Tauri onboarding
+  and workspace prototype, including generated visual references.
+
+### Changed - Tauri Workspace UI Prototype
+
+- Refined the static Tauri workspace prototype toward a native two-surface flow:
+  compact workspace-intent onboarding followed by a focused study workspace.
+
 ### Added - Workspace Intent First Flow
 
 - Added the Workspace Intent spec as the first user-facing Sibar Research
