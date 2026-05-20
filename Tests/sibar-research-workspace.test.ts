@@ -30,6 +30,7 @@ function makeSimpleNode() {
     disabled: false,
     addEventListener: () => {},
     setAttribute: () => {},
+    querySelectorAll: () => [],
   };
 }
 
@@ -76,6 +77,9 @@ test("second app exposes the research workspace screen contract", () => {
   assert.match(workspaceHtml, /ARTIFACTS \/ EVIDENCE/);
   assert.match(workspaceHtml, /Compile source to roadmap/);
   assert.match(workspaceHtml, /Attempt reconstruction first/);
+  assert.match(workspaceHtml, /No entiendo este concepto/);
+  assert.match(workspaceHtml, /Deep knowledge mini-nodes/);
+  assert.match(workspaceHtml, /Active study context/);
   assert.match(workspaceHtml, /\//); // command-like tool mode markers exist in HTML
 });
 
@@ -170,6 +174,126 @@ test("attempt-only workflow exists and exposes hint ladder", async () => {
 
   const normalized = workspaceModule.normalizeText("  Micrograd BACKPROP  ");
   assert.equal(normalized, "micrograd backprop");
+});
+
+test("roadmap node selection expands reader mini-nodes and contextual LM guidance", async () => {
+  const workspaceModule = await import(moduleUrl);
+  const plan = workspaceModule.buildNodeStudyPlan("backprop", workspaceModule.DEFAULT_ROADMAP);
+
+  assert.equal(plan.displayTitle, "Backpropagation");
+  assert.equal(plan.miniNodes.length, 5);
+  assert.equal(plan.defaultMiniNodeId, "chain-rule");
+  assert.equal(plan.miniNodes.some((node) => node.resources.some((resource) => resource.kind === "paper")), true);
+  assert.equal(plan.miniNodes.some((node) => node.resources.some((resource) => resource.kind === "direct-reading")), true);
+
+  const state = {
+    roadmap: workspaceModule.DEFAULT_ROADMAP.map((node) => ({ ...node })),
+    attempts: ["I attempted a chain rule reconstruction for backprop."],
+    artifacts: [...workspaceModule.DEFAULT_ARTIFACTS],
+    evidence: [...workspaceModule.DEFAULT_EVIDENCE],
+    evidenceChecklist: [],
+    readinessLabel: "Attempt logged",
+    readinessScore: 1,
+    detectedGap: "recall not present",
+    repairAction: "None",
+    activeNodeId: "backprop",
+    activeMiniNodeId: "chain-rule",
+    lastCompile: null,
+  };
+
+  const readAction = workspaceModule.describeModeAction("/read", state);
+  assert.equal(readAction.scope, "read");
+  assert.match(readAction.text, /Backpropagation \/ Chain rule trace/);
+  assert.match(readAction.text, /Rumelhart, Hinton, Williams/);
+
+  const helpAction = workspaceModule.requestConceptHelpForState(state);
+  assert.equal(state.conceptHelpRequested, true);
+  assert.match(helpAction.text, /Profundicemos mas/);
+  assert.match(helpAction.readerFocus, /output-to-weight path/);
+  assert.match(state.repairAction, /Deepen Chain rule trace/);
+});
+
+test("workspace initialization renders dynamic reader and LM context from active selection", async () => {
+  const workspaceModule = await import(moduleUrl);
+  const modeButtons = LM_MODES.map((mode) => ({
+    dataset: { mode },
+    textContent: mode,
+    setAttribute: () => {},
+    addEventListener: () => {},
+    type: "button",
+  }));
+  const modePanel = {
+    querySelectorAll: () => modeButtons,
+    appendChild: () => {},
+  };
+  const ids = [
+    "roadmapList",
+    "artifactList",
+    "evidenceList",
+    "lmModeStatus",
+    "modeActionLog",
+    "attemptHistory",
+    "sourceText",
+    "compileSource",
+    "compilerResult",
+    "attemptInput",
+    "submitAttempt",
+    "requestHint",
+    "attemptBadge",
+    "attemptFeedback",
+    "sourceCard",
+    "sourceCardTitle",
+    "sourceClaims",
+    "sourceSuggested",
+    "sourceNextSession",
+    "activeNodeTitle",
+    "activeNodeFocus",
+    "activeNodeSource",
+    "conceptConfusion",
+    "miniNodeList",
+    "readerInstruction",
+    "readerResourceList",
+    "evidenceChecklist",
+    "readinessSummary",
+    "gapSummary",
+    "repairActionText",
+    "lmActiveNode",
+    "lmActiveMiniNode",
+    "lmRecommendedDecision",
+    "lmReaderMove",
+  ];
+  const nodesById = new Map(ids.map((id) => [id, makeSimpleNode()]));
+  nodesById.set("lmModes", modePanel);
+
+  const previousDocument = globalThis.document;
+  const previousWindow = globalThis.window;
+
+  try {
+    // @ts-expect-error test shim
+    globalThis.document = { getElementById: (id) => nodesById.get(id) || null };
+    // @ts-expect-error test shim
+    globalThis.window = { addEventListener: () => {} };
+
+    const workspace = workspaceModule.initResearchWorkspace({});
+
+    assert.match(nodesById.get("activeNodeTitle")?.textContent || "", /Backpropagation/);
+    assert.match(nodesById.get("miniNodeList")?.innerHTML || "", /Chain rule trace/);
+    assert.match(nodesById.get("readerResourceList")?.innerHTML || "", /Rumelhart, Hinton, Williams/);
+    assert.equal(nodesById.get("lmActiveNode")?.textContent, "Backpropagation");
+    assert.equal(nodesById.get("lmActiveMiniNode")?.textContent, "Chain rule trace");
+
+    workspace.selectMiniNode("gradient-accumulation");
+    assert.match(nodesById.get("readerResourceList")?.innerHTML || "", /Baydin/);
+    assert.equal(nodesById.get("lmActiveMiniNode")?.textContent, "Gradient accumulation");
+
+    workspace.selectNode("transformer");
+    assert.match(nodesById.get("activeNodeTitle")?.textContent || "", /Transformer block/);
+    assert.match(nodesById.get("miniNodeList")?.innerHTML || "", /Definition boundary/);
+    assert.equal(nodesById.get("lmActiveNode")?.textContent, "Transformer block");
+  } finally {
+    globalThis.document = previousDocument;
+    globalThis.window = previousWindow;
+  }
 });
 
 test("mode actions create bounded scope effects without chat-like answer text", async () => {
