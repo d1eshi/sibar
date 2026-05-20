@@ -19,11 +19,21 @@
     "article:vercel:check": "node --test --test-concurrency=1 --experimental-strip-types Tests/article-workspace-vercel.test.ts",
     "test": "node --test --test-concurrency=1 --experimental-strip-types Tests/**/*.test.ts",
     "typecheck": "pnpm exec tsc -p tsconfig.json --noEmit",
-    "guard:supply-chain": "node --experimental-strip-types src/scripts/guard-supply-chain.ts"
+    "guard:supply-chain": "node --experimental-strip-types src/scripts/guard-supply-chain.ts",
+    "workspace:dev": "vite apps/sibar-research-workspace --host 127.0.0.1 --strictPort --port 5173",
+    "workspace:build": "vite build apps/sibar-research-workspace",
+    "workspace:preview": "vite preview apps/sibar-research-workspace --host 127.0.0.1 --strictPort --port 4173"
   },
   "devDependencies": {
+    "@types/react": "^19.1.13",
+    "@types/react-dom": "^19.1.9",
     "@types/node": "^22.15.3",
+    "vite": "^7.1.0",
     "typescript": "^5.8.3"
+  },
+  "dependencies": {
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0"
   },
   "packageManager": "pnpm@9.0.0+sha512.b4106707c7225b1748b61595953ccbebff97b54ad05d002aa3635f633b9c53cd666f7ce9b8bc44704f1fa048b9a49b55371ab2d9e9d667d1efe2ef1514bcd513"
 }

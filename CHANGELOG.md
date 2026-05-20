@@ -96,6 +96,17 @@ release yet.
   run traces, session history, compaction, replay, and failed workspace creation
   diagnostics.
 
+### Added - Workspace React Slice 0
+
+- Added a React + TypeScript + Vite bootstrap for the Tauri workspace app in
+  `apps/sibar-research-workspace` with `workspace:dev`, `workspace:build`, and
+  `workspace:preview` scripts.
+- Replaced the legacy HTML monolith with a React mount and a static onboarding
+  screen (native topbar, intent fields, preview rail/column) rendered from
+  `apps/sibar-research-workspace/src/main.tsx` and `src/App.tsx`.
+- Added global style entry and CSS module styles for the slice-0 viewport while
+  keeping legacy scripts/CSS untouched for later migration slices.
+
 ### Fixed - Codex Workspace Output Schema Strictness
 
 - Updated the Rust workspace plan JSON Schema and Codex prompt constraints so
