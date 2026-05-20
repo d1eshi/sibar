@@ -127,6 +127,14 @@ release yet.
   after local preview generation, with no fetch/Tauri/runner integrations in this
   slice.
 
+### Changed - Tauri Workspace Onboarding Layout
+
+- Reworked the onboarding surface to run full-width/full-height instead of inside
+  a centered fake desktop window.
+- Removed the fake macOS chrome and top toolbar from the Tauri workspace shell.
+- Simplified the onboarding preview title so user intent stays inside the plan
+  body instead of becoming an oversized, wrapping headline.
+
 ### Fixed - Codex Workspace Output Schema Strictness
 
 - Updated the Rust workspace plan JSON Schema and Codex prompt constraints so
