@@ -54,6 +54,9 @@ release yet.
   dataset, report outputs, and `VAL-EVAL-012-pedagogy-coverage` for semantic
   coverage across L1-L5, answer classes, gap labels, operations, evidence
   conditions, and loop stages.
+- Added `VAL-EVAL-013-pedagogy-core-coverage` to directly exercise the real
+  `src/pedagogy` layer, question, signal, and pipeline modules without LLM
+  calls.
 
 ### Changed - Workspace Intent Onboarding Compiler
 
