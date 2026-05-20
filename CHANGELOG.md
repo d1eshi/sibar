@@ -15,6 +15,11 @@ release yet.
 
 - Split `docs/specs/ui/` into `web/` and `workspace-tauri/` as the UI source of
   truth for public web surfaces and the direct Tauri workspace prototype.
+- Added `Workspace Home` as the canonical default Tauri entry screen so existing
+  workspaces, pending sessions, blocked intents, and resume paths are visible
+  before creating more work.
+- Updated the workspace UI flow to separate global home, create-workspace
+  onboarding, workspace study-path overview, and active learning node actions.
 - Added source maps that extract dispersed UI decisions from older specs,
   reports, product docs, and prototypes.
 - Moved generated workspace UI references under
