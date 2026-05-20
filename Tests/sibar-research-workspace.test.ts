@@ -351,6 +351,112 @@ test("create workspace intent compiles a core WorkspacePlan before opening the s
   }
 });
 
+test("create workspace intent can compile through native Tauri invoke", async () => {
+  const workspaceModule = await import(moduleUrl);
+  const previousWindow = globalThis.window;
+  const calls = [];
+
+  try {
+    // @ts-expect-error test shim
+    globalThis.window = {
+      addEventListener: () => {},
+      __TAURI__: {
+        core: {
+          invoke: async (command, payload) => {
+            calls.push({ command, payload });
+            assert.equal(command, "compile_workspace_intent");
+            assert.equal(
+              payload.payload.input.tryingToBuildOrUnderstand,
+              "quiero aprender embeddings, a no mas poder",
+            );
+            return {
+              job: {
+                id: "job-test",
+                request_id: "workspace-intent-test",
+                status: "completed",
+                status_history: ["queued", "running", "validating", "completed"],
+                reason_code: null,
+              },
+              runner: {
+                status: "completed",
+                adapter: "fixture",
+                command: "sibi-workspace-compiler",
+                args: [],
+                blocked_reason: null,
+              },
+              rust_intent: {
+                user_intent: "quiero aprender embeddings, a no mas poder",
+                source_bundle: {
+                  paths: ["inline://workspace-intent-source"],
+                  evidence: [],
+                },
+              },
+              rust_workspace_plan: {
+                objective: "Entender embeddings con un primer artifact reproducible.",
+                bounded_objective: true,
+                nodes: [
+                  {
+                    id: "embeddings-foundations",
+                    title: "Embeddings foundations",
+                    prerequisites: [],
+                    concepts: ["embeddings"],
+                    source_links: [
+                      {
+                        evidence_id: "evidence-workspace-intent-source",
+                        rationale: "Intent inline evidence",
+                      },
+                    ],
+                    artifact_requirement: {
+                      id: "embedding-note",
+                      path: "inline://workspace-intent-source",
+                      requires: "Explain embeddings from the supplied intent.",
+                      optional: false,
+                      confidence: "high",
+                    },
+                    is_advanced: false,
+                    locked: null,
+                  },
+                ],
+                next_actions: [
+                  {
+                    label: "Start embeddings",
+                    target_node_id: "embeddings-foundations",
+                    visible: true,
+                  },
+                ],
+                artifact_requirements: [],
+                questions_if_blocked: [],
+                ui_projection: {
+                  title: "Embeddings",
+                  summary: "First bounded embeddings session.",
+                  badges: ["embeddings"],
+                },
+              },
+            };
+          },
+        },
+      },
+    };
+
+    const compiled = await workspaceModule.compileWorkspaceIntentWithRunner(
+      {
+        tryingToBuildOrUnderstand: "quiero aprender embeddings, a no mas poder",
+        sourceInput: "",
+      },
+      { adapter: "fixture", runCodex: true },
+    );
+
+    assert.equal(calls.length, 1);
+    assert.equal(compiled.runner.status, "completed");
+    assert.equal(compiled.job.status, "completed");
+    assert.equal(compiled.workspace_plan.compiled_by, "llm");
+    assert.equal(compiled.workspace_plan.nodes[0].node_id, "embeddings-foundations");
+    assert.match(compiled.preview.first_session, /Embeddings foundations/);
+  } finally {
+    globalThis.window = previousWindow;
+  }
+});
+
 test("next actions are declared and wired to read, code, and explain actions", async () => {
   assert.match(workspaceHtml, /id="studyChoiceNow"[^>]*data-study-choice="read"/);
   assert.match(workspaceHtml, /id="studyChoiceBuild"[^>]*data-study-choice="build"[^>]*data-action-mode="\/build"/);
