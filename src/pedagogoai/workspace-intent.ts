@@ -16,7 +16,8 @@ export type {
   WorkspacePlanNode,
   WorkspacePlanNodeResource,
   WorkspacePlanPreview,
-} from "./workspace-intent.ts";
+} from "./workspace-intent-types.ts";
+
 export {
   DEFAULT_WORKSPACE_INTENT_INPUT,
   WORKSPACE_INTENT_CONTRACT_ORDER,
@@ -35,34 +36,4 @@ export {
   validateSourceIntake,
   validateWorkspaceIntent,
   validateWorkspacePlan,
-} from "./workspace-intent.ts";
-
-export type {
-  AgentWorkSessionSummary,
-  DeclaredWorkIntent,
-  LearningSignal,
-  OwnershipQuestion,
-  PipelineResult,
-} from "../pedagogy/index.ts";
-export type {
-  ArtifactSession,
-  AutopsyStep,
-  ConceptGraph,
-  ConceptNode,
-  ConceptUnderstandingState,
-  EvidenceCitation,
-  LearningGap,
-  PracticeChallenge,
-  RuntimeQuestion,
-  RuntimeSession,
-  UnderstandingMemory,
-} from "../runtime-support.ts";
-export type {
-  AttemptEvaluationContract,
-  EvidenceContract,
-  OwnershipAttemptContract,
-  ScopedReadinessContract,
-  WorkspaceSessionContract,
-} from "../runtime-workspace-session-contracts.ts";
-
-export { buildWorkspaceSessionContract } from "../runtime-workspace-session-contracts.ts";
+} from "./workspace-intent-runtime.js";

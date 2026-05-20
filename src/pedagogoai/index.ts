@@ -12,6 +12,7 @@ export type {
 } from "./architecture.ts";
 
 export * as PedagogoAIContracts from "./contracts.ts";
+export * as PedagogoAIWorkspaceIntent from "./workspace-intent.ts";
 export * as PedagogoAIPolicies from "./policies.ts";
 export * as PedagogoAIEvidenceArtifacts from "./evidence-artifacts.ts";
 export * as PedagogoAIReadinessMastery from "./readiness-mastery.ts";

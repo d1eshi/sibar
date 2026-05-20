@@ -9,6 +9,7 @@ import {
   PedagogoAIPolicies,
   PedagogoAIReadinessMastery,
   PedagogoAITracks,
+  PedagogoAIWorkspaceIntent,
   boundariesForCapability,
 } from "../src/pedagogoai/index.ts";
 
@@ -26,6 +27,7 @@ test("PedagogoAI exposes a declarative architecture map for core learning capabi
       "recall-review",
       "source-to-roadmap-session",
       "track-specialization",
+      "workspace-intent",
       "workspace-contracts",
     ].sort(),
   );
@@ -38,10 +40,16 @@ test("PedagogoAI facade reexports existing runtime pieces through stable subdoma
   assert.equal(typeof PedagogoAIPolicies.runPipeline, "function");
   assert.equal(typeof PedagogoAIGapRepair.createRepairAction, "function");
   assert.equal(typeof PedagogoAIReadinessMastery.createReadinessClaim, "function");
+  assert.equal(typeof PedagogoAIWorkspaceIntent.buildWorkspaceIntent, "function");
   assert.equal(PedagogoAITracks.EXPLAIN_A_Z_TRACK.id, "explain-a-z");
   assert.equal(PedagogoAITracks.DEEP_OWNERSHIP_TRACK.id, "deep-ownership");
 
   const gapRepair = boundariesForCapability("gap-repair");
   assert.equal(gapRepair.length, 1);
   assert.ok(gapRepair[0].adapters.includes("src/runtime-gap-detection.ts"));
+
+  const workspaceIntent = boundariesForCapability("workspace-intent");
+  assert.equal(workspaceIntent.length, 1);
+  assert.equal(workspaceIntent[0].entrypoint, "src/pedagogoai/workspace-intent.ts");
+  assert.ok(workspaceIntent[0].adapters.includes("apps/sibar-research-workspace/scripts/workspace-intent-adapter.js"));
 });
