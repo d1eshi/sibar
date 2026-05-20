@@ -16,6 +16,18 @@ This slice renders the onboarding prototype screen only: native style topbar, in
 fields, and static preview column. It does not connect to Rust, runners, or the
 compiler path.
 
+## React migration slice 1 (interactive onboarding)
+
+- Converted the onboarding screen to controlled form fields for intent, source,
+  constraint, and optional background fields.
+- `Review workspace plan` now computes a deterministic local workspace preview from
+  the current intent/source payload and enables `Open first session`.
+- `Open first session` now updates local flow state and surfaces a local
+  "First session ready" status (no compiler, runner, or workspace navigation in
+  this slice).
+- No fetch calls, Tauri invoke calls, or Rust/compiler execution is performed in
+  this step.
+
 ## Tauri shell
 
 - The app shell scaffold is in `src-tauri/`.
