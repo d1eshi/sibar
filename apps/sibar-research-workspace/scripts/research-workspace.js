@@ -69,7 +69,9 @@ export {
 export {
   WORKSPACE_INTENT_ADAPTER_KIND,
   WORKSPACE_INTENT_CORE_ENTRYPOINT,
+  WORKSPACE_INTENT_RUNNER_ENTRYPOINT,
   applyWorkspacePlanPreviewToState,
+  compileWorkspaceIntentWithRunner,
   compileWorkspaceIntentPreview,
   hydrateWorkspaceIntentForm,
   readWorkspaceIntentForm,

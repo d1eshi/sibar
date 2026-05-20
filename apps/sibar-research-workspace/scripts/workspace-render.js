@@ -428,6 +428,7 @@ export function initRootElements(attemptForm, lmContext) {
     workspaceIntentUnknown: document.getElementById("workspaceIntentUnknown"),
     workspaceIntentDesiredOutput: document.getElementById("workspaceIntentDesiredOutput"),
     generateWorkspace: document.getElementById("generateWorkspace"),
+    runCodexWorkspace: document.getElementById("runCodexWorkspace"),
     workspaceIntentPreview: document.getElementById("workspaceIntentPreview"),
     workspaceIntentPreviewTitle: document.getElementById("workspaceIntentPreviewTitle"),
     workspaceIntentOutputs: document.getElementById("workspaceIntentOutputs"),

@@ -242,6 +242,7 @@ test("second app exposes the research workspace screen contract", () => {
   assert.match(workspaceHtml, /Create Workspace/);
   assert.match(workspaceHtml, /What are you trying to build or understand\?/);
   assert.match(workspaceHtml, /Generate workspace/);
+  assert.match(workspaceHtml, /Run Codex runner/);
   assert.match(workspaceHtml, /Proposed Workspace: JAX Transformers/);
   assert.match(workspaceHtml, /Ask/);
   assert.match(workspaceHtml, /Key insight/);
@@ -253,7 +254,9 @@ test("second app exposes the research workspace screen contract", () => {
 test("create workspace intent compiles a core WorkspacePlan before opening the session", async () => {
   const workspaceModule = await import(moduleUrl);
   assert.equal(workspaceModule.WORKSPACE_INTENT_CORE_ENTRYPOINT, "src/pedagogoai/workspace-intent.ts");
+  assert.equal(workspaceModule.WORKSPACE_INTENT_RUNNER_ENTRYPOINT, "src/pedagogoai/workspace-compiler-runner.ts");
   assert.equal(workspaceModule.WORKSPACE_INTENT_ADAPTER_KIND, "workspace-intent-ui-adapter");
+  assert.equal(typeof workspaceModule.compileWorkspaceIntentWithRunner, "function");
 
   const ids = [
     "workspaceRoot",
@@ -264,6 +267,7 @@ test("create workspace intent compiles a core WorkspacePlan before opening the s
     "workspaceIntentUnknown",
     "workspaceIntentDesiredOutput",
     "generateWorkspace",
+    "runCodexWorkspace",
     "workspaceIntentPreview",
     "workspaceIntentPreviewTitle",
     "workspaceIntentOutputs",
@@ -307,6 +311,7 @@ test("create workspace intent compiles a core WorkspacePlan before opening the s
   ];
   const nodesById = new Map(ids.map((id) => [id, createHtmlAwareElement(id)]));
   nodesById.set("generateWorkspace", makeInteractiveNode());
+  nodesById.set("runCodexWorkspace", makeInteractiveNode());
   nodesById.set("openWorkspaceSession", makeInteractiveNode());
 
   nodesById.get("workspaceIntentBuild").value = "I want to follow this blog and build a JAX transformer + kernel path";

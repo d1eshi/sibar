@@ -9,6 +9,7 @@ import { ANTI_OVERLOAD, ARC_ID, MISSION_ID } from "./workspace-data.js";
 
 export const WORKSPACE_INTENT_ADAPTER_KIND = "workspace-intent-ui-adapter";
 export const WORKSPACE_INTENT_CORE_ENTRYPOINT = "src/pedagogoai/workspace-intent.ts";
+export const WORKSPACE_INTENT_RUNNER_ENTRYPOINT = "src/pedagogoai/workspace-compiler-runner.ts";
 
 function valueFrom(node, fallback = "") {
   return typeof node?.value === "string" && node.value.trim() ? node.value.trim() : fallback;
@@ -67,6 +68,36 @@ export function compileWorkspaceIntentPreview(input) {
   };
 }
 
+export async function compileWorkspaceIntentWithRunner(input, options = {}) {
+  const response = await fetch("/api/workspace-intent/compiler", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({
+      input,
+      adapter: options.adapter || "codex-exec",
+      runCodex: options.runCodex === true,
+    }),
+  });
+
+  const result = await response.json();
+  if (!response.ok) {
+    const reason = result?.runner?.blocked_reason || result?.error || `Workspace compiler request failed with ${response.status}.`;
+    throw new Error(reason);
+  }
+
+  return {
+    adapter_kind: result.runner?.adapter || "rust-workspace-compiler",
+    core_entrypoint: WORKSPACE_INTENT_RUNNER_ENTRYPOINT,
+    workspace_intent: result.workspace_intent,
+    workspace_plan: result.workspace_plan,
+    preview: result.preview,
+    runner: result.runner,
+    rust_intent: result.rust_intent,
+    rust_workspace_plan: result.rust_workspace_plan,
+    validation: result.validation,
+  };
+}
+
 export function renderWorkspaceIntentPreview(root = {}, compiled = null) {
   if (!compiled?.preview) return;
   const preview = compiled.preview;
@@ -78,7 +109,9 @@ export function renderWorkspaceIntentPreview(root = {}, compiled = null) {
   setText(root.workspaceIntentFirstSession, preview.first_session);
   setText(
     root.workspaceIntentStatus,
-    preview.validation.valid ? "Workspace plan ready. Open the first session when you want the focused workspace." : "Workspace plan needs input repair.",
+    compiled.runner?.status
+      ? `Runner ${compiled.runner.adapter}: ${compiled.runner.status}. ${preview.validation.valid ? "Workspace plan ready." : "Workspace plan needs input repair."}`
+      : preview.validation.valid ? "Workspace plan ready. Open the first session when you want the focused workspace." : "Workspace plan needs input repair.",
   );
   if (root.openWorkspaceSession) root.openWorkspaceSession.disabled = !preview.validation.valid;
 }
