@@ -51,6 +51,12 @@ release yet.
 - Updated the Workspace Intent execution specs in-place so the canonical path is
   UI onboarding -> Tauri/Rust async job -> adapter -> parse/schema/pedagogy
   validation -> reproducible UI projection, without adding new spec files.
+- Added a native Tauri `compile_workspace_intent` command that builds the Rust
+  `WorkspaceIntent`, runs the workspace compiler adapter, and returns job,
+  runner, Rust intent, and Rust plan data to the UI.
+- Updated the research workspace UI adapter to prefer the native Tauri compiler
+  bridge when available, falling back to the local dev endpoint or deterministic
+  compiler outside the desktop host.
 
 ### Fixed - Codex Workspace Output Schema Strictness
 

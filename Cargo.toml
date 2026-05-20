@@ -1,3 +1,6 @@
 [workspace]
-members = ["crates/sibi-workspace-compiler"]
+members = [
+  "crates/sibi-workspace-compiler",
+  "apps/sibar-research-workspace/src-tauri",
+]
 resolver = "2"

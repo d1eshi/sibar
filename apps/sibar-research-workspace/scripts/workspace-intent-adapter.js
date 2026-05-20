@@ -26,6 +26,24 @@ const WORKSPACE_INTENT_FORM_DEFAULTS = {
   createdAt: DEFAULT_WORKSPACE_INTENT_INPUT.createdAt,
 };
 
+function dedupe(values = []) {
+  const seen = new Set();
+  return values.filter((value) => {
+    const key = String(value || "").trim().toLowerCase();
+    if (!key || seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+
+function slug(value = "workspace") {
+  return String(value || "workspace")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-+|-+$)/g, "")
+    .replace(/-+/g, "-") || "workspace";
+}
+
 function valueFrom(node, fallback = "") {
   return typeof node?.value === "string" && node.value.trim() ? node.value.trim() : fallback;
 }
@@ -69,6 +87,168 @@ function buildWorkspaceIntentRunnerFallback(input, reason, adapter = DEFAULT_COM
   };
 }
 
+function getTauriInvoke() {
+  return globalThis.window?.__TAURI__?.core?.invoke || globalThis.__TAURI__?.core?.invoke || null;
+}
+
+function inferArtifactKindFromRustNode(node = {}) {
+  const source = [
+    node.title,
+    ...(node.prerequisites || []),
+    ...(node.concepts || []),
+    node.artifact_requirement?.requires,
+  ].join(" ").toLowerCase();
+  if (source.includes("benchmark")) return "benchmark";
+  if (source.includes("notebook")) return "notebook";
+  if (source.includes("note")) return "notes";
+  if (source.includes("repo") || source.includes("code")) return "repo";
+  if (source.includes("writeup") || source.includes("publish")) return "writeup";
+  return "source";
+}
+
+function inferOperationFromRustNode(node = {}) {
+  const context = [
+    node.title,
+    ...(node.concepts || []),
+    node.artifact_requirement?.requires,
+  ].join(" ").toLowerCase();
+  if (/(explain|understand|entender)/.test(context)) return "explain";
+  if (/(benchmark|measure|profile|evaluar)/.test(context)) return "benchmark";
+  if (/(publish|writeup|publicar)/.test(context)) return "publish";
+  if (/(build|implement|create|generate|patch|compile|code|construir)/.test(context)) return "build";
+  return "read";
+}
+
+function mapRustNodeToWorkspaceNode(node = {}) {
+  const evidenceOutputs = dedupe((node.source_links || []).map((link) => link.evidence_id));
+  return {
+    schema: "WorkspaceNodePlan",
+    node_id: node.id,
+    title: node.title?.trim() || node.id,
+    focus: `Integrar ${node.title || node.id} desde evidencia del compilador nativo.`,
+    operation_target: inferOperationFromRustNode(node),
+    prerequisite_node_ids: dedupe(node.prerequisites || []),
+    session_ids: ["session-01"],
+    evidence_outputs: evidenceOutputs.length ? evidenceOutputs : ["source-evidence"],
+    mini_nodes: [
+      {
+        id: `${node.id}-mini-01`,
+        title: "Ruta de evidencia",
+        goal: `Vincular evidencia del nodo ${node.id} con una evidencia accionable.`,
+        reader_prompt: "Lee la evidencia y define la siguiente acción mínima del workspace.",
+        resources: evidenceOutputs.map((evidenceId) => ({
+          kind: "source",
+          title: evidenceId,
+          source: `Evidence ${evidenceId}`,
+          action: "Use this evidence for workspace execution.",
+        })),
+      },
+    ],
+  };
+}
+
+function buildEvidencePlanFromRust(workspaceIntent, rustPlan, workspaceId) {
+  const fallback = compileWorkspacePlanFromIntent(workspaceIntent).evidence_plan;
+  const evidenceById = new Map();
+  for (const node of rustPlan.nodes || []) {
+    for (const source of node.source_links || []) {
+      if (!evidenceById.has(source.evidence_id)) {
+        evidenceById.set(source.evidence_id, {
+          rationale: source.rationale,
+          node,
+        });
+      }
+    }
+  }
+
+  const requiredEvidence = Array.from(evidenceById.entries()).map(([id, entry]) => {
+    const existing = fallback.required_evidence.find((candidate) => candidate.id === id);
+    if (existing) return existing;
+    return {
+      id,
+      label: entry.rationale || `Native compiler evidence: ${id}`,
+      artifact_kind: inferArtifactKindFromRustNode(entry.node),
+      acceptance_criteria: [
+        "La evidencia se usa para acotar el primer nodo del plan.",
+        "La evidencia debe ser trazable desde el workspace.",
+      ],
+    };
+  });
+
+  return {
+    ...fallback,
+    workspace_id: workspaceId,
+    required_evidence: requiredEvidence.length ? requiredEvidence : fallback.required_evidence,
+    minimum_evidence_count: Math.min(3, requiredEvidence.length || fallback.required_evidence.length),
+  };
+}
+
+function rustWorkspacePlanToWorkspacePlan(workspaceIntent, rustPlan) {
+  const basePlan = compileWorkspacePlanFromIntent(workspaceIntent);
+  if (!rustPlan?.nodes?.length) {
+    return { ...basePlan, compiled_by: "llm" };
+  }
+
+  const workspaceId = `workspace-${slug(workspaceIntent.workspace_title)}`;
+  const nodes = rustPlan.nodes.map(mapRustNodeToWorkspaceNode);
+  const first = rustPlan.nodes[0];
+  const evidenceOutputs = dedupe((first.source_links || []).map((source) => source.evidence_id));
+  const sessionPlan = {
+    ...basePlan.session_plan,
+    node_id: first.id,
+    title: first.title?.trim() || `Session for ${first.id}`,
+    focus: first.title?.trim() || first.id,
+    operation_target: inferOperationFromRustNode(first),
+    outputs: evidenceOutputs.length ? evidenceOutputs : basePlan.session_plan.outputs,
+    required_evidence: evidenceOutputs.length ? evidenceOutputs : basePlan.session_plan.required_evidence,
+    success_criteria: [
+      "La sesión inicial opera sobre evidencia citada por el compilador nativo.",
+      "La ejecución queda acotada al objetivo compilado.",
+    ],
+  };
+  const nodeEvidenceIds = dedupe(
+    rustPlan.nodes.flatMap((node) => (node.source_links || []).map((source) => source.evidence_id)),
+  );
+
+  return {
+    ...basePlan,
+    workspace: {
+      ...basePlan.workspace,
+      intent: rustPlan.objective || basePlan.workspace.intent,
+    },
+    outputs: nodeEvidenceIds.length ? nodeEvidenceIds : basePlan.outputs,
+    nodes,
+    session_plan: sessionPlan,
+    evidence_plan: buildEvidencePlanFromRust(workspaceIntent, rustPlan, workspaceId),
+    compiled_by: "llm",
+  };
+}
+
+function compileWorkspaceIntentFromNativeResult(input, result, adapter) {
+  const workspaceIntent = buildWorkspaceIntent(input);
+  if (!result?.rust_workspace_plan || result?.runner?.status !== "completed") {
+    return buildWorkspaceIntentRunnerFallback(
+      input,
+      result?.runner?.blocked_reason || "Native compiler did not produce an accepted plan.",
+      adapter,
+    );
+  }
+
+  const workspacePlan = rustWorkspacePlanToWorkspacePlan(workspaceIntent, result.rust_workspace_plan);
+  return {
+    adapter_kind: WORKSPACE_INTENT_ADAPTER_KIND,
+    core_entrypoint: WORKSPACE_INTENT_RUNNER_ENTRYPOINT,
+    workspace_intent: workspaceIntent,
+    workspace_plan: workspacePlan,
+    preview: formatWorkspacePlanPreview(workspacePlan),
+    runner: result.runner,
+    job: result.job,
+    rust_intent: result.rust_intent,
+    rust_workspace_plan: result.rust_workspace_plan,
+    validation: validateWorkspacePlan(workspacePlan),
+  };
+}
+
 export function hydrateWorkspaceIntentForm(root = {}) {
   if (root.openWorkspaceSession) root.openWorkspaceSession.disabled = true;
 }
@@ -106,6 +286,26 @@ export async function compileWorkspaceIntentWithRunner(input, options = {}) {
   const adapter = options.adapter || DEFAULT_COMPILER_ADAPTER;
   if (options.runCodex !== true) {
     return compileWorkspaceIntentPreview(input);
+  }
+
+  const nativeInvoke = getTauriInvoke();
+  if (nativeInvoke) {
+    try {
+      const nativeResult = await nativeInvoke("compile_workspace_intent", {
+        payload: {
+          input,
+          adapter,
+          runCodex: true,
+        },
+      });
+      return compileWorkspaceIntentFromNativeResult(input, nativeResult, adapter);
+    } catch (error) {
+      return buildWorkspaceIntentRunnerFallback(
+        input,
+        error instanceof Error ? error.message : "Native workspace compiler failed.",
+        adapter,
+      );
+    }
   }
 
   try {
