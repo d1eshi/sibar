@@ -1,0 +1,124 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.com/workspace-plan.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["objective", "bounded_objective", "nodes", "next_actions", "artifact_requirements", "questions_if_blocked", "ui_projection"],
+  "properties": {
+    "objective": {
+      "type": "string",
+      "maxLength": 280
+    },
+    "bounded_objective": {
+      "type": "boolean"
+    },
+    "nodes": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/workspace_node" },
+      "minItems": 1
+    },
+    "next_actions": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/next_action" },
+      "minItems": 1
+    },
+    "artifact_requirements": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/workspace_artifact_requirement" },
+      "minItems": 1
+    },
+    "questions_if_blocked": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "ui_projection": {
+      "anyOf": [
+        { "$ref": "#/$defs/ui_projection" },
+        { "type": "null" }
+      ]
+    }
+  },
+  "$defs": {
+    "workspace_artifact_requirement": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "path", "requires", "optional", "confidence"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "path": { "type": "string", "minLength": 1 },
+        "requires": { "type": "string", "minLength": 1 },
+        "optional": { "type": "boolean" },
+        "confidence": {
+          "type": ["string", "null"],
+          "minLength": 1
+        }
+      }
+    },
+    "workspace_node": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "title", "prerequisites", "concepts", "source_links", "artifact_requirement", "is_advanced", "locked"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "title": { "type": ["string", "null"] },
+        "prerequisites": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "minItems": 1
+        },
+        "concepts": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "minItems": 1
+        },
+        "source_links": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/source_link" },
+          "minItems": 1
+        },
+        "artifact_requirement": { "$ref": "#/$defs/workspace_artifact_requirement" },
+        "is_advanced": { "type": "boolean" },
+        "locked": {
+          "type": ["object", "null"],
+          "additionalProperties": false,
+          "required": ["reason"],
+          "properties": {
+            "reason": { "type": "string", "minLength": 1 }
+          }
+        }
+      }
+    },
+    "next_action": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["label", "target_node_id", "visible"],
+      "properties": {
+        "label": { "type": "string", "minLength": 1 },
+        "target_node_id": { "type": ["string", "null"] },
+        "visible": { "type": "boolean" }
+      }
+    },
+    "source_link": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["evidence_id", "rationale"],
+      "properties": {
+        "evidence_id": { "type": "string", "minLength": 1 },
+        "rationale": { "type": ["string", "null"] }
+      }
+    },
+    "ui_projection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["title", "summary", "badges"],
+      "properties": {
+        "title": { "type": "string", "minLength": 1 },
+        "summary": { "type": "string", "minLength": 1 },
+        "badges": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    }
+  }
+}

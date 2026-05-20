@@ -11,17 +11,100 @@ export const WORKSPACE_INTENT_CONTRACT_ORDER = [
 export const DEFAULT_WORKSPACE_INTENT_INPUT = {
   userAmbition: "Convertirme en AI researcher-builder",
   workspaceTitle: "",
-  tryingToBuildOrUnderstand: "I want to follow this blog and build a JAX transformer + kernel path",
+  tryingToBuildOrUnderstand: "I want to follow this topic and build a reproducible artifact with notes and checks",
   sourceInput: "URL / pasted text / paper / repo",
   whyItMatters: "I want evidence for frontier AI researcher preparation",
   alreadyKnow: "Python, basic ML, some PyTorch",
-  notKnowYet: "JAX, Flax, scaling laws, kernels",
+  notKnowYet: "Core concepts and reproducible workflows",
   desiredOutput: "repo, notes, benchmark, public writeup",
   createdAt: WORKSPACE_INTENT_GENERATED_AT,
 };
 
 const SOURCE_TYPES = ["url", "pasted_text", "paper", "repo", "mixed", "unknown"];
 const GENERATED_BY = "deterministic-builder";
+const FALLBACK_WORKSPACE_TITLE = "Focused Research Workspace";
+
+const WORKSPACE_TOPIC_RULES = [
+  {
+    key: "embeddings",
+    title: "Embeddings",
+    aliases: ["embedding", "embeddings", "vector", "vectorization", "semantic search"],
+    primaryOutput: "embeddings artifact",
+    notesOutput: "embeddings notes",
+    validationOutput: "embeddings notebook",
+  },
+  {
+    key: "transformer",
+    title: "Transformers",
+    aliases: ["transformer", "attention", "self-attention"],
+    primaryOutput: "transformer implementation",
+    notesOutput: "shape/attention notes",
+    validationOutput: "training/eval notebook",
+    hasJaxOutput: "toy transformer in JAX",
+  },
+  {
+    key: "kernel",
+    title: "Systems / Kernels",
+    aliases: ["kernel", "pallas", "triton", "xla", "vmap", "jit", "cuda", "profiling"],
+    primaryOutput: "kernel benchmark",
+    notesOutput: "kernel notes",
+    validationOutput: "benchmark artifact",
+  },
+  {
+    key: "scaling",
+    title: "Scaling Laws",
+    aliases: ["scaling", "scaling laws"],
+    primaryOutput: "scaling analysis",
+    notesOutput: "scaling notes",
+    validationOutput: "benchmark artifact",
+  },
+  {
+    key: "neural",
+    title: "Neural Nets from Scratch",
+    aliases: ["neural", "micrograd", "backprop"],
+    primaryOutput: "neural implementation",
+    notesOutput: "backprop notes",
+    validationOutput: "training/eval notebook",
+  },
+];
+
+const EVIDENCE_KIND_MATCHERS = [
+  { match: /\b(benchmark)\b/, kind: "benchmark" },
+  { match: /\b(repo|artifact|implementation|prototype|code|model|embedding|transformer|kernel)\b/, kind: "repo" },
+  { match: /\b(note|notes)\b/, kind: "notes" },
+  { match: /\b(notebook|training|eval|benchmark|experiment|experimenting)\b/, kind: "notebook" },
+  { match: /\b(writeup|public|blog|report|article)\b/, kind: "writeup" },
+];
+
+function containsAny(text, terms) {
+  return terms.some((term) => text.includes(term));
+}
+
+function inferWorkspaceTopic(context) {
+  const hasJax = containsAny(context, ["jax", "flax", "pallas", "triton"]);
+
+  for (const rule of WORKSPACE_TOPIC_RULES) {
+    if (containsAny(context, rule.aliases)) {
+      if (rule.key === "transformer" && hasJax) {
+        return {
+          ...rule,
+          title: "JAX Transformers",
+          primaryOutput: rule.hasJaxOutput || rule.primaryOutput,
+        };
+      }
+      return rule;
+    }
+  }
+
+  return {
+    key: "fallback",
+    title: FALLBACK_WORKSPACE_TITLE,
+    aliases: [],
+    primaryOutput: "research artifact",
+    notesOutput: "learning notes",
+    validationOutput: "training/eval notebook",
+  };
+}
 
 function normalizeString(value, fallback = "") {
   return typeof value === "string" ? value.trim() : fallback;
@@ -81,6 +164,9 @@ function extractSignals(text) {
     ["pallas", "Pallas"],
     ["triton", "Triton"],
     ["scaling", "scaling laws"],
+    ["embedding", "embeddings"],
+    ["vector", "embeddings"],
+    ["semantic", "semantic embeddings"],
     ["benchmark", "benchmark"],
     ["repo", "repo"],
     ["writeup", "public writeup"],
@@ -96,12 +182,7 @@ function inferWorkspaceTitle(input) {
     input.sourceInput,
     splitList(input.notKnowYet).join(" "),
   ].join(" "));
-  if (context.includes("jax") && context.includes("transformer")) return "JAX Transformers";
-  if (context.includes("transformer")) return "Transformers";
-  if (context.includes("neural") || context.includes("micrograd")) return "Neural Nets from Scratch";
-  if (context.includes("scaling")) return "Scaling Laws";
-  if (context.includes("kernel")) return "Systems / Kernels";
-  return "Focused Research Workspace";
+  return inferWorkspaceTopic(context).title || FALLBACK_WORKSPACE_TITLE;
 }
 
 function inferWorkspaceOutputs(intent) {
@@ -110,32 +191,24 @@ function inferWorkspaceOutputs(intent) {
     intent.desired_outputs.join(" "),
     intent.unknowns.join(" "),
   ].join(" "));
+  const topic = inferWorkspaceTopic(context);
   const outputs = [];
-
-  if ((context.includes("repo") || context.includes("transformer")) && context.includes("jax")) {
-    outputs.push("toy transformer in JAX");
-  } else if (context.includes("repo")) {
-    outputs.push("repo artifact");
+  outputs.push(...intent.desired_outputs.map((output) => `${output}`));
+  outputs.push(topic.primaryOutput);
+  if (!context.includes("notes")) {
+    outputs.push(topic.notesOutput);
   }
-
-  if (context.includes("notes") || context.includes("attention") || context.includes("shape")) {
-    outputs.push("shape/attention notes");
+  if (context.includes("benchmark") || context.includes("scaling") || context.includes("kernel")) {
+    outputs.push(topic.validationOutput);
   }
-
-  if (context.includes("transformer") || context.includes("training") || context.includes("notebook") || context.includes("eval")) {
-    outputs.push("training/eval notebook");
+  if (context.includes("training") || context.includes("eval") || context.includes("notebook")) {
+    outputs.push(topic.validationOutput);
   }
-
-  if (context.includes("benchmark") || context.includes("kernel")) {
-    outputs.push("benchmark artifact");
-  }
-
   if (context.includes("public") || context.includes("writeup")) {
     outputs.push("public writeup");
   }
-
   if (!outputs.length) {
-    outputs.push(...intent.desired_outputs.map((output) => `${output} artifact`));
+    outputs.push("research artifact");
   }
 
   return dedupe(outputs);
@@ -143,11 +216,11 @@ function inferWorkspaceOutputs(intent) {
 
 function evidenceKindForOutput(output) {
   const lower = normalizeText(output);
-  if (lower.includes("repo") || lower.includes("jax")) return "repo";
-  if (lower.includes("note") || lower.includes("shape")) return "notes";
-  if (lower.includes("notebook") || lower.includes("training") || lower.includes("eval")) return "notebook";
-  if (lower.includes("benchmark")) return "benchmark";
-  if (lower.includes("writeup") || lower.includes("public")) return "writeup";
+  for (const matcher of EVIDENCE_KIND_MATCHERS) {
+    if (matcher.match.test(lower)) {
+      return matcher.kind;
+    }
+  }
   return "source";
 }
 
@@ -197,101 +270,137 @@ export function buildWorkspaceIntent(input = {}) {
   };
 }
 
-function buildJaxTransformerNodes(workspaceId, outputs) {
+function categorizeOutputs(outputs, matcher) {
+  return outputs.filter((output) => matcher.test(normalizeText(output)));
+}
+
+function fallbackOutputs(outputs, fallback = []) {
+  return outputs.length > 0 ? outputs : fallback;
+}
+
+function buildWorkspaceNodes(workspaceId, outputs, topic) {
+  const topicSlug = slug(topic.title, "workspace");
   const sourceResource = {
     kind: "source",
     title: "Workspace source/playbook",
     source: "WorkspaceIntent SourceIntake",
     action: "Read the source slice, then write a reconstruction before hints.",
   };
+  const lowerOutputs = outputs.map((value) => normalizeText(value));
+  const foundationOutputs = dedupe(
+    fallbackOutputs(
+      categorizeOutputs(outputs, /\b(note|notes|concept|overview|theory|definition|understand)\b/),
+      outputs.slice(0, 2),
+    ),
+  );
+  const implementationOutputs = dedupe(
+    fallbackOutputs(
+      categorizeOutputs(outputs, /\b(implementation|artifact|repo|code|transformer|embedding|kernel|neural|model)\b/),
+      outputs.slice(0, 2),
+    ),
+  );
+  const validationOutputs = dedupe(
+    fallbackOutputs(
+      categorizeOutputs(outputs, /\b(notebook|training|eval|benchmark|experiment|metric)\b/),
+      outputs.slice(-2),
+    ),
+  );
+  const publishOutputs = dedupe(
+    fallbackOutputs(
+      categorizeOutputs(outputs, /\b(public|writeup|report|blog|article)\b/),
+      outputs.length ? outputs.slice(-1) : [topic.primaryOutput],
+    ),
+  );
+
+  const hasBenchmarkIntent = /\b(benchmark|eval|training|kernel|scaling)\b/.test(lowerOutputs.join(" "));
 
   return [
     {
       schema: "WorkspaceNodePlan",
-      node_id: "jax-arrays-autodiff",
-      title: "JAX arrays and autodiff",
-      focus: "Establish JAX array semantics, transformations, and gradient mechanics before attention code.",
+      node_id: `${topicSlug}-foundations`,
+      title: `${topic.title} foundations`,
+      focus: `Frame the core concepts and constraints for ${topic.title.toLowerCase()} before implementation.`,
       operation_target: "build",
       prerequisite_node_ids: [],
       session_ids: ["session-01"],
-      evidence_outputs: ["shape/attention notes", "training/eval notebook"],
+      evidence_outputs: foundationOutputs,
       mini_nodes: [
         {
-          id: "array-semantics",
-          title: "Array semantics",
-          goal: "Explain how JAX arrays and shapes move through one tiny function.",
-          reader_prompt: "Write one shape trace for a batched array operation and mark the transformation boundary.",
+          id: "topic-scope-map",
+          title: "Topic scope map",
+          goal: `Define scope, assumptions, and one measurable artifact for ${topic.title.toLowerCase()}.`,
+          reader_prompt: "Write one-page scope map with risks, constraints, and success criteria.",
           resources: [sourceResource],
         },
         {
-          id: "autodiff-transform",
-          title: "Autodiff transform",
-          goal: "Build one `grad` example and explain the traced computation.",
-          reader_prompt: "Implement a scalar loss, run grad, and describe which value is differentiated.",
+          id: "starter-check",
+          title: "Starter check",
+          goal: `Create one concrete sanity check tied to ${topic.title.toLowerCase()}.`,
+          reader_prompt: "Choose one metric and define what success and failure look like.",
           resources: [sourceResource],
         },
       ],
     },
     {
       schema: "WorkspaceNodePlan",
-      node_id: "single-head-attention-jax",
-      title: "Single-head attention in JAX",
-      focus: "Implement query/key/value projection, score scaling, masking, and weighted value mixing.",
+      node_id: `${topicSlug}-implementation`,
+      title: `${topic.title} implementation`,
+      focus: `Implement a minimal prototype for ${topic.title.toLowerCase()} that can be inspected step by step.`,
       operation_target: "build",
-      prerequisite_node_ids: ["jax-arrays-autodiff"],
+      prerequisite_node_ids: [`${topicSlug}-foundations`],
       session_ids: ["session-02"],
-      evidence_outputs: outputs.filter((output) => /transformer|attention|notes|repo/i.test(output)),
+      evidence_outputs: implementationOutputs,
       mini_nodes: [
         {
-          id: "qkv-shapes",
-          title: "QKV shapes",
-          goal: "Track tensor dimensions through query, key, and value projections.",
-          reader_prompt: "Create a 2-token QKV shape table and state each matrix multiplication.",
+          id: "core-loop",
+          title: "Core loop",
+          goal: `Design the core operation flow for ${topic.title.toLowerCase()}.`,
+          reader_prompt: "Write one pseudocode pass from input to output and mark the state transitions.",
           resources: [sourceResource],
         },
         {
-          id: "attention-weights",
-          title: "Attention weights",
-          goal: "Compute scaled dot-product weights for a tiny sequence.",
-          reader_prompt: "Manually calculate one score row, apply softmax, and multiply values.",
+          id: "artifact-check",
+          title: "Artifact check",
+          goal: `Add one verification step that catches the most likely regression for ${topic.title.toLowerCase()}.`,
+          reader_prompt: "List one assertion or check and the failure condition it catches.",
           resources: [sourceResource],
         },
       ],
     },
     {
       schema: "WorkspaceNodePlan",
-      node_id: "tiny-transformer-training",
-      title: "Tiny transformer training/eval",
-      focus: "Train and evaluate a small transformer with a reproducible notebook and clear failure notes.",
-      operation_target: "benchmark",
-      prerequisite_node_ids: ["single-head-attention-jax"],
+      node_id: `${topicSlug}-validation`,
+      title: `${topic.title} validation`,
+      focus: `Validate the prototype with one reproducible evaluation for ${topic.title.toLowerCase()}.`,
+      operation_target: hasBenchmarkIntent ? "benchmark" : "build",
+      prerequisite_node_ids: [`${topicSlug}-implementation`],
       session_ids: ["session-03"],
-      evidence_outputs: outputs.filter((output) => /notebook|benchmark|writeup/i.test(output)),
+      evidence_outputs: validationOutputs,
       mini_nodes: [
         {
-          id: "training-loop",
-          title: "Training loop",
-          goal: "Run a small training step with observable loss and fixed shapes.",
-          reader_prompt: "Write a minimal train/eval notebook cell and record the expected outputs.",
+          id: "metric-first",
+          title: "Metric-first benchmark",
+          goal: `Run one constrained comparison and record one clear metric for ${topic.title.toLowerCase()}.`,
+          reader_prompt: "Define input, metric, baseline, and what indicates success or failure.",
           resources: [sourceResource],
         },
       ],
     },
     {
       schema: "WorkspaceNodePlan",
-      node_id: "kernel-benchmark-path",
-      title: "Kernel and benchmark path",
-      focus: "Define one profiling hypothesis and benchmark artifact before claiming systems understanding.",
-      operation_target: "benchmark",
-      prerequisite_node_ids: ["single-head-attention-jax"],
+      node_id: `${topicSlug}-publishing`,
+      title: `${topic.title} synthesis`,
+      focus: `Summarize what is known, what is still unknown, and what to publish next for ${topic.title.toLowerCase()}.`,
+      operation_target: publishOutputs.some((output) => /writeup|public|blog|report|article/.test(normalizeText(output))) ? "publish" : "explain",
+      prerequisite_node_ids: [`${topicSlug}-implementation`, `${topicSlug}-validation`],
       session_ids: ["session-04"],
-      evidence_outputs: outputs.filter((output) => /benchmark|writeup/i.test(output)),
+      evidence_outputs: publishOutputs,
       mini_nodes: [
         {
-          id: "benchmark-protocol",
-          title: "Benchmark protocol",
-          goal: "Compare one attention operation with a clear measurement boundary.",
-          reader_prompt: "State the benchmark input, metric, warmup, and failure condition.",
+          id: "readiness-summary",
+          title: "Readiness summary",
+          goal: `Create one short artifact that explains outcomes and the next concrete step for ${topic.title.toLowerCase()}.`,
+          reader_prompt: "Write a short summary with evidence references and one open question.",
           resources: [sourceResource],
         },
       ],
@@ -323,36 +432,37 @@ export function buildEvidencePlan(intent, workspaceId = `workspace-${slug(intent
     required_evidence: requiredEvidence,
     minimum_evidence_count: Math.min(3, requiredEvidence.length),
     readiness_checks: [
-      "Can explain the first implementation artifact without notes.",
-      "Can trace shape and attention evidence to the source/playbook.",
+      "Can explain the first session artifact without prompting.",
+      "Can trace evidence back to source/playbook signals.",
       "Can name what remains unknown before publishing confidence.",
     ],
   };
 }
 
 function buildFirstSession(intent, workspaceId, firstNode) {
+  const firstSessionOutputs = dedupe([
+    `Initial ${normalizeText(firstNode.title).replace(/[-_]/g, " ")}`,
+    ...firstNode.evidence_outputs.slice(0, 2),
+  ]);
+  const firstSessionEvidence = firstNode.evidence_outputs.length
+    ? firstNode.evidence_outputs
+    : ["workspace kickoff artifact"];
+
   return {
     schema: "SessionPlan",
     version: WORKSPACE_INTENT_CONTRACT_VERSION,
     session_id: "session-01",
     workspace_id: workspaceId,
     node_id: firstNode.node_id,
-    title: "Session 01 - JAX arrays and autodiff",
-    focus: "Build the smallest JAX array/autodiff proof before starting attention.",
+    title: `Session 01 - ${firstNode.title}`,
+    focus: firstNode.focus,
     operation_target: "build",
-    outputs: [
-      "shape trace for one JAX array operation",
-      "autodiff note for one scalar loss",
-      "session evidence entry for the workspace plan",
-    ],
-    required_evidence: [
-      "shape/attention notes",
-      "training/eval notebook",
-    ],
+    outputs: firstSessionOutputs,
+    required_evidence: firstSessionEvidence,
     success_criteria: [
       `Session stays inside workspace ${intent.workspace_title}.`,
-      "User can reconstruct one shape trace before requesting hints.",
-      "Evidence can seed the next attention implementation session.",
+      "User can describe one concrete failure mode before moving to the next session.",
+      "Session evidence can be reused in the next planned node.",
     ],
   };
 }
@@ -360,7 +470,14 @@ function buildFirstSession(intent, workspaceId, firstNode) {
 export function compileWorkspacePlanFromIntent(intent) {
   const outputs = inferWorkspaceOutputs(intent);
   const workspaceId = `workspace-${slug(intent.workspace_title)}`;
-  const nodes = buildJaxTransformerNodes(workspaceId, outputs);
+  const topic = inferWorkspaceTopic(
+    normalizeText([
+      intent.trying_to_build_or_understand,
+      intent.unknowns.join(" "),
+      intent.desired_outputs.join(" "),
+    ].join(" ")),
+  );
+  const nodes = buildWorkspaceNodes(workspaceId, outputs, topic);
   const sessionPlan = buildFirstSession(intent, workspaceId, nodes[0]);
   const evidencePlan = buildEvidencePlan(intent, workspaceId, outputs);
 

@@ -37,7 +37,7 @@ Options:
 Recommendation:
 
 Use `DeepOwnershipLoop` internally for this track. It preserves the ambition and
-does not copy Factory/Droid mission language.
+does not copy external orchestration language.
 
 Status: accepted by this spec pack unless changed later.
 
@@ -215,4 +215,3 @@ The first prototype can proceed with:
 4. read-only evidence
 5. no product mutation
 6. no editor dependency
-

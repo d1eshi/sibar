@@ -212,6 +212,13 @@
   font-weight: 700;
 }
 
+.workspace-intent-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+
 .workspace-intent-preview {
   padding: 18px;
   background: var(--surface-raised);

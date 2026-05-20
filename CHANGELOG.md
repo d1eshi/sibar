@@ -23,6 +23,59 @@ release yet.
   app that compiles the intent through the core contract layer before opening
   the first session.
 
+### Added - Workspace Rust Compiler Bridge
+
+- Added a new PedagogoAI bridge module for invoking the Rust
+  `sibi-workspace-compiler` via `cargo run --quiet -p sibi-workspace-compiler`.
+- Added Rust plan intent normalization (`user_intent`, `source_bundle`, `evidence`,
+  `root_path`) and a pure codex adapter argument builder so adapter mode selection
+  can be tested without live execution.
+- Added Rust→Pedagogo plan projection that preserves required `WorkspacePlan`
+  fields (`nodes`, `outputs`, `session_plan`, `evidence_plan`) and marks
+  `compiled_by` as `llm` when a runner plan is successfully applied.
+- Added tests that verify fixture execution path, mapped audit payload, and
+  `trying_to_build_or_understand` + evidence inclusion in the generated Rust intent.
+
+### Changed - Workspace Intent Onboarding Compiler
+
+- Added a local Sibar Research Workspace dev server route for running the Rust
+  workspace compiler from the browser and rendering the returned workspace plan.
+- Updated the normal `Generate workspace` onboarding action to compile the user's
+  first-step intent through the Rust/Codex runner when available, with local
+  deterministic fallback instead of a separate developer runner button.
+- Added inline source evidence fallback for runner intents that use pasted source
+  text instead of repository file paths.
+- Updated the deterministic Workspace Intent compiler so fallback nodes, outputs,
+  and the first session are derived from the user's topic, including the
+  embeddings onboarding case, instead of defaulting to the JAX transformer path.
+- Updated the Workspace Intent execution specs in-place so the canonical path is
+  UI onboarding -> Tauri/Rust async job -> adapter -> parse/schema/pedagogy
+  validation -> reproducible UI projection, without adding new spec files.
+- Added a native Tauri `compile_workspace_intent` command that builds the Rust
+  `WorkspaceIntent`, runs the workspace compiler adapter, and returns job,
+  runner, Rust intent, and Rust plan data to the UI.
+- Updated the research workspace UI adapter to prefer the native Tauri compiler
+  bridge when available, falling back to the local dev endpoint or deterministic
+  compiler outside the desktop host.
+- Tightened the native compiler bridge after verifier review: fixture paths are
+  forwarded when configured, static HTML no longer attempts the web compiler by
+  default, Tauri runs the compiler on a blocking worker, and Rust validates the
+  2-3 `next_actions` UI contract.
+- Added visible native compiler progress for the onboarding flow and configured
+  the Codex runner to use `gpt-5.4` with medium reasoning, terminal logs, and a
+  stricter no-tool prompt for first workspace generation.
+- Added a pending Workspace Trace contract gate for durable intent attempts, LLM
+  run traces, session history, compaction, replay, and failed workspace creation
+  diagnostics.
+
+### Fixed - Codex Workspace Output Schema Strictness
+
+- Updated the Rust workspace plan JSON Schema and Codex prompt constraints so
+  `codex exec --output-schema` accepts the contract in strict mode and returns
+  node plans with evidence links, prerequisites, concepts, and artifacts.
+- Added a Rust regression test that verifies every object property in the static
+  output schema is listed as required, matching Codex structured output rules.
+
 ### Changed - Sibar Research Workspace Visual Direction
 
 - Added an image-first UI/UX report and mockup reference for the Sibar research
@@ -74,6 +127,14 @@ release yet.
   (`workspace-data`, `workspace-utils`, `workspace-study-plans`,
   `workspace-contract`, `workspace-session`, `workspace-render`, and
   `workspace-app`) while keeping the facade API and behavior stable.
+
+### Docs - Deep Ownership Workspace Rust Execution Specs
+
+- Added new lightweight spec docs for the Rust-native Deep Ownership Workspace path:
+  `15_workspace_intent_compiler.md`, `16_llm_adapter_contract.md`,
+  `17_workspace_execution_pipeline.md`, and `18_workspace_ui_reproducibility.md`.
+- Updated `docs/specs/deep-ownership-workspace/README.md` reading order to
+  reference the new spec sequence and ensure stable implementation handoff.
 
 ### Added - WorkspaceIntent Compiler Module
 
@@ -221,7 +282,7 @@ release yet.
   (`workspace investigador`), with
   `docs/specs/deep-ownership-workspace/13_tauri_second_app_product_plan.md`
   retained as a derived implementation plan, including:
-  - conceptual stack (Mission → Roadmap → Node → Session → Artifact → Evidence → Recall),
+  - conceptual stack (Goal → Roadmap → Node → Session → Artifact → Evidence → Recall),
   - first-screen UX (`Today`) requirements,
   - bounded LM tool mode,
   - no-goals and acceptance gates,
@@ -240,7 +301,7 @@ release yet.
 
 ### Added - Tauri Research Workspace Contract Work
 
-- Reworked the static roadmap pane into an expandable hierarchy (Mission → Arc → Track →
+- Reworked the static roadmap pane into an expandable hierarchy (Goal → Arc → Track →
   Node → Mini-node → Source) with expansion state persisted in UI state and active
   selection tied into reader/LM updates.
 - Added exported contract helpers for the static artifact flow:
@@ -390,14 +451,6 @@ exist to make the public reader story reviewable before production promotion.
   update `CHANGELOG.md`.
 - Added the Swift bridge candidate audit, narrowing the future native bridge to
   the five foundation runtime commands and keeping TypeScript as state owner.
-- Mission docs: added the v0.1 Build-to-Learn mission pack covering specs 01-10, internal
-  pedagogy evals, bounded LLM signal generation, and the Swift study panel UI.
-- Mission docs: added mission orchestration rules for implementation/verifier agents, Codex
-  model comparison evals, and dataset sizing research gates.
-- Mission docs: added the standalone Swift app audit, iteration, and validation
-  contract for the live study panel host.
-- Mission docs: updated Study Panel UI to require an accessory `NSPanel` host
-  and explicit Graph + Code canvas behavior.
 - Updated the self-hosted evaluation contract with first freeform evaluator slice
   results, coverage status, and the next expansion target.
 - Documented article reader persistence sequencing: use browser-local notes

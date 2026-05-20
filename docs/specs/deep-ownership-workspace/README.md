@@ -7,10 +7,9 @@ This directory defines the next ambitious Sibi product surface:
 > Sibi turns real technical artifacts into deep, evidence-backed ownership loops
 > that force the user to think, derive, build, test, and remember.
 
-This is not a generic repo chat, a passive explainer, a cloned editor, or a
-Factory/Droid mission pack. It is a Sibi-native spec pack that gives an agent
-such as Droid enough product, architecture, UI, and validation detail to turn
-the vision into an implementation track.
+This is not a generic repo chat, a passive explainer, or a cloned editor. It is
+a Sibi-native spec pack that captures product, architecture, UI, and validation
+detail without depending on an external orchestration format.
 
 ## Why This Exists
 
@@ -66,23 +65,32 @@ understanding.
    study mutations, and product mutations.
 10. `08_validation_contract.md` defines `VAL-*` assertions that implementation
    must satisfy.
-11. `09_implementation_plan.md` defines a Droid-ready implementation sequence.
-12. `10_droid_execution_brief.md` gives a concise worker/orchestrator brief.
-13. `11_open_decisions.md` lists decisions that remain intentionally open.
-14. `12_ui_reference_components.md` extracts reproducible UI components from
+11. `09_implementation_plan.md` defines a product implementation sequence.
+12. `11_open_decisions.md` lists decisions that remain intentionally open.
+13. `12_ui_reference_components.md` extracts reproducible UI components from
     the Sibi Lens + Lab iteration references.
-15. `13_tauri_second_app_product_plan.md` is the derived/historical plan for this workspace.
-16. `14_workspace_intent_flow.md` defines Workspace Intent as the first
+14. `13_tauri_second_app_product_plan.md` is the derived/historical plan for this workspace.
+15. `14_workspace_intent_flow.md` defines Workspace Intent as the first
     user-facing create-workspace flow before a pre-filled workspace appears.
-17. `features.json` translates the spec pack into an implementation queue.
+16. `15_workspace_intent_compiler.md` defines the Rust `WorkspaceIntentCompiler`
+    contract for `user_intent + source_bundle + existing_state -> WorkspacePlan`.
+17. `16_llm_adapter_contract.md` defines external LLM adapter behavior:
+    fixture first, then `codex-exec`, then `openai-api`/`opencode`/local.
+18. `17_workspace_execution_pipeline.md` defines source bundle prep, adapter calls,
+    validation/repair/block, and projection emission (`WorkspacePlan` + snapshot).
+19. `18_workspace_ui_reproducibility.md` defines stable UI projection fields, 2–3
+    visible next actions, evidence/artifact requirements, and locked advanced nodes.
+20. `19_workspace_trace_contract_gate.md` is a prerequisite contract gate for
+    workspace creation attempts, LLM run traces, session histories, compaction,
+    and replay.
 
 ## Naming Decision
 
 Use `Deep Ownership Workspace` as the spec-pack name.
 
-Avoid `Mission` as the product name. The system may borrow execution discipline
-from Factory/Droid-style work, but Sibi's user-facing concept should be about
-ownership, research, construction, and thinking.
+Avoid generic orchestration vocabulary in product-facing docs. Sibi's
+user-facing concept should be about ownership, research, construction, and
+thinking.
 
 Internal terms allowed:
 
@@ -96,11 +104,8 @@ Internal terms allowed:
 
 Terms to avoid in user-facing UI:
 
-1. `Mission`
-2. `Droid`
-3. `Factory`
-4. `agent orchestration`
-5. `knowledge graph` unless the user explicitly needs that level of detail
+1. `agent orchestration`
+2. `knowledge graph` unless the user explicitly needs that level of detail
 
 ## Implementation Principle
 
@@ -143,6 +148,31 @@ Minimum visible proof:
 7. one gap or readiness panel
 8. one next repair action
 
+## Runtime Topology for the Workspace Slice
+
+The runtime is always this sequence:
+
+1. UI onboarding captures `WorkspaceIntent` and selected source boundary.
+2. Tauri/Rust receives the request and creates an execution job.
+3. Rust invokes the adapter (`fixture` or `codex-exec`, then API/local fallback) as a
+   controlled child process via `stdin` JSON payload and schema.
+4. Rust validates parse/schema/pedagogy and classifies job outcome.
+5. Rust emits `WorkspacePlan` + reproducible workspace snapshot to UI.
+
+The UI does not expose a "Run Codex runner" button and does not know adapter
+details. It renders job progression via states:
+
+- queued
+- running
+- validating
+- completed
+- blocked
+- failed
+- cancelled
+
+No timeout strategy is defined as the main failure path. Cancellation is explicit
+and terminal (`cancelled`) through job control.
+
 ## Reproducible Live Workspace Repro
 
 For deterministic developer verification of the live ownership loop (no external LLM call),
@@ -160,6 +190,9 @@ Run:
 `Start` uses the current working directory as the repo root.
 
 and click `Start`.
+
+`web:dev` is only for smoke/fallback verification and is not the primary execution
+path for this architecture.
 
 For direct CLI checks:
 
@@ -180,12 +213,6 @@ Most existing runtime concepts map directly:
 6. `UnderstandingMemory` remains the durable moat.
 7. `ReadinessReport` remains the output that decides what the user is ready to
    explain, trace, modify, debug, transfer, or teach.
-
-## Feature Queue
-
-`features.json` is included for an implementation orchestrator. It is not a
-separate product spec. It maps the validation contract into small slices that
-can be implemented, verified, and handed off independently.
 
 ## Non-Goals For This Pack
 

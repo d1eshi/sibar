@@ -41,7 +41,7 @@ The first screen is `Create Workspace`.
 
 ```text
 What are you trying to build or understand?
-[ I want to follow this blog and build a JAX transformer + kernel path ]
+[ quiero aprender embeddings, a no mas poder ]
 
 Source / playbook
 [ URL / pasted text / paper / repo ]
@@ -50,16 +50,20 @@ Why does this matter?
 [ I want evidence for frontier AI researcher preparation ]
 
 What do you already know?
-[ Python, basic ML, some PyTorch ]
+[ optional background ]
 
 What do you not know yet?
-[ JAX, Flax, scaling laws, kernels ]
+[ optional unknowns / locked areas ]
 
 Desired output
 [ repo, notes, benchmark, public writeup ]
 
 Generate workspace
 ```
+
+The strings above are examples, not static defaults. The first usable path may
+start from only the first intent field; if source/playbook is empty, the system
+uses the intent text as inline evidence until the user supplies stronger source.
 
 The UI must make the global ambition visible as context, but the user is not
 asked to solve the whole ambition at once. The created object is a workspace:
@@ -69,10 +73,10 @@ Global ambition:
   Convertirme en AI researcher-builder
 
 Workspace intent:
-  JAX Transformers from scratch
+  Embeddings
 
 Session:
-  Implement single-head attention in JAX
+  Explain embeddings as vectors and compare them
 ```
 
 ## Contract Order
@@ -108,25 +112,23 @@ into visible nodes, a first session, and evidence expectations.
 
 ## Example Output
 
-For a user asking to build a JAX transformer and kernel path, Sibar can propose:
+For a user asking to learn embeddings deeply, Sibar can propose:
 
 ```text
-Proposed Workspace: JAX Transformers
+Proposed Workspace: Embeddings
 
 This workspace will produce:
-- toy transformer in JAX
-- shape/attention notes
-- training/eval notebook
-- benchmark artifact
-- public writeup
+- embeddings notes
+- small artifact
+- next session
 
 Start with:
-Session 01 - JAX arrays and autodiff
+Session 01 - Embeddings foundations
 ```
 
-The first session may later lead to `Implement single-head attention in JAX`, but
-the system should start with the smallest prerequisite session that makes the
-workspace executable and evidence-backed.
+The first session may later lead to vector search, retrieval evaluation, or
+embedding model internals, but the system should start with the smallest
+prerequisite session that makes the workspace executable and evidence-backed.
 
 ## Acceptance
 

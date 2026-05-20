@@ -48,22 +48,36 @@ test("WorkspacePlan keeps global ambition distinct from the bounded workspace", 
   assert.equal(preview.proposed_workspace, "JAX Transformers");
 });
 
-test("WorkspacePlan proposes outputs and a first prerequisite session for JAX Transformers", () => {
+test("WorkspacePlan derives outputs and first session for transformer intent", () => {
   const intent = PedagogoAIWorkspaceIntent.buildWorkspaceIntent(sampleInput);
   const plan = PedagogoAIWorkspaceIntent.compileWorkspacePlanFromIntent(intent);
   const firstSession = PedagogoAIWorkspaceIntent.selectFirstSessionPlan(plan);
 
-  assert.deepEqual(plan.outputs, [
-    "toy transformer in JAX",
-    "shape/attention notes",
-    "training/eval notebook",
-    "benchmark artifact",
-    "public writeup",
-  ]);
-  assert.equal(firstSession.title, "Session 01 - JAX arrays and autodiff");
-  assert.equal(firstSession.node_id, "jax-arrays-autodiff");
-  assert.equal(plan.nodes.some((node) => node.node_id === "single-head-attention-jax"), true);
-  assert.equal(plan.evidence_plan.required_evidence.length, 5);
+  assert.equal(plan.workspace.title, "JAX Transformers");
+  assert.equal(plan.outputs.includes("toy transformer in JAX"), true);
+  assert.equal(firstSession.title, "Session 01 - JAX Transformers foundations");
+  assert.equal(firstSession.node_id, plan.nodes[0].node_id);
+  assert.equal(plan.nodes.some((node) => /transformer/i.test(node.title)), true);
+  assert.equal(plan.evidence_plan.required_evidence.length >= 5, true);
+});
+
+test("WorkspacePlan derives embeddings nodes and session without hardcoded JAX defaults", () => {
+  const intent = PedagogoAIWorkspaceIntent.buildWorkspaceIntent({
+    userAmbition: "Quiero aprender embeddings de forma directa",
+    tryingToBuildOrUnderstand: "quiero aprender embeddings, a no mas poder",
+    sourceInput: "notes about embedding vectors",
+    whyItMatters: "Quiero construir una base concreta para mis proyectos",
+  });
+  const plan = PedagogoAIWorkspaceIntent.compileWorkspacePlanFromIntent(intent);
+  const firstSession = PedagogoAIWorkspaceIntent.selectFirstSessionPlan(plan);
+
+  assert.equal(plan.workspace.title, "Embeddings");
+  assert.match(plan.outputs.join(","), /embeddings/i);
+  assert.match(firstSession.title, /Embeddings/);
+  assert.equal(firstSession.node_id, plan.nodes[0].node_id);
+  assert.equal(plan.nodes[0].title.includes("Embeddings"), true);
+  assert.equal(plan.nodes.every((node) => !/jax/i.test(node.title)), true);
+  assert.equal(plan.nodes.length, 4);
 });
 
 test("WorkspaceIntent validators reject missing source input and ambition/workspace conflation", () => {
