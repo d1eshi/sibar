@@ -11,6 +11,8 @@ discoverable together without using historical spec names.
 ## Layout
 
 - `index.json`: catalog of eval suites, commands, report outputs, and tags.
+- `eval-suite.json`: root suite manifest that connects adapter evals, fixtures,
+  commands, docs, and generated reports.
 - `reports/`: generated eval reports for the current adapter suites.
 - `workspace-intent-compiler.eval.json`: PR #10 parser/schema/pedagogy adapter
   evals for `WorkspaceIntent` to `WorkspacePlan`.
@@ -50,3 +52,6 @@ evals/workspace-plan-adapters/reports/*.json
   explicitly enabled.
 - Rust process: owned by `sibi-workspace-compiler`; TypeScript evals only
   verify runner invocation, adapter status, fallback behavior, and plan mapping.
+
+Run `pnpm eval:catalog` from the repo root to see the suite purpose, protected
+contracts, eval commands, and generated reports.

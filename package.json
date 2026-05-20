@@ -15,6 +15,7 @@
     "eval:selfhost-pilot": "node --experimental-strip-types src/evals/selfhost-pilot.ts",
     "eval:selfhost-freeform": "node --experimental-strip-types src/evals/selfhost-freeform.ts",
     "eval:selfhost-benchmark": "node --experimental-strip-types src/evals/selfhost-benchmark.ts",
+    "eval:catalog": "node --experimental-strip-types src/evals/catalog.ts",
     "web:dev": "bun --hot scripts/web-dev.mjs",
     "article:workspace": "node --experimental-strip-types src/article-workspace-server.ts",
     "article:vercel:check": "node --test --test-concurrency=1 --experimental-strip-types Tests/article-workspace-vercel.test.ts",

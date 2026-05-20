@@ -105,7 +105,7 @@ export type TraceabilityReport = {
 // Demo fixture data
 // ---------------------------------------------------------------------------
 
-export const BENCHMARK_REPORT_PATH = "evals/attempt-readiness/reports/VAL-EVAL-006-selfhost-benchmark.json";
+export const BENCHMARK_REPORT_PATH = "evals/attempt-readiness/reports/VAL-EVAL-007-selfhost-benchmark.json";
 
 /**
  * The freeform evaluator report contains the detailed evidence-bearing fields

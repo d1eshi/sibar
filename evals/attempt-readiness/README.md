@@ -12,6 +12,8 @@ It covers the path from a bounded repo manifest and simulated user answer to:
 
 ## Layout
 
+- `eval-suite.json`: declarative suite manifest for humans, agents, and
+  validation tooling.
 - `manifest.json`: bounded repo slice, concepts, included paths, and eval
   indexes.
 - `mastery-checks/`: declarative prompts and evidence requirements.
@@ -22,3 +24,6 @@ It covers the path from a bounded repo manifest and simulated user answer to:
 The Markdown specs that explain the product contract remain under
 `docs/specs/selfhost/`. Throwaway review prototypes live under
 `prototypes/attempt-readiness/`.
+
+Run `pnpm eval:catalog` from the repo root to see the suite purpose, protected
+contracts, eval commands, and generated reports.
