@@ -107,6 +107,14 @@ release yet.
 - Added global style entry and CSS module styles for the slice-0 viewport while
   keeping legacy scripts/CSS untouched for later migration slices.
 
+### Changed - Tauri Workspace Onboarding (Slice 1)
+
+- Reworked the React onboarding screen into an interactive flow with controlled
+  intent/source/constraint inputs and optional background fields.
+- Added local deterministic preview generation on `Review workspace plan` from the
+  current inputs, and a clear local transition state when `Open first session`
+  is pressed.
+
 ### Fixed - Codex Workspace Output Schema Strictness
 
 - Updated the Rust workspace plan JSON Schema and Codex prompt constraints so

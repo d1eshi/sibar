@@ -1,0 +1,16 @@
+.contractStatus {
+  min-height: 1.8em;
+  color: var(--text-secondary);
+  margin: 0;
+  padding: 8px 0;
+}
+
+.sessionReady {
+  color: var(--text-primary);
+  font-weight: 650;
+}
+
+.openButtonActive {
+  border-color: var(--teal);
+  background: var(--teal-bg);
+}
