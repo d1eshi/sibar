@@ -23,6 +23,19 @@ release yet.
   app that compiles the intent through the core contract layer before opening
   the first session.
 
+### Added - Workspace Rust Compiler Bridge
+
+- Added a new PedagogoAI bridge module for invoking the Rust
+  `sibi-workspace-compiler` via `cargo run --quiet -p sibi-workspace-compiler`.
+- Added Rust plan intent normalization (`user_intent`, `source_bundle`, `evidence`,
+  `root_path`) and a pure codex adapter argument builder so adapter mode selection
+  can be tested without live execution.
+- Added Rust→Pedagogo plan projection that preserves required `WorkspacePlan`
+  fields (`nodes`, `outputs`, `session_plan`, `evidence_plan`) and marks
+  `compiled_by` as `llm` when a runner plan is successfully applied.
+- Added tests that verify fixture execution path, mapped audit payload, and
+  `trying_to_build_or_understand` + evidence inclusion in the generated Rust intent.
+
 ### Changed - Sibar Research Workspace Visual Direction
 
 - Added an image-first UI/UX report and mockup reference for the Sibar research
