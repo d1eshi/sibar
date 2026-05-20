@@ -15,9 +15,9 @@
       <h1>Researcher Workspace</h1>
       <p class="mission-line">
         Mission status:
-        <span data-field="ambition">Frontier AI researcher</span>
+        <span id="todayMission" data-field="ambition">Frontier AI researcher</span>
         ·
-        <span data-field="arc">Neural Nets from Scratch</span>
+        <span id="todayArc" data-field="arc">Neural Nets from Scratch</span>
       </p>
 
       <div class="today-grid">
@@ -25,11 +25,11 @@
           <h2>TODAY</h2>
           <div class="field-group">
             <strong>Current ambition</strong>
-            <span data-field="ambition">Frontier AI researcher</span>
+            <span id="todayMissionField" data-field="ambition">Frontier AI researcher</span>
           </div>
           <div class="field-group">
             <strong>Current arc</strong>
-            <span data-field="arc">Neural Nets from Scratch</span>
+            <span id="todayArcField" data-field="arc">Neural Nets from Scratch</span>
           </div>
           <div class="field-group">
             <strong>Session objective</strong>
@@ -59,6 +59,7 @@
           <small>Evidence-ready readiness graph</small>
         </header>
         <ul id="roadmapList" class="roadmap-list"></ul>
+        <p class="tree-hint" id="treeHint">Expand nodes to open mission/arc/track structure.</p>
       </section>
 
       <section class="panel session-panel" aria-labelledby="session-title" data-component="session-reader-panel">
@@ -74,6 +75,19 @@
           placeholder="Paste a URL, paper note, or article excerpt. Sibar extracts claims and maps them to roadmap nodes."
         ></textarea>
         <button id="compileSource" type="button">Compile source to roadmap</button>
+        <div class="contract-actions">
+          <button id="buildContractPayload" type="button">Generate compiler contract payload</button>
+          <button id="applyGeneratedArtifact" type="button">Apply generated artifact</button>
+          <button id="applySampleArtifact" type="button">Apply validated sample artifact</button>
+        </div>
+        <textarea
+          id="contractPayload"
+          rows="7"
+          class="contract-payload"
+          readonly
+          placeholder='{"request": {...}, "artifact": {...}}'
+        ></textarea>
+        <p id="contractStatus" class="contract-status" role="status" aria-live="polite"></p>
         <p id="compilerResult" class="compiler-result" role="status" aria-live="polite"></p>
         <section id="sourceCard" class="source-card">
           <h3>Source card</h3>
@@ -157,6 +171,8 @@
           <p><strong>Touching:</strong> <span id="lmActiveNode">Backpropagation</span></p>
           <p><strong>Mini-node:</strong> <span id="lmActiveMiniNode">Chain rule trace</span></p>
           <p><strong>Decision:</strong> <span id="lmRecommendedDecision">Read the smallest prerequisite, attempt, then repair.</span></p>
+          <p><strong>Decision alternatives:</strong> <span id="lmDecisionAlternatives">Loading anti-overload alternatives.</span></p>
+          <p><strong>Why not others:</strong> <span id="lmDecisionLockedReasons">No locked alternatives yet.</span></p>
           <p><strong>Reader move:</strong> <span id="lmReaderMove">Open the current mini-node resources.</span></p>
         </section>
         <ul id="modeActionLog" class="mode-log" aria-live="polite"></ul>
