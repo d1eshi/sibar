@@ -11,6 +11,15 @@ accepted specs and iterations, not by raw commit count.
 Use this section for changes that have landed but are not part of a tagged
 release yet.
 
+### Internal - PedagogoAI Layer Boundary
+
+- Added a declarative `src/pedagogoai` architecture layer that maps learning
+  workspace contracts, pedagogy policy, evidence/artifacts, readiness/mastery,
+  gap repair, recall/review, source-to-session compilation, and track
+  specialization into explicit domain entrypoints.
+- Reframed Explain A-Z as a PedagogoAI track alongside Deep Ownership, while
+  preserving existing runtime imports through adapter reexports.
+
 ### Fixed - Live Workspace Preview and Evidence Ranges
 
 - Updated live workspace contract generation so `artifact_previews` render text from
