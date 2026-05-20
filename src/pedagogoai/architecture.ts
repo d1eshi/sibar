@@ -1,5 +1,6 @@
 export type PedagogoAICapability =
   | "workspace-contracts"
+  | "workspace-intent"
   | "pedagogical-policies"
   | "evidence-artifacts"
   | "readiness-mastery"
@@ -33,6 +34,20 @@ export const PEDAGOGOAI_BOUNDARIES: PedagogoAIModuleBoundary[] = [
       "src/pedagogy/index.ts",
       "src/runtime-support.ts",
       "src/runtime-workspace-session-contracts.ts",
+    ],
+    track: "core-workspace",
+  },
+  {
+    capability: "workspace-intent",
+    entrypoint: "src/pedagogoai/workspace-intent.ts",
+    owns: [
+      "WorkspaceIntent user input contract",
+      "SourceIntake source/playbook contract",
+      "WorkspacePlan, SessionPlan, and EvidencePlan compile boundary",
+      "deterministic create-workspace builders and validators",
+    ],
+    adapters: [
+      "apps/sibar-research-workspace/scripts/workspace-intent-adapter.js",
     ],
     track: "core-workspace",
   },
