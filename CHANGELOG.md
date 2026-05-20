@@ -43,6 +43,17 @@ release yet.
 
 - Refined the static Tauri workspace prototype toward a native two-surface flow:
   compact workspace-intent onboarding followed by a focused study workspace.
+- Removed user-facing `Read / Build / Recall` choice buttons from the active
+  session flow. Workspace overview now uses a single selected-node/session open
+  action, and active session renders the selected node material surface directly
+  by typed render mode.
+- Added typed material-mode projection for active node views (`paper`, `note`,
+  `artifact`, `code`, `equation`, `math`, and `fallback`) and surfaced recall as
+  a guidance/review status instead of a primary action.
+- Implemented the runtime entry as `Workspace Home` (static first), with simple
+  fixtures for existing workspaces (`Embeddings`, `RAG`, `JAX`) and action routing:
+  `New workspace`, `Open`, and `Resume` to either study-path overview or active
+  learning-material session.
 
 ### Added - Workspace Intent First Flow
 

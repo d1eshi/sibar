@@ -2,6 +2,7 @@ import * as React from "react";
 import styles from "./App.module.css";
 import { OnboardingFlow } from "./flows/onboarding/OnboardingFlow";
 import { WorkspaceShell } from "./flows/workspace/WorkspaceShell";
+import { WorkspaceHome } from "./flows/workspace/WorkspaceHome";
 import { WorkspaceOverview } from "./flows/workspace/WorkspaceOverview";
 import { SessionWorkbench } from "./flows/workspace/SessionWorkbench";
 import { StudyPathRail } from "./flows/workspace/StudyPathRail";
@@ -9,14 +10,14 @@ import stylesWorkspace from "./flows/workspace/workspace.module.css";
 import {
   createInitialWorkspaceStateFromFixture,
   firstWorkspaceSessionFixture,
+  workspaceHomeProjection,
   projectWorkspaceSession,
 } from "./state/workspaceProjection";
 import { workspaceSessionReducer } from "./state/workspaceReducer";
 
 export default function App() {
-  const [flowStep, setFlowStep] = React.useState<"onboarding" | "overview" | "session">(
-    "onboarding",
-  );
+  type AppFlowStep = "home" | "onboarding" | "overview" | "session";
+  const [flowStep, setFlowStep] = React.useState<AppFlowStep>("home");
   const [workspaceState, dispatchWorkspace] = React.useReducer(
     workspaceSessionReducer,
     createInitialWorkspaceStateFromFixture(firstWorkspaceSessionFixture),
@@ -26,7 +27,7 @@ export default function App() {
     firstWorkspaceSessionFixture,
   );
 
-  function openFlowStep(nextStep: "overview" | "session") {
+  function openFlowStep(nextStep: AppFlowStep) {
     setFlowStep(nextStep);
     window.requestAnimationFrame(() => window.scrollTo({ top: 0, left: 0 }));
   }
@@ -34,7 +35,13 @@ export default function App() {
   return (
     <main className={styles.researchShell} data-component="research-workspace-root">
       <WorkspaceShell mode={flowStep}>
-        {flowStep === "onboarding" ? (
+        {flowStep === "home" ? (
+          <WorkspaceHome
+            projection={workspaceHomeProjection}
+            onNewWorkspace={() => openFlowStep("onboarding")}
+            onOpenWorkspace={(workspace) => openFlowStep(workspace.openTarget)}
+          />
+        ) : flowStep === "onboarding" ? (
           <OnboardingFlow onOpenWorkspace={() => openFlowStep("overview")} />
         ) : flowStep === "overview" ? (
           <WorkspaceOverview
@@ -55,8 +62,6 @@ export default function App() {
             />
             <SessionWorkbench
               projection={workspaceProjection}
-              state={workspaceState}
-              dispatch={dispatchWorkspace}
             />
             {workspaceState.isReadinessPanelVisible ? (
               <aside className={stylesWorkspace.readinessPanel}>
@@ -66,6 +71,7 @@ export default function App() {
                 <ul>
                   <li>One concrete artifact from the current mini-node.</li>
                   <li>One evidence-backed conclusion.</li>
+                  <li>{workspaceProjection.recallStatus}</li>
                   <li>{workspaceProjection.readinessLabel}</li>
                 </ul>
                 <button
