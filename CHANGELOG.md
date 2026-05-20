@@ -39,7 +39,7 @@ release yet.
   intent, fixtures, and generated reports by the WorkspacePlan adapter boundary,
   identifying Workspace Intent, Rust fixture, and `codex-exec` adapter coverage.
 - Moved attempt-readiness eval manifests, gold cases, mastery checks, generated
-  reports, and prototypes out of `docs/specs/selfhost/` into `evals/` and
+  reports, and prototypes out of the legacy self-host docs spec tree into `evals/` and
   `prototypes/` so the self-hosted pilot docs stay Markdown-only.
 - Added a declarative `evals/index.json` and per-suite `eval-suite.json`
   manifests plus `pnpm eval:catalog` so agents can discover eval purpose,
@@ -57,6 +57,8 @@ release yet.
 - Added `VAL-EVAL-013-pedagogy-core-coverage` to directly exercise the real
   `src/pedagogy` layer, question, signal, and pipeline modules without LLM
   calls.
+- Moved deep ownership workspace fixtures and pedagogy eval docs under `evals/`
+  so `docs/` no longer owns operational eval, fixture, or report paths.
 
 ### Changed - Workspace Intent Onboarding Compiler
 
@@ -219,7 +221,7 @@ release yet.
 ### Added - Deterministic Live Workspace Repro Path
 
 - Added a committed fixture at
-  `docs/specs/deep-ownership-workspace/fixtures/live-workspace-session.json`
+  `evals/deep-ownership-workspace/fixtures/live-workspace-session.json`
   and wired `start_workspace_session` to expose it in `live_workspace.ui_reproduction.fixture_path`.
 - Extended `start-workspace-session` and `explain` CLI commands with
   `--fixture-model-response-path` for deterministic dev/runtime checks.

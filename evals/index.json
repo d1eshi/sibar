@@ -9,9 +9,9 @@
       "summary": "Evaluates bounded repo evidence, simulated user answers, gap labels, repair actions, re-evaluation prompts, and readiness labels.",
       "manifest_path": "evals/attempt-readiness/eval-suite.json",
       "docs": [
-        "docs/specs/selfhost/01_selfhost_boundary.md",
-        "docs/specs/selfhost/02_evaluation_contract.md",
-        "docs/specs/selfhost/04_selfhost_gap_detection_benchmark.md"
+        "evals/attempt-readiness/docs/01_selfhost_boundary.md",
+        "evals/attempt-readiness/docs/02_evaluation_contract.md",
+        "evals/attempt-readiness/docs/04_selfhost_gap_detection_benchmark.md"
       ],
       "tags": [
         "attempt-readiness",
@@ -27,9 +27,9 @@
       "summary": "Evaluates WorkspaceIntent parsing, provider-neutral model IO normalization, WorkspacePlan validation, Rust fixture execution, and offline Codex runner metadata.",
       "manifest_path": "evals/workspace-plan-adapters/eval-suite.json",
       "docs": [
-        "docs/specs/deep-ownership-workspace/15_workspace_intent_compiler.md",
-        "docs/specs/deep-ownership-workspace/16_llm_adapter_contract.md",
-        "docs/specs/deep-ownership-workspace/19_workspace_trace_contract_gate.md"
+        "evals/workspace-plan-adapters/docs/15_workspace_intent_compiler.md",
+        "evals/workspace-plan-adapters/docs/16_llm_adapter_contract.md",
+        "evals/workspace-plan-adapters/docs/19_workspace_trace_contract_gate.md"
       ],
       "tags": [
         "workspace-plan",

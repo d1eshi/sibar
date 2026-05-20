@@ -16,7 +16,7 @@ import { buildWorkspaceSessionContract } from "../src/runtime-workspace-session-
 
 type Success<T> = { ok: true; data: T };
 const LIVE_WORKSPACE_FIXTURE_PATH = resolve(
-  "docs/specs/deep-ownership-workspace/fixtures/live-workspace-session.json",
+  "evals/deep-ownership-workspace/fixtures/live-workspace-session.json",
 );
 
 function expectSuccess<T>(value: unknown): Success<T> {

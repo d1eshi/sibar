@@ -13,6 +13,7 @@ discoverable together without using historical spec names.
 - `index.json`: catalog of eval suites, commands, report outputs, and tags.
 - `eval-suite.json`: root suite manifest that connects adapter evals, fixtures,
   commands, docs, and generated reports.
+- `docs/`: local copies of the contracts referenced by the suite.
 - `reports/`: generated eval reports for the current adapter suites.
 - `workspace-intent-compiler.eval.json`: PR #10 parser/schema/pedagogy adapter
   evals for `WorkspaceIntent` to `WorkspacePlan`.

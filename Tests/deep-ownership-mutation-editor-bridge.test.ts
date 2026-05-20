@@ -13,7 +13,7 @@ import {
   type EvidenceRef,
 } from "../src/runtime-deep-ownership.ts";
 
-const FIXTURE_PATH = "docs/specs/deep-ownership-workspace/fixtures/sibi-pedagogy-loop.json";
+const FIXTURE_PATH = "evals/deep-ownership-workspace/fixtures/sibi-pedagogy-loop.json";
 
 function makeEvidenceRef(filePath = "src/runtime-deep-ownership.ts"): EvidenceRef {
   return {

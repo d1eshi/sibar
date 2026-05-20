@@ -21,9 +21,8 @@ It covers the path from a bounded repo manifest and simulated user answer to:
 - `reports/`: generated reports from the deterministic and freeform eval
   runners.
 
-The Markdown specs that explain the product contract remain under
-`docs/specs/selfhost/`. Throwaway review prototypes live under
-`prototypes/attempt-readiness/`.
+The Markdown contracts consumed by this suite live under `docs/` in this
+directory. Throwaway review prototypes live under `prototypes/attempt-readiness/`.
 
 Run `pnpm eval:catalog` from the repo root to see the suite purpose, protected
 contracts, eval commands, and generated reports.
