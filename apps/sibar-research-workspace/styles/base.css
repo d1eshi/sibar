@@ -1,0 +1,94 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  background: var(--surface);
+  color: var(--text-primary);
+  line-height: 1.45;
+}
+
+.research-shell {
+  min-height: 100vh;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.eyebrow {
+  margin: 0 0 6px;
+  color: var(--text-muted);
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0,0,0,0);
+  border: 0;
+}
+
+h1, h2, h3, p {
+  margin: 0;
+}
+
+.panel,
+.item-list,
+.tile,
+.artifact-strip,
+.attempt-feedback,
+.compiler-result {
+  background: var(--surface-raised);
+  border: 1px solid var(--divider);
+  border-radius: var(--radius);
+}
+
+button,
+textarea {
+  font: inherit;
+}
+
+button {
+  border: 1px solid var(--divider);
+  background: var(--surface);
+  color: var(--text-primary);
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+
+button:hover {
+  background: var(--surface-soft);
+}
+
+button:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid var(--blue);
+  outline-offset: 2px;
+}
+
+textarea {
+  width: 100%;
+  resize: vertical;
+  padding: 8px;
+  color: var(--text-primary);
+  background: var(--surface);
+  border: 1px solid var(--divider);
+  border-radius: var(--radius-sm);
+}
