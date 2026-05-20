@@ -4,6 +4,8 @@
 
 Define the end-to-end Rust execution flow for producing a UI-ready workspace
 from user request to snapshot, including repair loops and context-question prompts.
+The flow is asynchronous and host-driven: onboarding triggers a Tauri/Rust job and
+the UI renders only the resulting state, never talking to the adapter itself.
 
 The pipeline must be robust to missing source data, schema drift, and LLM uncertainty,
 while preserving a clean audit trail and deterministic outputs for UI.
@@ -29,8 +31,18 @@ PreparedSourceBundle
   boundary_guard
   bundle_fingerprint
 
+ExecutionJob
+  job_id
+  status: queued | running | validating | completed | blocked | failed | cancelled
+  runner
+  request_id
+  created_at
+  updated_at
+  cancel_requested_at?
+
 ExecutionDecision
   status: need_context | plan_ready | blocked
+  job: ExecutionJob
   reason_code
   plan_snapshot? : WorkspacePlan
   workspace_snapshot? : WorkspaceSnapshot
@@ -61,7 +73,12 @@ WorkspaceSnapshot
    - pass intent/bundle/state to `WorkspaceIntentCompiler`.
 3. **Call adapter**
    - if plan compiles without model step and confidence is high, skip call,
-   - otherwise invoke `LLM Adapter` with `WorkspacePlan` context.
+   - otherwise create `ExecutionJob` with `status=queued`, then invoke `LLM Adapter`
+     through Rust/Tauri child-process boundary with a JSON payload on `stdin`.
+   - the host updates `ExecutionJob.status` to:
+     - `running` when process is spawned,
+     - `validating` while parser/schema/pedagogy checks run,
+     - `completed`, `blocked`, `failed`, or `cancelled` on terminal outcomes.
 4. **Validate and classify**
    - parse + schema + invariants.
    - `accept`: merge candidate and continue.
@@ -72,11 +89,17 @@ WorkspaceSnapshot
    - emit `WorkspacePlan` for execution runtime and UI.
 6. **Persist minimal trace**
    - store decision, fingerprints, diagnostics, and repair history.
+   - cancel path stores `ExecutionJob.status=cancelled` and `reason_code`.
 
 ## Invariants
 
 - `prepare` never dereferences files outside declared boundary.
-- Every execution produces either `need_context` or `plan_ready` or `blocked`.
+- Every execution produces either `need_context` or `plan_ready` or `blocked`
+  and includes a job status.
+- Job status transitions are deterministic:
+  `queued -> running -> validating -> completed/blocked/failed/cancelled`.
+- Job cancelation is explicit and traceable (`cancel_requested_at`, `reason_code`).
+- No timeout is the normal termination strategy for long jobs.
 - `workspace_snapshot` is never emitted if invariant checks are incomplete.
 - Evidence used by artifacts must be stable and point to paths in `manifest_path`.
 - No hidden mutation of product source from execution pipeline.
@@ -91,6 +114,10 @@ WorkspaceSnapshot
   - `accept` path produces both `WorkspacePlan` and `WorkspaceSnapshot`,
   - `repair` path emits user question before any mutation attempt,
   - `reject` path contains reason code and diagnostics.
+- Async job behavior:
+  - status transitions cover queued/running/validating/completed/blocked/failed/cancelled,
+  - explicit cancel request drives `cancelled` terminal state,
+  - no hardcoded timeout as canonical execution stop condition.
 - `UX` verification:
   - no mega-workspace from large boundary (visible cap respected),
   - no direct answer leakage in `workspace_snapshot`.

@@ -15,8 +15,11 @@ This contract follows `14_workspace_intent_flow.md`: the user-facing
 Rust-native boundary that turns that intent plus source evidence into a bounded
 plan.
 
-The compiler must be usable without LLM execution in first slice (heuristic fallback),
-but must emit a model-ready plan request envelope when needed.
+The compiler must be usable without LLM execution in first slice (heuristic
+fallback), but must emit a model-ready plan request envelope when needed.
+The UI does not call the compiler directly; onboarding triggers a Tauri/Rust
+job that owns schema validation, compiler execution, adapter invocation, and plan
+projection.
 
 ## Data Contract
 
@@ -27,7 +30,7 @@ WorkspaceIntentInput
   user_intent { id, raw_text, learning_goal, preferred_mode?, requested_artifact_kind? }
   source_bundle { id, root_path, included_paths[], excluded_paths[], evidence_inventory[], skip_zones[] }
   existing_state { loop_id?, user_prefs?, prior_readiness[], prior_gaps[], preferred_artifact_count?, locked_nodes[] }
-  context_budget { max_nodes, max_evidence_refs, max_plan_steps, max_next_actions=3 }
+  context_budget { max_nodes, max_evidence_refs, max_plan_steps, max_next_actions=3, max_artifact_count }
 ```
 
 ### Output
@@ -75,6 +78,10 @@ WorkspacePlan
    - evidence inventory exists for selected slice,
    - next actions are between 2 and 3,
    - `ui_contract.no_mega_workspace` is true.
+8. Emit `WorkspaceIntentCompilerRun` metadata for the Rust host (`status`,
+   `input_schema_version`, `compiler_duration_ms`, `boundary_fingerprint`)
+   so the execution pipeline can report queued/running/validating/completed
+   transitions.
 
 Fallback:
 
@@ -88,6 +95,11 @@ object asking the user for missing boundary, preferred depth, or evidence.
 - Every `concept_slice` references at least one valid evidence ref.
 - `next_actions` must be renderable and non-empty at UI time.
 - Never emit a plan with artifact count above `context_budget.max_artifact_count`.
+- Compiler output must remain stable for downstream parser/schema checks.
+- Pedagogical invariants are preserved here:
+  - evidence-grounded artifacts and next actions,
+  - operation must remain attempt-first in intent shape,
+  - no claims of total-repo ownership are synthesized.
 
 ## Verification
 

@@ -36,15 +36,21 @@ release yet.
 - Added tests that verify fixture execution path, mapped audit payload, and
   `trying_to_build_or_understand` + evidence inclusion in the generated Rust intent.
 
-### Added - Workspace Codex Runner Smoke UI
+### Changed - Workspace Intent Onboarding Compiler
 
 - Added a local Sibar Research Workspace dev server route for running the Rust
   workspace compiler from the browser and rendering the returned workspace plan.
-- Added a `Run Codex runner` action to the Workspace Intent UI so a bounded
-  intent can execute the Rust `codex-exec` adapter and preview the generated
-  first learning node.
+- Updated the normal `Generate workspace` onboarding action to compile the user's
+  first-step intent through the Rust/Codex runner when available, with local
+  deterministic fallback instead of a separate developer runner button.
 - Added inline source evidence fallback for runner intents that use pasted source
   text instead of repository file paths.
+- Updated the deterministic Workspace Intent compiler so fallback nodes, outputs,
+  and the first session are derived from the user's topic, including the
+  embeddings onboarding case, instead of defaulting to the JAX transformer path.
+- Updated the Workspace Intent execution specs in-place so the canonical path is
+  UI onboarding -> Tauri/Rust async job -> adapter -> parse/schema/pedagogy
+  validation -> reproducible UI projection, without adding new spec files.
 
 ### Fixed - Codex Workspace Output Schema Strictness
 

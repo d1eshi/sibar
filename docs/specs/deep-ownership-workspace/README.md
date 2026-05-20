@@ -151,6 +151,31 @@ Minimum visible proof:
 7. one gap or readiness panel
 8. one next repair action
 
+## Runtime Topology for the Workspace Slice
+
+The runtime is always this sequence:
+
+1. UI onboarding captures `WorkspaceIntent` and selected source boundary.
+2. Tauri/Rust receives the request and creates an execution job.
+3. Rust invokes the adapter (`fixture` or `codex-exec`, then API/local fallback) as a
+   controlled child process via `stdin` JSON payload and schema.
+4. Rust validates parse/schema/pedagogy and classifies job outcome.
+5. Rust emits `WorkspacePlan` + reproducible workspace snapshot to UI.
+
+The UI does not expose a "Run Codex runner" button and does not know adapter
+details. It renders job progression via states:
+
+- queued
+- running
+- validating
+- completed
+- blocked
+- failed
+- cancelled
+
+No timeout strategy is defined as the main failure path. Cancellation is explicit
+and terminal (`cancelled`) through job control.
+
 ## Reproducible Live Workspace Repro
 
 For deterministic developer verification of the live ownership loop (no external LLM call),
@@ -168,6 +193,9 @@ Run:
 `Start` uses the current working directory as the repo root.
 
 and click `Start`.
+
+`web:dev` is only for smoke/fallback verification and is not the primary execution
+path for this architecture.
 
 For direct CLI checks:
 

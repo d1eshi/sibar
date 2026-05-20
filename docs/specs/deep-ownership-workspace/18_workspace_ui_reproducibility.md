@@ -17,6 +17,7 @@ WorkspaceUiProjection
   snapshot_id
   plan_id
   source_bundle_id
+  execution_job { id, status, reason_code? }
   reproducibility_hash
   loop_summary { goal, boundary_label, scope, readiness_scope }
   active_slice { id, path, slice_title, confidence_band }
@@ -54,7 +55,12 @@ WorkspaceUiProjection
 4. Render constraints:
    - if no lock conditions are met, keep nodes in `blocked_state`,
    - if required evidence is missing, keep action disabled with hint.
-5. Return projection with explicit failure state instead of silent omission.
+5. Include execution state:
+   - pass `execution_job.status` in projection order-independent.
+   - keep adapter runner internals out of the payload.
+   - do not render a `Run Codex runner` or provider-specific action.
+   - show clear blocked/failed/cancelled messaging through `blocked_state`.
+6. Return projection with explicit failure state instead of silent omission.
 
 ## Invariants
 
@@ -67,6 +73,9 @@ WorkspaceUiProjection
   - max 80 evidence rows visible by default.
 - Snapshot is stable across rerenders with same plan/evidence IDs.
 - UI must not render unsafely inferred claims without support markers.
+- UI render contract never includes raw adapter output or command stderr content.
+- Execution status in projection is constrained to:
+  queued, running, validating, completed, blocked, failed, cancelled.
 
 ## Verification
 
