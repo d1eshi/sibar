@@ -9,6 +9,13 @@ import {
   importSampleRoadmapArtifact,
 } from "./workspace-contract.js";
 import {
+  applyWorkspacePlanPreviewToState,
+  compileWorkspaceIntentPreview,
+  hydrateWorkspaceIntentForm,
+  readWorkspaceIntentForm,
+  renderWorkspaceIntentPreview,
+} from "./workspace-intent-adapter.js";
+import {
   buildDecisionState,
   createDefaultState,
   evaluateAttemptForState,
@@ -99,6 +106,11 @@ export function initResearchWorkspace({
   root.modeStatus = document.getElementById(modeStatus);
   root.modeActionLog = document.getElementById(modeActionLog);
   const maxModeEntries = 6;
+
+  function setWorkspaceStage(stage) {
+    state.workspaceStage = stage;
+    root.workspaceRoot?.setAttribute?.("data-workspace-state", stage);
+  }
 
   function render() {
     const context = renderNodeReader(root, state);
@@ -213,6 +225,33 @@ export function initResearchWorkspace({
     root.studyChoiceNow?.addEventListener("click", () => focusRecommendedStudyChoice());
     root.studyChoiceBuild?.addEventListener("click", () => setMode(root.studyChoiceBuild?.dataset?.actionMode || "/build"));
     root.studyChoiceExplain?.addEventListener("click", () => setMode(root.studyChoiceExplain?.dataset?.actionMode || "/explain"));
+  }
+
+  function wireWorkspaceIntent() {
+    hydrateWorkspaceIntentForm(root);
+    root.generateWorkspace?.addEventListener("click", () => {
+      const compiled = compileWorkspaceIntentPreview(readWorkspaceIntentForm(root));
+      const applied = applyWorkspacePlanPreviewToState(state, compiled.workspace_plan);
+      state.workspaceIntentCompiled = compiled;
+      renderWorkspaceIntentPreview(root, compiled);
+      setWorkspaceStage(applied.applied ? "preview" : "intent");
+      render();
+      pushModeAction({
+        scope: "workspace-intent",
+        text: applied.applied
+          ? `Workspace intent compiled: ${compiled.preview.proposed_workspace}; first session ${compiled.preview.first_session}.`
+          : "Workspace intent compile failed validation.",
+      });
+    });
+
+    root.openWorkspaceSession?.addEventListener("click", () => {
+      setWorkspaceStage("session");
+      render();
+      pushModeAction({
+        scope: "/read",
+        text: `Opened first session: ${state.workspaceIntentCompiled?.preview?.first_session || state.activeSessionId}.`,
+      });
+    });
   }
 
   function wireModes() {
@@ -349,6 +388,7 @@ export function initResearchWorkspace({
   });
 
   state.lastDecision = buildDecisionState(state);
+  wireWorkspaceIntent();
   render();
   wireStudyChoices();
   const wiredModes = wireModes();
@@ -367,6 +407,7 @@ export function initResearchWorkspace({
     buildRoadmapArtifactFromRequest,
     applyRoadmapArtifact,
     compileCurrentStateArtifact,
+    compileWorkspaceIntentPreview,
   };
 }
 

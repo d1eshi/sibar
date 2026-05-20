@@ -67,6 +67,16 @@ export {
   validateRoadmapArtifact,
 } from "./workspace-contract.js";
 export {
+  WORKSPACE_INTENT_ADAPTER_KIND,
+  WORKSPACE_INTENT_CORE_ENTRYPOINT,
+  applyWorkspacePlanPreviewToState,
+  compileWorkspaceIntentPreview,
+  hydrateWorkspaceIntentForm,
+  readWorkspaceIntentForm,
+  renderWorkspaceIntentPreview,
+  workspacePlanToRoadmap,
+} from "./workspace-intent-adapter.js";
+export {
   activeRoadmapNode,
   buildDecisionState,
   describeModeAction,

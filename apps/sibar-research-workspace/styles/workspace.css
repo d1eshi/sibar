@@ -9,6 +9,15 @@
   box-shadow: 0 28px 80px rgba(0, 0, 0, 0.38);
 }
 
+.native-window[data-workspace-state="intent"] .workspace-frame,
+.native-window[data-workspace-state="preview"] .workspace-frame {
+  display: none;
+}
+
+.native-window[data-workspace-state="session"] .workspace-intent-screen {
+  display: none;
+}
+
 .workspace-topbar {
   display: flex;
   align-items: center;
@@ -144,6 +153,95 @@
   grid-template-columns: 260px minmax(500px, 1fr) 360px;
   grid-template-rows: minmax(0, 1fr) auto;
   background: #f8f3ea;
+}
+
+.workspace-intent-screen {
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(460px, 640px) minmax(320px, 1fr);
+  gap: 24px;
+  padding: 28px;
+  overflow: auto;
+  background: #fbf8f1;
+}
+
+.workspace-intent-form,
+.workspace-intent-preview {
+  align-self: start;
+  display: grid;
+  gap: 14px;
+}
+
+.workspace-intent-form {
+  max-width: 640px;
+}
+
+.workspace-intent-form h1 {
+  font-size: 34px;
+  line-height: 1.06;
+}
+
+.intent-copy {
+  max-width: 560px;
+  color: var(--text-secondary);
+}
+
+.workspace-intent-form label {
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.intent-field-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.intent-field-grid > div {
+  display: grid;
+  gap: 8px;
+}
+
+.generate-workspace-button {
+  justify-self: start;
+  min-width: 180px;
+  background: var(--accent);
+  color: #fffaf1;
+  border-color: var(--accent);
+  font-weight: 700;
+}
+
+.workspace-intent-preview {
+  padding: 18px;
+  background: var(--surface-raised);
+  border: 1px solid var(--divider);
+  border-radius: var(--radius);
+}
+
+.workspace-intent-preview[hidden] {
+  display: none;
+}
+
+.workspace-intent-preview h2 {
+  font-size: 24px;
+  line-height: 1.14;
+}
+
+.first-session-callout {
+  display: grid;
+  gap: 4px;
+  padding: 12px;
+  background: #f7efe0;
+  border: 1px solid #e6d2ad;
+  border-radius: var(--radius-sm);
+}
+
+.first-session-callout span {
+  color: var(--text-muted);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
 }
 
 .library-sidebar {
@@ -845,6 +943,10 @@
     grid-template-rows: auto auto auto;
   }
 
+  .workspace-intent-screen {
+    grid-template-columns: 1fr;
+  }
+
   .library-sidebar {
     grid-row: 1 / 4;
   }
@@ -879,6 +981,18 @@
   }
 
   .workspace-frame {
+    grid-template-columns: 1fr;
+  }
+
+  .workspace-intent-screen {
+    padding: 18px;
+  }
+
+  .workspace-intent-form h1 {
+    font-size: 28px;
+  }
+
+  .intent-field-grid {
     grid-template-columns: 1fr;
   }
 
