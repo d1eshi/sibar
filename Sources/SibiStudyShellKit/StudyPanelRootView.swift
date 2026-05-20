@@ -94,13 +94,15 @@ struct StudyPanelRootView: View {
                 if let liveWorkspaceSession = model.liveWorkspaceSession {
                     LiveWorkspaceSessionView(
                         result: liveWorkspaceSession,
-                        onSubmitAttempt: { answerText, selectedEvidence, confidence, unknowns in
+                        isSubmittingWorkspaceAttempt: model.isSubmittingWorkspaceAttempt,
+                        onSubmitAttempt: { answerText, selectedEvidence, confidence, unknowns, action in
                             Task {
                                 await model.submitWorkspaceAttempt(
                                     answerText: answerText,
                                     selectedEvidence: selectedEvidence,
                                     confidence: confidence,
-                                    declaredUnknowns: unknowns
+                                    declaredUnknowns: unknowns,
+                                    action: action
                                 )
                             }
                         }

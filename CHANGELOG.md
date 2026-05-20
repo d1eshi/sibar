@@ -11,6 +11,17 @@ accepted specs and iterations, not by raw commit count.
 Use this section for changes that have landed but are not part of a tagged
 release yet.
 
+### Fixed - Live Workspace Preview and Evidence Ranges
+
+- Updated live workspace contract generation so `artifact_previews` render text from
+  `payload.lines` when `excerpt` is not provided, while preserving preview
+  `line_start` and `line_end`.
+- Updated `evidence` contract `line_range` to use cited `start_line`/`end_line`
+  from `source_evidence` when available, with payload line metadata as fallback.
+- Updated artifact type inference for PDF/paper handling, including `.pdf` path
+  detection and clearer `preview_fallback_reason` messages when no renderable
+  snippet exists for non-text previews.
+
 ### Added - Native Explain A-Z Attempt Bridge
 
 - Added the native Swift live-loop attempt bridge for `Explain this project A-Z`:
@@ -19,6 +30,39 @@ release yet.
 - The Swift panel now renders the attempt composer, locked required evidence,
   deterministic evidence-check results, detected gaps, repair actions, and
   scoped readiness without opening a browser workspace.
+
+### Added - Native Live Workspace Repro Path
+
+- Extended `StartWorkspaceSessionPayload` with optional
+  `fixture_model_response_path`, encoded as `fixture_model_response_path` only
+  when provided.
+- Updated native live workspace startup to read
+  `SIBI_WORKSPACE_FIXTURE_MODEL_RESPONSE_PATH` and pass it through to the
+  `start_workspace_session` payload, with a lightweight injectable environment
+  hook for tests.
+
+### Added - Live Workspace Evaluation Visibility
+
+- Extended `LiveWorkspaceRenderModel` with explicit evidence/evaluation fields:
+  selected/cited/missing evidence IDs and normalized attempt-evaluation data
+  (observed/missing/unsupported/contradicted claims, detected gap, repair action,
+  reattempt prompt, and scoped readiness).
+- Updated the native live-workspace center/right panel rendering to surface those
+  deterministic fields as explicit sections and to mark artifact code lines by
+  active range, cited evidence, selected evidence, and missing evidence.
+- Added focused tests for submit-time evidence defaults and evaluation payload
+  rendering in `Tests/SibiCoreTests/StudyPanelTests.swift`.
+
+### Added - Deterministic Live Workspace Repro Path
+
+- Added a committed fixture at
+  `docs/specs/deep-ownership-workspace/fixtures/live-workspace-session.json`
+  and wired `start_workspace_session` to expose it in `live_workspace.ui_reproduction.fixture_path`.
+- Extended `start-workspace-session` and `explain` CLI commands with
+  `--fixture-model-response-path` for deterministic dev/runtime checks.
+- Added runtime and CLI tests in `Tests/workspace-live-session.test.ts`
+  proving `start` + `submit` paths return attempt evaluation, submitted attempt,
+  readiness, and deterministic reproduction metadata without requiring a live model runner.
 
 ### Added - Deep Ownership Workspace Attempt-First UI Flow
 
@@ -33,6 +77,13 @@ release yet.
   rejects whole-repo mastery.
 - Added `assertHiddenAnswerGated()` runtime check verifying no hidden solution
   content leaks into DOM or accessibility text before attempt submission.
+
+### Added - Live Workspace Render Model for 3-Panel Shell
+
+- Added `LiveWorkspaceRenderModel` for `LiveWorkspaceSessionView` as a deterministic
+  source of left/center/right panel data from `StartWorkspaceSessionResult`, and
+  added `StudyPanelTests` coverage for start/submit fixtures (requested artifact,
+  evidence, next action, excluded/unknown scope, and readiness when available).
 
 ### Added - Reference Component Contracts, Accessibility, and Setup Flow
 
@@ -68,6 +119,20 @@ release yet.
   verifying evidence ID stability, role classification of source/tests/docs,
   unknown zone presence, boundary enforcement against out-of-bound paths,
   and readiness scope without whole-repo ownership claims.
+
+### Fixed - Live Workspace Submission Action
+
+- Routed submit action from the live workspace attempt composer to `SubmitWorkspaceAttemptPayload`,
+  so normal submit uses `.submit` and the "I do not know" button sends `.i_do_not_know`.
+- Updated `StudyPanelLiveModel.submitWorkspaceAttempt` to accept an optional action
+  argument (defaulting to `.submit`) and forward it unchanged to runtime payloads.
+
+### Changed - Native Live Workspace Preview and Composer Submit Behavior
+
+- The native live workspace now lets users select among left panel artifact previews; the
+  center preview updates from runtime-provided options to match the selected artifact.
+- During attempt submission, the composer now visibly disables controls until the submit
+  resolves, preventing duplicate interactions while preserving selection state.
 
 Each changelog-worthy change should be updated in the same commit as the work it
 describes. Skip this file only when the commit is purely mechanical and does not
@@ -108,6 +173,10 @@ exist to make the public reader story reviewable before production promotion.
 
 ### Added
 
+- Added typed live workspace contracts in the current runtime/Swift slice:
+  `live_workspace` render contracts for start/submit, the submitted attempt
+  contract, attempt evaluation contract, and `ui_reproduction` contract, including
+  Swift decoding plus contract tests for round-trip validation.
 - Live Deep Ownership Workspace sessions that inventory repo evidence, include
   source-control context, run the project-learning agent through Codex CLI
   `auto`, and expose a `sibi explain` command for starting the A-Z project
