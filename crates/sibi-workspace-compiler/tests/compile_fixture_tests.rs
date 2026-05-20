@@ -1,4 +1,5 @@
 use std::fs;
+use std::path::PathBuf;
 
 use sibi_workspace_compiler::{
     build_adapter, compile_workspace_intent, parse_workspace_intent, CompileError,
@@ -54,6 +55,40 @@ fn write_temp_plan(json: &str) -> (tempfile::TempDir, std::path::PathBuf) {
     (dir, path)
 }
 
+fn assert_object_properties_are_required(value: &serde_json::Value, path: &str) {
+    if let Some(properties) = value.get("properties").and_then(|entry| entry.as_object()) {
+        let required = value
+            .get("required")
+            .and_then(|entry| entry.as_array())
+            .expect("object schema with properties must declare required");
+        let required_values = required
+            .iter()
+            .filter_map(|entry| entry.as_str())
+            .collect::<std::collections::BTreeSet<_>>();
+
+        for property in properties.keys() {
+            assert!(
+                required_values.contains(property.as_str()),
+                "{path} property '{property}' must be listed in required for Codex output-schema strict mode",
+            );
+        }
+    }
+
+    match value {
+        serde_json::Value::Object(map) => {
+            for (key, child) in map {
+                assert_object_properties_are_required(child, &format!("{path}.{key}"));
+            }
+        }
+        serde_json::Value::Array(entries) => {
+            for (index, child) in entries.iter().enumerate() {
+                assert_object_properties_are_required(child, &format!("{path}[{index}]"));
+            }
+        }
+        _ => {}
+    }
+}
+
 fn valid_plan_json(with_questions: bool, source_link: &str, advanced_locked: bool) -> String {
     let questions = if with_questions {
         vec!["¿Qué parte del código define la entrada principal?"]
@@ -102,6 +137,17 @@ fn valid_plan_json(with_questions: bool, source_link: &str, advanced_locked: boo
             "badges": ["entrypoint", "runtime"]
         }
     }).to_string()
+}
+
+#[test]
+fn static_workspace_plan_schema_is_strict_for_codex_output_schema() {
+    let schema_path = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+        .join("schemas")
+        .join("workspace-plan.schema.json");
+    let raw_schema = fs::read_to_string(schema_path).expect("static workspace plan schema");
+    let schema = serde_json::from_str::<serde_json::Value>(&raw_schema).expect("valid json schema");
+
+    assert_object_properties_are_required(&schema, "$");
 }
 
 #[test]
