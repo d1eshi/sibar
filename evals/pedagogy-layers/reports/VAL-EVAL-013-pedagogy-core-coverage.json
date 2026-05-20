@@ -1,0 +1,189 @@
+{
+  "report_id": "VAL-EVAL-013-pedagogy-core-coverage-2026-05-20T00:00:00.000Z",
+  "generated_at": "2026-05-20T00:00:00.000Z",
+  "validation": "VAL-EVAL-013-pedagogy-core-coverage",
+  "eval_spec_path": "evals/pedagogy-layers/eval-suite.json",
+  "no_llm": true,
+  "coverage_passed": true,
+  "aggregate": {
+    "total_cases": 5,
+    "covered_modules": [
+      "index",
+      "layers",
+      "pipeline",
+      "questions",
+      "signals"
+    ],
+    "covered_scenarios": [
+      "answer_verification",
+      "layer_progression",
+      "pipeline_gap_generation",
+      "question_adaptation",
+      "signal_detection"
+    ],
+    "generated_questions": 3,
+    "detected_gaps": 3
+  },
+  "cases": [
+    {
+      "id": "CORE-001-LAYER-PROGRESSION",
+      "scenario": "layer_progression",
+      "modules": [
+        "index",
+        "layers"
+      ],
+      "assertions": [
+        "getAllLayers returns L1-L5 in order",
+        "task minimums require L5 for architecture review",
+        "signalTypeToLayer maps application to L4"
+      ]
+    },
+    {
+      "id": "CORE-002-SIGNAL-DETECTION",
+      "scenario": "signal_detection",
+      "modules": [
+        "index",
+        "signals"
+      ],
+      "assertions": [
+        "signal catalog exposes entries for every layer",
+        "detectLayer prefers the highest high-confidence signal",
+        "low-confidence-only observations do not classify a layer"
+      ]
+    },
+    {
+      "id": "CORE-003-QUESTION-ADAPTATION",
+      "scenario": "question_adaptation",
+      "modules": [
+        "index",
+        "questions"
+      ],
+      "assertions": [
+        "adaptQuestion selects depth, timing, count, and answer style",
+        "classifyGapSeverity covers critical, important, and later",
+        "isUncertaintyDeclared detects explicit Spanish uncertainty"
+      ]
+    },
+    {
+      "id": "CORE-004-PIPELINE-GAP-GENERATION",
+      "scenario": "pipeline_gap_generation",
+      "modules": [
+        "index",
+        "pipeline",
+        "layers",
+        "questions",
+        "signals"
+      ],
+      "assertions": [
+        "observeSession records tool evidence",
+        "detectGaps ranks critical gaps before later gaps",
+        "generateQuestions and runPipeline create ownership questions from real gaps"
+      ]
+    },
+    {
+      "id": "CORE-005-ANSWER-VERIFICATION",
+      "scenario": "answer_verification",
+      "modules": [
+        "index",
+        "pipeline"
+      ],
+      "assertions": [
+        "verifyAnswer emits every verification action branch"
+      ]
+    }
+  ],
+  "observations": {
+    "layers": {
+      "all_layers": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "task_minimums": {
+        "make-small-change": 3,
+        "review-architecture": 5
+      },
+      "signal_type_mapping": {
+        "recognition": 1,
+        "application": 4,
+        "ownership": 5
+      }
+    },
+    "signals": {
+      "catalog_layers": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "detected_layers": {
+        "l1": 1,
+        "l3_prefers_high_over_lower": 3,
+        "ignores_low_only": null,
+        "l4_medium_fallback": 4
+      },
+      "lookup_signal": "S4.1"
+    },
+    "questions": {
+      "depths_by_layer": {
+        "L1": "orienting",
+        "L2": "connecting",
+        "L3": "applying",
+        "L4": "challenging",
+        "L5": "metacognitive"
+      },
+      "answer_styles_by_layer": {
+        "L1": "short_explanation",
+        "L2": "system_walkthrough",
+        "L3": "risk_analysis",
+        "L4": "boundary_explanation",
+        "L5": "boundary_explanation"
+      },
+      "severity_examples": {
+        "critical": "critical",
+        "important": "important",
+        "later": "later"
+      },
+      "uncertainty_detected": true,
+      "adaptation": {
+        "detected_layer": 3,
+        "severity": "important",
+        "depth": "applying",
+        "answer_style": "risk_analysis",
+        "timing": "deferred",
+        "question_count": [
+          1,
+          3
+        ]
+      }
+    },
+    "pipeline": {
+      "observation_tool_count": 1,
+      "gap_order": [
+        "src/pedagogy/layers.ts:critical",
+        "src/pedagogy/questions.ts:critical",
+        "src/pedagogy/signals.ts:later"
+      ],
+      "deliveries": [
+        "immediate",
+        "queued",
+        "queued"
+      ],
+      "prompts": [
+        "Based on your work in \"src/pedagogy/layers.ts\", can you walk me through how this connects to the rest of the system?",
+        "Based on your work in \"src/pedagogy/questions.ts\", can you explain in one or two sentences what this area does?",
+        "Based on your work in \"src/pedagogy/signals.ts\", which component owns this responsibility, and what are its boundaries?"
+      ],
+      "verification_actions": [
+        "advance",
+        "connect",
+        "drop_and_orient",
+        "respect_boundary"
+      ],
+      "run_pipeline_question_count": 3
+    }
+  }
+}

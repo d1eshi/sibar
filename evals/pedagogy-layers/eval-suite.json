@@ -54,6 +54,24 @@
       "answers": "Which L1-L5 layers, answer classes, gap labels, operations, evidence conditions, and loop stages are covered or missing?"
     },
     {
+      "validation": "VAL-EVAL-013-pedagogy-core-coverage",
+      "title": "Pedagogy core coverage eval",
+      "command": "pnpm eval:pedagogy-core-coverage",
+      "implementation": "src/evals/pedagogy-core-coverage.ts",
+      "llm_execution": "disabled",
+      "inputs": [
+        "src/pedagogy/index.ts",
+        "src/pedagogy/layers.ts",
+        "src/pedagogy/questions.ts",
+        "src/pedagogy/signals.ts",
+        "src/pedagogy/pipeline.ts"
+      ],
+      "reports": [
+        "evals/pedagogy-layers/reports/VAL-EVAL-013-pedagogy-core-coverage.json"
+      ],
+      "answers": "Do direct calls into the real pedagogy layer, question, signal, and pipeline modules still produce coherent coverage?"
+    },
+    {
       "validation": "VAL-EVAL-003",
       "title": "Pedagogy runtime trace eval",
       "command": "pnpm eval:llm-runtime-trace",
