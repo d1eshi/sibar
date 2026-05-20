@@ -208,6 +208,8 @@ pub fn build_codex_prompt(
             "At most 3 next_actions may have visible=true.\n\n",
             "Every node must include at least one prerequisite, one concept, one source_link, and one artifact requirement.\n",
             "If a beginner node has no prior prerequisite, use a concrete prerequisite like 'read e-embedding-definition first'.\n\n",
+            "For onboarding intents, prefer a small beginner path with is_advanced=false.\n",
+            "If any node has is_advanced=true, locked MUST be an object with a clear non-empty reason, and that node must not be the first visible action.\n\n",
             "WorkspaceIntent (normalized_user_intent):\n",
             "{normalized}\n\n",
             "Source paths:\n",

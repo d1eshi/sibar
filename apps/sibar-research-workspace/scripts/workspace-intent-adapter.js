@@ -10,14 +10,24 @@ import { ANTI_OVERLOAD, ARC_ID, MISSION_ID } from "./workspace-data.js";
 export const WORKSPACE_INTENT_ADAPTER_KIND = "workspace-intent-ui-adapter";
 export const WORKSPACE_INTENT_CORE_ENTRYPOINT = "src/pedagogoai/workspace-intent.ts";
 export const WORKSPACE_INTENT_RUNNER_ENTRYPOINT = "src/pedagogoai/workspace-compiler-runner.ts";
+const WORKSPACE_COMPILER_ENDPOINT = "/api/workspace-intent/compiler";
+const DEFAULT_COMPILER_ADAPTER = "codex-exec";
+const FALLBACK_COMPILER_RUNNER = {
+  status: "blocked",
+  args: [],
+};
+const WORKSPACE_INTENT_FORM_DEFAULTS = {
+  userAmbition: DEFAULT_WORKSPACE_INTENT_INPUT.userAmbition,
+  tryingToBuildOrUnderstand: "I want to learn one bounded research topic and complete a short, evidence-first session.",
+  whyItMatters: "Build a bounded evidence-first workspace from this intent.",
+  alreadyKnow: "",
+  notKnowYet: "",
+  desiredOutput: "notes, artifact, next session",
+  createdAt: DEFAULT_WORKSPACE_INTENT_INPUT.createdAt,
+};
 
 function valueFrom(node, fallback = "") {
   return typeof node?.value === "string" && node.value.trim() ? node.value.trim() : fallback;
-}
-
-function setValueIfEmpty(node, value) {
-  if (!node || typeof node.value !== "string") return;
-  if (!node.value.trim()) node.value = value;
 }
 
 function setText(node, value) {
@@ -34,25 +44,48 @@ function setHidden(node, hidden) {
   }
 }
 
+function normalizeRunnerCommand(input = "") {
+  if (typeof input === "string" && input.trim()) return input.trim();
+  return `POST ${WORKSPACE_COMPILER_ENDPOINT}`;
+}
+
+function buildWorkspaceIntentRunnerFallback(input, reason, adapter = DEFAULT_COMPILER_ADAPTER) {
+  const preview = compileWorkspaceIntentPreview(input);
+  return {
+    adapter_kind: WORKSPACE_INTENT_ADAPTER_KIND,
+    core_entrypoint: WORKSPACE_INTENT_RUNNER_ENTRYPOINT,
+    workspace_intent: preview.workspace_intent,
+    workspace_plan: preview.workspace_plan,
+    preview: preview.preview,
+    runner: {
+      ...FALLBACK_COMPILER_RUNNER,
+      adapter,
+      command: normalizeRunnerCommand(WORKSPACE_COMPILER_ENDPOINT),
+      blocked_reason: reason || "Live compiler unavailable; local compiler generated the workspace plan.",
+    },
+    rust_intent: null,
+    rust_workspace_plan: null,
+    validation: preview.validation,
+  };
+}
+
 export function hydrateWorkspaceIntentForm(root = {}) {
-  setValueIfEmpty(root.workspaceIntentBuild, DEFAULT_WORKSPACE_INTENT_INPUT.tryingToBuildOrUnderstand);
-  setValueIfEmpty(root.workspaceIntentSource, DEFAULT_WORKSPACE_INTENT_INPUT.sourceInput);
-  setValueIfEmpty(root.workspaceIntentWhy, DEFAULT_WORKSPACE_INTENT_INPUT.whyItMatters);
-  setValueIfEmpty(root.workspaceIntentKnown, DEFAULT_WORKSPACE_INTENT_INPUT.alreadyKnow);
-  setValueIfEmpty(root.workspaceIntentUnknown, DEFAULT_WORKSPACE_INTENT_INPUT.notKnowYet);
-  setValueIfEmpty(root.workspaceIntentDesiredOutput, DEFAULT_WORKSPACE_INTENT_INPUT.desiredOutput);
   if (root.openWorkspaceSession) root.openWorkspaceSession.disabled = true;
 }
 
 export function readWorkspaceIntentForm(root = {}) {
+  const tryingToBuildOrUnderstand = valueFrom(
+    root.workspaceIntentBuild,
+    WORKSPACE_INTENT_FORM_DEFAULTS.tryingToBuildOrUnderstand,
+  );
   return {
-    userAmbition: DEFAULT_WORKSPACE_INTENT_INPUT.userAmbition,
-    tryingToBuildOrUnderstand: valueFrom(root.workspaceIntentBuild, DEFAULT_WORKSPACE_INTENT_INPUT.tryingToBuildOrUnderstand),
-    sourceInput: valueFrom(root.workspaceIntentSource, DEFAULT_WORKSPACE_INTENT_INPUT.sourceInput),
-    whyItMatters: valueFrom(root.workspaceIntentWhy, DEFAULT_WORKSPACE_INTENT_INPUT.whyItMatters),
-    alreadyKnow: valueFrom(root.workspaceIntentKnown, DEFAULT_WORKSPACE_INTENT_INPUT.alreadyKnow),
-    notKnowYet: valueFrom(root.workspaceIntentUnknown, DEFAULT_WORKSPACE_INTENT_INPUT.notKnowYet),
-    desiredOutput: valueFrom(root.workspaceIntentDesiredOutput, DEFAULT_WORKSPACE_INTENT_INPUT.desiredOutput),
+    userAmbition: WORKSPACE_INTENT_FORM_DEFAULTS.userAmbition,
+    tryingToBuildOrUnderstand,
+    sourceInput: valueFrom(root.workspaceIntentSource, tryingToBuildOrUnderstand),
+    whyItMatters: valueFrom(root.workspaceIntentWhy, WORKSPACE_INTENT_FORM_DEFAULTS.whyItMatters),
+    alreadyKnow: valueFrom(root.workspaceIntentKnown, WORKSPACE_INTENT_FORM_DEFAULTS.alreadyKnow),
+    notKnowYet: valueFrom(root.workspaceIntentUnknown, WORKSPACE_INTENT_FORM_DEFAULTS.notKnowYet),
+    desiredOutput: valueFrom(root.workspaceIntentDesiredOutput, WORKSPACE_INTENT_FORM_DEFAULTS.desiredOutput),
   };
 }
 
@@ -65,37 +98,81 @@ export function compileWorkspaceIntentPreview(input) {
     workspace_intent: workspaceIntent,
     workspace_plan: workspacePlan,
     preview: formatWorkspacePlanPreview(workspacePlan),
+    validation: validateWorkspacePlan(workspacePlan),
   };
 }
 
 export async function compileWorkspaceIntentWithRunner(input, options = {}) {
-  const response = await fetch("/api/workspace-intent/compiler", {
-    method: "POST",
-    headers: { "content-type": "application/json" },
-    body: JSON.stringify({
-      input,
-      adapter: options.adapter || "codex-exec",
-      runCodex: options.runCodex === true,
-    }),
-  });
-
-  const result = await response.json();
-  if (!response.ok) {
-    const reason = result?.runner?.blocked_reason || result?.error || `Workspace compiler request failed with ${response.status}.`;
-    throw new Error(reason);
+  const adapter = options.adapter || DEFAULT_COMPILER_ADAPTER;
+  if (options.runCodex !== true) {
+    return compileWorkspaceIntentPreview(input);
   }
 
-  return {
-    adapter_kind: result.runner?.adapter || "rust-workspace-compiler",
-    core_entrypoint: WORKSPACE_INTENT_RUNNER_ENTRYPOINT,
-    workspace_intent: result.workspace_intent,
-    workspace_plan: result.workspace_plan,
-    preview: result.preview,
-    runner: result.runner,
-    rust_intent: result.rust_intent,
-    rust_workspace_plan: result.rust_workspace_plan,
-    validation: result.validation,
-  };
+  try {
+    const response = await fetch(WORKSPACE_COMPILER_ENDPOINT, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        input,
+        adapter,
+        runCodex: true,
+      }),
+    });
+
+    if (!response.ok) {
+      let failed;
+      try {
+        failed = await response.json();
+      } catch {
+        failed = null;
+      }
+      return buildWorkspaceIntentRunnerFallback(
+        input,
+        failed?.runner?.blocked_reason || failed?.error || `Workspace compiler request failed with ${response.status}.`,
+        adapter,
+      );
+    }
+
+    const result = await response.json();
+    if (!result || typeof result !== "object") {
+      return buildWorkspaceIntentRunnerFallback(
+        input,
+        "Workspace compiler response was malformed JSON.",
+        adapter,
+      );
+    }
+
+    if (!result.workspace_plan || !result.preview || !result.workspace_intent) {
+      return buildWorkspaceIntentRunnerFallback(
+        input,
+        "Workspace compiler returned an incomplete response.",
+        adapter,
+      );
+    }
+
+    return {
+      adapter_kind: WORKSPACE_INTENT_ADAPTER_KIND,
+      core_entrypoint: WORKSPACE_INTENT_RUNNER_ENTRYPOINT,
+      workspace_intent: result.workspace_intent,
+      workspace_plan: result.workspace_plan,
+      preview: result.preview,
+      runner: result.runner || {
+        ...FALLBACK_COMPILER_RUNNER,
+        adapter,
+        command: normalizeRunnerCommand(WORKSPACE_COMPILER_ENDPOINT),
+        blocked_reason: "Workspace compiler did not return a runner entry.",
+      },
+      rust_intent: result.rust_intent || null,
+      rust_workspace_plan: result.rust_workspace_plan || null,
+      validation: result.validation || null,
+    };
+  } catch (error) {
+    return buildWorkspaceIntentRunnerFallback(
+      input,
+      error instanceof Error ? error.message : "Workspace compiler endpoint is unreachable.",
+      adapter,
+    );
+  }
 }
 
 export function renderWorkspaceIntentPreview(root = {}, compiled = null) {
@@ -110,7 +187,7 @@ export function renderWorkspaceIntentPreview(root = {}, compiled = null) {
   setText(
     root.workspaceIntentStatus,
     compiled.runner?.status
-      ? `Runner ${compiled.runner.adapter}: ${compiled.runner.status}. ${preview.validation.valid ? "Workspace plan ready." : "Workspace plan needs input repair."}`
+      ? `${preview.validation.valid ? "Workspace plan ready." : "Workspace plan needs input repair."}`
       : preview.validation.valid ? "Workspace plan ready. Open the first session when you want the focused workspace." : "Workspace plan needs input repair.",
   );
   if (root.openWorkspaceSession) root.openWorkspaceSession.disabled = !preview.validation.valid;

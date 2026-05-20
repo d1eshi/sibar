@@ -219,14 +219,6 @@
   align-items: center;
 }
 
-.runner-workspace-button {
-  min-width: 168px;
-  background: #fffaf7;
-  color: var(--accent);
-  border-color: var(--divider);
-  font-weight: 700;
-}
-
 .workspace-intent-preview {
   padding: 18px;
   background: var(--surface-raised);
