@@ -75,6 +75,33 @@ release yet.
   `workspace-contract`, `workspace-session`, `workspace-render`, and
   `workspace-app`) while keeping the facade API and behavior stable.
 
+### Added - WorkspaceIntent Compiler Module
+
+- Added `src/pedagogoai/workspace-intent/contracts.ts` with public plan types:
+  `WorkspaceIntent`, `WorkspacePlan`, `SourceBundle`, `LearningNode`,
+  `ArtifactTarget`, `SessionPlan`, and `Decision`.
+- Added deterministic parsing and validation for raw model outputs:
+  `src/pedagogoai/workspace-intent/parse-model-output.ts` and
+  `src/pedagogoai/workspace-intent/validate.ts`.
+- Added fixtures and prompt contracts for deterministic intent-to-plan generation:
+  `src/pedagogoai/workspace-intent/prompts.ts`,
+  `src/pedagogoai/workspace-intent/fixtures.ts`,
+  `src/pedagogoai/workspace-intent/adapters/fixture.ts`.
+- Added optional `codex exec` adapter at
+  `src/pedagogoai/workspace-intent/adapters/codex-exec.ts` behind explicit
+  invocation.
+- Added `Tests/workspace-intent-contract.test.ts` to cover schema, parser, and
+  pedagogy invariants.
+- Added deterministic WorkspaceIntent compiler evals in
+  `src/evals/workspace-intent-compiler.ts`, covered by
+  `Tests/workspace-intent-evals.test.ts` and runnable with
+  `pnpm eval:workspace-intent`.
+- Refined the public contract to keep compatibility with the requested API shape:
+  `WorkspaceIntent` now exposes `global_ambition`, `workspace_title`,
+  `source_bundle`, `known_skills`, `unknowns`, `desired_outputs`, `horizon`;
+  `WorkspacePlan` now exposes `first_session` and
+  `open_questions_for_user` as required contract fields.
+
 ### Added - Native Explain A-Z Attempt Bridge
 
 - Added the native Swift live-loop attempt bridge for `Explain this project A-Z`:
