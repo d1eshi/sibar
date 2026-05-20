@@ -81,12 +81,12 @@ test("freeform evaluator detects evidence_gap for uncited answers (GC-002)", () 
   assert.equal(gc002.finding.gap_present, true);
 });
 
-test("freeform evaluator detects design_induced_gap (GC-008)", () => {
+test("freeform evaluator detects boundary_gap (GC-008)", () => {
   const report = runSelfhostFreeformEval();
   const gc008 = report.cases.find((entry) => entry.case_id === "GC-008");
   assert.ok(gc008, "GC-008 must exist");
-  assert.equal(gc008.observed_finding_type, "design_induced_gap");
-  assert.equal(gc008.observed_issue_candidate_type, "DesignIssue");
+  assert.equal(gc008.observed_finding_type, "boundary_gap");
+  assert.equal(gc008.observed_issue_candidate_type, "LearningGap");
 });
 
 test("freeform evaluator detects boundary or false_confidence gap for overconfident boundary violation (GC-006)", () => {
@@ -299,8 +299,10 @@ test("gap label coverage reports all 10 contract labels (VAL-EVAL-005)", () => {
   for (const label of allLabels) {
     const entry = report.gap_label_coverage.find((e) => e.label === label);
     assert.ok(entry, `gap label '${label}' must be in coverage report`);
-    // Each label is either represented (has case_count > 0) or explicitly listed
+    assert.equal(entry.represented, true, `gap label '${label}' must be represented by at least one case`);
+    assert.equal(entry.case_count > 0, true, `gap label '${label}' must have expected gold cases`);
   }
+  assert.equal(report.aggregate.mismatch_count, 0);
 });
 
 test("eval:selfhost-freeform CLI processes 40 cases and writes report", () => {
@@ -400,6 +402,10 @@ test("freeform evaluator detects duplicate/partial case coverage and fails with 
     assert.equal(report.aggregate.total_cases, 1);
     assert.equal(
       hasMismatchWithCode(report, "duplicate_case_id"),
+      true,
+    );
+    assert.equal(
+      hasMismatchWithCode(report, "missing_gap_label_coverage"),
       true,
     );
   } finally {

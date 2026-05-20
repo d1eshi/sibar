@@ -4,16 +4,16 @@
   "concept_id": "artifact_boundary",
   "operation": "trace",
   "answer_class": "design_induced_confusion",
-  "simulated_user_answer": "The manifest looks like a style document, not an enforcement rule, so I kept adding references from docs and excluded directories to avoid missing anything.",
+  "simulated_user_answer": "Excluded directories are acceptable evidence because they still looked relevant to the boundary trace, even though the manifest listed only the bounded slice.",
   "declared_confidence": "medium",
-  "expected_gap_type": "design_induced_gap",
+  "expected_gap_type": "boundary_gap",
   "expected_layer": 4,
   "expected_severity": "important",
   "expected_confidence": "medium",
   "required_repo_evidence": [
     {
       "path": "src/runtime-concept-graph.ts",
-      "rationale": "Conflicting expectation that the manifest is only descriptive."
+      "rationale": "Shows why excluded directories cannot be treated as in-boundary evidence."
     },
     {
       "path": "src/runtime-concept-graph.ts",
@@ -28,9 +28,9 @@
     "Confusing documentation for boundary policy.",
     "Treating excluded directories as safe for primary evidence."
   ],
-  "acceptable_repair_task": "Add product-improvement style repair for interface affordance: make manifest boundary intent and enforcement behavior explicit before re-test.",
-  "acceptable_issue_candidate_type": "DesignIssue",
+  "acceptable_repair_task": "Re-ground the answer using only manifest included_paths evidence and explicitly reject excluded directories as primary evidence.",
+  "acceptable_issue_candidate_type": "LearningGap",
   "expected_readiness": "not ready yet",
-  "notes": "Represents user confusion caused by design wording, not purely conceptual misunderstanding.",
+  "notes": "Represents a boundary violation that must remain covered as a contractual freeform label.",
   "expected_gap_present": true
 }

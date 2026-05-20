@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-20T17:06:10.883Z",
+  "generated_at": "2026-05-20T22:13:15.289Z",
   "validation": "VAL-EVAL-008-selfhost-freeform",
   "gold_case_index_path": "evals/attempt-readiness/gold-cases/index.json",
   "manifest_path": "evals/attempt-readiness/manifest.json",
@@ -696,10 +696,10 @@
       "mastery_check_id": "SC-001-artifact-boundary",
       "concept_id": "artifact_boundary",
       "answer_class": "design_induced_confusion",
-      "expected_finding_type": "design_induced_gap",
-      "observed_finding_type": "design_induced_gap",
-      "expected_issue_candidate_type": "DesignIssue",
-      "observed_issue_candidate_type": "DesignIssue",
+      "expected_finding_type": "boundary_gap",
+      "observed_finding_type": "boundary_gap",
+      "expected_issue_candidate_type": "LearningGap",
+      "observed_issue_candidate_type": "LearningGap",
       "issue_candidate_id": "IC-007",
       "user_evidence_attached": true,
       "repo_evidence_attached": true,
@@ -707,57 +707,29 @@
       "generic_answer_detected": false,
       "passed": true,
       "finding": {
-        "finding_type": "design_induced_gap",
+        "finding_type": "boundary_gap",
         "gap_present": true,
         "concept_id": "artifact_boundary",
         "operation": "trace",
         "readiness": "not ready yet",
-        "issue_candidate_type": "DesignIssue",
+        "issue_candidate_type": "LearningGap",
         "issue_candidate": {
           "id": "IC-007",
-          "type": "DesignIssue",
-          "title": "artifact_boundary: product terminology makes enforcement unclear",
+          "type": "LearningGap",
+          "title": "artifact_boundary: learner needs evidence-backed repair",
           "evidence": [
             "src/runtime-concept-graph.ts: Boundary traversal logic (included/excluded checks and inventory walk) defines what is in-scope for concept graph evidence.",
             "src/runtime-support.ts: Core types and shared session metadata describe the boundary contract used when reading sessions and sessions' path fields.",
             "Tests/concept-graph.test.ts: Tests show boundary expectations, especially evidence filtering and exclusion behavior."
           ],
-          "why_it_matters": "When product terminology obscures executable enforcement, users treat optional conventions as binding rules.",
-          "proposed_action": "Separate product wording confusion from the executable enforcement behavior in the code; clarify which rules are enforced.",
+          "why_it_matters": "The learner still needs a narrow evidence-producing repair before readiness can advance.",
+          "proposed_action": "Ask the learner to restate the answer with required repo evidence and the same operation.",
           "readiness_blocking": true,
-          "linked_to_gap": "design_induced_gap"
+          "linked_to_gap": "boundary_gap"
         },
         "issue_candidates": [
           {
             "id": "IC-007",
-            "type": "DesignIssue",
-            "title": "artifact_boundary: product terminology makes enforcement unclear",
-            "evidence": [
-              "src/runtime-concept-graph.ts: Boundary traversal logic (included/excluded checks and inventory walk) defines what is in-scope for concept graph evidence.",
-              "src/runtime-support.ts: Core types and shared session metadata describe the boundary contract used when reading sessions and sessions' path fields.",
-              "Tests/concept-graph.test.ts: Tests show boundary expectations, especially evidence filtering and exclusion behavior."
-            ],
-            "why_it_matters": "When product terminology obscures executable enforcement, users treat optional conventions as binding rules.",
-            "proposed_action": "Separate product wording confusion from the executable enforcement behavior in the code; clarify which rules are enforced.",
-            "readiness_blocking": true,
-            "linked_to_gap": "design_induced_gap"
-          },
-          {
-            "id": "IC-008",
-            "type": "DocsIssue",
-            "title": "artifact_boundary: documentation gap blocks evidence-backed understanding",
-            "evidence": [
-              "src/runtime-concept-graph.ts: Boundary traversal logic (included/excluded checks and inventory walk) defines what is in-scope for concept graph evidence.",
-              "src/runtime-support.ts: Core types and shared session metadata describe the boundary contract used when reading sessions and sessions' path fields.",
-              "Tests/concept-graph.test.ts: Tests show boundary expectations, especially evidence filtering and exclusion behavior."
-            ],
-            "why_it_matters": "Documentation gaps can prevent users from finding the required repo evidence even when the code behavior exists.",
-            "proposed_action": "Clarify the documentation so it names the required evidence path and the specific operation being checked.",
-            "readiness_blocking": true,
-            "linked_to_gap": "design_induced_gap"
-          },
-          {
-            "id": "IC-009",
             "type": "LearningGap",
             "title": "artifact_boundary: learner needs evidence-backed repair",
             "evidence": [
@@ -768,10 +740,10 @@
             "why_it_matters": "The learner still needs a narrow evidence-producing repair before readiness can advance.",
             "proposed_action": "Ask the learner to restate the answer with required repo evidence and the same operation.",
             "readiness_blocking": true,
-            "linked_to_gap": "design_induced_gap"
+            "linked_to_gap": "boundary_gap"
           }
         ],
-        "user_evidence_excerpt": "The manifest looks like a style document, not an enforcement rule, so I kept adding references from docs and excluded directories to avoid missing anything.",
+        "user_evidence_excerpt": "Excluded directories are acceptable evidence because they still looked relevant to the boundary trace, even though the manifest listed only the bounded slice.",
         "repo_evidence_citations": [
           {
             "path": "src/runtime-concept-graph.ts",
@@ -794,11 +766,11 @@
         ],
         "user_evidence_attached": true,
         "repo_evidence_attached": true,
-        "contradiction_or_insufficiency": "The answer treats product terminology as unclear rather than engaging with executable enforcement behavior.",
-        "missing_reasoning_step": "Separate product wording confusion from the executable enforcement behavior.",
-        "repair_task": "Clarify the product affordance that makes manifest enforcement visible, then retry the boundary trace.",
+        "contradiction_or_insufficiency": "The answer relies on evidence or claims that cross the artifact boundary into excluded scope.",
+        "missing_reasoning_step": "Identify which paths are inside the manifest included_paths and restrict claims to that scope.",
+        "repair_task": "Re-ground the answer using only manifest included_paths evidence; exclude paths outside the artifact boundary.",
         "repair_task_info": {
-          "description": "Clarify the product affordance that makes manifest enforcement visible, then retry the boundary trace.",
+          "description": "Re-ground the answer using only manifest included_paths evidence; exclude paths outside the artifact boundary.",
           "required_evidence": [
             "src/runtime-concept-graph.ts",
             "src/runtime-support.ts",
@@ -816,7 +788,7 @@
         },
         "forbidden_claim_triggered": false,
         "generic_answer_detected": false,
-        "gap_label": "design_induced_gap",
+        "gap_label": "boundary_gap",
         "loop_status": "reevaluation_prompted",
         "loop_error": null
       },
@@ -894,7 +866,7 @@
       "observed_finding_type": "evidence_gap",
       "expected_issue_candidate_type": "LearningGap",
       "observed_issue_candidate_type": "LearningGap",
-      "issue_candidate_id": "IC-010",
+      "issue_candidate_id": "IC-008",
       "user_evidence_attached": true,
       "repo_evidence_attached": true,
       "forbidden_claim_triggered": false,
@@ -908,7 +880,7 @@
         "readiness": "not ready yet",
         "issue_candidate_type": "LearningGap",
         "issue_candidate": {
-          "id": "IC-010",
+          "id": "IC-008",
           "type": "LearningGap",
           "title": "concept_graph_generation: learner needs evidence-backed repair",
           "evidence": [
@@ -923,7 +895,7 @@
         },
         "issue_candidates": [
           {
-            "id": "IC-010",
+            "id": "IC-008",
             "type": "LearningGap",
             "title": "concept_graph_generation: learner needs evidence-backed repair",
             "evidence": [
@@ -998,7 +970,7 @@
       "observed_finding_type": "causal_gap",
       "expected_issue_candidate_type": "LearningGap",
       "observed_issue_candidate_type": "LearningGap",
-      "issue_candidate_id": "IC-011",
+      "issue_candidate_id": "IC-009",
       "user_evidence_attached": true,
       "repo_evidence_attached": true,
       "forbidden_claim_triggered": false,
@@ -1012,7 +984,7 @@
         "readiness": "not ready yet",
         "issue_candidate_type": "LearningGap",
         "issue_candidate": {
-          "id": "IC-011",
+          "id": "IC-009",
           "type": "LearningGap",
           "title": "concept_graph_generation: learner needs evidence-backed repair",
           "evidence": [
@@ -1027,7 +999,7 @@
         },
         "issue_candidates": [
           {
-            "id": "IC-011",
+            "id": "IC-009",
             "type": "LearningGap",
             "title": "concept_graph_generation: learner needs evidence-backed repair",
             "evidence": [
@@ -1102,7 +1074,7 @@
       "observed_finding_type": "responsibility_gap",
       "expected_issue_candidate_type": "LearningGap",
       "observed_issue_candidate_type": "LearningGap",
-      "issue_candidate_id": "IC-012",
+      "issue_candidate_id": "IC-010",
       "user_evidence_attached": true,
       "repo_evidence_attached": true,
       "forbidden_claim_triggered": false,
@@ -1116,7 +1088,7 @@
         "readiness": "not ready yet",
         "issue_candidate_type": "LearningGap",
         "issue_candidate": {
-          "id": "IC-012",
+          "id": "IC-010",
           "type": "LearningGap",
           "title": "concept_graph_generation: learner needs evidence-backed repair",
           "evidence": [
@@ -1131,7 +1103,7 @@
         },
         "issue_candidates": [
           {
-            "id": "IC-012",
+            "id": "IC-010",
             "type": "LearningGap",
             "title": "concept_graph_generation: learner needs evidence-backed repair",
             "evidence": [
@@ -1206,7 +1178,7 @@
       "observed_finding_type": "flow_gap",
       "expected_issue_candidate_type": "LearningGap",
       "observed_issue_candidate_type": "LearningGap",
-      "issue_candidate_id": "IC-013",
+      "issue_candidate_id": "IC-011",
       "user_evidence_attached": true,
       "repo_evidence_attached": true,
       "forbidden_claim_triggered": false,
@@ -1220,7 +1192,7 @@
         "readiness": "not ready yet",
         "issue_candidate_type": "LearningGap",
         "issue_candidate": {
-          "id": "IC-013",
+          "id": "IC-011",
           "type": "LearningGap",
           "title": "concept_graph_generation: learner needs evidence-backed repair",
           "evidence": [
@@ -1235,7 +1207,7 @@
         },
         "issue_candidates": [
           {
-            "id": "IC-013",
+            "id": "IC-011",
             "type": "LearningGap",
             "title": "concept_graph_generation: learner needs evidence-backed repair",
             "evidence": [
@@ -1310,7 +1282,7 @@
       "observed_finding_type": "false_confidence_gap",
       "expected_issue_candidate_type": "LearningGap",
       "observed_issue_candidate_type": "LearningGap",
-      "issue_candidate_id": "IC-014",
+      "issue_candidate_id": "IC-012",
       "user_evidence_attached": true,
       "repo_evidence_attached": true,
       "forbidden_claim_triggered": false,
@@ -1324,7 +1296,7 @@
         "readiness": "not ready yet",
         "issue_candidate_type": "LearningGap",
         "issue_candidate": {
-          "id": "IC-014",
+          "id": "IC-012",
           "type": "LearningGap",
           "title": "concept_graph_generation: learner needs evidence-backed repair",
           "evidence": [
@@ -1339,7 +1311,7 @@
         },
         "issue_candidates": [
           {
-            "id": "IC-014",
+            "id": "IC-012",
             "type": "LearningGap",
             "title": "concept_graph_generation: learner needs evidence-backed repair",
             "evidence": [
@@ -1414,7 +1386,7 @@
       "observed_finding_type": "surface_gap",
       "expected_issue_candidate_type": "LearningGap",
       "observed_issue_candidate_type": "LearningGap",
-      "issue_candidate_id": "IC-015",
+      "issue_candidate_id": "IC-013",
       "user_evidence_attached": true,
       "repo_evidence_attached": true,
       "forbidden_claim_triggered": false,
@@ -1428,7 +1400,7 @@
         "readiness": "not ready yet",
         "issue_candidate_type": "LearningGap",
         "issue_candidate": {
-          "id": "IC-015",
+          "id": "IC-013",
           "type": "LearningGap",
           "title": "concept_graph_generation: learner needs evidence-backed repair",
           "evidence": [
@@ -1443,7 +1415,7 @@
         },
         "issue_candidates": [
           {
-            "id": "IC-015",
+            "id": "IC-013",
             "type": "LearningGap",
             "title": "concept_graph_generation: learner needs evidence-backed repair",
             "evidence": [
@@ -1518,7 +1490,7 @@
       "observed_finding_type": "design_induced_gap",
       "expected_issue_candidate_type": "DesignIssue",
       "observed_issue_candidate_type": "DesignIssue",
-      "issue_candidate_id": "IC-016",
+      "issue_candidate_id": "IC-014",
       "user_evidence_attached": true,
       "repo_evidence_attached": true,
       "forbidden_claim_triggered": false,
@@ -1532,7 +1504,7 @@
         "readiness": "not ready yet",
         "issue_candidate_type": "DesignIssue",
         "issue_candidate": {
-          "id": "IC-016",
+          "id": "IC-014",
           "type": "DesignIssue",
           "title": "concept_graph_generation: product terminology makes enforcement unclear",
           "evidence": [
@@ -1547,7 +1519,7 @@
         },
         "issue_candidates": [
           {
-            "id": "IC-016",
+            "id": "IC-014",
             "type": "DesignIssue",
             "title": "concept_graph_generation: product terminology makes enforcement unclear",
             "evidence": [
@@ -1684,7 +1656,7 @@
       "observed_finding_type": "evidence_gap",
       "expected_issue_candidate_type": "LearningGap",
       "observed_issue_candidate_type": "LearningGap",
-      "issue_candidate_id": "IC-017",
+      "issue_candidate_id": "IC-015",
       "user_evidence_attached": true,
       "repo_evidence_attached": true,
       "forbidden_claim_triggered": false,
@@ -1698,7 +1670,7 @@
         "readiness": "not ready yet",
         "issue_candidate_type": "LearningGap",
         "issue_candidate": {
-          "id": "IC-017",
+          "id": "IC-015",
           "type": "LearningGap",
           "title": "gap_detection: learner needs evidence-backed repair",
           "evidence": [
@@ -1713,7 +1685,7 @@
         },
         "issue_candidates": [
           {
-            "id": "IC-017",
+            "id": "IC-015",
             "type": "LearningGap",
             "title": "gap_detection: learner needs evidence-backed repair",
             "evidence": [
@@ -1788,7 +1760,7 @@
       "observed_finding_type": "flow_gap",
       "expected_issue_candidate_type": "LearningGap",
       "observed_issue_candidate_type": "LearningGap",
-      "issue_candidate_id": "IC-018",
+      "issue_candidate_id": "IC-016",
       "user_evidence_attached": true,
       "repo_evidence_attached": true,
       "forbidden_claim_triggered": false,
@@ -1802,7 +1774,7 @@
         "readiness": "not ready yet",
         "issue_candidate_type": "LearningGap",
         "issue_candidate": {
-          "id": "IC-018",
+          "id": "IC-016",
           "type": "LearningGap",
           "title": "gap_detection: learner needs evidence-backed repair",
           "evidence": [
@@ -1817,7 +1789,7 @@
         },
         "issue_candidates": [
           {
-            "id": "IC-018",
+            "id": "IC-016",
             "type": "LearningGap",
             "title": "gap_detection: learner needs evidence-backed repair",
             "evidence": [
@@ -1892,7 +1864,7 @@
       "observed_finding_type": "responsibility_gap",
       "expected_issue_candidate_type": "LearningGap",
       "observed_issue_candidate_type": "LearningGap",
-      "issue_candidate_id": "IC-019",
+      "issue_candidate_id": "IC-017",
       "user_evidence_attached": true,
       "repo_evidence_attached": true,
       "forbidden_claim_triggered": false,
@@ -1906,7 +1878,7 @@
         "readiness": "not ready yet",
         "issue_candidate_type": "LearningGap",
         "issue_candidate": {
-          "id": "IC-019",
+          "id": "IC-017",
           "type": "LearningGap",
           "title": "gap_detection: learner needs evidence-backed repair",
           "evidence": [
@@ -1921,7 +1893,7 @@
         },
         "issue_candidates": [
           {
-            "id": "IC-019",
+            "id": "IC-017",
             "type": "LearningGap",
             "title": "gap_detection: learner needs evidence-backed repair",
             "evidence": [
@@ -1996,7 +1968,7 @@
       "observed_finding_type": "flow_gap",
       "expected_issue_candidate_type": "LearningGap",
       "observed_issue_candidate_type": "LearningGap",
-      "issue_candidate_id": "IC-020",
+      "issue_candidate_id": "IC-018",
       "user_evidence_attached": true,
       "repo_evidence_attached": true,
       "forbidden_claim_triggered": false,
@@ -2010,7 +1982,7 @@
         "readiness": "not ready yet",
         "issue_candidate_type": "LearningGap",
         "issue_candidate": {
-          "id": "IC-020",
+          "id": "IC-018",
           "type": "LearningGap",
           "title": "gap_detection: learner needs evidence-backed repair",
           "evidence": [
@@ -2025,7 +1997,7 @@
         },
         "issue_candidates": [
           {
-            "id": "IC-020",
+            "id": "IC-018",
             "type": "LearningGap",
             "title": "gap_detection: learner needs evidence-backed repair",
             "evidence": [
@@ -2100,7 +2072,7 @@
       "observed_finding_type": "false_confidence_gap",
       "expected_issue_candidate_type": "LearningGap",
       "observed_issue_candidate_type": "LearningGap",
-      "issue_candidate_id": "IC-021",
+      "issue_candidate_id": "IC-019",
       "user_evidence_attached": true,
       "repo_evidence_attached": true,
       "forbidden_claim_triggered": false,
@@ -2114,7 +2086,7 @@
         "readiness": "not ready yet",
         "issue_candidate_type": "LearningGap",
         "issue_candidate": {
-          "id": "IC-021",
+          "id": "IC-019",
           "type": "LearningGap",
           "title": "gap_detection: learner needs evidence-backed repair",
           "evidence": [
@@ -2129,7 +2101,7 @@
         },
         "issue_candidates": [
           {
-            "id": "IC-021",
+            "id": "IC-019",
             "type": "LearningGap",
             "title": "gap_detection: learner needs evidence-backed repair",
             "evidence": [
@@ -2204,7 +2176,7 @@
       "observed_finding_type": "surface_gap",
       "expected_issue_candidate_type": "LearningGap",
       "observed_issue_candidate_type": "LearningGap",
-      "issue_candidate_id": "IC-022",
+      "issue_candidate_id": "IC-020",
       "user_evidence_attached": true,
       "repo_evidence_attached": true,
       "forbidden_claim_triggered": false,
@@ -2218,7 +2190,7 @@
         "readiness": "not ready yet",
         "issue_candidate_type": "LearningGap",
         "issue_candidate": {
-          "id": "IC-022",
+          "id": "IC-020",
           "type": "LearningGap",
           "title": "gap_detection: learner needs evidence-backed repair",
           "evidence": [
@@ -2233,7 +2205,7 @@
         },
         "issue_candidates": [
           {
-            "id": "IC-022",
+            "id": "IC-020",
             "type": "LearningGap",
             "title": "gap_detection: learner needs evidence-backed repair",
             "evidence": [
@@ -2308,7 +2280,7 @@
       "observed_finding_type": "design_induced_gap",
       "expected_issue_candidate_type": "DesignIssue",
       "observed_issue_candidate_type": "DesignIssue",
-      "issue_candidate_id": "IC-023",
+      "issue_candidate_id": "IC-021",
       "user_evidence_attached": true,
       "repo_evidence_attached": true,
       "forbidden_claim_triggered": false,
@@ -2322,7 +2294,7 @@
         "readiness": "not ready yet",
         "issue_candidate_type": "DesignIssue",
         "issue_candidate": {
-          "id": "IC-023",
+          "id": "IC-021",
           "type": "DesignIssue",
           "title": "gap_detection: product terminology makes enforcement unclear",
           "evidence": [
@@ -2337,7 +2309,7 @@
         },
         "issue_candidates": [
           {
-            "id": "IC-023",
+            "id": "IC-021",
             "type": "DesignIssue",
             "title": "gap_detection: product terminology makes enforcement unclear",
             "evidence": [
@@ -2474,7 +2446,7 @@
       "observed_finding_type": "evidence_gap",
       "expected_issue_candidate_type": "LearningGap",
       "observed_issue_candidate_type": "LearningGap",
-      "issue_candidate_id": "IC-024",
+      "issue_candidate_id": "IC-022",
       "user_evidence_attached": true,
       "repo_evidence_attached": true,
       "forbidden_claim_triggered": false,
@@ -2488,7 +2460,7 @@
         "readiness": "not ready yet",
         "issue_candidate_type": "LearningGap",
         "issue_candidate": {
-          "id": "IC-024",
+          "id": "IC-022",
           "type": "LearningGap",
           "title": "repair_practice_generation: learner needs evidence-backed repair",
           "evidence": [
@@ -2503,7 +2475,7 @@
         },
         "issue_candidates": [
           {
-            "id": "IC-024",
+            "id": "IC-022",
             "type": "LearningGap",
             "title": "repair_practice_generation: learner needs evidence-backed repair",
             "evidence": [
@@ -2578,7 +2550,7 @@
       "observed_finding_type": "causal_gap",
       "expected_issue_candidate_type": "LearningGap",
       "observed_issue_candidate_type": "LearningGap",
-      "issue_candidate_id": "IC-025",
+      "issue_candidate_id": "IC-023",
       "user_evidence_attached": true,
       "repo_evidence_attached": true,
       "forbidden_claim_triggered": false,
@@ -2592,7 +2564,7 @@
         "readiness": "not ready yet",
         "issue_candidate_type": "LearningGap",
         "issue_candidate": {
-          "id": "IC-025",
+          "id": "IC-023",
           "type": "LearningGap",
           "title": "repair_practice_generation: learner needs evidence-backed repair",
           "evidence": [
@@ -2607,7 +2579,7 @@
         },
         "issue_candidates": [
           {
-            "id": "IC-025",
+            "id": "IC-023",
             "type": "LearningGap",
             "title": "repair_practice_generation: learner needs evidence-backed repair",
             "evidence": [
@@ -2682,7 +2654,7 @@
       "observed_finding_type": "responsibility_gap",
       "expected_issue_candidate_type": "LearningGap",
       "observed_issue_candidate_type": "LearningGap",
-      "issue_candidate_id": "IC-026",
+      "issue_candidate_id": "IC-024",
       "user_evidence_attached": true,
       "repo_evidence_attached": true,
       "forbidden_claim_triggered": false,
@@ -2696,7 +2668,7 @@
         "readiness": "not ready yet",
         "issue_candidate_type": "LearningGap",
         "issue_candidate": {
-          "id": "IC-026",
+          "id": "IC-024",
           "type": "LearningGap",
           "title": "repair_practice_generation: learner needs evidence-backed repair",
           "evidence": [
@@ -2711,7 +2683,7 @@
         },
         "issue_candidates": [
           {
-            "id": "IC-026",
+            "id": "IC-024",
             "type": "LearningGap",
             "title": "repair_practice_generation: learner needs evidence-backed repair",
             "evidence": [
@@ -2786,7 +2758,7 @@
       "observed_finding_type": "flow_gap",
       "expected_issue_candidate_type": "LearningGap",
       "observed_issue_candidate_type": "LearningGap",
-      "issue_candidate_id": "IC-027",
+      "issue_candidate_id": "IC-025",
       "user_evidence_attached": true,
       "repo_evidence_attached": true,
       "forbidden_claim_triggered": false,
@@ -2800,7 +2772,7 @@
         "readiness": "not ready yet",
         "issue_candidate_type": "LearningGap",
         "issue_candidate": {
-          "id": "IC-027",
+          "id": "IC-025",
           "type": "LearningGap",
           "title": "repair_practice_generation: learner needs evidence-backed repair",
           "evidence": [
@@ -2815,7 +2787,7 @@
         },
         "issue_candidates": [
           {
-            "id": "IC-027",
+            "id": "IC-025",
             "type": "LearningGap",
             "title": "repair_practice_generation: learner needs evidence-backed repair",
             "evidence": [
@@ -2890,7 +2862,7 @@
       "observed_finding_type": "false_confidence_gap",
       "expected_issue_candidate_type": "LearningGap",
       "observed_issue_candidate_type": "LearningGap",
-      "issue_candidate_id": "IC-028",
+      "issue_candidate_id": "IC-026",
       "user_evidence_attached": true,
       "repo_evidence_attached": true,
       "forbidden_claim_triggered": false,
@@ -2904,7 +2876,7 @@
         "readiness": "not ready yet",
         "issue_candidate_type": "LearningGap",
         "issue_candidate": {
-          "id": "IC-028",
+          "id": "IC-026",
           "type": "LearningGap",
           "title": "repair_practice_generation: learner needs evidence-backed repair",
           "evidence": [
@@ -2919,7 +2891,7 @@
         },
         "issue_candidates": [
           {
-            "id": "IC-028",
+            "id": "IC-026",
             "type": "LearningGap",
             "title": "repair_practice_generation: learner needs evidence-backed repair",
             "evidence": [
@@ -2994,7 +2966,7 @@
       "observed_finding_type": "surface_gap",
       "expected_issue_candidate_type": "LearningGap",
       "observed_issue_candidate_type": "LearningGap",
-      "issue_candidate_id": "IC-029",
+      "issue_candidate_id": "IC-027",
       "user_evidence_attached": true,
       "repo_evidence_attached": true,
       "forbidden_claim_triggered": false,
@@ -3008,7 +2980,7 @@
         "readiness": "not ready yet",
         "issue_candidate_type": "LearningGap",
         "issue_candidate": {
-          "id": "IC-029",
+          "id": "IC-027",
           "type": "LearningGap",
           "title": "repair_practice_generation: learner needs evidence-backed repair",
           "evidence": [
@@ -3023,7 +2995,7 @@
         },
         "issue_candidates": [
           {
-            "id": "IC-029",
+            "id": "IC-027",
             "type": "LearningGap",
             "title": "repair_practice_generation: learner needs evidence-backed repair",
             "evidence": [
@@ -3094,54 +3066,54 @@
       "mastery_check_id": "SC-004-repair-practice-generation",
       "concept_id": "repair_practice_generation",
       "answer_class": "design_induced_confusion",
-      "expected_finding_type": "design_induced_gap",
-      "observed_finding_type": "design_induced_gap",
-      "expected_issue_candidate_type": "DesignIssue",
-      "observed_issue_candidate_type": "DesignIssue",
-      "issue_candidate_id": "IC-030",
+      "expected_finding_type": "test_oracle_gap",
+      "observed_finding_type": "test_oracle_gap",
+      "expected_issue_candidate_type": "TestIssue",
+      "observed_issue_candidate_type": "TestIssue",
+      "issue_candidate_id": "IC-028",
       "user_evidence_attached": true,
       "repo_evidence_attached": true,
       "forbidden_claim_triggered": false,
       "generic_answer_detected": false,
       "passed": true,
       "finding": {
-        "finding_type": "design_induced_gap",
+        "finding_type": "test_oracle_gap",
         "gap_present": true,
         "concept_id": "repair_practice_generation",
         "operation": "modify",
         "readiness": "not ready yet",
-        "issue_candidate_type": "DesignIssue",
+        "issue_candidate_type": "TestIssue",
         "issue_candidate": {
-          "id": "IC-030",
-          "type": "DesignIssue",
-          "title": "repair_practice_generation: product terminology makes enforcement unclear",
+          "id": "IC-028",
+          "type": "TestIssue",
+          "title": "repair_practice_generation: test oracle gap blocks evidence-backed understanding",
           "evidence": [
             "src/runtime-practice.ts: Defines `generatePracticeChallengesCommand`, `challengeFromGap`, and the due/difficulty mapping from gap severity.",
             "src/runtime-gap-detection.ts: Provides the shape of persisted gap artifacts that practice generation consumes.",
             "Tests/practice-challenges.test.ts: Verifies repair challenge persistence, deduplication, due_after, difficulty, and prompt structure for critical/medium gaps."
           ],
-          "why_it_matters": "When product terminology obscures executable enforcement, users treat optional conventions as binding rules.",
-          "proposed_action": "Separate product wording confusion from the executable enforcement behavior in the code; clarify which rules are enforced.",
+          "why_it_matters": "Test oracle gaps leave the expected behavior under-specified and hard to verify.",
+          "proposed_action": "Add or name the concrete test assertion that would verify the expected behavior.",
           "readiness_blocking": true,
-          "linked_to_gap": "design_induced_gap"
+          "linked_to_gap": "test_oracle_gap"
         },
         "issue_candidates": [
           {
-            "id": "IC-030",
-            "type": "DesignIssue",
-            "title": "repair_practice_generation: product terminology makes enforcement unclear",
+            "id": "IC-028",
+            "type": "TestIssue",
+            "title": "repair_practice_generation: test oracle gap blocks evidence-backed understanding",
             "evidence": [
               "src/runtime-practice.ts: Defines `generatePracticeChallengesCommand`, `challengeFromGap`, and the due/difficulty mapping from gap severity.",
               "src/runtime-gap-detection.ts: Provides the shape of persisted gap artifacts that practice generation consumes.",
               "Tests/practice-challenges.test.ts: Verifies repair challenge persistence, deduplication, due_after, difficulty, and prompt structure for critical/medium gaps."
             ],
-            "why_it_matters": "When product terminology obscures executable enforcement, users treat optional conventions as binding rules.",
-            "proposed_action": "Separate product wording confusion from the executable enforcement behavior in the code; clarify which rules are enforced.",
+            "why_it_matters": "Test oracle gaps leave the expected behavior under-specified and hard to verify.",
+            "proposed_action": "Add or name the concrete test assertion that would verify the expected behavior.",
             "readiness_blocking": true,
-            "linked_to_gap": "design_induced_gap"
+            "linked_to_gap": "test_oracle_gap"
           }
         ],
-        "user_evidence_excerpt": "The challenge taxonomy and phrasing are confusing, so I gave a generic recommendation without matching practice helper naming.",
+        "user_evidence_excerpt": "I described the repair idea without a test oracle: the expected behavior is not mapped to a concrete assertion or coverage check, so the challenge change cannot be verified.",
         "repo_evidence_citations": [
           {
             "path": "src/runtime-practice.ts",
@@ -3164,11 +3136,11 @@
         ],
         "user_evidence_attached": true,
         "repo_evidence_attached": true,
-        "contradiction_or_insufficiency": "The answer treats product terminology as unclear rather than engaging with executable enforcement behavior.",
-        "missing_reasoning_step": "Separate product wording confusion from the executable enforcement behavior.",
-        "repair_task": "Clarify the product affordance that makes manifest enforcement visible, then retry the boundary trace.",
+        "contradiction_or_insufficiency": "The answer does not connect the expected behavior to specific test assertions that would validate it.",
+        "missing_reasoning_step": "Identify the specific test file and test case that validates the expected behavior.",
+        "repair_task": "Map each expected behavior to a concrete test assertion and explain why that test constrains the implementation.",
         "repair_task_info": {
-          "description": "Clarify the product affordance that makes manifest enforcement visible, then retry the boundary trace.",
+          "description": "Map each expected behavior to a concrete test assertion and explain why that test constrains the implementation.",
           "required_evidence": [
             "src/runtime-practice.ts",
             "src/runtime-gap-detection.ts",
@@ -3186,7 +3158,7 @@
         },
         "forbidden_claim_triggered": false,
         "generic_answer_detected": false,
-        "gap_label": "design_induced_gap",
+        "gap_label": "test_oracle_gap",
         "loop_status": "reevaluation_prompted",
         "loop_error": null
       },
@@ -3264,7 +3236,7 @@
       "observed_finding_type": "evidence_gap",
       "expected_issue_candidate_type": "LearningGap",
       "observed_issue_candidate_type": "LearningGap",
-      "issue_candidate_id": "IC-031",
+      "issue_candidate_id": "IC-029",
       "user_evidence_attached": true,
       "repo_evidence_attached": true,
       "forbidden_claim_triggered": false,
@@ -3278,7 +3250,7 @@
         "readiness": "not ready yet",
         "issue_candidate_type": "LearningGap",
         "issue_candidate": {
-          "id": "IC-031",
+          "id": "IC-029",
           "type": "LearningGap",
           "title": "readiness_report_generation: learner needs evidence-backed repair",
           "evidence": [
@@ -3293,7 +3265,7 @@
         },
         "issue_candidates": [
           {
-            "id": "IC-031",
+            "id": "IC-029",
             "type": "LearningGap",
             "title": "readiness_report_generation: learner needs evidence-backed repair",
             "evidence": [
@@ -3368,7 +3340,7 @@
       "observed_finding_type": "causal_gap",
       "expected_issue_candidate_type": "LearningGap",
       "observed_issue_candidate_type": "LearningGap",
-      "issue_candidate_id": "IC-032",
+      "issue_candidate_id": "IC-030",
       "user_evidence_attached": true,
       "repo_evidence_attached": true,
       "forbidden_claim_triggered": false,
@@ -3382,7 +3354,7 @@
         "readiness": "not ready yet",
         "issue_candidate_type": "LearningGap",
         "issue_candidate": {
-          "id": "IC-032",
+          "id": "IC-030",
           "type": "LearningGap",
           "title": "readiness_report_generation: learner needs evidence-backed repair",
           "evidence": [
@@ -3397,7 +3369,7 @@
         },
         "issue_candidates": [
           {
-            "id": "IC-032",
+            "id": "IC-030",
             "type": "LearningGap",
             "title": "readiness_report_generation: learner needs evidence-backed repair",
             "evidence": [
@@ -3472,7 +3444,7 @@
       "observed_finding_type": "responsibility_gap",
       "expected_issue_candidate_type": "LearningGap",
       "observed_issue_candidate_type": "LearningGap",
-      "issue_candidate_id": "IC-033",
+      "issue_candidate_id": "IC-031",
       "user_evidence_attached": true,
       "repo_evidence_attached": true,
       "forbidden_claim_triggered": false,
@@ -3486,7 +3458,7 @@
         "readiness": "not ready yet",
         "issue_candidate_type": "LearningGap",
         "issue_candidate": {
-          "id": "IC-033",
+          "id": "IC-031",
           "type": "LearningGap",
           "title": "readiness_report_generation: learner needs evidence-backed repair",
           "evidence": [
@@ -3501,7 +3473,7 @@
         },
         "issue_candidates": [
           {
-            "id": "IC-033",
+            "id": "IC-031",
             "type": "LearningGap",
             "title": "readiness_report_generation: learner needs evidence-backed repair",
             "evidence": [
@@ -3576,7 +3548,7 @@
       "observed_finding_type": "flow_gap",
       "expected_issue_candidate_type": "LearningGap",
       "observed_issue_candidate_type": "LearningGap",
-      "issue_candidate_id": "IC-034",
+      "issue_candidate_id": "IC-032",
       "user_evidence_attached": true,
       "repo_evidence_attached": true,
       "forbidden_claim_triggered": false,
@@ -3590,7 +3562,7 @@
         "readiness": "not ready yet",
         "issue_candidate_type": "LearningGap",
         "issue_candidate": {
-          "id": "IC-034",
+          "id": "IC-032",
           "type": "LearningGap",
           "title": "readiness_report_generation: learner needs evidence-backed repair",
           "evidence": [
@@ -3605,7 +3577,7 @@
         },
         "issue_candidates": [
           {
-            "id": "IC-034",
+            "id": "IC-032",
             "type": "LearningGap",
             "title": "readiness_report_generation: learner needs evidence-backed repair",
             "evidence": [
@@ -3680,7 +3652,7 @@
       "observed_finding_type": "false_confidence_gap",
       "expected_issue_candidate_type": "LearningGap",
       "observed_issue_candidate_type": "LearningGap",
-      "issue_candidate_id": "IC-035",
+      "issue_candidate_id": "IC-033",
       "user_evidence_attached": true,
       "repo_evidence_attached": true,
       "forbidden_claim_triggered": false,
@@ -3694,7 +3666,7 @@
         "readiness": "not ready yet",
         "issue_candidate_type": "LearningGap",
         "issue_candidate": {
-          "id": "IC-035",
+          "id": "IC-033",
           "type": "LearningGap",
           "title": "readiness_report_generation: learner needs evidence-backed repair",
           "evidence": [
@@ -3709,7 +3681,7 @@
         },
         "issue_candidates": [
           {
-            "id": "IC-035",
+            "id": "IC-033",
             "type": "LearningGap",
             "title": "readiness_report_generation: learner needs evidence-backed repair",
             "evidence": [
@@ -3784,7 +3756,7 @@
       "observed_finding_type": "surface_gap",
       "expected_issue_candidate_type": "LearningGap",
       "observed_issue_candidate_type": "LearningGap",
-      "issue_candidate_id": "IC-036",
+      "issue_candidate_id": "IC-034",
       "user_evidence_attached": true,
       "repo_evidence_attached": true,
       "forbidden_claim_triggered": false,
@@ -3798,7 +3770,7 @@
         "readiness": "not ready yet",
         "issue_candidate_type": "LearningGap",
         "issue_candidate": {
-          "id": "IC-036",
+          "id": "IC-034",
           "type": "LearningGap",
           "title": "readiness_report_generation: learner needs evidence-backed repair",
           "evidence": [
@@ -3813,7 +3785,7 @@
         },
         "issue_candidates": [
           {
-            "id": "IC-036",
+            "id": "IC-034",
             "type": "LearningGap",
             "title": "readiness_report_generation: learner needs evidence-backed repair",
             "evidence": [
@@ -3884,54 +3856,68 @@
       "mastery_check_id": "SC-005-readiness-report-generation",
       "concept_id": "readiness_report_generation",
       "answer_class": "design_induced_confusion",
-      "expected_finding_type": "design_induced_gap",
-      "observed_finding_type": "design_induced_gap",
-      "expected_issue_candidate_type": "DesignIssue",
-      "observed_issue_candidate_type": "DesignIssue",
-      "issue_candidate_id": "IC-037",
+      "expected_finding_type": "product_gap",
+      "observed_finding_type": "product_gap",
+      "expected_issue_candidate_type": "ProductIssue",
+      "observed_issue_candidate_type": "ProductIssue",
+      "issue_candidate_id": "IC-035",
       "user_evidence_attached": true,
       "repo_evidence_attached": true,
       "forbidden_claim_triggered": false,
       "generic_answer_detected": false,
       "passed": true,
       "finding": {
-        "finding_type": "design_induced_gap",
+        "finding_type": "product_gap",
         "gap_present": true,
         "concept_id": "readiness_report_generation",
         "operation": "transfer",
         "readiness": "not ready yet",
-        "issue_candidate_type": "DesignIssue",
+        "issue_candidate_type": "ProductIssue",
         "issue_candidate": {
-          "id": "IC-037",
-          "type": "DesignIssue",
-          "title": "readiness_report_generation: product terminology makes enforcement unclear",
+          "id": "IC-035",
+          "type": "ProductIssue",
+          "title": "readiness_report_generation: product affordance gap blocks evidence-backed understanding",
           "evidence": [
             "src/runtime-readiness.ts: Primary generator for readiness scoring, claim levels, evidence indexing, and summary/risk/report composition.",
             "src/runtime-memory.ts: Constructs understanding memory state that readiness_report consumes for concept/gap/challenge context.",
             "Tests/readiness-report.test.ts: Demonstrates supported/unsupported report claims and evidence indexing behavior."
           ],
-          "why_it_matters": "When product terminology obscures executable enforcement, users treat optional conventions as binding rules.",
-          "proposed_action": "Separate product wording confusion from the executable enforcement behavior in the code; clarify which rules are enforced.",
+          "why_it_matters": "Product affordance gaps can make the required evidence path hard to discover or apply correctly.",
+          "proposed_action": "Clarify the product affordance so the user can discover and apply the required evidence path.",
           "readiness_blocking": true,
-          "linked_to_gap": "design_induced_gap"
+          "linked_to_gap": "product_gap"
         },
         "issue_candidates": [
           {
-            "id": "IC-037",
-            "type": "DesignIssue",
-            "title": "readiness_report_generation: product terminology makes enforcement unclear",
+            "id": "IC-035",
+            "type": "ProductIssue",
+            "title": "readiness_report_generation: product affordance gap blocks evidence-backed understanding",
             "evidence": [
               "src/runtime-readiness.ts: Primary generator for readiness scoring, claim levels, evidence indexing, and summary/risk/report composition.",
               "src/runtime-memory.ts: Constructs understanding memory state that readiness_report consumes for concept/gap/challenge context.",
               "Tests/readiness-report.test.ts: Demonstrates supported/unsupported report claims and evidence indexing behavior."
             ],
-            "why_it_matters": "When product terminology obscures executable enforcement, users treat optional conventions as binding rules.",
-            "proposed_action": "Separate product wording confusion from the executable enforcement behavior in the code; clarify which rules are enforced.",
+            "why_it_matters": "Product affordance gaps can make the required evidence path hard to discover or apply correctly.",
+            "proposed_action": "Clarify the product affordance so the user can discover and apply the required evidence path.",
             "readiness_blocking": true,
-            "linked_to_gap": "design_induced_gap"
+            "linked_to_gap": "product_gap"
+          },
+          {
+            "id": "IC-036",
+            "type": "LearningGap",
+            "title": "readiness_report_generation: learner needs evidence-backed repair",
+            "evidence": [
+              "src/runtime-readiness.ts: Primary generator for readiness scoring, claim levels, evidence indexing, and summary/risk/report composition.",
+              "src/runtime-memory.ts: Constructs understanding memory state that readiness_report consumes for concept/gap/challenge context.",
+              "Tests/readiness-report.test.ts: Demonstrates supported/unsupported report claims and evidence indexing behavior."
+            ],
+            "why_it_matters": "The learner still needs a narrow evidence-producing repair before readiness can advance.",
+            "proposed_action": "Ask the learner to restate the answer with required repo evidence and the same operation.",
+            "readiness_blocking": true,
+            "linked_to_gap": "product_gap"
           }
         ],
-        "user_evidence_excerpt": "The many report sections and confidence labels are overwhelming, so I skipped exact section mapping and gave a generic blocked-vs-ready statement.",
+        "user_evidence_excerpt": "The product affordance gap is that the report UI/docs do not show how summary readiness maps to evidence IDs, while the code behavior enforces section-level evidence indexing.",
         "repo_evidence_citations": [
           {
             "path": "src/runtime-readiness.ts",
@@ -3954,11 +3940,11 @@
         ],
         "user_evidence_attached": true,
         "repo_evidence_attached": true,
-        "contradiction_or_insufficiency": "The answer treats product terminology as unclear rather than engaging with executable enforcement behavior.",
-        "missing_reasoning_step": "Separate product wording confusion from the executable enforcement behavior.",
-        "repair_task": "Clarify the product affordance that makes manifest enforcement visible, then retry the boundary trace.",
+        "contradiction_or_insufficiency": "The product affordance or documentation makes the correct answer hard to discover from the code alone.",
+        "missing_reasoning_step": "Separate product wording confusion from the executable enforcement behavior in the code.",
+        "repair_task": "Identify the product affordance gap: what the UI/docs should show versus what the code actually enforces.",
         "repair_task_info": {
-          "description": "Clarify the product affordance that makes manifest enforcement visible, then retry the boundary trace.",
+          "description": "Identify the product affordance gap: what the UI/docs should show versus what the code actually enforces.",
           "required_evidence": [
             "src/runtime-readiness.ts",
             "src/runtime-memory.ts",
@@ -3976,7 +3962,7 @@
         },
         "forbidden_claim_triggered": false,
         "generic_answer_detected": false,
-        "gap_label": "design_induced_gap",
+        "gap_label": "product_gap",
         "loop_status": "reevaluation_prompted",
         "loop_error": null
       },
@@ -4013,9 +3999,11 @@
     },
     {
       "label": "boundary_gap",
-      "represented": false,
-      "case_count": 0,
-      "case_ids": []
+      "represented": true,
+      "case_count": 1,
+      "case_ids": [
+        "GC-008"
+      ]
     },
     {
       "label": "responsibility_gap",
@@ -4053,15 +4041,19 @@
     },
     {
       "label": "test_oracle_gap",
-      "represented": false,
-      "case_count": 0,
-      "case_ids": []
+      "represented": true,
+      "case_count": 1,
+      "case_ids": [
+        "GC-032"
+      ]
     },
     {
       "label": "product_gap",
-      "represented": false,
-      "case_count": 0,
-      "case_ids": []
+      "represented": true,
+      "case_count": 1,
+      "case_ids": [
+        "GC-040"
+      ]
     },
     {
       "label": "false_confidence_gap",
@@ -4078,13 +4070,10 @@
     {
       "label": "design_induced_gap",
       "represented": true,
-      "case_count": 5,
+      "case_count": 2,
       "case_ids": [
-        "GC-008",
         "GC-016",
-        "GC-024",
-        "GC-032",
-        "GC-040"
+        "GC-024"
       ]
     }
   ],
