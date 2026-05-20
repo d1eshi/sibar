@@ -13,8 +13,12 @@ release yet.
 
 ### Docs - Tauri Workspace UI Specs
 
-- Added `docs/specs/ui/` as the single UI spec home for the Tauri onboarding
-  and workspace prototype, including generated visual references.
+- Split `docs/specs/ui/` into `web/` and `workspace-tauri/` as the UI source of
+  truth for public web surfaces and the direct Tauri workspace prototype.
+- Added source maps that extract dispersed UI decisions from older specs,
+  reports, product docs, and prototypes.
+- Moved generated workspace UI references under
+  `docs/specs/ui/workspace-tauri/assets/`.
 
 ### Changed - Tauri Workspace UI Prototype
 
