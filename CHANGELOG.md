@@ -57,6 +57,12 @@ release yet.
 - Reworked the workspace home layout to fit the Tauri desktop viewport as a
   single-screen workspace surface, with compact header and side-by-side resume
   panels instead of a long scrolling page.
+- Matched the workspace home to the generated visual reference with a dedicated
+  continue column, compact workspace rows, readiness meters, and local-data
+  footer treatment.
+- Reworked the active node session into a viewport-bounded reader layout:
+  study path rail, material/source tree, central scrollable reader canvas, and
+  compact guide/readiness rail.
 
 ### Added - Workspace Intent First Flow
 

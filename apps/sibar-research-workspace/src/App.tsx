@@ -62,6 +62,9 @@ export default function App() {
             />
             <SessionWorkbench
               projection={workspaceProjection}
+              onSelectSource={(sourceId) =>
+                dispatchWorkspace({ type: "select_source", sourceId })
+              }
             />
             {workspaceState.isReadinessPanelVisible ? (
               <aside className={stylesWorkspace.readinessPanel}>

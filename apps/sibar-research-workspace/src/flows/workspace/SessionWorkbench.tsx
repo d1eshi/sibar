@@ -1,62 +1,88 @@
 import styles from "./workspace.module.css";
 import type { WorkspaceSessionProjection } from "../../state/workspaceProjection";
 
-export function SessionWorkbench({ projection }: { projection: WorkspaceSessionProjection }) {
+export function SessionWorkbench({
+  projection,
+  onSelectSource,
+}: {
+  projection: WorkspaceSessionProjection;
+  onSelectSource: (sourceId: string) => void;
+}) {
+  const isCodeMaterial = projection.selectedMaterial.mode === "code";
+  const isEquationMaterial =
+    projection.selectedMaterial.mode === "equation" ||
+    projection.selectedMaterial.mode === "math";
+
   return (
     <section className={styles.sessionWorkbench} aria-label="Session workbench">
       <header className={styles.sessionHeader}>
         <div>
-          <p className={styles.kicker}>Active node session</p>
+          <p className={styles.kicker}>Active node reader</p>
           <h1>{projection.selectedNode.sessionTitle}</h1>
+          <p>{projection.selectedMiniNode.question}</p>
         </div>
         <span className={styles.sessionMark} aria-hidden="true" />
       </header>
 
-      <div className={styles.sessionDivider} />
+      <section className={styles.readerWorkspace} aria-label="Learning material reader">
+        <aside className={styles.materialTree} aria-label="Learning material selection">
+          <p className={styles.kicker}>Materials</p>
+          <div className={styles.materialTreeList}>
+            {projection.sources.map((source) => (
+              <button
+                key={source.id}
+                type="button"
+                className={
+                  source.id === projection.selectedSource.id
+                    ? styles.materialTreeItemActive
+                    : styles.materialTreeItem
+                }
+                onClick={() => onSelectSource(source.id)}
+              >
+                <span>{source.type}</span>
+                <strong>{source.title}</strong>
+                <em>{source.metadata}</em>
+              </button>
+            ))}
+          </div>
+        </aside>
 
-      <section className={styles.sessionReadingPanel} aria-label="Active learning node">
-        <article className={styles.currentQuestion}>
-          <p className={styles.kicker}>Current study node</p>
-          <h2>{projection.selectedNode.name}</h2>
-          <p>{projection.selectedNode.scope}</p>
-        </article>
-
-        <article className={styles.currentMiniNode}>
-          <p className={styles.kicker}>Current mini-node</p>
-          <h3>{projection.selectedMiniNode.name}</h3>
-          <p>{projection.selectedMiniNode.question}</p>
-        </article>
-
-        <article className={styles.sourceWindow} aria-label="Learning material surface">
-          <div className={styles.sourceWindowHeader}>
+        <main className={styles.readerCanvas} aria-label="Selected learning material">
+          <header className={styles.readerHeader}>
             <div>
-              <p className={styles.kicker}>Learning material</p>
-              <h3>{projection.selectedMaterial.title}</h3>
+              <p className={styles.kicker}>{projection.selectedMaterial.modeLabel}</p>
+              <h2>{projection.selectedMaterial.title}</h2>
+              <p>{projection.selectedSource.metadata}</p>
             </div>
             <span className={styles.sourceTypeBadge}>
               {projection.selectedMaterial.modeLabel}
             </span>
-          </div>
-          <p className={styles.materialBody}>{projection.selectedMaterial.content}</p>
-          <footer className={styles.sourceLedger}>
-            <span>{projection.selectedSource.metadata}</span>
-            <strong>{projection.selectedMaterial.modeLabel} source</strong>
-          </footer>
-        </article>
+          </header>
 
-        <article className={styles.outputContract}>
-          <p className={styles.kicker}>Pedagogy status</p>
-          <ul>
-            <li>
-              <strong>Recall follow-up</strong>
-              <span>{projection.recallStatus}</span>
-            </li>
-            <li>
-              <strong>Readiness</strong>
-              <span>{projection.readinessLabel}</span>
-            </li>
-          </ul>
-        </article>
+          <article
+            className={styles.readerDocument}
+            data-mode={projection.selectedMaterial.mode}
+          >
+            {isCodeMaterial ? (
+              <pre className={styles.codeMaterial}>
+                <code>{projection.selectedMaterial.content.join("\n")}</code>
+              </pre>
+            ) : isEquationMaterial ? (
+              <div className={styles.equationMaterial}>
+                {projection.selectedMaterial.content.map((line, index) => (
+                  <p key={line}>
+                    <span>{index + 1}</span>
+                    {line}
+                  </p>
+                ))}
+              </div>
+            ) : (
+              projection.selectedMaterial.content.map((paragraph) => (
+                <p key={paragraph}>{paragraph}</p>
+              ))
+            )}
+          </article>
+        </main>
       </section>
     </section>
   );
