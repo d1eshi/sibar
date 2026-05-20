@@ -24,6 +24,8 @@ release yet.
 
 - Added `docs/specs/ui/01_ui_technology_architecture.md` as a transversal UI
   architecture spec for the Tauri workspace.
+- Added `docs/specs/ui/workspace-tauri/04_react_migration_plan.md` to translate
+  the static Tauri prototype into React by flow slices.
 - Declared React + TypeScript + Vite as the UI baseline with CSS Modules plus
   tokens as the initial styling strategy.
 - Clarified the Rust/Tauri native boundary and that runner/sidecar/runtime
