@@ -33,6 +33,12 @@ release yet.
 - Fixed evidence grouping so the bottom evidence drawer renders observed,
   inferred, unverified, and conflict fixture evidence instead of empty groups.
 
+### Fixed - Sibi Ownership Workbench Lab
+
+- Kept the file tree, ownership harness, and lab on the same active boundary
+  state source so initial `gap` and submitted `gap`/`partial`/`owned`/
+  `questionable` results render consistently.
+
 ### Docs - Sibi Ownership Harness
 
 - Clarified the Sibi manifesto around cognitive debt recovery: AI-assisted work
