@@ -128,7 +128,7 @@ Path mutation actions:
 4. `Change artifact`
 
 These actions do not instantly rewrite the track. They open a bounded proposal
-state governed by `21_curated_track_pedagogy_contract.md`.
+state governed by `docs/specs/deep-ownership-workspace/01_source_to_mission_mvp.md`.
 
 ## Artifact Choice UI
 

@@ -100,19 +100,21 @@ test("WorkspaceIntent validators reject missing source input and ambition/worksp
   assert.ok(conflatedValidation.issues.some((issue) => /distinct/.test(issue.message)));
 });
 
-test("Workspace Intent spec links the first-flow transition to the deep ownership loop", () => {
-  const workspaceIntentSpec = readFileSync(
-    join(root, "docs/specs/deep-ownership-workspace/14_workspace_intent_flow.md"),
+test("current deep ownership specs define the source-driven mission flow", () => {
+  const sourceMissionSpec = readFileSync(
+    join(root, "docs/specs/deep-ownership-workspace/01_source_to_mission_mvp.md"),
     "utf8",
   );
-  const loopSpec = readFileSync(
-    join(root, "docs/specs/deep-ownership-workspace/01_deep_ownership_loop.md"),
+  const northStarSpec = readFileSync(
+    join(root, "docs/specs/deep-ownership-workspace/00_current_north_star.md"),
     "utf8",
   );
 
-  assert.match(workspaceIntentSpec, /User Ambition[\s\S]*Workspace[\s\S]*Node[\s\S]*Session[\s\S]*Artifact \/ Evidence/);
-  assert.match(workspaceIntentSpec, /WorkspaceIntent[\s\S]*SourceIntake[\s\S]*WorkspacePlan[\s\S]*SessionPlan[\s\S]*EvidencePlan/);
-  assert.match(workspaceIntentSpec, /User fills WorkspaceIntent[\s\S]*LLM compiles WorkspacePlan[\s\S]*System selects first SessionPlan[\s\S]*UI opens session/);
-  assert.doesNotMatch(workspaceIntentSpec, /RoadmapArtifact` is the source of truth/);
-  assert.match(loopSpec, /14_workspace_intent_flow\.md/);
+  assert.match(sourceMissionSpec, /SourceIntentInput[\s\S]*SourceIntakeResult[\s\S]*SourceSignal[\s\S]*MissionPreview/);
+  assert.match(sourceMissionSpec, /Mission[\s\S]*Track[\s\S]*Session[\s\S]*Artifact/);
+  assert.match(sourceMissionSpec, /Focused Track Queue/);
+  assert.match(sourceMissionSpec, /Source Map as an advanced\/secondary view/);
+  assert.match(sourceMissionSpec, /JAX tutorials[\s\S]*JAX scaling book[\s\S]*Pallas kernel work/);
+  assert.match(northStarSpec, /URL or pasted text[\s\S]*why this source matters to me/);
+  assert.doesNotMatch(sourceMissionSpec, /WorkspaceIntent[\s\S]*WorkspacePlan[\s\S]*SessionPlan[\s\S]*EvidencePlan/);
 });

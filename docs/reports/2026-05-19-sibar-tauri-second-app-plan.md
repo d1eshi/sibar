@@ -2,6 +2,8 @@
 
 La versión ejecutable y vigente de este segundo app quedó migrada a:
 
-- `docs/specs/deep-ownership-workspace/00_new_app_tauri_workspace.md`
+- `docs/specs/deep-ownership-workspace/00_current_north_star.md`
+- `docs/specs/deep-ownership-workspace/01_source_to_mission_mvp.md`
 
-`docs/specs/deep-ownership-workspace/13_tauri_second_app_product_plan.md` queda como plan derivado/histórico y trazabilidad de decisiones.
+Los planes exploratorios previos fueron podados del directorio canónico; git
+retiene esa historia.

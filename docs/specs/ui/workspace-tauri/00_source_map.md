@@ -7,27 +7,23 @@ then reduce them into the canonical specs in this directory.
 
 ## Canonical Inputs
 
-1. `docs/specs/deep-ownership-workspace/03_ui_product_surface.md`
-   Source for the workspace-as-lab model: left boundary/source rail, central
-   artifact canvas, right loop rail, bottom evidence rail.
-2. `docs/specs/deep-ownership-workspace/12_ui_reference_components.md`
-   Source for visual grammar and reusable shell components.
-3. `docs/specs/deep-ownership-workspace/14_workspace_intent_flow.md`
-   Source for create-workspace onboarding and the `WorkspaceIntent ->
-   WorkspacePlan -> SessionPlan -> EvidencePlan` sequence.
-4. `docs/specs/deep-ownership-workspace/18_workspace_ui_reproducibility.md`
-   Source for deterministic projection, visible 2-3 next actions, locked nodes,
-   and evidence requirements.
-5. `docs/specs/deep-ownership-workspace/19_workspace_trace_contract_gate.md`
-   Source for workspace history, intent attempts, failed/blocked creation
-   traces, resume behavior, and the durable state that `Workspace Home`
-   summarizes.
-6. `docs/reports/2026-05-20-sibar-research-workspace-ui-ux-report.md`
+1. `docs/specs/deep-ownership-workspace/00_current_north_star.md`
+   Source for the current source-driven mission north and product hierarchy.
+2. `docs/specs/deep-ownership-workspace/01_source_to_mission_mvp.md`
+   Source for source intake, `MissionPreview`, Mission Brief, Focused Track
+   Queue, Active Session, Source Map, and artifact recommendations.
+3. `docs/specs/deep-ownership-workspace/02_runtime_boundary.md`
+   Source for deterministic projection, visible 2-3 next actions, locked
+   sessions, execution jobs, adapter boundary, and trace requirements.
+4. `docs/specs/deep-ownership-workspace/03_validation_and_plan.md`
+   Source for accepted decisions, validation assertions, and implementation
+   order.
+5. `docs/reports/2026-05-20-sibar-research-workspace-ui-ux-report.md`
    Source for the current static Tauri prototype diagnosis and redesign
    principles.
-7. `docs/reports/2026-05-19-sibar-tauri-second-app-plan.md`
+6. `docs/reports/2026-05-19-sibar-tauri-second-app-plan.md`
    Historical pointer to the second Tauri app plan.
-8. `docs/specs/10_study_panel_ui.md`
+7. `docs/specs/10_study_panel_ui.md`
    Source for the older Swift panel contract. Use only when the Tauri workspace
    needs to align with accessory panel behavior.
 
@@ -55,8 +51,8 @@ then reduce them into the canonical specs in this directory.
 
 ## Pending Extraction
 
-1. Convert the Lab component library from `12_ui_reference_components.md` into
-   concrete Tauri screen components only when the current prototype needs them.
+1. Convert the canonical source-driven mission flow into concrete Tauri screen
+   components only when the current prototype needs them.
 2. Add a deterministic `WorkspaceHomeProjection` before relying on hand-authored
    home cards as production resume/history state.
 3. Add a deterministic `WorkspaceUiProjection` adapter before relying on the

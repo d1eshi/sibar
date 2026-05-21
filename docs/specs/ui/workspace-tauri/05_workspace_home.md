@@ -92,9 +92,8 @@ or runner behavior.
 
 Relevant non-UI contracts:
 
-1. `docs/specs/deep-ownership-workspace/19_workspace_trace_contract_gate.md`
-2. `docs/specs/deep-ownership-workspace/18_workspace_ui_reproducibility.md`
-3. `docs/specs/deep-ownership-workspace/15_workspace_intent_compiler.md`
+1. `docs/specs/deep-ownership-workspace/02_runtime_boundary.md`
+2. `docs/specs/deep-ownership-workspace/03_validation_and_plan.md`
 
 ## Acceptance
 

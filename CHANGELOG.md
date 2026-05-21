@@ -25,6 +25,17 @@ release yet.
   source fixture the first MVP path and keep Sibi-repo ownership as internal
   regression context.
 
+### Docs - Deep Ownership Workspace Pruning
+
+- Pruned `docs/specs/deep-ownership-workspace/` from the pre-consolidation spec
+  pack to five canonical files: README, current north star, source-to-mission
+  MVP, runtime boundary, and validation/plan.
+- Consolidated mission/track/session/artifact, source-intent ingestion, focused
+  queues, runtime boundaries, trace requirements, validation assertions, and
+  implementation order into the new canonical docs.
+- Updated UI specs, reports, and tests to point at the canonical docs instead of
+  deleted pre-consolidation specs.
+
 ### Docs - Tauri Workspace UI Specs
 
 - Added mission-track study specs for the frontier lab readiness flow, including
@@ -266,9 +277,9 @@ release yet.
 - Fixed applied roadmap artifacts so imported `mini_nodes`, `sources`,
   prerequisites, and reader guidance survive into the roadmap tree and reader
   instead of falling back to generic node defaults.
-- Updated tests and spec pack references so the live spec source is read from
-  `00_new_app_tauri_workspace.md` and the README identifies
-  `13_tauri_second_app_product_plan.md` as derived/historical context.
+- Updated tests and spec pack references for the then-current Tauri workspace
+  source docs; those pre-consolidation specs were later pruned into the canonical
+  deep ownership spec set.
 
 ### Internal - Deep Ownership Workspace Modularization
 
@@ -279,11 +290,11 @@ release yet.
 
 ### Docs - Deep Ownership Workspace Rust Execution Specs
 
-- Added new lightweight spec docs for the Rust-native Deep Ownership Workspace path:
-  `15_workspace_intent_compiler.md`, `16_llm_adapter_contract.md`,
-  `17_workspace_execution_pipeline.md`, and `18_workspace_ui_reproducibility.md`.
-- Updated `docs/specs/deep-ownership-workspace/README.md` reading order to
-  reference the new spec sequence and ensure stable implementation handoff.
+- Added lightweight pre-consolidation Rust-native Deep Ownership Workspace specs
+  for compiler, adapter, execution, and reproducibility behavior. These were
+  later consolidated into the canonical runtime boundary doc.
+- Updated the deep ownership README reading order to reference the then-current
+  spec sequence and ensure stable implementation handoff.
 
 ### Added - WorkspaceIntent Compiler Module
 
@@ -380,7 +391,7 @@ release yet.
 - Implemented a 7-step first-run setup wizard (goal, boundary, evidence roles,
   boundary confirmation, evidence inventory, concept slice, active operation)
   that gates the main Workspace until the user confirms the loop boundaries.
-- Mapped all six major UI regions to `12_ui_reference_components.md` component
+- Mapped all six major UI regions to the then-current reference component
   contracts via `data-component` attributes: Lab Shell, Source & Artifact Rail,
   Code Workbench Artifact, Call/Data Diagram, Sibi Loop Rail, Evidence Strip.
 - Added keyboard accessibility: skip navigation links for all three regions,
@@ -426,11 +437,9 @@ release yet.
 
 ### Docs - Tauri Second App Workspace Spec
 
-- Treat `docs/specs/deep-ownership-workspace/00_new_app_tauri_workspace.md`
-  as the current source spec for the second sibling Sibar app in Tauri
-  (`workspace investigador`), with
-  `docs/specs/deep-ownership-workspace/13_tauri_second_app_product_plan.md`
-  retained as a derived implementation plan, including:
+- Treated the pre-consolidation deep ownership workspace notes as the source
+  specs for the second sibling Sibar app in Tauri (`workspace investigador`),
+  including:
   - conceptual stack (Goal → Roadmap → Node → Session → Artifact → Evidence → Recall),
   - first-screen UX (`Today`) requirements,
   - bounded LM tool mode,
