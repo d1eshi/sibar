@@ -4,17 +4,18 @@ import type {
   CodeViewFileItem,
   DiffLineAnnotation,
   FileDiffMetadata,
+  ParsedPatch,
   LineAnnotation,
 } from "@pierre/diffs";
 
-import { evidenceForLine, isInBoundary } from "./helpers";
+import { evidenceForLine, isInBoundary } from "./helpers.ts";
 import type {
   BoundaryState,
   EvidenceRef,
   OwnershipBoundary,
   TreeNode,
   WorkbenchLineMetadata,
-} from "./types";
+} from "./types.ts";
 
 export const ownershipBoundary: OwnershipBoundary = {
   id: "boundary-01",
@@ -98,20 +99,27 @@ export const fixtureDiff = `diff --git a/src/api/session.ts b/src/api/session.ts
 index 4f2cc..8f9ad 100644
 --- a/src/api/session.ts
 +++ b/src/api/session.ts
-@@ -9,6 +9,10 @@ export async function createSession(payload: LoginPayload) {
--  return response.json();
+@@ -1,11 +1,14 @@
+ import type { LoginPayload } from "./types";
+\x20
+ export async function createSession(payload: LoginPayload) {
+   const response = await fetch("/api/session", {
+     method: "POST",
+     body: JSON.stringify(payload),
+   });
+\x20
 +  if (response.status === 204) {
 +    return null;
 +  }
-+  return response.json();
-+}
+  return response.json();
+ }
 diff --git a/src/api/session.test.ts b/src/api/session.test.ts
 index 9f11a..7e2bc 100644
 --- a/src/api/session.test.ts
 +++ b/src/api/session.test.ts
-@@ -1,3 +1,7 @@
+@@ -1 +1,5 @@
  import { createSession } from "./session";
-
+\x20
 +test("handles no active session", async () => {
 +  await expect(createSession({ email: "a@b.com" })).resolves.toBeNull();
 +});
@@ -209,7 +217,9 @@ export const fileTreePaths: string[] = (() => {
   const paths: string[] = [];
   const walk = (nodes: TreeNode[]): void => {
     for (const node of nodes) {
-      paths.push(node.path);
+      if (node.kind === "file") {
+        paths.push(node.path);
+      }
       if (node.kind === "directory" && node.children != null) {
         walk(node.children);
       }
@@ -395,7 +405,20 @@ function extractDiffLineAnnotations(
   return byLine;
 }
 
-export const fixtureParsedPatches = parsePatchFiles(fixtureDiff, "sibi-slice-0");
+export const fixtureParsedPatches = (() => {
+  try {
+    const parsed = parsePatchFiles(fixtureDiff, "sibi-slice-0", true);
+    if (parsed.length === 0) {
+      console.error(
+        "[sibi-workbench] Fixture diff parsed to zero file changes. Expected two fixture changes in `fixtureDiff`.",
+      );
+    }
+    return parsed;
+  } catch (error) {
+    console.error("[sibi-workbench] Fixture diff failed to parse; diff mode will fallback to file content only.", error);
+    return [] as ParsedPatch[];
+  }
+})();
 export const fileDiffsByPath = fixtureParsedPatches.flatMap((patch) => patch.files).reduce(
   (acc, fileDiff) => {
     acc[fileDiff.name] = fileDiff;
