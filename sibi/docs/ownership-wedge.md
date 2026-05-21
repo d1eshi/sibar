@@ -115,8 +115,10 @@ mostrar, como mínimo:
 - siguiente paso.
 
 El prompt de ownership es una etapa de la secuencia, no el primer concepto de la
-UI. El lab de derivación local puede existir, pero queda como sección secundaria
-o interna después de la guía user-facing.
+UI. El lab de derivación local no forma parte de la UI default del usuario. Debe
+abrirse explícitamente como vista local/debug con `?view=lab` o `?lab=1`, para
+revisar traces, derivación de estado o reportes de usuario sin sobrecargar el
+flujo normal.
 
 Ejemplos:
 

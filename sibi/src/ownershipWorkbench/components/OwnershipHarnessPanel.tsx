@@ -6,20 +6,26 @@ import type {
   OwnershipBoundary,
   ReviewQueueItem,
   ViewMode,
+  WorkbenchSurfaceMode,
 } from "../types";
 import * as React from "react";
 import { OwnershipLabPanel } from "./OwnershipLabPanel";
 import { ReviewGuidePanel } from "./ReviewGuidePanel";
 
-interface OwnershipHarnessPanelProps {
+interface OwnershipLabContext {
   selectedFile: string;
   viewMode: ViewMode;
   selection: LineSelection | null;
   selectionSummaryText: string;
+  evidenceRefs: EvidenceRef[];
+}
+
+interface OwnershipHarnessPanelProps {
   boundary: OwnershipBoundary;
   boundaryState: BoundaryState;
-  evidenceRefs: EvidenceRef[];
   reviewQueue: ReviewQueueItem[];
+  surfaceMode: WorkbenchSurfaceMode;
+  labContext: OwnershipLabContext | null;
   attemptText: string;
   attemptResult: AttemptResult | null;
   showHint: boolean;
@@ -31,14 +37,11 @@ interface OwnershipHarnessPanelProps {
 }
 
 export function OwnershipHarnessPanel({
-  selectedFile,
-  viewMode,
-  selection,
-  selectionSummaryText,
   boundary,
   boundaryState,
-  evidenceRefs,
   reviewQueue,
+  surfaceMode,
+  labContext,
   attemptText,
   attemptResult,
   showHint,
@@ -48,15 +51,28 @@ export function OwnershipHarnessPanel({
   onMarkUnknown,
   onReattempt,
 }: OwnershipHarnessPanelProps): React.ReactElement {
+  const isLabView = surfaceMode === "lab" && labContext != null;
+
   return (
     <aside className="panel ownershipPanel">
       <header className="panelHeader">
-        <p className="panelSub">Ownership Harness</p>
-        <h1>Review sequence</h1>
+        <p className="panelSub">{isLabView ? "Local trace lab" : "Ownership Harness"}</p>
+        <h1>{isLabView ? "Derivation lab" : "Review sequence"}</h1>
         <p className="boundaryTitle">{boundary.title}</p>
       </header>
 
       <div className="ownershipPanelBody">
+        {isLabView && (
+          <section className="ownershipSection labModeNotice">
+            <p className="panelSub">Debug view</p>
+            <h2>Local trace lab</h2>
+            <p>
+              This URL mode is for reviewing derivation traces and user reports. The default
+              workbench hides the lab and keeps the right panel user-facing.
+            </p>
+          </section>
+        )}
+
         <ReviewGuidePanel boundary={boundary} boundaryState={boundaryState} reviewQueue={reviewQueue} />
 
         <section className="ownershipSection">
@@ -124,15 +140,17 @@ export function OwnershipHarnessPanel({
           </section>
         )}
 
-        <OwnershipLabPanel
-          selectedFile={selectedFile}
-          viewMode={viewMode}
-          selection={selection}
-          selectionSummaryText={selectionSummaryText}
-          boundary={boundary}
-          boundaryState={boundaryState}
-          evidenceRefs={evidenceRefs}
-        />
+        {isLabView && (
+          <OwnershipLabPanel
+            selectedFile={labContext.selectedFile}
+            viewMode={labContext.viewMode}
+            selection={labContext.selection}
+            selectionSummaryText={labContext.selectionSummaryText}
+            boundary={boundary}
+            boundaryState={boundaryState}
+            evidenceRefs={labContext.evidenceRefs}
+          />
+        )}
       </div>
     </aside>
   );

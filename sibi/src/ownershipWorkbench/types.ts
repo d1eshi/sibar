@@ -6,6 +6,8 @@ export type EvidenceConfidence = "observed" | "inferred" | "unverified" | "confl
 
 export type ViewMode = "code" | "diff";
 
+export type WorkbenchSurfaceMode = "default" | "lab";
+
 export type EvidenceRef = {
   id: string;
   title: string;

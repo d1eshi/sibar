@@ -128,9 +128,11 @@ show:
 - reason for order;
 - next step.
 
-The ownership prompt is a stage in this sequence. The local derivation lab may
-remain available as an internal or secondary section after the user-facing guide,
-but it should not be the first concept a new user sees.
+The ownership prompt is a stage in this sequence. The local derivation lab is
+not part of the default user-facing UI. It should open only through an explicit
+local/debug query param such as `?view=lab` or `?lab=1`, where it can show trace
+derivation, state projection, and report context without overwhelming the normal
+flow.
 
 Anti-patterns for the wedge:
 
