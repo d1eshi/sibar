@@ -3,7 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sibar Early Access</title>
+<title>Sibar - De leer papers a construir entendimiento</title>
+<meta name="description" content="Sibar convierte research tecnico en un workspace de evidencia, artifacts, codigo y memoria para estudiar profundo aplicando lo aprendido.">
+<meta property="og:title" content="Sibar - Research workspace para estudiar profundo">
+<meta property="og:description" content="De leer papers, blogs, lecturas y apuntes a construir entendimiento con evidencia, artifacts, codigo y memoria.">
 <script>
 window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
 window.va("beforeSend", (event) => {
@@ -26,149 +29,194 @@ if (location.protocol !== "file:" && location.hostname !== "localhost" && locati
 <link rel="stylesheet" href="styles/reader.css">
 </head>
 <body>
-<main>
-  <section class="start-screen" id="startView">
-    <div class="brand-lockup" aria-label="Sibar">
-      <span class="brand-letter primary">S</span>
-      <span class="brand-letter">i</span>
-      <span class="brand-letter">b</span>
-      <span class="brand-letter">a</span>
-      <span class="brand-letter">r</span>
-    </div>
-    <p class="brand-mark">Build-to-Learn</p>
-    <h1 class="start-mark">Estudia una fuente tecnica con evidencia.</h1>
-    <p class="start-subtitle">Lee, marca lo importante y guarda dudas o ideas para volver con mas claridad.</p>
+<header class="site-header" aria-label="Navegacion principal">
+  <a class="brand" href="#top" aria-label="Sibar inicio">
+    <span>S</span>
+    <strong>Sibar</strong>
+  </a>
+  <nav class="site-nav" aria-label="Secciones">
+    <a href="#demo">Workspace</a>
+    <a href="#artifacts">Artifacts</a>
+    <a href="#early-access">Early access</a>
+  </nav>
+  <a class="header-cta" href="#early-access">Pedir acceso</a>
+</header>
 
-    <form class="ingest-form" id="loadForm">
-      <label class="ingest-label" for="urlInput">Pega una URL para empezar</label>
-      <div class="ingest-row">
-        <input class="source-input" id="urlInput" type="url" placeholder="https://..." autocomplete="url">
-        <button class="primary-btn" type="submit">Estudiar</button>
-        <button class="secondary-btn" type="button" id="sampleBtn">Ver demo</button>
+<main id="top">
+  <section class="hero section-band" aria-labelledby="hero-title">
+    <div class="hero-copy">
+      <h1 id="hero-title">De leer <span class="rotating-source" id="rotatingSource" data-terms="papers,blogs,lecturas,apuntes">papers</span> a construir entendimiento.</h1>
+      <p class="hero-lede">Sibar convierte research tecnico en un workspace de evidencia, artifacts, codigo y memoria para estudiar profundo aplicando lo aprendido.</p>
+      <div class="hero-actions">
+        <a class="primary-action" href="#demo">Ver el workspace</a>
+        <a class="secondary-action" href="#early-access">Entrar al early access</a>
       </div>
-      <p class="trial-note">La prueba guarda tus notas en este navegador. El workspace completo abre por early access.</p>
+    </div>
+    <aside class="hero-instrument" aria-label="Sibar workflow">
+      <span>Source</span>
+      <strong>Claim selected</strong>
+      <span>Artifact</span>
+      <strong>Notebook check</strong>
+      <span>Memory</span>
+      <strong>Formula ready</strong>
+    </aside>
+  </section>
+
+  <section class="workspace-demo section-band" id="demo" aria-label="Sibar workspace preview">
+    <div class="tauri-window">
+      <div class="tauri-titlebar">
+        <span class="window-dot ink"></span>
+        <span class="window-dot amber"></span>
+        <span class="window-dot green"></span>
+        <strong>Sibar Research Workspace</strong>
+        <em>Focused workspace: embeddings</em>
+      </div>
+
+      <div class="workspace-preview">
+        <aside class="preview-path" aria-label="Workspace study path">
+          <div class="preview-path-head">
+            <span class="preview-glyph" aria-hidden="true"></span>
+            <strong>Study Path</strong>
+            <h2>Focused workspace: embeddings</h2>
+            <p>2 of 5</p>
+            <span class="preview-progress"><span></span></span>
+          </div>
+          <ol class="preview-node-list">
+            <li data-state="complete">
+              <span>1</span>
+              <strong>Embedding basics</strong>
+            </li>
+            <li data-state="ready" class="selected">
+              <span>2</span>
+              <strong>Failure cases</strong>
+              <ol>
+                <li class="selected"><em>2.1</em> Boundary checks</li>
+                <li><em>2.2</em> Evidence check</li>
+              </ol>
+            </li>
+            <li>
+              <span>3</span>
+              <strong>Toy implementation</strong>
+            </li>
+            <li data-state="locked">
+              <span>4</span>
+              <strong>Retrieval trade-offs</strong>
+            </li>
+          </ol>
+        </aside>
+
+        <section class="preview-study" aria-label="Workspace study surface">
+          <header class="preview-study-head">
+            <p>Current study</p>
+            <h2>Where do embeddings fail in real retrieval?</h2>
+          </header>
+          <section class="preview-open-node">
+            <h3>Selected learning node</h3>
+            <div>
+              <strong>Failure cases</strong>
+              <span>Resume with equation material in this session.</span>
+            </div>
+          </section>
+          <section class="preview-evidence">
+            <header>
+              <h3>Evidence from sources <span>4</span></h3>
+              <button type="button" tabindex="-1">View all</button>
+            </header>
+            <article>
+              <span data-source="paper"></span>
+              <div>
+                <strong>Embedding overview paper excerpt</strong>
+                <em>Wu et al. - arXiv:2309.12345 - 2023</em>
+              </div>
+              <q>Short queries and out-of-domain language often break semantic generalization...</q>
+            </article>
+            <article>
+              <span data-source="code"></span>
+              <div>
+                <strong>Local toy retrieval notebook</strong>
+                <em>Local artifact - Notebook - 2024</em>
+              </div>
+              <q>Nearest neighbors drift when the query distribution shifts...</q>
+            </article>
+          </section>
+        </section>
+
+        <aside class="preview-tutor" aria-label="Sibar tutor guidance">
+          <header>
+            <span class="preview-tutor-glyph" aria-hidden="true"></span>
+            <strong>Sibar Tutor</strong>
+          </header>
+          <section class="preview-status">
+            <strong>You're on track</strong>
+            <p>Keep going with purpose.</p>
+            <span><span></span></span>
+          </section>
+          <section class="preview-guidance">
+            <h3>Focus guidance</h3>
+            <article>
+              <strong>Focus</strong>
+              <p>Identify the failure case.</p>
+            </article>
+            <article>
+              <strong>Consider</strong>
+              <p>Compare source claim and artifact.</p>
+            </article>
+            <article>
+              <strong>Produce</strong>
+              <p>Create one evidence-backed note.</p>
+            </article>
+          </section>
+          <section class="preview-readiness">
+            <h3>Readiness</h3>
+            <strong>78%</strong>
+            <p>Good readiness</p>
+          </section>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <section class="signal-section section-band" id="artifacts" aria-labelledby="artifacts-title">
+    <div class="signal-intro">
+      <p class="eyebrow">Artifacts generables</p>
+      <h2 id="artifacts-title">El estudio termina en piezas que podes volver a usar.</h2>
+    </div>
+    <div class="signal-stack">
+      <div class="signal-card active">
+        <span>paper / evidencia</span>
+        <strong>Fuentes seleccionadas, claims y dudas en un mismo lugar.</strong>
+        <p>El workspace separa evidencia, notas y preguntas abiertas para que cada lectura tenga trazabilidad.</p>
+      </div>
+      <div class="signal-card">
+        <span>codigo reproducible</span>
+        <strong>Pequenos experimentos que prueban si entendiste.</strong>
+        <p>Converti una idea del material en un snippet, notebook o verificacion local que puedas repetir.</p>
+      </div>
+      <div class="signal-card">
+        <span>conocimiento / formulas</span>
+        <strong>Reglas, formulas y conexiones listas para aplicar.</strong>
+        <p>Lo aprendido queda como memoria de trabajo: definiciones, relaciones y pasos para volver sin empezar de cero.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="access-section section-band" id="early-access" aria-labelledby="access-title">
+    <div class="access-copy-block">
+      <p class="eyebrow">Early access</p>
+      <h2 id="access-title">Estoy abriendo Sibar con builders que ya sienten esta deuda.</h2>
+      <p>Deja tu correo y, si queres, tu handle de X. La siguiente tanda va a probar Sibar sobre papers, notas, codigo, formulas y loops de entendimiento durable.</p>
+    </div>
+    <form class="access-form" id="earlyAccessForm">
+      <label for="earlyAccessEmail">Email</label>
+      <input id="earlyAccessEmail" name="email" type="email" placeholder="tu@email.com" autocomplete="email" required>
+      <label for="earlyAccessXHandle">X handle <span>opcional</span></label>
+      <input id="earlyAccessXHandle" name="x_handle" type="text" placeholder="@usuario" autocomplete="off" inputmode="text">
+      <button class="primary-action" type="submit">Pedir early access</button>
+      <p class="form-status" id="earlyAccessStatus" aria-live="polite"></p>
     </form>
-
-    <ul class="source-examples" aria-label="Tipos de fuente">
-      <li class="source-chip"><span>Articulo</span><small>Argumento o ensayo tecnico</small></li>
-      <li class="source-chip"><span>Paper</span><small>Abstract, metodo o conclusion</small></li>
-      <li class="source-chip"><span>Docs</span><small>API, framework o arquitectura</small></li>
-      <li class="source-chip"><span>Post tecnico</span><small>Decisiones, tradeoffs o guia</small></li>
-    </ul>
-
-    <section class="early-access-card" aria-label="Early access">
-      <div>
-        <p class="early-access-kicker">Early access</p>
-        <h2>Workspace completo por cohortes</h2>
-        <p>Deja tu correo y, si queres, tu handle de X. Te contacto cuando abramos la siguiente tanda.</p>
-      </div>
-      <form class="early-access-form" id="earlyAccessForm">
-        <input id="earlyAccessEmail" name="email" type="email" placeholder="tu@email.com" autocomplete="email" required>
-        <input id="earlyAccessXHandle" name="x_handle" type="text" placeholder="@x_handle opcional" autocomplete="off" inputmode="text">
-        <button class="secondary-btn small" type="submit">Pedir acceso</button>
-        <p class="early-access-status" id="earlyAccessStatus" aria-live="polite"></p>
-      </form>
-    </section>
-
-    <section class="recent-sources" id="recentSources" aria-label="Lecturas recientes" hidden>
-      <div class="recent-header">
-        <span>Recientes</span>
-        <span id="historyCount">0</span>
-      </div>
-      <nav class="history-list" id="historyList" aria-label="Ultimos articulos leidos"></nav>
-    </section>
-
-    <section class="ghost-reader" aria-label="Vista de lectura futura">
-      <div class="ghost-line title"></div>
-      <div class="ghost-line mid"></div>
-      <div class="ghost-line mid"></div>
-      <div class="ghost-line"></div>
-      <div class="ghost-line short"></div>
-      <br>
-      <div class="ghost-line mid"></div>
-      <div class="ghost-line"></div>
-      <div class="ghost-line"></div>
-      <div class="ghost-line mid"></div>
-    </section>
-    <p class="screen-status" id="status"></p>
-  </section>
-
-  <section class="early-access-screen" id="earlyAccessView" hidden>
-    <p class="brand-mark">Sibar early access</p>
-    <h1 class="access-title">El reader es solo la entrada.</h1>
-    <p class="access-copy" id="earlyAccessReason">Ya probaste las fuentes reales incluidas en esta prueba publica.</p>
-    <p class="access-copy">Estamos abriendo el workspace completo por cohortes: artefactos reales, preguntas de ownership, deteccion de gaps, practica y readiness.</p>
-    <div class="access-actions">
-      <a class="primary-btn access-link" href="mailto:hello@sibar.app?subject=Early%20access%20Sibar&body=Quiero%20early%20access%20a%20Sibar.%0A%0AQuiero%20entender%20mejor:%20">Solicitar early access</a>
-      <button class="secondary-btn" type="button" id="emptySampleBtn">Ver demo</button>
-    </div>
-  </section>
-
-  <section class="loading-screen" id="loadingView" hidden>
-    <div class="loading-block">
-      <p class="loading-kicker">Cargando fuente</p>
-      <div class="loading-title"></div>
-      <div class="loading-line"></div>
-      <div class="loading-line wide"></div>
-      <div class="loading-line short"></div>
-    </div>
-  </section>
-
-  <section class="reader-view" id="readerView" hidden>
-    <header class="saved-header">
-      <div class="sibi-wordmark">Sibar</div>
-      <button class="saved-chip" type="button" id="savedChip" hidden>0 guardadas</button>
-    </header>
-
-    <main class="article-shell">
-      <article class="article" id="article">
-        <h1 id="articleTitle"></h1>
-        <div class="article-rule"></div>
-        <div class="article-body" id="articleBody"></div>
-      </article>
-    </main>
   </section>
 </main>
 
-<form class="save-popover floating" id="selectionCard" hidden>
-  <div class="card-label">Seleccion</div>
-  <p class="selection-text" id="selectionText"></p>
-  <textarea id="selectionNote" placeholder="Nota breve..."></textarea>
-  <div class="kind-row" role="tablist" aria-label="Tipo de nota">
-    <button class="small kind-btn active" type="button" role="tab" aria-selected="true" data-kind="highlight">Highlight</button>
-    <button class="small kind-btn" type="button" role="tab" aria-selected="false" data-kind="question">Pregunta</button>
-    <button class="small kind-btn" type="button" role="tab" aria-selected="false" data-kind="key">Idea</button>
-  </div>
-  <div class="actions">
-    <button class="primary-btn small" type="button" id="saveSelectionBtn">Guardar</button>
-    <button class="secondary-btn small" type="button" id="clearSelectionBtn">Cancelar</button>
-  </div>
-</form>
-
-<aside class="saved-drawer" id="savedDrawer" hidden>
-  <header class="saved-drawer-header">
-    <div>
-      <p class="drawer-kicker">Sibar / Reader</p>
-      <h2>Guardadas</h2>
-    </div>
-    <button class="icon-btn" type="button" id="closeSavedBtn" aria-label="Cerrar">×</button>
-  </header>
-  <section class="loose-note">
-    <textarea id="looseNote" placeholder="Nota atomica..."></textarea>
-    <span class="input-hint">⌘/Ctrl + Enter para guardar</span>
-    <button class="primary-btn small" type="button" id="saveLooseBtn">Guardar nota</button>
-  </section>
-  <section class="notes" id="notes"></section>
-</aside>
-
-<div class="saved-toast" id="savedToast" hidden>Guardado</div>
-
-<div class="toolbar" id="selectionToolbar">
-  <button type="button" data-toolbar-kind="highlight">Highlight</button>
-  <button type="button" data-toolbar-kind="question">Pregunta</button>
-  <button type="button" data-toolbar-kind="key">Idea</button>
-</div>
-
-<script type="module" src="scripts/app.js"></script>
+<script type="module" src="scripts/landing.js"></script>
 </body>
 </html>

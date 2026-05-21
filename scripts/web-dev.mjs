@@ -1,6 +1,7 @@
 import { join, normalize } from "node:path";
 
 import { GET as readArticle } from "../web/api/read.mjs";
+import { POST as requestEarlyAccess } from "../web/api/early-access.mjs";
 import { handleRequest } from "../src/runtime.ts";
 
 const root = join(process.cwd(), "web");
@@ -34,6 +35,10 @@ const server = Bun.serve({
 
     if (url.pathname === "/api/read") {
       return readArticle(request);
+    }
+
+    if (url.pathname === "/api/early-access" && request.method === "POST") {
+      return requestEarlyAccess(request);
     }
 
     if (url.pathname === "/api/runtime" && request.method === "POST") {

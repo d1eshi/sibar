@@ -20,9 +20,9 @@ const rootVercelConfig = JSON.parse(readFileSync(join(root, "vercel.json"), "utf
 const vercelConfig = JSON.parse(readFileSync(join(root, "web/vercel.json"), "utf8"));
 
 test("article workspace web deploy is rooted under /web", () => {
-  assert.match(webHtml, /Sibar Early Access/);
+  assert.match(webHtml, /Sibar - De leer papers a construir entendimiento/);
   assert.match(webHtml, /<link rel="stylesheet" href="styles\/reader\.css">/);
-  assert.match(webHtml, /<script type="module" src="scripts\/app\.js"><\/script>/);
+  assert.match(webHtml, /<script type="module" src="scripts\/landing\.js"><\/script>/);
   assert.match(webApiClient, /fetch\(`\/api\/read\?url=\$\{encodeURIComponent\(url\)\}`\)/);
   assert.equal(vercelConfig.framework, null);
   assert.equal(vercelConfig.cleanUrls, true);
@@ -48,8 +48,11 @@ test("Vercel deploy ownership spec protects SSR and function changes", () => {
 
 test("local Bun web dev server serves the same article API route", () => {
   assert.match(webDevServer, /import \{ GET as readArticle \} from "\.\.\/web\/api\/read\.mjs"/);
+  assert.match(webDevServer, /import \{ POST as requestEarlyAccess \} from "\.\.\/web\/api\/early-access\.mjs"/);
   assert.match(webDevServer, /url\.pathname === "\/api\/read"/);
   assert.match(webDevServer, /return readArticle\(request\)/);
+  assert.match(webDevServer, /url\.pathname === "\/api\/early-access"/);
+  assert.match(webDevServer, /return requestEarlyAccess\(request\)/);
   assert.match(webDevServer, /url\.pathname === "\/favicon\.ico"/);
   assert.match(webDevServer, /status: 204/);
 });
