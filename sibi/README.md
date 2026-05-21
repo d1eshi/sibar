@@ -12,11 +12,14 @@ The MVP is intentionally local and deterministic:
   suggested evidence, a minimal read path, and a `blocked | limited | ready`
   status.
 
-This app does not request OS permissions, inspect user folders, call a model, or
-open repository files. It is Tauri-ready only in the sense that the web surface
-can be packaged later. Shared runtime and pedagogy contracts continue to live in
-the monorepo `src/`; this first wedge keeps its local review contract in
-`sibi/src/ownershipReview.ts` until it proves useful as shared runtime.
+The review logic is now consumed from `src/ownership-core/diff-review.ts` and
+re-exported by `sibi/src/ownershipReview.ts`, so Sibi and `ownership-core` keep
+contract behavior in sync.
+
+This app still does not request OS permissions, inspect user folders, call a
+model, or open repository files. It is Tauri-ready only in the sense that the
+web surface can be packaged later. It also remains independent of `WorkspaceIntent`
+and all PedagogoAI workspace adapters for this slice.
 
 ## Commands
 
@@ -28,11 +31,12 @@ pnpm run sibi:build
 ```
 
 The first input path is pasted text. A future Sibar session handoff can reuse the
-review output as the starting artifact.
+review output as the starting artifact; opening a Sibar workspace session is not
+connected in this slice.
 
 ## Boundaries
 
 The product and runtime boundaries for this wedge live in
-[`docs/ownership-boundaries.md`](docs/ownership-boundaries.md). New Sibi
-features should preserve that split: the model proposes claims, while the
-runtime validates evidence, scope, pedagogy, readiness, and handoff shape.
+[`docs/ownership-wedge.md`](docs/ownership-wedge.md). New Sibi features should
+preserve that split: the model proposes claims, while the runtime validates
+evidence, scope, pedagogy, readiness, and handoff shape.
