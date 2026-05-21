@@ -9,6 +9,11 @@ Deliverables:
 - Vite/React route or app entry for Sibi Ownership Workbench.
 - Static fixture with file tree, one diff, one boundary, one prompt.
 - Three-panel layout plus evidence drawer.
+- Maintain modular React structure for this slice:
+  - fixture data/types/helpers in dedicated module(s),
+  - dedicated components for file tree, code/diff view, ownership harness, and evidence drawer,
+  - `App` kept as behavior/state orchestration only.
+- Prefer component modules well below 500 lines (avoid monolithic React files).
 
 Acceptance:
 
