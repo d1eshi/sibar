@@ -146,6 +146,9 @@ release yet.
 - Fixed a localhost runtime blank screen by passing only file paths into
   `@pierre/trees/react` while preserving directory nodes in `fileTreeNodeByPath`
   for metadata and decoration lookup.
+- Fixed the Ownership Workbench code/diff renderer to use the React
+  `@pierre/diffs/react` `CodeView` entrypoint instead of rendering the vanilla
+  `CodeView` constructor as JSX under React 19.
 - Repaired malformed fixture diff content in `ownershipWorkbench/fixtures.ts` to match
   `@pierre/diffs` unified diff parsing and added guarded fixture parse error
   handling that keeps the app running with file mode in case parsing fails.

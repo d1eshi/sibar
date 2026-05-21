@@ -1,7 +1,7 @@
-import { CodeView, type CodeViewLineSelection } from "@pierre/diffs";
 import type {
   CodeViewDiffItem,
   CodeViewFileItem,
+  CodeViewLineSelection,
   DiffLineAnnotation,
   LineAnnotation,
   SelectedLineRange,
@@ -10,6 +10,7 @@ import * as React from "react";
 import { noCodeLinePlaceHolder } from "../fixtures";
 import type { LineSelection, ViewMode } from "../types";
 import type { WorkbenchLineMetadata } from "../types";
+import { PierreCodeView } from "./PierreCodeView";
 
 interface CodeDiffPanelProps {
   selectedFile: string;
@@ -128,7 +129,7 @@ export function CodeDiffPanel({
 
       <p className="selectionSummary">{modeDescription}</p>
       {activeItem ? (
-        <CodeView<WorkbenchLineMetadata>
+        <PierreCodeView<WorkbenchLineMetadata>
           className="codeViewport"
           options={{ controlledSelection: true, enableLineSelection: true }}
           items={[activeItem]}
