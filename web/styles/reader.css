@@ -139,12 +139,10 @@ a {
 }
 
 .hero {
-  min-height: calc(100vh - 72px);
+  min-height: auto;
   display: grid;
-  grid-template-columns: minmax(0, 1.15fr) minmax(320px, 0.85fr);
-  gap: 54px;
-  align-items: center;
-  padding: 64px 0 46px;
+  align-items: start;
+  padding: clamp(58px, 10vh, 112px) 0 24px;
 }
 
 .eyebrow {
@@ -165,18 +163,18 @@ p {
 }
 
 h1 {
-  max-width: 760px;
-  margin-bottom: 22px;
+  max-width: 920px;
+  margin-bottom: 20px;
   font-family: var(--serif);
-  font-size: clamp(54px, 7vw, 108px);
+  font-size: clamp(64px, 9vw, 126px);
   font-weight: 500;
   letter-spacing: 0;
   line-height: 0.94;
 }
 
 .hero-lede {
-  max-width: 660px;
-  margin-bottom: 34px;
+  max-width: 760px;
+  margin-bottom: 28px;
   color: #3f3b34;
   font-size: 21px;
   line-height: 1.5;
@@ -214,6 +212,7 @@ h1 {
 
 .signal-stack {
   display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 14px;
 }
 
@@ -253,7 +252,11 @@ h1 {
 }
 
 .workspace-demo {
-  padding: 64px 0 52px;
+  padding: 28px 0 32px;
+}
+
+.signal-section {
+  padding: 28px 0 56px;
 }
 
 .access-copy-block h2 {
@@ -712,8 +715,11 @@ h1 {
     display: none;
   }
 
-  .hero,
   .access-section {
+    grid-template-columns: 1fr;
+  }
+
+  .signal-stack {
     grid-template-columns: 1fr;
   }
 
