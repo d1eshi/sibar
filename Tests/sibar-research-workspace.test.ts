@@ -14,7 +14,7 @@ const workspaceScript = readFileSync(join(appRoot, "scripts", "research-workspac
 const tauriConfig = JSON.parse(readFileSync(join(appRoot, "src-tauri", "tauri.conf.json"), "utf8"));
 const tauriCargo = readFileSync(join(appRoot, "src-tauri", "Cargo.toml"), "utf8");
 const tauriMain = readFileSync(join(appRoot, "src-tauri", "src", "main.rs"), "utf8");
-const currentSpecPath = join(root, "docs", "specs", "deep-ownership-workspace", "00_new_app_tauri_workspace.md");
+const currentSpecPath = join(root, "docs", "specs", "deep-ownership-workspace", "00_current_north_star.md");
 
 const moduleUrl = pathToFileURL(join(appRoot, "scripts", "research-workspace.js")).href;
 const LM_MODES = ["/map", "/read", "/explain", "/test", "/critic", "/repair", "/build", "/publish"];
@@ -586,23 +586,20 @@ test("next actions are declared and wired to read, code, and explain actions", a
   }
 });
 
-test("product vocabulary is present in the current Tauri workspace spec", () => {
+test("source-driven mission vocabulary is present in the current workspace spec", () => {
   assert.ok(existsSync(currentSpecPath), `missing current spec document at ${currentSpecPath}`);
   const currentSpec = readFileSync(currentSpecPath, "utf8");
   const currentSpecNormalized = currentSpec.toLowerCase();
 
-  for (const term of productTerms) {
-    assert.ok(currentSpec.includes(term), `missing ${term} in current spec document`);
-  }
   const requiredSpecVocabulary = [
-    "workspace nativo de formación investigadora",
-    "source-to-roadmap compiler",
-    "ambición → ruta → nodo → sesión → artifact → evidencia → revisión",
-    "no evidence = no mastery",
-    "TODAY",
-    "ROADMAP",
-    "SESSION / READER",
-    "LM GUIDE",
+    "URL or pasted text",
+    "SourceSignals",
+    "MissionPreview",
+    "Mission Brief",
+    "Focused Track Queue",
+    "Active Session",
+    "Artifact evidence",
+    "scoped readiness",
   ];
 
   for (const term of requiredSpecVocabulary) {
@@ -610,10 +607,14 @@ test("product vocabulary is present in the current Tauri workspace spec", () => 
   }
 });
 
-test("spec pack reading order marks the current source and derived plan", () => {
+test("spec pack reading order lists only canonical deep ownership files", () => {
   const specPackReadme = readFileSync(join(root, "docs/specs/deep-ownership-workspace/README.md"), "utf8");
-  assert.match(specPackReadme, /00_new_app_tauri_workspace\.md` is the current source spec/);
-  assert.match(specPackReadme, /13_tauri_second_app_product_plan\.md` is the derived\/historical plan/);
+  assert.match(specPackReadme, /00_current_north_star\.md/);
+  assert.match(specPackReadme, /01_source_to_mission_mvp\.md/);
+  assert.match(specPackReadme, /02_runtime_boundary\.md/);
+  assert.match(specPackReadme, /03_validation_and_plan\.md/);
+  assert.doesNotMatch(specPackReadme, /00_new_app_tauri_workspace\.md/);
+  assert.doesNotMatch(specPackReadme, /13_tauri_second_app_product_plan\.md/);
 });
 
 test("no chat-first generic landing UI appears in the Tauri slice", () => {

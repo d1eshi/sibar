@@ -10,10 +10,10 @@ Define a deterministic compiler that turns:
 
 into one `WorkspacePlan` JSON object consumed by Rust services and rendered by UI.
 
-This contract follows `14_workspace_intent_flow.md`: the user-facing
-`WorkspaceIntent` remains the source of intent, and this compiler is the
-Rust-native boundary that turns that intent plus source evidence into a bounded
-plan.
+This eval-local contract predates the pruned canonical spec pack. The current
+source-driven boundary lives in
+`docs/specs/deep-ownership-workspace/02_runtime_boundary.md`; this file remains
+only as eval fixture documentation for legacy WorkspacePlan adapter checks.
 
 The compiler must be usable without LLM execution in first slice (heuristic
 fallback), but must emit a model-ready plan request envelope when needed.

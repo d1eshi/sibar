@@ -15,6 +15,7 @@
     "eval:workspace-model-io-boundary": "node --experimental-strip-types src/evals/workspace-model-io-boundary.ts",
     "eval:pedagogy-coverage": "node --experimental-strip-types src/evals/pedagogy-coverage.ts",
     "eval:pedagogy-core-coverage": "node --experimental-strip-types src/evals/pedagogy-core-coverage.ts",
+    "eval:shared-core-boundaries": "node --experimental-strip-types src/evals/shared-core-boundaries.ts",
     "eval:selfhost-pilot": "node --experimental-strip-types src/evals/selfhost-pilot.ts",
     "eval:selfhost-freeform": "node --experimental-strip-types src/evals/selfhost-freeform.ts",
     "eval:selfhost-benchmark": "node --experimental-strip-types src/evals/selfhost-benchmark.ts",
@@ -27,7 +28,9 @@
     "guard:supply-chain": "node --experimental-strip-types src/scripts/guard-supply-chain.ts",
     "workspace:dev": "vite apps/sibar-research-workspace --host 127.0.0.1 --strictPort --port 5173",
     "workspace:build": "vite build apps/sibar-research-workspace",
-    "workspace:preview": "vite preview apps/sibar-research-workspace --host 127.0.0.1 --strictPort --port 4173"
+    "workspace:preview": "vite preview apps/sibar-research-workspace --host 127.0.0.1 --strictPort --port 4173",
+    "sibi:dev": "vite sibi --host 127.0.0.1 --strictPort --port 5174",
+    "sibi:build": "vite build sibi"
   },
   "devDependencies": {
     "@types/react": "^19.1.13",

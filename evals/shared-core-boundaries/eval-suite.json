@@ -1,0 +1,45 @@
+{
+  "schema": "SibarEvalSuite",
+  "version": 1,
+  "suite_id": "shared-core-boundaries",
+  "title": "Shared core boundary guardrails",
+  "purpose": "Evaluate deterministic import and spec gates before ownership-core, pedagogy-core, and memory-core implementation moves begin.",
+  "protects": [
+    "shared core modules stay free of host, surface, adapter, persistence, and workspace UI imports",
+    "Sibi stays independent from WorkspaceIntent, PedagogoAI workspace adapters, and Sibar Workspace UI",
+    "the shared core boundary spec keeps the essential global gates explicit before implementation extraction"
+  ],
+  "docs": [
+    "evals/shared-core-boundaries/README.md",
+    "docs/specs/deep-ownership-workspace/04_shared_core_boundaries.md"
+  ],
+  "artifacts": [
+    {
+      "kind": "generated-report",
+      "path": "evals/shared-core-boundaries/reports/VAL-EVAL-014-shared-core-boundaries.json",
+      "description": "Deterministic no-LLM report for shared core import boundaries and spec gate declarations."
+    }
+  ],
+  "evaluations": [
+    {
+      "validation": "VAL-EVAL-014-shared-core-boundaries",
+      "title": "Shared core boundary guardrail",
+      "command": "pnpm eval:shared-core-boundaries",
+      "implementation": "src/evals/shared-core-boundaries.ts",
+      "llm_execution": "disabled",
+      "inputs": [
+        "sibi/src"
+      ],
+      "documented_inputs": [
+        "docs/specs/deep-ownership-workspace/04_shared_core_boundaries.md",
+        "src/ownership-core",
+        "src/pedagogy-core",
+        "src/memory-core"
+      ],
+      "reports": [
+        "evals/shared-core-boundaries/reports/VAL-EVAL-014-shared-core-boundaries.json"
+      ],
+      "answers": "Do shared core directories avoid host/surface effects, does Sibi avoid workspace imports, and does the boundary spec declare the global gates?"
+    }
+  ]
+}

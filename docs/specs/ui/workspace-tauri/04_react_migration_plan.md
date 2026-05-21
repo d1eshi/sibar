@@ -220,10 +220,8 @@ Only after parity is verified:
 If a migration slice needs live compiler, Rust command, runner, sidecar, or TS
 runtime behavior, stop and create or update the appropriate non-UI spec:
 
-1. `docs/specs/deep-ownership-workspace/15_workspace_intent_compiler.md`
-2. `docs/specs/deep-ownership-workspace/16_llm_adapter_contract.md`
-3. `docs/specs/deep-ownership-workspace/17_workspace_execution_pipeline.md`
-4. `docs/specs/deep-ownership-workspace/18_workspace_ui_reproducibility.md`
+1. `docs/specs/deep-ownership-workspace/02_runtime_boundary.md`
+2. `docs/specs/deep-ownership-workspace/03_validation_and_plan.md`
 
 The UI migration may define the shape of a consumed projection, but it must not
 define command execution or runner lifecycle.

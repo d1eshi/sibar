@@ -11,8 +11,97 @@ accepted specs and iterations, not by raw commit count.
 Use this section for changes that have landed but are not part of a tagged
 release yet.
 
+### Docs - Deep Ownership Workspace North Star
+
+- Added a current north-star entrypoint for the source-driven MVP:
+  URL/pasted source plus one user reason -> source signals -> MissionPreview ->
+  Mission Brief -> Focused Track Queue -> Active Session.
+- Reorganized the deep ownership spec README into current MVP, runtime contract,
+  foundation reference, and historical/superseded reading paths.
+- Marked older broad Tauri/workspace-intent notes as historical/reference so
+  they do not compete with `Mission -> Track -> Session -> Artifact` product
+  hierarchy.
+- Updated open decisions and implementation plan to make the frontier lab
+  source fixture the first MVP path and keep Sibi-repo ownership as internal
+  regression context.
+
+### Added - Slice Final Sibi Ownership-Review Wedge
+
+- Converted `sibi/src/ownershipReview.ts` into a direct re-export shim of
+  `src/ownership-core/diff-review.ts` to keep Sibi and core review contracts in
+  parity by default.
+- Updated `sibi/README.md` and added `sibi/docs/ownership-wedge.md` to document
+  the wedge flow (input, goal, gaps, evidence/tests, read path, status),
+  added explicit LLM/runtime split, and specified the future claim-verifier
+  contract direction.
+- Clarified that this slice still avoids any direct `WorkspaceIntent` /
+  PedagogoAI adapter dependency and intentionally does not wire
+  `Open Sibar session`.
+
+### Docs - Deep Ownership Workspace Pruning
+
+- Pruned `docs/specs/deep-ownership-workspace/` from the pre-consolidation spec
+  pack to the canonical spec set anchored by README, current north star,
+  source-to-mission MVP, runtime boundary, and validation/plan.
+- Consolidated mission/track/session/artifact, source-intent ingestion, focused
+  queues, runtime boundaries, trace requirements, validation assertions, and
+  implementation order into the new canonical docs.
+- Updated UI specs, reports, and tests to point at the canonical docs instead of
+  deleted pre-consolidation specs.
+
+### Docs - Shared Core Boundaries
+
+- Added a shared core boundary spec for separating Sibi ownership review, Sibar
+  Workspace, ownership-core, pedagogy-core, memory-core, adapters, and surfaces.
+- Documented global gates for ownership, pedagogy, readiness, repair, memory,
+  and model-output validation so new features do not bypass the core.
+- Added a sequential implementation plan that starts with entrypoint wrappers
+  and shims before any destructive poda or duplicate taxonomy.
+- Added a deterministic shared core boundary eval that guards core imports,
+  Sibi workspace separation, and required global gate declarations.
+
+### Added - Slice 2 Shared Core Entrypoints
+
+- Added `src/ownership-core/index.ts` as a minimal ownership boundary shim with
+  copyable contract types and explicit extraction-ownership metadata.
+- Added `src/pedagogy-core/index.ts` as a deterministic facade over existing
+  pedagogy runtime contracts and functions.
+- Added `src/memory-core/index.ts` with an append-only `MemoryStore`, subject and
+  evidence/attempt/gap/repair/review/transfer/artifact/event structures, and pure
+  helper functions for immutable updates.
+- Added `Tests/shared-core-entrypoints.test.ts` to validate entrypoint availability,
+  append-only behavior for memory helpers, and boundary-surface independence.
+
+### Added - Slice 3 Memory Core Invariants
+
+- Added pure consistency checks for `MemoryStore` in `src/memory-core/index.ts`
+  (`getMemoryStoreProblems` + `validateMemoryStore`), including subject,
+  attempt, gap, and transfer reference invariants.
+- Added `Tests/memory-core.test.ts` with happy-path, missing-subject, missing-
+  attempt, missing-gap, missing-transfer-subject, and append-only behavior coverage.
+- Kept `memory-core` append helpers pure and unchanged at API boundaries while adding
+  explicit traceability validation before persistence or runtime-store integration.
+
+### Added - Slice 4 Ownership Review Deterministic Core Extraction
+
+- Extracted `sibi/src/ownershipReview.ts` heuristics into
+  `src/ownership-core/diff-review.ts` as a deterministic, import-safe core module
+  with unchanged `reviewOwnership` behavior and typed outputs.
+- Added ownership review exports to `src/ownership-core/index.ts` and updated
+  `OWNERSHIP_REVIEW_EXTRACTION_STATE.status` to `available`, with `ownedBySlice`
+  set to `slice-4`.
+- Added `Tests/ownership-core.test.ts` and updated `Tests/sibi-ownership-review.test.ts`
+  for direct core coverage plus core/Sibi review parity on representative diffs.
+
 ### Docs - Tauri Workspace UI Specs
 
+- Added mission-track study specs for the frontier lab readiness flow, including
+  `Mission -> Track -> Session -> Artifact` vocabulary, focused track queues,
+  source-map separation, prerequisite routing, artifact recommendation, and
+  explicit path mutation proposals.
+- Added source-intent ingestion MVP specs for creating a mission preview from a
+  URL or pasted source plus one user reason, including source signal extraction,
+  review-before-create, and source-to-mission UI behavior.
 - Split `docs/specs/ui/` into `web/` and `workspace-tauri/` as the UI source of
   truth for public web surfaces and the direct Tauri workspace prototype.
 - Added `Workspace Home` as the canonical default Tauri entry screen so existing
@@ -99,6 +188,35 @@ release yet.
 - Added a minimal `Create Workspace` UI entry in the Sibar research workspace
   app that compiles the intent through the core contract layer before opening
   the first session.
+
+### Added - Source Mission Runtime Contracts (MVP)
+
+- Added source-to-mission contract definitions in
+  `src/runtime-source-mission-contracts.ts`:
+  `SourceIntentInput`, `SourceIntakeResult`, `SourceSignal`, `MissionPreview`,
+  `ProposedTrack`, and `ProposedSession`.
+- Added pure validators in `src/runtime-source-mission-validate.ts` for the same
+  contract chain: source intent/input kinds, intake status/diagnostics, signal
+  integrity, and mission preview invariants (`first_sessions` cap, track/session
+  references, and source-backed references).
+- Added `Tests/source-mission-contracts.test.ts` covering frontier-lab valid payload,
+  missing `user_reason`, bad URL, non-referenced sessions/tracks, unknown track
+  IDs, first-session cap, and blocked-source diagnostics.
+
+- Corrected the MVP contract shape to match the canonical source-driven boundary:
+  signal and mission confidence became categorical (`low|medium|high`), `SourceIntakeResult`
+  now exposes canonical fields directly (`source_id`, `source_kind`, text refs),
+  and `MissionPreview.first_sessions` now carries session objects.
+
+### Added - Sibi Ownership Review Wedge
+
+- Added `sibi/`, a Vite/React app for pasted AI-generated diffs, PR text, or
+  agent output that returns a deterministic `OwnershipReview` before merge.
+- Added local heuristics for touched files, additions/deletions, risky areas,
+  missing evidence, ownership questions, suggested tests, minimum read path, and
+  `blocked | limited | ready` merge posture.
+- Added root `sibi:dev` and `sibi:build` scripts plus unit coverage for the
+  deterministic review logic.
 
 ### Added - Workspace Rust Compiler Bridge
 
@@ -269,9 +387,9 @@ release yet.
 - Fixed applied roadmap artifacts so imported `mini_nodes`, `sources`,
   prerequisites, and reader guidance survive into the roadmap tree and reader
   instead of falling back to generic node defaults.
-- Updated tests and spec pack references so the live spec source is read from
-  `00_new_app_tauri_workspace.md` and the README identifies
-  `13_tauri_second_app_product_plan.md` as derived/historical context.
+- Updated tests and spec pack references for the then-current Tauri workspace
+  source docs; those pre-consolidation specs were later pruned into the canonical
+  deep ownership spec set.
 
 ### Internal - Deep Ownership Workspace Modularization
 
@@ -282,11 +400,11 @@ release yet.
 
 ### Docs - Deep Ownership Workspace Rust Execution Specs
 
-- Added new lightweight spec docs for the Rust-native Deep Ownership Workspace path:
-  `15_workspace_intent_compiler.md`, `16_llm_adapter_contract.md`,
-  `17_workspace_execution_pipeline.md`, and `18_workspace_ui_reproducibility.md`.
-- Updated `docs/specs/deep-ownership-workspace/README.md` reading order to
-  reference the new spec sequence and ensure stable implementation handoff.
+- Added lightweight pre-consolidation Rust-native Deep Ownership Workspace specs
+  for compiler, adapter, execution, and reproducibility behavior. These were
+  later consolidated into the canonical runtime boundary doc.
+- Updated the deep ownership README reading order to reference the then-current
+  spec sequence and ensure stable implementation handoff.
 
 ### Added - WorkspaceIntent Compiler Module
 
@@ -383,7 +501,7 @@ release yet.
 - Implemented a 7-step first-run setup wizard (goal, boundary, evidence roles,
   boundary confirmation, evidence inventory, concept slice, active operation)
   that gates the main Workspace until the user confirms the loop boundaries.
-- Mapped all six major UI regions to `12_ui_reference_components.md` component
+- Mapped all six major UI regions to the then-current reference component
   contracts via `data-component` attributes: Lab Shell, Source & Artifact Rail,
   Code Workbench Artifact, Call/Data Diagram, Sibi Loop Rail, Evidence Strip.
 - Added keyboard accessibility: skip navigation links for all three regions,
@@ -429,11 +547,9 @@ release yet.
 
 ### Docs - Tauri Second App Workspace Spec
 
-- Treat `docs/specs/deep-ownership-workspace/00_new_app_tauri_workspace.md`
-  as the current source spec for the second sibling Sibar app in Tauri
-  (`workspace investigador`), with
-  `docs/specs/deep-ownership-workspace/13_tauri_second_app_product_plan.md`
-  retained as a derived implementation plan, including:
+- Treated the pre-consolidation deep ownership workspace notes as the source
+  specs for the second sibling Sibar app in Tauri (`workspace investigador`),
+  including:
   - conceptual stack (Goal → Roadmap → Node → Session → Artifact → Evidence → Recall),
   - first-screen UX (`Today`) requirements,
   - bounded LM tool mode,

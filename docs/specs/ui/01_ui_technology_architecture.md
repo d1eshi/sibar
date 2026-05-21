@@ -142,9 +142,8 @@ The reader layer is required to support:
 Any real impact on runners, Rust sidecar, or TS runtime must be routed through
 the existing adapter/connection specs and implemented as those surfaces only:
 
-- workspace execution and compiler pipeline: `docs/specs/deep-ownership-workspace/17_workspace_execution_pipeline.md`
-- adapter contracts and runner handoff: `docs/specs/deep-ownership-workspace/16_llm_adapter_contract.md`
-- workspace compiler boundary: `docs/specs/deep-ownership-workspace/15_workspace_intent_compiler.md`
+- source-driven runtime, compiler, adapter, projection, and trace boundary:
+  `docs/specs/deep-ownership-workspace/02_runtime_boundary.md`
 
 The UI spec layer must never define how those systems execute commands or
 handle process lifecycle.

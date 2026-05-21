@@ -18,6 +18,8 @@ bounded create flow, study-path overview, and focused active learning node.
 4. `02_workspace_study_surface.md`
 5. `03_iteration_flow.md`
 6. `04_react_migration_plan.md`
+7. `06_mission_track_study_flow.md`
+8. `07_source_to_mission_intake.md`
 
 ## Current Prototype
 
