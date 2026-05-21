@@ -77,6 +77,7 @@ interaction is attempt-first:
 ```text
 User selects diff/file/directory
   -> Sibi builds deterministic context
+  -> Sibi shows a prioritized review queue
   -> Sibi asks an ownership claim
   -> user attempts an explanation
   -> Sibi diagnoses the gap
@@ -100,6 +101,36 @@ Prove ownership
 The UI may offer hints, but it must not make explanation the first move. A user
 does not prove ownership by reading an answer. They prove ownership by attempting
 an operation and having that attempt checked against evidence.
+
+### First-Run Review Sequence
+
+The first visible right-panel experience should be a guided review sequence, not
+the internal lab and not the ownership prompt alone. Sibi should tell the user
+what it is about to inspect before asking for ownership:
+
+```text
+Review touched surface
+  -> prioritize changed files and ownership boundaries
+  -> state why each item is ordered there
+  -> name the next check
+  -> ask for the ownership attempt
+```
+
+The queue should make the relationship between files and boundaries explicit.
+Touched files are usually reviewed first, but only because they provide the
+initial evidence for a boundary. Supporting tests and inferred callers can follow
+when they are needed to prove or falsify the boundary. Each queue item should
+show:
+
+- file or boundary name;
+- touched status;
+- priority;
+- reason for order;
+- next step.
+
+The ownership prompt is a stage in this sequence. The local derivation lab may
+remain available as an internal or secondary section after the user-facing guide,
+but it should not be the first concept a new user sees.
 
 Anti-patterns for the wedge:
 

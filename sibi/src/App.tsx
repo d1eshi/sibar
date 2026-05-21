@@ -17,6 +17,7 @@ import {
   initialFile,
   initialFileStates,
   ownershipBoundary,
+  ownershipReviewQueue,
   fileTreePaths,
 } from "./ownershipWorkbench/fixtures";
 import {
@@ -113,6 +114,7 @@ export default function App() {
         boundary={ownershipBoundary}
         boundaryState={boundaryState}
         evidenceRefs={fixtureEvidence}
+        reviewQueue={ownershipReviewQueue}
         attemptText={attemptText}
         attemptResult={attemptResult}
         showHint={showHint}

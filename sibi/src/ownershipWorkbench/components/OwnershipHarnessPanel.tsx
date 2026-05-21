@@ -1,7 +1,15 @@
-import type { AttemptResult, BoundaryState, EvidenceRef, LineSelection, OwnershipBoundary, ViewMode } from "../types";
+import type {
+  AttemptResult,
+  BoundaryState,
+  EvidenceRef,
+  LineSelection,
+  OwnershipBoundary,
+  ReviewQueueItem,
+  ViewMode,
+} from "../types";
 import * as React from "react";
-import { labelForState } from "../helpers";
 import { OwnershipLabPanel } from "./OwnershipLabPanel";
+import { ReviewGuidePanel } from "./ReviewGuidePanel";
 
 interface OwnershipHarnessPanelProps {
   selectedFile: string;
@@ -11,6 +19,7 @@ interface OwnershipHarnessPanelProps {
   boundary: OwnershipBoundary;
   boundaryState: BoundaryState;
   evidenceRefs: EvidenceRef[];
+  reviewQueue: ReviewQueueItem[];
   attemptText: string;
   attemptResult: AttemptResult | null;
   showHint: boolean;
@@ -29,6 +38,7 @@ export function OwnershipHarnessPanel({
   boundary,
   boundaryState,
   evidenceRefs,
+  reviewQueue,
   attemptText,
   attemptResult,
   showHint,
@@ -42,30 +52,15 @@ export function OwnershipHarnessPanel({
     <aside className="panel ownershipPanel">
       <header className="panelHeader">
         <p className="panelSub">Ownership Harness</p>
-        <h1>Current boundary</h1>
+        <h1>Review sequence</h1>
         <p className="boundaryTitle">{boundary.title}</p>
-        <p>
-          <strong>State:</strong> <span className={`stateBadge ${boundaryState}-state`}>{labelForState(boundaryState)}</span>
-        </p>
       </header>
 
       <div className="ownershipPanelBody">
-        <OwnershipLabPanel
-          selectedFile={selectedFile}
-          viewMode={viewMode}
-          selection={selection}
-          selectionSummaryText={selectionSummaryText}
-          boundary={boundary}
-          boundaryState={boundaryState}
-          evidenceRefs={evidenceRefs}
-        />
+        <ReviewGuidePanel boundary={boundary} boundaryState={boundaryState} reviewQueue={reviewQueue} />
 
         <section className="ownershipSection">
-          <h2>Why this boundary matters</h2>
-          <p>{boundary.whyMatters}</p>
-        </section>
-
-        <section className="ownershipSection">
+          <p className="panelSub">Stage 3</p>
           <h2>Ownership prompt</h2>
           <ol>
             {boundary.prompt.map((line) => (
@@ -128,6 +123,16 @@ export function OwnershipHarnessPanel({
             </div>
           </section>
         )}
+
+        <OwnershipLabPanel
+          selectedFile={selectedFile}
+          viewMode={viewMode}
+          selection={selection}
+          selectionSummaryText={selectionSummaryText}
+          boundary={boundary}
+          boundaryState={boundaryState}
+          evidenceRefs={evidenceRefs}
+        />
       </div>
     </aside>
   );

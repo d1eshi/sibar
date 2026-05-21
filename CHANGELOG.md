@@ -11,6 +11,25 @@ accepted specs and iterations, not by raw commit count.
 Use this section for changes that have landed but are not part of a tagged
 release yet.
 
+### Changed - Sibi Ownership Workbench Review Guide
+
+- Changed the ownership harness first-run experience to open with a guided
+  review sequence and prioritized file/boundary queue before the ownership
+  prompt.
+- Moved the local derivation lab into a secondary/internal section after the
+  user-facing guide and ownership attempt stage.
+
+### Docs - Sibi Ownership Workbench Review Guide
+
+- Defined the first-run review sequence in the ownership wedge and boundary
+  docs, including touched status, priority, order reason, next step, and the
+  prompt as a later stage.
+
+### Internal - Sibi Ownership Workbench Review Guide
+
+- Added deterministic workbench coverage for review guide rendering order,
+  prioritized queue fixtures, and avoiding open-chat framing.
+
 ### Docs - Deep Ownership Workspace North Star
 
 - Added a current north-star entrypoint for the source-driven MVP:

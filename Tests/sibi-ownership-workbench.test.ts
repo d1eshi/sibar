@@ -151,6 +151,32 @@ test("boundary state projection preserves evaluated states for tree, harness, an
   }
 });
 
+test("ownership review queue prioritizes touched boundary review before ownership prompt", async () => {
+  const fixtures = await loadFixturesModule();
+
+  assert.deepEqual(
+    fixtures.ownershipReviewQueue.map((item) => item.filePath),
+    ["src/api/session.ts", "src/api/session.test.ts", "src/runtime/consumer.ts"],
+    "review queue should walk touched boundary, supporting test, then inferred caller evidence",
+  );
+  assert.deepEqual(
+    fixtures.ownershipReviewQueue.map((item) => item.priority),
+    [1, 2, 3],
+    "review queue should expose deterministic priorities",
+  );
+  assert.equal(fixtures.ownershipReviewQueue[0]?.touched, true);
+  assert.match(
+    fixtures.ownershipReviewQueue[0]?.orderReason ?? "",
+    /return contract/,
+    "highest-priority queue item should explain why the touched boundary comes first",
+  );
+  assert.match(
+    fixtures.ownershipReviewQueue[2]?.nextStep ?? "",
+    /before asking for the ownership attempt/,
+    "queue should make ownership attempt the next stage after boundary review",
+  );
+});
+
 test("evidenceForSelection returns evidence overlapping the selected range", async () => {
   const fixtures = await loadFixturesModule();
   const helpers = await loadHelpersModule();
@@ -189,6 +215,72 @@ test("evidenceForSelection returns evidence overlapping the selected range", asy
       endLine: 24,
     }),
     [],
+  );
+});
+
+test("ReviewGuidePanel defines a first-run review sequence without free chat language", () => {
+  const guideSource = readFileSync(
+    new URL("../sibi/src/ownershipWorkbench/components/ReviewGuidePanel.tsx", import.meta.url),
+    "utf8",
+  );
+
+  assert.match(
+    guideSource,
+    /aria-label="First-run review sequence"/,
+    "ReviewGuidePanel should expose a first-run sequence landmark",
+  );
+  assert.match(
+    guideSource,
+    /Priority queue/,
+    "ReviewGuidePanel should render a prioritized review queue",
+  );
+  assert.match(
+    guideSource,
+    /Touched[\s\S]*Reason[\s\S]*Next step/,
+    "ReviewGuidePanel should show touched status, order reason, and next step",
+  );
+  assert.match(
+    guideSource,
+    /Request ownership attempt/,
+    "ReviewGuidePanel should make the ownership prompt a stage of the sequence",
+  );
+  assert.doesNotMatch(
+    guideSource,
+    /ask anything|anything about|chat freely|free chat|chat libre/i,
+    "ReviewGuidePanel must not frame the workbench as open chat",
+  );
+});
+
+test("OwnershipHarnessPanel renders review guide before prompt and internal lab", () => {
+  const harnessSource = readFileSync(
+    new URL("../sibi/src/ownershipWorkbench/components/OwnershipHarnessPanel.tsx", import.meta.url),
+    "utf8",
+  );
+
+  assert.match(
+    harnessSource,
+    /import\s+\{\s*ReviewGuidePanel\s*\}\s+from\s+["']\.\/ReviewGuidePanel["']/,
+    "OwnershipHarnessPanel should import the review guide subcomponent",
+  );
+
+  const guideIndex = harnessSource.indexOf("<ReviewGuidePanel");
+  const promptIndex = harnessSource.indexOf("Ownership prompt");
+  const labIndex = harnessSource.indexOf("<OwnershipLabPanel");
+
+  assert.ok(guideIndex >= 0, "OwnershipHarnessPanel should render ReviewGuidePanel");
+  assert.ok(promptIndex >= 0, "OwnershipHarnessPanel should still render the ownership prompt");
+  assert.ok(labIndex >= 0, "OwnershipHarnessPanel should still render the internal lab");
+  assert.ok(guideIndex < promptIndex, "review guide should render before ownership prompt");
+  assert.ok(promptIndex < labIndex, "ownership prompt should render before the secondary lab");
+  assert.match(
+    harnessSource,
+    /reviewQueue=\{reviewQueue\}/,
+    "OwnershipHarnessPanel should pass review queue data into ReviewGuidePanel",
+  );
+  assert.doesNotMatch(
+    harnessSource,
+    /ask anything|anything about|chat freely|free chat|chat libre/i,
+    "OwnershipHarnessPanel must not frame the workbench as open chat",
   );
 });
 

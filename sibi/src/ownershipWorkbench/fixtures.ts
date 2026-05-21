@@ -13,6 +13,7 @@ import type {
   BoundaryState,
   EvidenceRef,
   OwnershipBoundary,
+  ReviewQueueItem,
   TreeNode,
   WorkbenchLineMetadata,
 } from "./types.ts";
@@ -62,6 +63,39 @@ export const fixtureEvidence: EvidenceRef[] = [
     detail: "A nearby doc states `createSession` always resolves to object; this fixture proves a `null` branch exists.",
     location: "docs/notes/session-api.md:4-9",
     confidence: "conflict",
+  },
+];
+
+export const ownershipReviewQueue: ReviewQueueItem[] = [
+  {
+    id: "queue-session-boundary",
+    filePath: "src/api/session.ts",
+    boundaryTitle: "Session API boundary for absent sessions",
+    priority: 1,
+    touched: true,
+    orderReason: "The touched diff changes the return contract from always-json to possible null.",
+    nextStep: "Inspect the added 204 branch and confirm what caller behavior it requires.",
+    state: "gap",
+  },
+  {
+    id: "queue-session-test",
+    filePath: "src/api/session.test.ts",
+    boundaryTitle: "Regression evidence for absent session behavior",
+    priority: 2,
+    touched: true,
+    orderReason: "The test proves the new null branch exists but does not prove downstream safety.",
+    nextStep: "Check what the test covers before accepting it as ownership evidence.",
+    state: "attempted",
+  },
+  {
+    id: "queue-runtime-consumer",
+    filePath: "src/runtime/consumer.ts",
+    boundaryTitle: "Caller contract for unauthenticated runtime paths",
+    priority: 3,
+    touched: false,
+    orderReason: "This inferred caller is the first place the null contract can break user-facing auth flow.",
+    nextStep: "Trace the falsy-session branch before asking for the ownership attempt.",
+    state: "attempted",
   },
 ];
 

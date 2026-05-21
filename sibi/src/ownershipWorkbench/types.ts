@@ -33,6 +33,17 @@ export type OwnershipBoundary = {
   returnCondition: string;
 };
 
+export type ReviewQueueItem = {
+  id: string;
+  filePath: string;
+  boundaryTitle: string;
+  priority: 1 | 2 | 3 | 4 | 5;
+  touched: boolean;
+  orderReason: string;
+  nextStep: string;
+  state: BoundaryState;
+};
+
 export type LineSelection = {
   startLine: number;
   endLine: number;

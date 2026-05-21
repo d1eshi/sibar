@@ -79,6 +79,7 @@ El loop de producto esperado es:
 Usuario selecciona diff / archivo / directorio
   -> Sibi construye contexto determinístico
   -> Sibi detecta boundaries tocadas
+  -> Sibi muestra una cola priorizada de revisión
   -> Sibi pregunta un ownership claim
   -> el usuario intenta explicar
   -> Sibi diagnostica gaps
@@ -90,6 +91,32 @@ Usuario selecciona diff / archivo / directorio
 La unidad principal no debe ser siempre el archivo. La unidad correcta es una
 `ownership boundary`: una responsabilidad técnica que el usuario debe poder
 explicar, modificar y defender con evidencia.
+
+### First-run review sequence
+
+El primer contacto no debe abrir directamente en el lab interno ni en el prompt.
+Sibi debe empezar como una ceremonia de revisión guiada:
+
+```text
+Sibi dice qué va a revisar
+  -> muestra archivos/boundaries en cola priorizada
+  -> explica prioridad, razón de orden y siguiente paso
+  -> revisa la superficie tocada antes de inferir callers
+  -> recién entonces pide probar ownership
+```
+
+La cola de revisión existe para anclar el ownership prompt en evidencia. Debe
+mostrar, como mínimo:
+
+- archivo o boundary;
+- si fue tocado por el diff;
+- prioridad;
+- razón de orden;
+- siguiente paso.
+
+El prompt de ownership es una etapa de la secuencia, no el primer concepto de la
+UI. El lab de derivación local puede existir, pero queda como sección secundaria
+o interna después de la guía user-facing.
 
 Ejemplos:
 
