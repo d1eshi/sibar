@@ -33,13 +33,15 @@
     "sibi:build": "vite build sibi"
   },
   "devDependencies": {
+    "@types/node": "^22.15.3",
     "@types/react": "^19.1.13",
     "@types/react-dom": "^19.1.9",
-    "@types/node": "^22.15.3",
-    "vite": "^7.1.0",
-    "typescript": "^5.8.3"
+    "typescript": "^5.8.3",
+    "vite": "^7.1.0"
   },
   "dependencies": {
+    "@pierre/diffs": "^1.2.1",
+    "@pierre/trees": "1.0.0-beta.4",
     "react": "^19.1.0",
     "react-dom": "^19.1.0"
   },
