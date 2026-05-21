@@ -1,0 +1,158 @@
+{
+  "report_id": "VAL-EVAL-014-shared-core-boundaries-2026-05-21T00:00:00.000Z",
+  "generated_at": "2026-05-21T00:00:00.000Z",
+  "validation": "VAL-EVAL-014-shared-core-boundaries",
+  "eval_spec_path": "evals/shared-core-boundaries/eval-suite.json",
+  "no_llm": true,
+  "passed": true,
+  "aggregate": {
+    "total_cases": 5,
+    "passed_cases": 2,
+    "failed_cases": 0,
+    "skipped_cases": 3,
+    "files_checked": 4,
+    "violations": 0,
+    "declared_gates": 10,
+    "expected_gates": 10
+  },
+  "cases": [
+    {
+      "id": "SCB-001-OWNERSHIP-CORE-IMPORTS",
+      "title": "ownership-core stays free of host, surface, and adapter imports.",
+      "status": "skipped",
+      "checked_paths": [
+        "src/ownership-core"
+      ],
+      "files_checked": 0,
+      "violations": []
+    },
+    {
+      "id": "SCB-002-PEDAGOGY-CORE-IMPORTS",
+      "title": "pedagogy-core stays free of host, surface, and adapter imports.",
+      "status": "skipped",
+      "checked_paths": [
+        "src/pedagogy-core"
+      ],
+      "files_checked": 0,
+      "violations": []
+    },
+    {
+      "id": "SCB-003-MEMORY-CORE-IMPORTS",
+      "title": "memory-core stays free of host, surface, and adapter imports.",
+      "status": "skipped",
+      "checked_paths": [
+        "src/memory-core"
+      ],
+      "files_checked": 0,
+      "violations": []
+    },
+    {
+      "id": "SCB-004-SIBI-WORKSPACE-IMPORTS",
+      "title": "sibi/src stays independent from WorkspaceIntent, PedagogoAI workspace adapters, and workspace UI.",
+      "status": "passed",
+      "checked_paths": [
+        "sibi/src"
+      ],
+      "files_checked": 3,
+      "violations": []
+    },
+    {
+      "id": "SCB-005-SPEC-GLOBAL-GATES",
+      "title": "shared core boundary spec declares all essential global gates.",
+      "status": "passed",
+      "checked_paths": [
+        "docs/specs/deep-ownership-workspace/04_shared_core_boundaries.md"
+      ],
+      "files_checked": 1,
+      "violations": [],
+      "gates": [
+        {
+          "gate": "evidence-grounded",
+          "declared": true,
+          "evidence": [
+            "Evidence-grounded",
+            "cited evidence",
+            "unsupported state"
+          ]
+        },
+        {
+          "gate": "attempt-first",
+          "declared": true,
+          "evidence": [
+            "Attempt-first",
+            "passive reading",
+            "model explanation"
+          ]
+        },
+        {
+          "gate": "operation-scoped",
+          "declared": true,
+          "evidence": [
+            "Operation-scoped",
+            "explain, trace,\\s+derive,\\s+predict,\\s+implement,\\s+test,\\s+benchmark,\\s+or modify"
+          ]
+        },
+        {
+          "gate": "artifact-scoped",
+          "declared": true,
+          "evidence": [
+            "Artifact-scoped",
+            "source slice",
+            "diff, PR, or\\s+repo area"
+          ]
+        },
+        {
+          "gate": "no whole mission or repo ownership claim",
+          "declared": true,
+          "evidence": [
+            "No whole-mission or whole-repo ownership claim",
+            "one session or review"
+          ]
+        },
+        {
+          "gate": "closed gap taxonomy",
+          "declared": true,
+          "evidence": [
+            "Closed gap taxonomy",
+            "new gap kinds require tests and eval coverage"
+          ]
+        },
+        {
+          "gate": "repair return condition",
+          "declared": true,
+          "evidence": [
+            "Repair with return condition",
+            "what original operation\\s+it returns to"
+          ]
+        },
+        {
+          "gate": "misconception memory",
+          "declared": true,
+          "evidence": [
+            "Misconception memory",
+            "durable evidence",
+            "overwritten"
+          ]
+        },
+        {
+          "gate": "recall and transfer separation",
+          "declared": true,
+          "evidence": [
+            "Recall and transfer are separate",
+            "local success does not imply retained or\\s+transferable ownership"
+          ]
+        },
+        {
+          "gate": "raw model output untrusted",
+          "declared": true,
+          "evidence": [
+            "Raw model output is untrusted",
+            "schema-checked",
+            "evidence-checked",
+            "pedagogy-checked"
+          ]
+        }
+      ]
+    }
+  ]
+}
