@@ -2,70 +2,73 @@ import { requestEarlyAccess } from "./api.js";
 
 const demoStates = {
   source: {
-    evidenceTitle: "Artifact boundary",
-    code: `included:
-  - attention score formula
-  - masking rule
-  - residual path note
+    evidenceTitle: "Debt boundary",
+    code: `generated:
+  - auth middleware
+  - cached data loader
+  - optimistic save path
 
-excluded:
-  - training recipe
-  - optimizer claims`,
-    pills: ["cited", "bounded", "not a summary"],
-    workTitle: "What breaks first?",
-    question: "Si removemos la mascara causal, que afirmacion del articulo deja de ser verdadera?",
-    answer: "Tu respuesta todavia no prueba el boundary. Sibar pide evidencia antes de darte la explicacion completa.",
-    resultTitle: "No aprobado todavia",
+unknown:
+  - invalidation rule
+  - retry behavior`,
+    pills: ["owned", "bounded", "transferable"],
+    workTitle: "Can you change it?",
+    question: "Si cambia el cache key, que comportamiento se rompe primero y donde lo verificas?",
+    answer: "Todavia hay deuda cognitiva: podes nombrar la pieza, pero no predecir su fallo con evidencia.",
+    resultTitle: "Debt abierto",
     readiness: 42,
-    result: "Gap detectado: confundis mecanismo local con garantia global. La reparacion es escribir un contraejemplo pequeno.",
+    result: "Gap detectado: entendimiento nominal sin capacidad de cambio. La reparacion es una modificacion pequena con prediccion previa.",
     repairs: [
-      "Marcar la linea que justifica causal masking.",
-      "Escribir un input donde mirar el futuro rompe la prediccion.",
-      "Reintentar con una respuesta de 4 frases."
+      "Marcar la funcion que define el cache key.",
+      "Predecir que estado queda stale despues del cambio.",
+      "Hacer un patch minimo y explicar por que no rompe el loader."
     ]
   },
   question: {
-    evidenceTitle: "Evidence slice",
-    code: `source slice:
-  attention(Q, K, V) = softmax(QK^T / sqrt(d_k))V
+    evidenceTitle: "Ownership slice",
+    code: `claim under test:
+  "this loader is safe to reuse"
 
-claim under test:
-  decoder tokens cannot attend to future positions`,
-    pills: ["line cited", "claim under test", "counterexample ready"],
+evidence needed:
+  - cache key source
+  - invalidation trigger
+  - stale-state test`,
+    pills: ["claim under test", "needs evidence", "change-ready"],
     workTitle: "Ownership check",
-    question: "Explicalo sin usar la palabra 'contexto': por que la mascara cambia lo que el modelo puede saber?",
-    answer: "Respuesta rapida: 'porque mira solo lo anterior'. Falta conectar esa frase con la matriz de atencion.",
+    question: "Explicalo como si fueras a tocarlo manana: que input produce stale data y que archivo confirma tu respuesta?",
+    answer: "Respuesta rapida: 'hay que limpiar cache'. Falta ubicar el mecanismo y probar que el cambio aplica.",
     resultTitle: "Gap activo",
     readiness: 54,
-    result: "Sibar no desbloquea la explicacion larga hasta que aparezca el mecanismo. La pregunta fuerza una prueba corta.",
+    result: "Sibar mantiene el gap abierto hasta que el usuario conecta codigo, comportamiento y evidencia.",
     repairs: [
-      "Nombrar QK^T como matriz de compatibilidad.",
-      "Mostrar donde la mascara vuelve imposible una conexion.",
-      "Separar 'orden' de 'informacion disponible'."
+      "Citar el loader exacto.",
+      "Nombrar la condicion que invalida el cache.",
+      "Describir el cambio minimo antes de tocar el archivo."
     ]
   },
   readiness: {
-    evidenceTitle: "Re-evaluation trace",
+    evidenceTitle: "Understanding memory",
     code: `attempt:
-  "masking zeroes future attention scores before softmax"
+  "changing the key without invalidating pending saves leaves stale UI"
 
 evidence:
-  - cites formula
-  - cites future-token constraint
+  - cites loader
+  - cites save path
+  - predicts stale state
 
 verdict:
-  bounded readiness for causal masking`,
-    pills: ["reevaluated", "evidence-backed", "next node unlocked"],
+  bounded readiness for this change`,
+    pills: ["retained", "evidence-backed", "replicable"],
     workTitle: "Repair accepted",
-    question: "Ahora si: que cambio minimo haria que el decoder deje de ser autoregresivo?",
-    answer: "Respuesta con evidencia: si permito scores hacia posiciones futuras antes del softmax, cada token puede condicionar su salida en informacion que no deberia existir.",
+    question: "Ahora si: que parte podes cambiar sin fingir seguridad?",
+    answer: "Respuesta con evidencia: puedo tocar el cache key si tambien invalido el pending save path y cubro el stale-state case.",
     resultTitle: "Ready: bounded",
     readiness: 86,
-    result: "Readiness acotado: podes explicar causal masking y detectar una violacion simple. No implica dominar transformers completos.",
+    result: "Readiness acotado: podes cambiar esta parte, explicar el riesgo y transferir el patron a otro loader. No implica dominar todo el repo.",
     repairs: [
-      "Siguiente nodo: cross-attention.",
-      "Mantener boundary: no saltar a training dynamics.",
-      "Guardar esta evidencia como memoria de misconception resuelta."
+      "Guardar el patron como memoria reutilizable.",
+      "Repetirlo en otro loader parecido.",
+      "Retestear despues de una demora para medir retencion."
     ]
   }
 };

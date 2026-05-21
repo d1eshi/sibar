@@ -20,7 +20,7 @@ const rootVercelConfig = JSON.parse(readFileSync(join(root, "vercel.json"), "utf
 const vercelConfig = JSON.parse(readFileSync(join(root, "web/vercel.json"), "utf8"));
 
 test("article workspace web deploy is rooted under /web", () => {
-  assert.match(webHtml, /Sibar - Workspace creativo/);
+  assert.match(webHtml, /Sibar - Resolver cognitive debt/);
   assert.match(webHtml, /<link rel="stylesheet" href="styles\/reader\.css">/);
   assert.match(webHtml, /<script type="module" src="scripts\/landing\.js"><\/script>/);
   assert.match(webApiClient, /fetch\(`\/api\/read\?url=\$\{encodeURIComponent\(url\)\}`\)/);
