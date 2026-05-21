@@ -29,10 +29,13 @@
     "workspace:dev": "vite apps/sibar-research-workspace --host 127.0.0.1 --strictPort --port 5173",
     "workspace:build": "vite build apps/sibar-research-workspace",
     "workspace:preview": "vite preview apps/sibar-research-workspace --host 127.0.0.1 --strictPort --port 4173",
-    "sibi:dev": "vite sibi --host 127.0.0.1 --strictPort --port 5174",
-    "sibi:build": "vite build sibi"
+    "sibi:dev": "vite sibi --host 127.0.0.1 --strictPort --port 5174 --configLoader native",
+    "sibi:build": "vite build sibi --configLoader native",
+    "sibi:e2e": "playwright test Tests/sibi-ownership-workbench.e2e.spec.ts",
+    "sibi:e2e:ui": "playwright test Tests/sibi-ownership-workbench.e2e.spec.ts --ui"
   },
   "devDependencies": {
+    "@playwright/test": "^1.60.0",
     "@types/node": "^22.15.3",
     "@types/react": "^19.1.13",
     "@types/react-dom": "^19.1.9",

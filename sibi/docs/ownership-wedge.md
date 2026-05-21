@@ -102,7 +102,9 @@ Sibi dice qué va a revisar
   -> muestra el current step de la cola priorizada
   -> explica por qué empieza ahí y cuál es la siguiente acción
   -> revisa la superficie tocada antes de inferir callers
-  -> recién entonces pide probar ownership
+  -> pregunta por el archivo/check actual
+  -> si la respuesta falta o no conecta evidencia, registra el gap y avanza
+  -> después de dos intentos flojos, muestra contexto mínimo antes de seguir
 ```
 
 La cola de revisión existe para anclar el ownership prompt en evidencia. Debe
@@ -121,6 +123,16 @@ UI. El lab de derivación local no forma parte de la UI default del usuario. Deb
 abrirse explícitamente como vista local/debug con `?view=lab` o `?lab=1`, para
 revisar la cola completa, traces, derivación de estado o reportes de usuario sin
 sobrecargar el flujo normal.
+
+La sesión de ownership default debe sentirse guiada por Sibi, no como chat
+abierto. Cada paso tiene una pregunta asociada al archivo/check actual. Para la
+superficie tocada puede preguntar qué cambió en `src/api/session.ts`; para
+`session.test.ts` o `consumer.ts` debe pedir conectar la relación entre archivos:
+qué contrato prueba el test, qué caller falta, o qué rama debe existir cuando
+`createSession` devuelve `null`. Si el usuario envía vacío, marca unknown, o da
+una respuesta inconclusa, Sibi registra una observación acotada (`no answer`,
+`inconclusive`, `could not connect caller/test`) y avanza al siguiente check para
+probar si puede conectar la evidencia desde otro ángulo.
 
 Ejemplos:
 

@@ -113,7 +113,10 @@ Review touched surface
   -> show the current prioritized queue step
   -> state why the review starts there
   -> name the next check
-  -> ask for the ownership attempt
+  -> ask the current file/check question
+  -> record missing or inconclusive answers as observations
+  -> advance to the next relationship check
+  -> reveal minimal context after repeated weak attempts
 ```
 
 The queue should make the relationship between files and boundaries explicit.
@@ -135,6 +138,15 @@ not part of the default user-facing UI. It should open only through an explicit
 local/debug query param such as `?view=lab` or `?lab=1`, where it can show trace
 derivation, the full priority queue, state projection, and report context
 without overwhelming the normal flow.
+
+The default session should be guided, not open chat. Sibi asks one bounded
+question at a time for the current queue item. The touched API file can ask what
+changed in `src/api/session.ts`; later checks such as `session.test.ts` and
+`consumer.ts` must ask the user to connect files instead of summarizing one file
+in isolation. Empty attempts, explicit unknowns, and inconclusive answers advance
+the queue and log a concrete observation: `no answer`, `inconclusive`, or `could
+not connect caller/test`. After two weak attempts in a row, Sibi should show only
+the smallest useful hint ladder before the next attempt.
 
 Anti-patterns for the wedge:
 

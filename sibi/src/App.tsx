@@ -5,9 +5,9 @@ import { EvidenceDrawerPanel } from "./ownershipWorkbench/components/EvidenceDra
 import { FileTreePanel } from "./ownershipWorkbench/components/FileTreePanel";
 import { OwnershipHarnessPanel } from "./ownershipWorkbench/components/OwnershipHarnessPanel";
 import type {
-  AttemptResult,
   BoundaryState,
   LineSelection,
+  OwnershipSessionState,
 } from "./ownershipWorkbench/types";
 import {
   codeViewDiffItemsByPath,
@@ -21,12 +21,15 @@ import {
   fileTreePaths,
 } from "./ownershipWorkbench/fixtures";
 import {
-  evaluateAttempt,
   getActiveBoundaryState,
   getLineSelectionText,
   groupedEvidence,
-  withBoundaryFileState,
 } from "./ownershipWorkbench/helpers";
+import {
+  advanceOwnershipSession,
+  createOwnershipSessionState,
+  makeOwnershipSessionQuestions,
+} from "./ownershipWorkbench/ownershipReviewSession";
 import { getWorkbenchSurfaceMode } from "./ownershipWorkbench/surfaceMode";
 import type { ViewMode } from "./ownershipWorkbench/types";
 
@@ -39,10 +42,15 @@ export default function App() {
   const [selection, setSelection] = React.useState<LineSelection | null>(null);
   const [fileStates, setFileStates] = React.useState<Record<string, BoundaryState>>(initialFileStates);
   const [attemptText, setAttemptText] = React.useState("");
-  const [attemptResult, setAttemptResult] = React.useState<AttemptResult | null>(null);
-  const [showHint, setShowHint] = React.useState(false);
+  const [sessionState, setSessionState] = React.useState<OwnershipSessionState>(
+    createOwnershipSessionState,
+  );
 
   const evidenceGroups = React.useMemo(() => groupedEvidence(fixtureEvidence), []);
+  const sessionQuestions = React.useMemo(
+    () => makeOwnershipSessionQuestions(ownershipReviewQueue),
+    [],
+  );
   const codeViewFileItem = codeViewFileItemsByPath[selectedFile];
   const codeViewDiffItem = codeViewDiffItemsByPath[selectedFile];
   const boundaryState = getActiveBoundaryState(fileStates, ownershipBoundary);
@@ -62,42 +70,32 @@ export default function App() {
     setSelection(null);
   }, [selectedFile, viewMode]);
 
-  function submitAttempt() {
-    const result = evaluateAttempt(attemptText, ownershipBoundary);
-    setAttemptResult(result);
-    setShowHint(false);
+  React.useEffect(() => {
+    const currentQuestion = sessionQuestions[sessionState.currentIndex];
+    if (currentQuestion && currentQuestion.filePath !== selectedFile) {
+      setSelectedFile(currentQuestion.filePath);
+    }
+  }, [selectedFile, sessionQuestions, sessionState.currentIndex]);
 
-    setFileStates((prev) =>
-      withBoundaryFileState(
-        {
-          ...prev,
-          "src/api/session.test.ts": result.state === "owned" ? "owned" : "attempted",
-          "src/runtime/consumer.ts": "attempted",
-        },
-        ownershipBoundary,
-        result.state,
-      ),
-    );
+  function submitAttempt() {
+    advanceSession("submit");
   }
 
   function markUnknown() {
-    setShowHint(false);
-    const unknownResult = {
-      state: "questionable" as const,
-      summary: "Boundary manually marked unknown; no ownership state assigned yet.",
-      smallestRepair:
-        "Re-run with an attempt focused on null handling and the caller safety path.",
-      returnCondition: ownershipBoundary.returnCondition,
-    };
-    setAttemptResult(unknownResult);
-    setFileStates((prev) => ({
-      ...prev,
-      [ownershipBoundary.filePath]: unknownResult.state,
-    }));
+    advanceSession("mark_unknown");
   }
 
-  function reattempt() {
-    setAttemptResult(null);
+  function advanceSession(action: "submit" | "mark_unknown") {
+    const result = advanceOwnershipSession(sessionState, sessionQuestions, attemptText, action);
+    setSessionState(result.state);
+    setAttemptText("");
+
+    if (result.observation) {
+      setFileStates((prev) => ({
+        ...prev,
+        [result.observation.filePath]: "gap",
+      }));
+    }
   }
 
   return (
@@ -125,20 +123,16 @@ export default function App() {
         boundary={ownershipBoundary}
         boundaryState={boundaryState}
         reviewQueue={ownershipReviewQueue}
+        sessionQuestions={sessionQuestions}
+        sessionState={sessionState}
         surfaceMode={workbenchSurfaceMode}
         labContext={labContext}
         attemptText={attemptText}
-        attemptResult={attemptResult}
-        showHint={showHint}
         onAttemptChange={setAttemptText}
         onSubmitAttempt={submitAttempt}
-        onShowHint={() => {
-          setShowHint(true);
-        }}
         onMarkUnknown={() => {
           markUnknown();
         }}
-        onReattempt={reattempt}
       />
 
       <EvidenceDrawerPanel evidenceGroups={evidenceGroups} />

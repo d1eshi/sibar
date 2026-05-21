@@ -7,6 +7,7 @@ import type { BoundaryState } from "../sibi/src/ownershipWorkbench/types.ts";
 
 type OwnershipWorkbenchFixtures = typeof import("../sibi/src/ownershipWorkbench/fixtures.ts");
 type OwnershipWorkbenchHelpers = typeof import("../sibi/src/ownershipWorkbench/helpers.ts");
+type OwnershipReviewSession = typeof import("../sibi/src/ownershipWorkbench/ownershipReviewSession.ts");
 type OwnershipWorkbenchSurfaceMode = typeof import("../sibi/src/ownershipWorkbench/surfaceMode.ts");
 
 const EXPECTED_DIFF_FILES = ["src/api/session.ts", "src/api/session.test.ts"] as const;
@@ -14,6 +15,7 @@ const DIRECTORY_PATHS = ["src", "src/api", "src/runtime"] as const;
 
 let cachedFixtures: OwnershipWorkbenchFixtures | null = null;
 let cachedHelpers: OwnershipWorkbenchHelpers | null = null;
+let cachedReviewSession: OwnershipReviewSession | null = null;
 let cachedSurfaceMode: OwnershipWorkbenchSurfaceMode | null = null;
 let fixtureImportConsoleErrors: unknown[] = [];
 
@@ -53,6 +55,15 @@ async function loadSurfaceModeModule(): Promise<OwnershipWorkbenchSurfaceMode> {
 
   cachedSurfaceMode = (await import("../sibi/src/ownershipWorkbench/surfaceMode.ts")) as OwnershipWorkbenchSurfaceMode;
   return cachedSurfaceMode;
+}
+
+async function loadReviewSessionModule(): Promise<OwnershipReviewSession> {
+  if (cachedReviewSession != null) {
+    return cachedReviewSession;
+  }
+
+  cachedReviewSession = (await import("../sibi/src/ownershipWorkbench/ownershipReviewSession.ts")) as OwnershipReviewSession;
+  return cachedReviewSession;
 }
 
 test("fixture file tree paths only include leaf file paths", async () => {
@@ -188,6 +199,125 @@ test("ownership review queue prioritizes touched boundary review before ownershi
   );
 });
 
+test("ownership review session asks file-specific and relation-specific questions", async () => {
+  const fixtures = await loadFixturesModule();
+  const session = await loadReviewSessionModule();
+  const questions = session.makeOwnershipSessionQuestions(fixtures.ownershipReviewQueue);
+
+  assert.match(questions[0]?.prompt ?? "", /Repasá `src\/api\/session\.ts`/);
+  assert.match(
+    questions[1]?.prompt ?? "",
+    /Conectá `src\/api\/session\.test\.ts` con `src\/api\/session\.ts`/,
+    "test step should ask for a relationship, not a file summary",
+  );
+  assert.match(
+    questions[2]?.prompt ?? "",
+    /conectá `src\/runtime\/consumer\.ts` con `src\/api\/session\.ts`/i,
+    "consumer step should ask for the caller/API relationship",
+  );
+});
+
+test("ownership review session advances on empty and mark-unknown attempts", async () => {
+  const fixtures = await loadFixturesModule();
+  const session = await loadReviewSessionModule();
+  const questions = session.makeOwnershipSessionQuestions(fixtures.ownershipReviewQueue);
+  const initialState = session.createOwnershipSessionState();
+
+  const emptyResult = session.advanceOwnershipSession(initialState, questions, "", "submit");
+  assert.equal(emptyResult.kind, "advanced");
+  assert.equal(emptyResult.state.currentIndex, 1);
+  assert.equal(emptyResult.state.observations[0]?.reason, "no answer");
+
+  const unknownResult = session.advanceOwnershipSession(initialState, questions, "ignored", "mark_unknown");
+  assert.equal(unknownResult.kind, "advanced");
+  assert.equal(unknownResult.state.currentIndex, 1);
+  assert.equal(unknownResult.state.observations[0]?.reason, "no answer");
+});
+
+test("ownership review session advances valid answers without recording observations", async () => {
+  const fixtures = await loadFixturesModule();
+  const session = await loadReviewSessionModule();
+  const questions = session.makeOwnershipSessionQuestions(fixtures.ownershipReviewQueue);
+  const initialState = session.createOwnershipSessionState();
+
+  const result = session.advanceOwnershipSession(
+    initialState,
+    questions,
+    "The 204 branch returns null instead of JSON, so callers need to handle the new null contract.",
+    "submit",
+  );
+
+  assert.equal(result.kind, "advanced");
+  assert.equal(result.state.currentIndex, 1);
+  assert.equal(result.state.isComplete, false);
+  assert.equal(result.state.observations.length, 0);
+  assert.equal(result.state.lastFeedback, "Respuesta aceptada. Sibi avanza al siguiente check.");
+});
+
+test("ownership review session records relation gaps and opens hint ladder after two weak attempts", async () => {
+  const fixtures = await loadFixturesModule();
+  const session = await loadReviewSessionModule();
+  const questions = session.makeOwnershipSessionQuestions(fixtures.ownershipReviewQueue);
+  const initialState = session.createOwnershipSessionState();
+
+  const first = session.advanceOwnershipSession(initialState, questions, "", "submit");
+  assert.equal(first.kind, "advanced");
+  const second = session.advanceOwnershipSession(
+    first.state,
+    questions,
+    "The test exists but I cannot connect it yet.",
+    "submit",
+  );
+
+  assert.equal(second.kind, "advanced");
+  assert.equal(second.state.currentIndex, 2);
+  assert.equal(second.state.showHintLadder, true);
+  assert.equal(second.state.observations[1]?.reason, "could not connect caller/test");
+});
+
+test("ownership review session completes on a valid final answer", async () => {
+  const fixtures = await loadFixturesModule();
+  const session = await loadReviewSessionModule();
+  const questions = session.makeOwnershipSessionQuestions(fixtures.ownershipReviewQueue);
+  const finalState = {
+    ...session.createOwnershipSessionState(),
+    currentIndex: questions.length - 1,
+  };
+
+  const result = session.advanceOwnershipSession(
+    finalState,
+    questions,
+    "consumer.ts must branch on createSession returning null from session.ts and keep the user unauthenticated without privileged calls.",
+    "submit",
+  );
+
+  assert.equal(result.kind, "complete");
+  assert.equal(result.state.isComplete, true);
+  assert.equal(result.state.currentIndex, questions.length - 1);
+  assert.equal(result.state.observations.length, 0);
+  assert.match(result.feedback, /session complete/i);
+});
+
+test("ownership review session completes with a final observation on weak last answer", async () => {
+  const fixtures = await loadFixturesModule();
+  const session = await loadReviewSessionModule();
+  const questions = session.makeOwnershipSessionQuestions(fixtures.ownershipReviewQueue);
+  const finalState = {
+    ...session.createOwnershipSessionState(),
+    currentIndex: questions.length - 1,
+    weakAttemptStreak: 1,
+  };
+
+  const result = session.advanceOwnershipSession(finalState, questions, "Still unsure.", "submit");
+
+  assert.equal(result.kind, "complete");
+  assert.equal(result.state.isComplete, true);
+  assert.equal(result.state.currentIndex, questions.length - 1);
+  assert.equal(result.observation?.reason, "inconclusive");
+  assert.equal(result.state.observations[0]?.filePath, "src/runtime/consumer.ts");
+  assert.match(result.feedback, /Gap final registrado/);
+});
+
 test("evidenceForSelection returns evidence overlapping the selected range", async () => {
   const fixtures = await loadFixturesModule();
   const helpers = await loadHelpersModule();
@@ -295,7 +425,7 @@ test("ReviewGuidePanel gates detailed priority queue behind lab mode", () => {
   );
 });
 
-test("OwnershipHarnessPanel renders review guide before prompt and gates the local lab", () => {
+test("OwnershipHarnessPanel renders review guide before guided session and gates the local lab", () => {
   const harnessSource = readFileSync(
     new URL("../sibi/src/ownershipWorkbench/components/OwnershipHarnessPanel.tsx", import.meta.url),
     "utf8",
@@ -308,14 +438,14 @@ test("OwnershipHarnessPanel renders review guide before prompt and gates the loc
   );
 
   const guideIndex = harnessSource.indexOf("<ReviewGuidePanel");
-  const promptIndex = harnessSource.indexOf("Ownership prompt");
+  const sessionIndex = harnessSource.indexOf("Guided ownership review session");
   const labIndex = harnessSource.indexOf("<OwnershipLabPanel");
 
   assert.ok(guideIndex >= 0, "OwnershipHarnessPanel should render ReviewGuidePanel");
-  assert.ok(promptIndex >= 0, "OwnershipHarnessPanel should still render the ownership prompt");
+  assert.ok(sessionIndex >= 0, "OwnershipHarnessPanel should render the guided ownership session");
   assert.ok(labIndex >= 0, "OwnershipHarnessPanel should still define the local lab render path");
-  assert.ok(guideIndex < promptIndex, "review guide should render before ownership prompt");
-  assert.ok(promptIndex < labIndex, "ownership prompt should render before the secondary lab");
+  assert.ok(guideIndex < sessionIndex, "review guide should render before guided session");
+  assert.ok(sessionIndex < labIndex, "guided session should render before the secondary lab");
   assert.match(
     harnessSource,
     /const isLabView = surfaceMode === "lab" && labContext != null/,
@@ -340,6 +470,11 @@ test("OwnershipHarnessPanel renders review guide before prompt and gates the loc
     harnessSource,
     /showDetailedQueue=\{isLabView\}/,
     "OwnershipHarnessPanel should reserve the full priority queue for lab mode",
+  );
+  assert.match(
+    harnessSource,
+    /const currentQuestion = sessionState\.isComplete \? null : sessionQuestions\[sessionState\.currentIndex\] \?\? null/,
+    "OwnershipHarnessPanel should derive the current step from deterministic session questions and hide it after completion",
   );
   assert.doesNotMatch(
     harnessSource,
@@ -385,6 +520,16 @@ test("App passes a query-derived surface mode into the ownership harness", () =>
     appSource,
     /labContext=\{labContext\}/,
     "App should pass the gated lab context into OwnershipHarnessPanel",
+  );
+  assert.match(
+    appSource,
+    /makeOwnershipSessionQuestions\(ownershipReviewQueue\)/,
+    "App should build the guided session from the deterministic review queue",
+  );
+  assert.match(
+    appSource,
+    /advanceOwnershipSession\(sessionState, sessionQuestions, attemptText, action\)/,
+    "App should advance the guided session through the pure state machine helper",
   );
 });
 
