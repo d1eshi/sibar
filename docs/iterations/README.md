@@ -9,7 +9,9 @@ bridge slices.
 This queue originally turned the first 8 foundation specs into a launchable
 v0.1. The mission pack extends that queue with evals, a bounded
 project-learning agent, and the Swift study panel. Active self-hosted MVP
-execution now routes to `docs/specs/selfhost/` and `docs/specs/selfhost/pilot/`.
+docs now route to `docs/specs/selfhost/`, while eval assets route to
+`evals/attempt-readiness/` and review prototypes route to
+`prototypes/attempt-readiness/`.
 
 The queue is intentionally small. Do not add surface integrations before the Build-to-Learn loop works.
 

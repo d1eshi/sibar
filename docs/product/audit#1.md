@@ -183,7 +183,7 @@ El primer benchmark interno debe probar si SIBI detecta gaps reales mejor que un
 Ya existe una base en:
 
 - `Tests/deterministic-pedagogy-evals.test.ts`
-- `docs/missions/sibi-v01-build-to-learn/evals/dataset/cases`
+- `evals/pedagogy-layers/dataset/cases`
 - `src/evals/deterministic-pedagogy`
 
 Pero el benchmark actual parece centrado en clasificación de casos fixture. El benchmark self-hosted debe agregar casos con respuestas humanas o simuladas sobre el propio repo.
@@ -463,7 +463,7 @@ Riesgos de producto:
 ## 7-Day Build Plan
 
 Día 1:
-Definir `sibar.selfhost.manifest.json` con boundary, entrypoints, concepts iniciales, test commands y scope explícito.
+Definir `evals/attempt-readiness/manifest.json` con boundary, entrypoints, concepts iniciales, test commands y scope explícito.
 
 Día 2:
 Crear 5 mastery checks self-hosted sobre runtime/concept graph/gap/readiness. Cada check debe tener gold answer, required evidence y forbidden claims.

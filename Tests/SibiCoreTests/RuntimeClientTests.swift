@@ -296,7 +296,7 @@ final class RuntimeClientTests: XCTestCase {
             goal: "Explain project ownership boundaries.",
             root: "/tmp/sibi",
             codex_command: "auto",
-            fixture_model_response_path: "docs/specs/deep-ownership-workspace/fixtures/live-workspace-session.json"
+            fixture_model_response_path: "evals/deep-ownership-workspace/fixtures/live-workspace-session.json"
         ))
 
         let requestData = try XCTUnwrap(runner.standardInput.data(using: .utf8))
@@ -304,7 +304,7 @@ final class RuntimeClientTests: XCTestCase {
         let payload = try XCTUnwrap(requestObject?["payload"] as? [String: Any])
 
         XCTAssertEqual(requestObject?["command"] as? String, "start_workspace_session")
-        XCTAssertEqual(payload["fixture_model_response_path"] as? String, "docs/specs/deep-ownership-workspace/fixtures/live-workspace-session.json")
+        XCTAssertEqual(payload["fixture_model_response_path"] as? String, "evals/deep-ownership-workspace/fixtures/live-workspace-session.json")
     }
 
     func testSendsSubmitWorkspaceAttemptCommand() throws {

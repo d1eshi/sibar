@@ -1,0 +1,37 @@
+{
+  "id": "GC-032",
+  "mastery_check_id": "SC-004-repair-practice-generation",
+  "concept_id": "repair_practice_generation",
+  "operation": "modify",
+  "answer_class": "design_induced_confusion",
+  "simulated_user_answer": "I described the repair idea without a test oracle: the expected behavior is not mapped to a concrete assertion or coverage check, so the challenge change cannot be verified.",
+  "declared_confidence": "medium",
+  "expected_gap_type": "test_oracle_gap",
+  "expected_layer": 4,
+  "expected_severity": "important",
+  "expected_confidence": "medium",
+  "required_repo_evidence": [
+    {
+      "path": "src/runtime-practice.ts",
+      "rationale": "Contains concrete challenge types and prompt generation text."
+    },
+    {
+      "path": "src/runtime-gap-detection.ts",
+      "rationale": "Defines gap signatures used by practice generation."
+    },
+    {
+      "path": "Tests/practice-challenges.test.ts",
+      "rationale": "Documents the assertions that should constrain helper selection and prompt requirements."
+    }
+  ],
+  "forbidden_claims": [
+    "Leaving challenge taxonomy undefined because naming is hard.",
+    "Replacing prompt shape with generic study-card language.",
+    "Claiming the repair is valid without mapping expected behavior to a concrete test assertion."
+  ],
+  "acceptable_repair_task": "Map the repair behavior to a concrete test assertion for challenge_type, expected_evidence, due_after, and difficulty.",
+  "acceptable_issue_candidate_type": "TestIssue",
+  "expected_readiness": "not ready yet",
+  "notes": "Represents a missing test oracle for repair behavior and must remain covered as a contractual freeform label.",
+  "expected_gap_present": true
+}

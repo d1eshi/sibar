@@ -8,6 +8,7 @@ import {
   PedagogoAIContracts,
   PedagogoAIWorkspaceCompilerRunner,
 } from "../src/pedagogoai/index.ts";
+import type { RustWorkspacePlan } from "../src/pedagogoai/workspace-compiler-runner.ts";
 
 const root = process.cwd();
 const sampleInput = {
@@ -58,6 +59,10 @@ function buildRustPlanFixture(rustIntent: { source_bundle: { evidence: { id: str
     }],
     questions_if_blocked: [],
   };
+}
+
+function buildStandaloneRustPlanFixture(): RustWorkspacePlan {
+  return buildRustPlanFixture({ source_bundle: { evidence: [{ id: "evidence-standalone" }] } });
 }
 
 function withFixturePlan(plan: unknown): string {
@@ -142,4 +147,45 @@ test("codex-exec adapter builds command metadata without execution by default", 
   });
   assert.equal(blocked.runner.status, "blocked");
   assert.equal(blocked.workspace_plan.compiled_by, "deterministic-builder");
+});
+
+test("parseRustWorkspacePlan accepts direct JSON, candidate_plan envelopes, and logged stdout", () => {
+  const plan = buildStandaloneRustPlanFixture();
+  const direct = PedagogoAIWorkspaceCompilerRunner.parseRustWorkspacePlan(JSON.stringify(plan));
+  assert.equal(direct.objective, plan.objective);
+
+  const enveloped = PedagogoAIWorkspaceCompilerRunner.parseRustWorkspacePlan(JSON.stringify({ candidate_plan: plan }));
+  assert.equal(enveloped.objective, plan.objective);
+
+  const noisy = PedagogoAIWorkspaceCompilerRunner.parseRustWorkspacePlan([
+    "adapter log: preparing provider request",
+    JSON.stringify({ candidate_plan: plan }),
+    "adapter log: provider request finished",
+  ].join("\n"));
+  assert.equal(noisy.objective, plan.objective);
+});
+
+test("parseRustWorkspacePlan rejects malformed and invalid candidate output", () => {
+  assert.throws(
+    () => PedagogoAIWorkspaceCompilerRunner.parseRustWorkspacePlan("log\n{not-json\n"),
+    /does not contain valid JSON/,
+  );
+  assert.throws(
+    () => PedagogoAIWorkspaceCompilerRunner.parseRustWorkspacePlan(JSON.stringify({ candidate_plan: { objective: "thin" } })),
+    /not a valid WorkspacePlan/,
+  );
+});
+
+test("unknown workspace compiler adapter fails explicitly instead of falling back to fixture", () => {
+  const workspaceIntent = PedagogoAIContracts.buildWorkspaceIntent(sampleInput);
+  const result = PedagogoAIWorkspaceCompilerRunner.runRustWorkspaceCompiler(workspaceIntent, {
+    adapter: "future-provider" as never,
+    fixturePath: "evals/workspace-plan-adapters/fixtures/rust_workspace_plan_fixture.json",
+  });
+
+  assert.equal(result.runner.status, "failed");
+  assert.equal(result.runner.adapter, "future-provider");
+  assert.match(result.runner.blocked_reason ?? "", /Unknown workspace compiler adapter: future-provider/);
+  assert.equal(result.rust_workspace_plan, null);
+  assert.equal(result.workspace_plan.compiled_by, "deterministic-builder");
 });

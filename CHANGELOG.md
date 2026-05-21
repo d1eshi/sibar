@@ -35,6 +35,32 @@ release yet.
   `compiled_by` as `llm` when a runner plan is successfully applied.
 - Added tests that verify fixture execution path, mapped audit payload, and
   `trying_to_build_or_understand` + evidence inclusion in the generated Rust intent.
+- Added a root-level Workspace Plan Adapter eval catalog that groups eval
+  intent, fixtures, and generated reports by the WorkspacePlan adapter boundary,
+  identifying Workspace Intent, Rust fixture, and `codex-exec` adapter coverage.
+- Moved attempt-readiness eval manifests, gold cases, mastery checks, generated
+  reports, and prototypes out of the legacy self-host docs spec tree into `evals/` and
+  `prototypes/` so the self-hosted pilot docs stay Markdown-only.
+- Added a declarative `evals/index.json` and per-suite `eval-suite.json`
+  manifests plus `pnpm eval:catalog` so agents can discover eval purpose,
+  fixtures, commands, and generated reports from the repo root.
+- Added `VAL-EVAL-010-workspace-runner-adapter` for offline runner adapter
+  checks across Rust fixture execution, missing-fixture fallback, and blocked
+  Codex command metadata.
+- Added `VAL-EVAL-011-workspace-model-io-boundary` for provider-neutral
+  CandidatePlan parsing across direct JSON, envelopes, logged stdout,
+  malformed output, invalid candidates, and unknown adapter rejection.
+- Added `evals/pedagogy-layers/` with the migrated deterministic pedagogy
+  dataset, report outputs, and `VAL-EVAL-012-pedagogy-coverage` for semantic
+  coverage across L1-L5, answer classes, gap labels, operations, evidence
+  conditions, and loop stages.
+- Added `VAL-EVAL-013-pedagogy-core-coverage` to directly exercise the real
+  `src/pedagogy` layer, question, signal, and pipeline modules without LLM
+  calls.
+- Moved deep ownership workspace fixtures and pedagogy eval docs under `evals/`
+  so `docs/` no longer owns operational eval, fixture, or report paths.
+- Documented that `pnpm eval:pedagogy-coverage` is fail-closed by default and
+  requires `--allow-coverage-gaps` for exploratory report-only runs.
 
 ### Changed - Workspace Intent Onboarding Compiler
 
@@ -197,7 +223,7 @@ release yet.
 ### Added - Deterministic Live Workspace Repro Path
 
 - Added a committed fixture at
-  `docs/specs/deep-ownership-workspace/fixtures/live-workspace-session.json`
+  `evals/deep-ownership-workspace/fixtures/live-workspace-session.json`
   and wired `start_workspace_session` to expose it in `live_workspace.ui_reproduction.fixture_path`.
 - Extended `start-workspace-session` and `explain` CLI commands with
   `--fixture-model-response-path` for deterministic dev/runtime checks.

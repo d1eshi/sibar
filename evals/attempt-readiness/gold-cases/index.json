@@ -1,0 +1,304 @@
+{
+  "dataset_id": "selfhost-pilot-gold-cases-first-slice",
+  "version": "1.0.0",
+  "artifact": "evals/attempt-readiness/manifest.json",
+  "concepts": [
+    "artifact_boundary",
+    "concept_graph_generation",
+    "gap_detection",
+    "repair_practice_generation",
+    "readiness_report_generation"
+  ],
+  "answer_classes": [
+    "correct_grounded",
+    "correct_uncited",
+    "partial",
+    "wrong_responsibility",
+    "wrong_flow",
+    "overconfident_wrong",
+    "declared_uncertainty",
+    "design_induced_confusion"
+  ],
+  "cases": [
+    {
+      "id": "GC-001",
+      "path": "cases/GC-001-artifact-boundary-correct-grounded.json",
+      "concept_id": "artifact_boundary",
+      "answer_class": "correct_grounded",
+      "mastery_check_id": "SC-001-artifact-boundary"
+    },
+    {
+      "id": "GC-002",
+      "path": "cases/GC-002-artifact-boundary-correct-uncited.json",
+      "concept_id": "artifact_boundary",
+      "answer_class": "correct_uncited",
+      "mastery_check_id": "SC-001-artifact-boundary"
+    },
+    {
+      "id": "GC-003",
+      "path": "cases/GC-003-artifact-boundary-partial.json",
+      "concept_id": "artifact_boundary",
+      "answer_class": "partial",
+      "mastery_check_id": "SC-001-artifact-boundary"
+    },
+    {
+      "id": "GC-004",
+      "path": "cases/GC-004-artifact-boundary-wrong-responsibility.json",
+      "concept_id": "artifact_boundary",
+      "answer_class": "wrong_responsibility",
+      "mastery_check_id": "SC-001-artifact-boundary"
+    },
+    {
+      "id": "GC-005",
+      "path": "cases/GC-005-artifact-boundary-wrong-flow.json",
+      "concept_id": "artifact_boundary",
+      "answer_class": "wrong_flow",
+      "mastery_check_id": "SC-001-artifact-boundary"
+    },
+    {
+      "id": "GC-006",
+      "path": "cases/GC-006-artifact-boundary-overconfident-wrong.json",
+      "concept_id": "artifact_boundary",
+      "answer_class": "overconfident_wrong",
+      "mastery_check_id": "SC-001-artifact-boundary"
+    },
+    {
+      "id": "GC-007",
+      "path": "cases/GC-007-artifact-boundary-declared-uncertainty.json",
+      "concept_id": "artifact_boundary",
+      "answer_class": "declared_uncertainty",
+      "mastery_check_id": "SC-001-artifact-boundary"
+    },
+    {
+      "id": "GC-008",
+      "path": "cases/GC-008-artifact-boundary-design-induced-confusion.json",
+      "concept_id": "artifact_boundary",
+      "answer_class": "design_induced_confusion",
+      "mastery_check_id": "SC-001-artifact-boundary"
+    },
+    {
+      "id": "GC-009",
+      "path": "cases/GC-009-concept-graph-generation-correct-grounded.json",
+      "concept_id": "concept_graph_generation",
+      "answer_class": "correct_grounded",
+      "mastery_check_id": "SC-002-concept-graph-generation"
+    },
+    {
+      "id": "GC-010",
+      "path": "cases/GC-010-concept-graph-generation-correct-uncited.json",
+      "concept_id": "concept_graph_generation",
+      "answer_class": "correct_uncited",
+      "mastery_check_id": "SC-002-concept-graph-generation"
+    },
+    {
+      "id": "GC-011",
+      "path": "cases/GC-011-concept-graph-generation-partial.json",
+      "concept_id": "concept_graph_generation",
+      "answer_class": "partial",
+      "mastery_check_id": "SC-002-concept-graph-generation"
+    },
+    {
+      "id": "GC-012",
+      "path": "cases/GC-012-concept-graph-generation-wrong-responsibility.json",
+      "concept_id": "concept_graph_generation",
+      "answer_class": "wrong_responsibility",
+      "mastery_check_id": "SC-002-concept-graph-generation"
+    },
+    {
+      "id": "GC-013",
+      "path": "cases/GC-013-concept-graph-generation-wrong-flow.json",
+      "concept_id": "concept_graph_generation",
+      "answer_class": "wrong_flow",
+      "mastery_check_id": "SC-002-concept-graph-generation"
+    },
+    {
+      "id": "GC-014",
+      "path": "cases/GC-014-concept-graph-generation-overconfident-wrong.json",
+      "concept_id": "concept_graph_generation",
+      "answer_class": "overconfident_wrong",
+      "mastery_check_id": "SC-002-concept-graph-generation"
+    },
+    {
+      "id": "GC-015",
+      "path": "cases/GC-015-concept-graph-generation-declared-uncertainty.json",
+      "concept_id": "concept_graph_generation",
+      "answer_class": "declared_uncertainty",
+      "mastery_check_id": "SC-002-concept-graph-generation"
+    },
+    {
+      "id": "GC-016",
+      "path": "cases/GC-016-concept-graph-generation-design-induced-confusion.json",
+      "concept_id": "concept_graph_generation",
+      "answer_class": "design_induced_confusion",
+      "mastery_check_id": "SC-002-concept-graph-generation"
+    },
+    {
+      "id": "GC-017",
+      "path": "cases/GC-017-gap-detection-correct-grounded.json",
+      "concept_id": "gap_detection",
+      "answer_class": "correct_grounded",
+      "mastery_check_id": "SC-003-gap-detection"
+    },
+    {
+      "id": "GC-018",
+      "path": "cases/GC-018-gap-detection-correct-uncited.json",
+      "concept_id": "gap_detection",
+      "answer_class": "correct_uncited",
+      "mastery_check_id": "SC-003-gap-detection"
+    },
+    {
+      "id": "GC-019",
+      "path": "cases/GC-019-gap-detection-partial.json",
+      "concept_id": "gap_detection",
+      "answer_class": "partial",
+      "mastery_check_id": "SC-003-gap-detection"
+    },
+    {
+      "id": "GC-020",
+      "path": "cases/GC-020-gap-detection-wrong-responsibility.json",
+      "concept_id": "gap_detection",
+      "answer_class": "wrong_responsibility",
+      "mastery_check_id": "SC-003-gap-detection"
+    },
+    {
+      "id": "GC-021",
+      "path": "cases/GC-021-gap-detection-wrong-flow.json",
+      "concept_id": "gap_detection",
+      "answer_class": "wrong_flow",
+      "mastery_check_id": "SC-003-gap-detection"
+    },
+    {
+      "id": "GC-022",
+      "path": "cases/GC-022-gap-detection-overconfident-wrong.json",
+      "concept_id": "gap_detection",
+      "answer_class": "overconfident_wrong",
+      "mastery_check_id": "SC-003-gap-detection"
+    },
+    {
+      "id": "GC-023",
+      "path": "cases/GC-023-gap-detection-declared-uncertainty.json",
+      "concept_id": "gap_detection",
+      "answer_class": "declared_uncertainty",
+      "mastery_check_id": "SC-003-gap-detection"
+    },
+    {
+      "id": "GC-024",
+      "path": "cases/GC-024-gap-detection-design-induced-confusion.json",
+      "concept_id": "gap_detection",
+      "answer_class": "design_induced_confusion",
+      "mastery_check_id": "SC-003-gap-detection"
+    },
+    {
+      "id": "GC-025",
+      "path": "cases/GC-025-repair-practice-generation-correct-grounded.json",
+      "concept_id": "repair_practice_generation",
+      "answer_class": "correct_grounded",
+      "mastery_check_id": "SC-004-repair-practice-generation"
+    },
+    {
+      "id": "GC-026",
+      "path": "cases/GC-026-repair-practice-generation-correct-uncited.json",
+      "concept_id": "repair_practice_generation",
+      "answer_class": "correct_uncited",
+      "mastery_check_id": "SC-004-repair-practice-generation"
+    },
+    {
+      "id": "GC-027",
+      "path": "cases/GC-027-repair-practice-generation-partial.json",
+      "concept_id": "repair_practice_generation",
+      "answer_class": "partial",
+      "mastery_check_id": "SC-004-repair-practice-generation"
+    },
+    {
+      "id": "GC-028",
+      "path": "cases/GC-028-repair-practice-generation-wrong-responsibility.json",
+      "concept_id": "repair_practice_generation",
+      "answer_class": "wrong_responsibility",
+      "mastery_check_id": "SC-004-repair-practice-generation"
+    },
+    {
+      "id": "GC-029",
+      "path": "cases/GC-029-repair-practice-generation-wrong-flow.json",
+      "concept_id": "repair_practice_generation",
+      "answer_class": "wrong_flow",
+      "mastery_check_id": "SC-004-repair-practice-generation"
+    },
+    {
+      "id": "GC-030",
+      "path": "cases/GC-030-repair-practice-generation-overconfident-wrong.json",
+      "concept_id": "repair_practice_generation",
+      "answer_class": "overconfident_wrong",
+      "mastery_check_id": "SC-004-repair-practice-generation"
+    },
+    {
+      "id": "GC-031",
+      "path": "cases/GC-031-repair-practice-generation-declared-uncertainty.json",
+      "concept_id": "repair_practice_generation",
+      "answer_class": "declared_uncertainty",
+      "mastery_check_id": "SC-004-repair-practice-generation"
+    },
+    {
+      "id": "GC-032",
+      "path": "cases/GC-032-repair-practice-generation-design-induced-confusion.json",
+      "concept_id": "repair_practice_generation",
+      "answer_class": "design_induced_confusion",
+      "mastery_check_id": "SC-004-repair-practice-generation"
+    },
+    {
+      "id": "GC-033",
+      "path": "cases/GC-033-readiness-report-generation-correct-grounded.json",
+      "concept_id": "readiness_report_generation",
+      "answer_class": "correct_grounded",
+      "mastery_check_id": "SC-005-readiness-report-generation"
+    },
+    {
+      "id": "GC-034",
+      "path": "cases/GC-034-readiness-report-generation-correct-uncited.json",
+      "concept_id": "readiness_report_generation",
+      "answer_class": "correct_uncited",
+      "mastery_check_id": "SC-005-readiness-report-generation"
+    },
+    {
+      "id": "GC-035",
+      "path": "cases/GC-035-readiness-report-generation-partial.json",
+      "concept_id": "readiness_report_generation",
+      "answer_class": "partial",
+      "mastery_check_id": "SC-005-readiness-report-generation"
+    },
+    {
+      "id": "GC-036",
+      "path": "cases/GC-036-readiness-report-generation-wrong-responsibility.json",
+      "concept_id": "readiness_report_generation",
+      "answer_class": "wrong_responsibility",
+      "mastery_check_id": "SC-005-readiness-report-generation"
+    },
+    {
+      "id": "GC-037",
+      "path": "cases/GC-037-readiness-report-generation-wrong-flow.json",
+      "concept_id": "readiness_report_generation",
+      "answer_class": "wrong_flow",
+      "mastery_check_id": "SC-005-readiness-report-generation"
+    },
+    {
+      "id": "GC-038",
+      "path": "cases/GC-038-readiness-report-generation-overconfident-wrong.json",
+      "concept_id": "readiness_report_generation",
+      "answer_class": "overconfident_wrong",
+      "mastery_check_id": "SC-005-readiness-report-generation"
+    },
+    {
+      "id": "GC-039",
+      "path": "cases/GC-039-readiness-report-generation-declared-uncertainty.json",
+      "concept_id": "readiness_report_generation",
+      "answer_class": "declared_uncertainty",
+      "mastery_check_id": "SC-005-readiness-report-generation"
+    },
+    {
+      "id": "GC-040",
+      "path": "cases/GC-040-readiness-report-generation-design-induced-confusion.json",
+      "concept_id": "readiness_report_generation",
+      "answer_class": "design_induced_confusion",
+      "mastery_check_id": "SC-005-readiness-report-generation"
+    }
+  ]
+}

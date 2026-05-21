@@ -1,0 +1,36 @@
+{
+  "id": "GC-040",
+  "mastery_check_id": "SC-005-readiness-report-generation",
+  "concept_id": "readiness_report_generation",
+  "operation": "transfer",
+  "answer_class": "design_induced_confusion",
+  "simulated_user_answer": "The product affordance gap is that the report UI/docs do not show how summary readiness maps to evidence IDs, while the code behavior enforces section-level evidence indexing.",
+  "declared_confidence": "medium",
+  "expected_gap_type": "product_gap",
+  "expected_layer": 4,
+  "expected_severity": "important",
+  "expected_confidence": "medium",
+  "required_repo_evidence": [
+    {
+      "path": "src/runtime-readiness.ts",
+      "rationale": "Defines all report sections and section-specific readiness."
+    },
+    {
+      "path": "src/runtime-memory.ts",
+      "rationale": "Defines confidence and level transitions used in section output."
+    },
+    {
+      "path": "Tests/readiness-report.test.ts",
+      "rationale": "Shows section-by-section expectations for deterministic report output."
+    }
+  ],
+  "forbidden_claims": [
+    "Replacing multi-section report explanation with a generic readiness statement.",
+    "Ignoring evidence index linkage across sections."
+  ],
+  "acceptable_repair_task": "Identify the product affordance gap between visible report guidance and code-enforced evidence indexing, then require section-level mapping.",
+  "acceptable_issue_candidate_type": "ProductIssue",
+  "expected_readiness": "not ready yet",
+  "notes": "Represents a product affordance gap and must remain covered as a contractual freeform label.",
+  "expected_gap_present": true
+}

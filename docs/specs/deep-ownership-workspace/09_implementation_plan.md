@@ -54,7 +54,7 @@ A deterministic fixture describes one loop over this Sibi repo.
 Recommended path:
 
 ```text
-docs/specs/deep-ownership-workspace/fixtures/sibi-pedagogy-loop.json
+evals/deep-ownership-workspace/fixtures/sibi-pedagogy-loop.json
 ```
 
 Fixture content:

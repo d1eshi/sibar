@@ -1,0 +1,2036 @@
+{
+  "report_id": "VAL-EVAL-003-005-2026-05-20T21:31:53.622Z",
+  "generated_at": "2026-05-20T21:31:53.622Z",
+  "validations": [
+    "VAL-EVAL-003",
+    "VAL-EVAL-005",
+    "VAL-AGENT-001",
+    "VAL-AGENT-002"
+  ],
+  "dataset": {
+    "id": "sibi-v01-e01-canonical-pilot",
+    "version": "0.1.0",
+    "index_path": "evals/pedagogy-layers/dataset/index.json",
+    "benchmark_quality_claim": false,
+    "sizing_note": "Uses the E01 7-case contract seed only; dataset_sizing_research.md requires 35 pilot and 210 scale cases before benchmark-quality claims."
+  },
+  "model_configurations": [
+    {
+      "model_name": "gpt-5.2",
+      "reasoning_effort": "medium",
+      "label": "codex gpt-5.2 medium"
+    },
+    {
+      "model_name": "gpt-5.5",
+      "reasoning_effort": "low",
+      "label": "codex gpt-5.5 low"
+    }
+  ],
+  "shared_case_ids": [
+    "E01-CORRECT-L4-BOUNDARY",
+    "E01-PARTIAL-L2-GAP",
+    "E01-UNCERTAIN-L1-DECLARED",
+    "E01-WRONG-L3-MISCONCEPTION",
+    "E01-MISSING-EVIDENCE-L3",
+    "E01-BOUNDARY-VIOLATION-L4",
+    "E01-LLM-OVERCONFIDENT-L5"
+  ],
+  "prompt_schema_shared": true,
+  "artifact_boundary_shared_per_case": true,
+  "deterministic_validator": "run_project_learning_agent.validateModelSignalCandidates",
+  "live_run": {
+    "status": "blocked",
+    "guidance": "Live Codex trace evals are skipped because no runner is configured. Set SIBI_CODEX_COMMAND, SIBI_CODEX_MODEL, SIBI_CODEX_REASONING, and SIBI_CODEX_TIMEOUT_MS to enable live runs."
+  },
+  "aggregate": {
+    "total_cases": 7,
+    "traces_recorded": 14,
+    "accepted_signals_by_model": {
+      "codex gpt-5.2 medium": 9,
+      "codex gpt-5.5 low": 6
+    },
+    "rejected_signals_by_model": {
+      "codex gpt-5.2 medium": 2,
+      "codex gpt-5.5 low": 5
+    },
+    "boundary_violations_rejected": 5,
+    "readiness_or_truth_claims_rejected": 2,
+    "uncited_claims_rejected": 6
+  },
+  "cases": [
+    {
+      "case_id": "E01-CORRECT-L4-BOUNDARY",
+      "case_class": "correct_answer",
+      "model_label": "codex gpt-5.2 medium",
+      "trace": {
+        "trace_id": "7561e43f-d6a0-421c-8ba8-4eea6f23dd36",
+        "artifact_session_id": "022c846c-9c48-4fb5-976a-5caa26f1d075",
+        "eval_case_id": "E01-CORRECT-L4-BOUNDARY",
+        "model_runner": "fixture",
+        "model_name": "gpt-5.2",
+        "reasoning_effort": "medium",
+        "prompt": "{\n  \"role\": \"sibi_project_learning_agent\",\n  \"instruction\": \"Return candidate learning signals only. Do not decide truth, learner mastery, readiness, or final grades.\",\n  \"rules\": [\n    \"Only claim facts supported by cited files inside the artifact boundary.\",\n    \"Use source_control and file_inventory as orientation, not as proof for uncited project facts.\",\n    \"Every candidate_signal must include at least one citation to an allowed file.\",\n    \"If evidence is insufficient, return fewer candidate_signals instead of guessing.\"\n  ],\n  \"output_schema\": {\n    \"files_read\": [\n      \"path inside artifact boundary\"\n    ],\n    \"candidate_signals\": [\n      {\n        \"signal_type\": \"concept | flow | risk | gap_candidate | misconception_candidate | practice_candidate\",\n        \"claim\": \"bounded claim\",\n        \"confidence\": \"low | medium | high\",\n        \"citations\": [\n          {\n            \"path\": \"allowed file path\",\n            \"range\": \"line or line range\"\n          }\n        ],\n        \"rationale\": \"why this may help learning\",\n        \"proposed_layer\": \"optional integer 1-5\"\n      }\n    ]\n  },\n  \"workspace_context\": null,\n  \"artifact_boundary\": {\n    \"artifact_session_id\": \"022c846c-9c48-4fb5-976a-5caa26f1d075\",\n    \"root_path\": \"/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-CORRECT-L4-BOUNDARY-34787706-a9a7-4b26-a5a3-53e25f269c21/artifact-root\",\n    \"included_paths\": [\n      \"/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-CORRECT-L4-BOUNDARY-34787706-a9a7-4b26-a5a3-53e25f269c21/artifact-root/src/runtime.ts\",\n      \"/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-CORRECT-L4-BOUNDARY-34787706-a9a7-4b26-a5a3-53e25f269c21/artifact-root/src/runtime-support.ts\",\n      \"/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-CORRECT-L4-BOUNDARY-34787706-a9a7-4b26-a5a3-53e25f269c21/artifact-root/Tests/runtime.test.ts\"\n    ],\n    \"excluded_paths\": [\n      \"/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-CORRECT-L4-BOUNDARY-34787706-a9a7-4b26-a5a3-53e25f269c21/artifact-root/docs/private-notes.md\"\n    ],\n    \"learning_goal\": \"Explain how runtime request routing persists a bounded artifact session.\"\n  }\n}",
+        "artifact_boundary": {
+          "root_path": "/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-CORRECT-L4-BOUNDARY-34787706-a9a7-4b26-a5a3-53e25f269c21/artifact-root",
+          "included_paths": [
+            "/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-CORRECT-L4-BOUNDARY-34787706-a9a7-4b26-a5a3-53e25f269c21/artifact-root/src/runtime.ts",
+            "/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-CORRECT-L4-BOUNDARY-34787706-a9a7-4b26-a5a3-53e25f269c21/artifact-root/src/runtime-support.ts",
+            "/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-CORRECT-L4-BOUNDARY-34787706-a9a7-4b26-a5a3-53e25f269c21/artifact-root/Tests/runtime.test.ts"
+          ],
+          "excluded_paths": [
+            "/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-CORRECT-L4-BOUNDARY-34787706-a9a7-4b26-a5a3-53e25f269c21/artifact-root/docs/private-notes.md"
+          ]
+        },
+        "files_read": [
+          "src/runtime.ts"
+        ],
+        "candidate_signals": [
+          {
+            "id": "E01-CORRECT-L4-BOUNDARY-gpt-5.2-accepted-concept",
+            "artifact_session_id": "022c846c-9c48-4fb5-976a-5caa26f1d075",
+            "model_name": "gpt-5.2",
+            "signal_type": "concept",
+            "claim": "Artifact session command routing and persistence is relevant to Explain how runtime request routing persists a bounded artifact session.",
+            "citations": [
+              {
+                "file_path": "/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-CORRECT-L4-BOUNDARY-34787706-a9a7-4b26-a5a3-53e25f269c21/artifact-root/src/runtime.ts",
+                "start_line": 1,
+                "end_line": 1,
+                "excerpt": "// E01-CORRECT-L4-BOUNDARY"
+              }
+            ],
+            "confidence": "medium",
+            "rationale": "Fixture candidate for deterministic trace validation.",
+            "proposed_layer": 4,
+            "validation_error_hints": []
+          }
+        ],
+        "deterministic_validation": [
+          {
+            "candidate_id": "files_read:0:src/runtime.ts",
+            "accepted": true,
+            "errors": []
+          },
+          {
+            "candidate_id": "E01-CORRECT-L4-BOUNDARY-gpt-5.2-accepted-concept",
+            "accepted": true,
+            "errors": []
+          }
+        ],
+        "accepted_signals": [
+          {
+            "id": "E01-CORRECT-L4-BOUNDARY-gpt-5.2-accepted-concept",
+            "artifact_session_id": "022c846c-9c48-4fb5-976a-5caa26f1d075",
+            "model_name": "gpt-5.2",
+            "signal_type": "concept",
+            "claim": "Artifact session command routing and persistence is relevant to Explain how runtime request routing persists a bounded artifact session.",
+            "citations": [
+              {
+                "file_path": "/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-CORRECT-L4-BOUNDARY-34787706-a9a7-4b26-a5a3-53e25f269c21/artifact-root/src/runtime.ts",
+                "start_line": 1,
+                "end_line": 1,
+                "excerpt": "// E01-CORRECT-L4-BOUNDARY"
+              }
+            ],
+            "confidence": "medium",
+            "rationale": "Fixture candidate for deterministic trace validation.",
+            "proposed_layer": 4,
+            "validation_error_hints": []
+          }
+        ],
+        "rejected_signals": [],
+        "final_runtime_output": {
+          "accepted_signal_count": 1,
+          "rejected_signal_count": 0,
+          "readiness_decided_by_model": false
+        },
+        "created_at": "2026-05-20T21:31:53.596Z"
+      },
+      "accepted_signal_ids": [
+        "E01-CORRECT-L4-BOUNDARY-gpt-5.2-accepted-concept"
+      ],
+      "rejected_signal_ids": [],
+      "rejected_signal_reasons": {},
+      "citation_quality": {
+        "accepted_with_citations": 1,
+        "rejected_missing_citation": 0,
+        "rejected_invalid_or_out_of_bound_citation": 0
+      },
+      "boundary_compliance": {
+        "invalid_file_reads": [],
+        "accepted_out_of_boundary_count": 0
+      },
+      "failure_modes": []
+    },
+    {
+      "case_id": "E01-CORRECT-L4-BOUNDARY",
+      "case_class": "correct_answer",
+      "model_label": "codex gpt-5.5 low",
+      "trace": {
+        "trace_id": "97af39bf-f4a5-49de-926d-789bd435a278",
+        "artifact_session_id": "022c846c-9c48-4fb5-976a-5caa26f1d075",
+        "eval_case_id": "E01-CORRECT-L4-BOUNDARY",
+        "model_runner": "fixture",
+        "model_name": "gpt-5.5",
+        "reasoning_effort": "low",
+        "prompt": "{\n  \"role\": \"sibi_project_learning_agent\",\n  \"instruction\": \"Return candidate learning signals only. Do not decide truth, learner mastery, readiness, or final grades.\",\n  \"rules\": [\n    \"Only claim facts supported by cited files inside the artifact boundary.\",\n    \"Use source_control and file_inventory as orientation, not as proof for uncited project facts.\",\n    \"Every candidate_signal must include at least one citation to an allowed file.\",\n    \"If evidence is insufficient, return fewer candidate_signals instead of guessing.\"\n  ],\n  \"output_schema\": {\n    \"files_read\": [\n      \"path inside artifact boundary\"\n    ],\n    \"candidate_signals\": [\n      {\n        \"signal_type\": \"concept | flow | risk | gap_candidate | misconception_candidate | practice_candidate\",\n        \"claim\": \"bounded claim\",\n        \"confidence\": \"low | medium | high\",\n        \"citations\": [\n          {\n            \"path\": \"allowed file path\",\n            \"range\": \"line or line range\"\n          }\n        ],\n        \"rationale\": \"why this may help learning\",\n        \"proposed_layer\": \"optional integer 1-5\"\n      }\n    ]\n  },\n  \"workspace_context\": null,\n  \"artifact_boundary\": {\n    \"artifact_session_id\": \"022c846c-9c48-4fb5-976a-5caa26f1d075\",\n    \"root_path\": \"/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-CORRECT-L4-BOUNDARY-34787706-a9a7-4b26-a5a3-53e25f269c21/artifact-root\",\n    \"included_paths\": [\n      \"/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-CORRECT-L4-BOUNDARY-34787706-a9a7-4b26-a5a3-53e25f269c21/artifact-root/src/runtime.ts\",\n      \"/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-CORRECT-L4-BOUNDARY-34787706-a9a7-4b26-a5a3-53e25f269c21/artifact-root/src/runtime-support.ts\",\n      \"/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-CORRECT-L4-BOUNDARY-34787706-a9a7-4b26-a5a3-53e25f269c21/artifact-root/Tests/runtime.test.ts\"\n    ],\n    \"excluded_paths\": [\n      \"/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-CORRECT-L4-BOUNDARY-34787706-a9a7-4b26-a5a3-53e25f269c21/artifact-root/docs/private-notes.md\"\n    ],\n    \"learning_goal\": \"Explain how runtime request routing persists a bounded artifact session.\"\n  }\n}",
+        "artifact_boundary": {
+          "root_path": "/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-CORRECT-L4-BOUNDARY-34787706-a9a7-4b26-a5a3-53e25f269c21/artifact-root",
+          "included_paths": [
+            "/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-CORRECT-L4-BOUNDARY-34787706-a9a7-4b26-a5a3-53e25f269c21/artifact-root/src/runtime.ts",
+            "/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-CORRECT-L4-BOUNDARY-34787706-a9a7-4b26-a5a3-53e25f269c21/artifact-root/src/runtime-support.ts",
+            "/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-CORRECT-L4-BOUNDARY-34787706-a9a7-4b26-a5a3-53e25f269c21/artifact-root/Tests/runtime.test.ts"
+          ],
+          "excluded_paths": [
+            "/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-CORRECT-L4-BOUNDARY-34787706-a9a7-4b26-a5a3-53e25f269c21/artifact-root/docs/private-notes.md"
+          ]
+        },
+        "files_read": [
+          "src/runtime.ts"
+        ],
+        "candidate_signals": [
+          {
+            "id": "E01-CORRECT-L4-BOUNDARY-gpt-5.5-accepted-concept",
+            "artifact_session_id": "022c846c-9c48-4fb5-976a-5caa26f1d075",
+            "model_name": "gpt-5.5",
+            "signal_type": "concept",
+            "claim": "Artifact session command routing and persistence is relevant to Explain how runtime request routing persists a bounded artifact session.",
+            "citations": [
+              {
+                "file_path": "/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-CORRECT-L4-BOUNDARY-34787706-a9a7-4b26-a5a3-53e25f269c21/artifact-root/src/runtime.ts",
+                "start_line": 1,
+                "end_line": 1,
+                "excerpt": "// E01-CORRECT-L4-BOUNDARY"
+              }
+            ],
+            "confidence": "medium",
+            "rationale": "Fixture candidate for deterministic trace validation.",
+            "proposed_layer": 4,
+            "validation_error_hints": []
+          }
+        ],
+        "deterministic_validation": [
+          {
+            "candidate_id": "files_read:0:src/runtime.ts",
+            "accepted": true,
+            "errors": []
+          },
+          {
+            "candidate_id": "E01-CORRECT-L4-BOUNDARY-gpt-5.5-accepted-concept",
+            "accepted": true,
+            "errors": []
+          }
+        ],
+        "accepted_signals": [
+          {
+            "id": "E01-CORRECT-L4-BOUNDARY-gpt-5.5-accepted-concept",
+            "artifact_session_id": "022c846c-9c48-4fb5-976a-5caa26f1d075",
+            "model_name": "gpt-5.5",
+            "signal_type": "concept",
+            "claim": "Artifact session command routing and persistence is relevant to Explain how runtime request routing persists a bounded artifact session.",
+            "citations": [
+              {
+                "file_path": "/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-CORRECT-L4-BOUNDARY-34787706-a9a7-4b26-a5a3-53e25f269c21/artifact-root/src/runtime.ts",
+                "start_line": 1,
+                "end_line": 1,
+                "excerpt": "// E01-CORRECT-L4-BOUNDARY"
+              }
+            ],
+            "confidence": "medium",
+            "rationale": "Fixture candidate for deterministic trace validation.",
+            "proposed_layer": 4,
+            "validation_error_hints": []
+          }
+        ],
+        "rejected_signals": [],
+        "final_runtime_output": {
+          "accepted_signal_count": 1,
+          "rejected_signal_count": 0,
+          "readiness_decided_by_model": false
+        },
+        "created_at": "2026-05-20T21:31:53.597Z"
+      },
+      "accepted_signal_ids": [
+        "E01-CORRECT-L4-BOUNDARY-gpt-5.5-accepted-concept"
+      ],
+      "rejected_signal_ids": [],
+      "rejected_signal_reasons": {},
+      "citation_quality": {
+        "accepted_with_citations": 1,
+        "rejected_missing_citation": 0,
+        "rejected_invalid_or_out_of_bound_citation": 0
+      },
+      "boundary_compliance": {
+        "invalid_file_reads": [],
+        "accepted_out_of_boundary_count": 0
+      },
+      "failure_modes": []
+    },
+    {
+      "case_id": "E01-PARTIAL-L2-GAP",
+      "case_class": "partial_answer",
+      "model_label": "codex gpt-5.2 medium",
+      "trace": {
+        "trace_id": "a0ee3182-7872-4411-a0bc-476a47829507",
+        "artifact_session_id": "aab33c16-fe4b-4ed3-b90b-94b58244f4b2",
+        "eval_case_id": "E01-PARTIAL-L2-GAP",
+        "model_runner": "fixture",
+        "model_name": "gpt-5.2",
+        "reasoning_effort": "medium",
+        "prompt": "{\n  \"role\": \"sibi_project_learning_agent\",\n  \"instruction\": \"Return candidate learning signals only. Do not decide truth, learner mastery, readiness, or final grades.\",\n  \"rules\": [\n    \"Only claim facts supported by cited files inside the artifact boundary.\",\n    \"Use source_control and file_inventory as orientation, not as proof for uncited project facts.\",\n    \"Every candidate_signal must include at least one citation to an allowed file.\",\n    \"If evidence is insufficient, return fewer candidate_signals instead of guessing.\"\n  ],\n  \"output_schema\": {\n    \"files_read\": [\n      \"path inside artifact boundary\"\n    ],\n    \"candidate_signals\": [\n      {\n        \"signal_type\": \"concept | flow | risk | gap_candidate | misconception_candidate | practice_candidate\",\n        \"claim\": \"bounded claim\",\n        \"confidence\": \"low | medium | high\",\n        \"citations\": [\n          {\n            \"path\": \"allowed file path\",\n            \"range\": \"line or line range\"\n          }\n        ],\n        \"rationale\": \"why this may help learning\",\n        \"proposed_layer\": \"optional integer 1-5\"\n      }\n    ]\n  },\n  \"workspace_context\": null,\n  \"artifact_boundary\": {\n    \"artifact_session_id\": \"aab33c16-fe4b-4ed3-b90b-94b58244f4b2\",\n    \"root_path\": \"/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-PARTIAL-L2-GAP-4f17d025-c4a2-4d94-917a-c81e2d3d95d4/artifact-root\",\n    \"included_paths\": [\n      \"/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-PARTIAL-L2-GAP-4f17d025-c4a2-4d94-917a-c81e2d3d95d4/artifact-root/src/runtime.ts\",\n      \"/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-PARTIAL-L2-GAP-4f17d025-c4a2-4d94-917a-c81e2d3d95d4/artifact-root/src/runtime-gap-detection.ts\",\n      \"/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-PARTIAL-L2-GAP-4f17d025-c4a2-4d94-917a-c81e2d3d95d4/artifact-root/src/runtime-practice.ts\"\n    ],\n    \"excluded_paths\": [\n      \"/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-PARTIAL-L2-GAP-4f17d025-c4a2-4d94-917a-c81e2d3d95d4/artifact-root/docs/private-notes.md\"\n    ],\n    \"learning_goal\": \"Trace how a weak answer becomes a gap and then a practice challenge.\"\n  }\n}",
+        "artifact_boundary": {
+          "root_path": "/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-PARTIAL-L2-GAP-4f17d025-c4a2-4d94-917a-c81e2d3d95d4/artifact-root",
+          "included_paths": [
+            "/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-PARTIAL-L2-GAP-4f17d025-c4a2-4d94-917a-c81e2d3d95d4/artifact-root/src/runtime.ts",
+            "/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-PARTIAL-L2-GAP-4f17d025-c4a2-4d94-917a-c81e2d3d95d4/artifact-root/src/runtime-gap-detection.ts",
+            "/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-PARTIAL-L2-GAP-4f17d025-c4a2-4d94-917a-c81e2d3d95d4/artifact-root/src/runtime-practice.ts"
+          ],
+          "excluded_paths": [
+            "/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-PARTIAL-L2-GAP-4f17d025-c4a2-4d94-917a-c81e2d3d95d4/artifact-root/docs/private-notes.md"
+          ]
+        },
+        "files_read": [
+          "src/runtime-gap-detection.ts"
+        ],
+        "candidate_signals": [
+          {
+            "id": "E01-PARTIAL-L2-GAP-gpt-5.2-accepted-concept",
+            "artifact_session_id": "aab33c16-fe4b-4ed3-b90b-94b58244f4b2",
+            "model_name": "gpt-5.2",
+            "signal_type": "concept",
+            "claim": "Gap detection to practice challenge flow is relevant to Trace how a weak answer becomes a gap and then a practice challenge.",
+            "citations": [
+              {
+                "file_path": "/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-PARTIAL-L2-GAP-4f17d025-c4a2-4d94-917a-c81e2d3d95d4/artifact-root/src/runtime-gap-detection.ts",
+                "start_line": 1,
+                "end_line": 1,
+                "excerpt": "// E01-PARTIAL-L2-GAP"
+              }
+            ],
+            "confidence": "medium",
+            "rationale": "Fixture candidate for deterministic trace validation.",
+            "proposed_layer": 2,
+            "validation_error_hints": []
+          },
+          {
+            "id": "E01-PARTIAL-L2-GAP-gpt-5.2-uncited-gap",
+            "artifact_session_id": "aab33c16-fe4b-4ed3-b90b-94b58244f4b2",
+            "model_name": "gpt-5.2",
+            "signal_type": "gap_candidate",
+            "claim": "The learner may be missing the evidence chain.",
+            "citations": [
+              {
+                "file_path": "/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-PARTIAL-L2-GAP-4f17d025-c4a2-4d94-917a-c81e2d3d95d4/artifact-root/src/runtime-gap-detection.ts",
+                "start_line": 1,
+                "end_line": 1,
+                "excerpt": "// E01-PARTIAL-L2-GAP"
+              }
+            ],
+            "confidence": "medium",
+            "rationale": "Fixture checks uncited candidate rejection.",
+            "proposed_layer": 2,
+            "validation_error_hints": []
+          }
+        ],
+        "deterministic_validation": [
+          {
+            "candidate_id": "files_read:0:src/runtime-gap-detection.ts",
+            "accepted": true,
+            "errors": []
+          },
+          {
+            "candidate_id": "E01-PARTIAL-L2-GAP-gpt-5.2-accepted-concept",
+            "accepted": true,
+            "errors": []
+          },
+          {
+            "candidate_id": "E01-PARTIAL-L2-GAP-gpt-5.2-uncited-gap",
+            "accepted": true,
+            "errors": []
+          }
+        ],
+        "accepted_signals": [
+          {
+            "id": "E01-PARTIAL-L2-GAP-gpt-5.2-accepted-concept",
+            "artifact_session_id": "aab33c16-fe4b-4ed3-b90b-94b58244f4b2",
+            "model_name": "gpt-5.2",
+            "signal_type": "concept",
+            "claim": "Gap detection to practice challenge flow is relevant to Trace how a weak answer becomes a gap and then a practice challenge.",
+            "citations": [
+              {
+                "file_path": "/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-PARTIAL-L2-GAP-4f17d025-c4a2-4d94-917a-c81e2d3d95d4/artifact-root/src/runtime-gap-detection.ts",
+                "start_line": 1,
+                "end_line": 1,
+                "excerpt": "// E01-PARTIAL-L2-GAP"
+              }
+            ],
+            "confidence": "medium",
+            "rationale": "Fixture candidate for deterministic trace validation.",
+            "proposed_layer": 2,
+            "validation_error_hints": []
+          },
+          {
+            "id": "E01-PARTIAL-L2-GAP-gpt-5.2-uncited-gap",
+            "artifact_session_id": "aab33c16-fe4b-4ed3-b90b-94b58244f4b2",
+            "model_name": "gpt-5.2",
+            "signal_type": "gap_candidate",
+            "claim": "The learner may be missing the evidence chain.",
+            "citations": [
+              {
+                "file_path": "/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-PARTIAL-L2-GAP-4f17d025-c4a2-4d94-917a-c81e2d3d95d4/artifact-root/src/runtime-gap-detection.ts",
+                "start_line": 1,
+                "end_line": 1,
+                "excerpt": "// E01-PARTIAL-L2-GAP"
+              }
+            ],
+            "confidence": "medium",
+            "rationale": "Fixture checks uncited candidate rejection.",
+            "proposed_layer": 2,
+            "validation_error_hints": []
+          }
+        ],
+        "rejected_signals": [],
+        "final_runtime_output": {
+          "accepted_signal_count": 2,
+          "rejected_signal_count": 0,
+          "readiness_decided_by_model": false
+        },
+        "created_at": "2026-05-20T21:31:53.600Z"
+      },
+      "accepted_signal_ids": [
+        "E01-PARTIAL-L2-GAP-gpt-5.2-accepted-concept",
+        "E01-PARTIAL-L2-GAP-gpt-5.2-uncited-gap"
+      ],
+      "rejected_signal_ids": [],
+      "rejected_signal_reasons": {},
+      "citation_quality": {
+        "accepted_with_citations": 2,
+        "rejected_missing_citation": 0,
+        "rejected_invalid_or_out_of_bound_citation": 0
+      },
+      "boundary_compliance": {
+        "invalid_file_reads": [],
+        "accepted_out_of_boundary_count": 0
+      },
+      "failure_modes": []
+    },
+    {
+      "case_id": "E01-PARTIAL-L2-GAP",
+      "case_class": "partial_answer",
+      "model_label": "codex gpt-5.5 low",
+      "trace": {
+        "trace_id": "b13f1382-6eed-4ca0-984c-e8421a283a6f",
+        "artifact_session_id": "aab33c16-fe4b-4ed3-b90b-94b58244f4b2",
+        "eval_case_id": "E01-PARTIAL-L2-GAP",
+        "model_runner": "fixture",
+        "model_name": "gpt-5.5",
+        "reasoning_effort": "low",
+        "prompt": "{\n  \"role\": \"sibi_project_learning_agent\",\n  \"instruction\": \"Return candidate learning signals only. Do not decide truth, learner mastery, readiness, or final grades.\",\n  \"rules\": [\n    \"Only claim facts supported by cited files inside the artifact boundary.\",\n    \"Use source_control and file_inventory as orientation, not as proof for uncited project facts.\",\n    \"Every candidate_signal must include at least one citation to an allowed file.\",\n    \"If evidence is insufficient, return fewer candidate_signals instead of guessing.\"\n  ],\n  \"output_schema\": {\n    \"files_read\": [\n      \"path inside artifact boundary\"\n    ],\n    \"candidate_signals\": [\n      {\n        \"signal_type\": \"concept | flow | risk | gap_candidate | misconception_candidate | practice_candidate\",\n        \"claim\": \"bounded claim\",\n        \"confidence\": \"low | medium | high\",\n        \"citations\": [\n          {\n            \"path\": \"allowed file path\",\n            \"range\": \"line or line range\"\n          }\n        ],\n        \"rationale\": \"why this may help learning\",\n        \"proposed_layer\": \"optional integer 1-5\"\n      }\n    ]\n  },\n  \"workspace_context\": null,\n  \"artifact_boundary\": {\n    \"artifact_session_id\": \"aab33c16-fe4b-4ed3-b90b-94b58244f4b2\",\n    \"root_path\": \"/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-PARTIAL-L2-GAP-4f17d025-c4a2-4d94-917a-c81e2d3d95d4/artifact-root\",\n    \"included_paths\": [\n      \"/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-PARTIAL-L2-GAP-4f17d025-c4a2-4d94-917a-c81e2d3d95d4/artifact-root/src/runtime.ts\",\n      \"/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-PARTIAL-L2-GAP-4f17d025-c4a2-4d94-917a-c81e2d3d95d4/artifact-root/src/runtime-gap-detection.ts\",\n      \"/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-PARTIAL-L2-GAP-4f17d025-c4a2-4d94-917a-c81e2d3d95d4/artifact-root/src/runtime-practice.ts\"\n    ],\n    \"excluded_paths\": [\n      \"/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-PARTIAL-L2-GAP-4f17d025-c4a2-4d94-917a-c81e2d3d95d4/artifact-root/docs/private-notes.md\"\n    ],\n    \"learning_goal\": \"Trace how a weak answer becomes a gap and then a practice challenge.\"\n  }\n}",
+        "artifact_boundary": {
+          "root_path": "/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-PARTIAL-L2-GAP-4f17d025-c4a2-4d94-917a-c81e2d3d95d4/artifact-root",
+          "included_paths": [
+            "/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-PARTIAL-L2-GAP-4f17d025-c4a2-4d94-917a-c81e2d3d95d4/artifact-root/src/runtime.ts",
+            "/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-PARTIAL-L2-GAP-4f17d025-c4a2-4d94-917a-c81e2d3d95d4/artifact-root/src/runtime-gap-detection.ts",
+            "/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-PARTIAL-L2-GAP-4f17d025-c4a2-4d94-917a-c81e2d3d95d4/artifact-root/src/runtime-practice.ts"
+          ],
+          "excluded_paths": [
+            "/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-PARTIAL-L2-GAP-4f17d025-c4a2-4d94-917a-c81e2d3d95d4/artifact-root/docs/private-notes.md"
+          ]
+        },
+        "files_read": [
+          "src/runtime-gap-detection.ts"
+        ],
+        "candidate_signals": [
+          {
+            "id": "E01-PARTIAL-L2-GAP-gpt-5.5-accepted-concept",
+            "artifact_session_id": "aab33c16-fe4b-4ed3-b90b-94b58244f4b2",
+            "model_name": "gpt-5.5",
+            "signal_type": "concept",
+            "claim": "Gap detection to practice challenge flow is relevant to Trace how a weak answer becomes a gap and then a practice challenge.",
+            "citations": [
+              {
+                "file_path": "/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-PARTIAL-L2-GAP-4f17d025-c4a2-4d94-917a-c81e2d3d95d4/artifact-root/src/runtime-gap-detection.ts",
+                "start_line": 1,
+                "end_line": 1,
+                "excerpt": "// E01-PARTIAL-L2-GAP"
+              }
+            ],
+            "confidence": "medium",
+            "rationale": "Fixture candidate for deterministic trace validation.",
+            "proposed_layer": 2,
+            "validation_error_hints": []
+          },
+          {
+            "id": "E01-PARTIAL-L2-GAP-gpt-5.5-uncited-gap",
+            "artifact_session_id": "aab33c16-fe4b-4ed3-b90b-94b58244f4b2",
+            "model_name": "gpt-5.5",
+            "signal_type": "gap_candidate",
+            "claim": "The learner may be missing the evidence chain.",
+            "citations": [],
+            "confidence": "high",
+            "rationale": "Fixture checks uncited candidate rejection.",
+            "proposed_layer": 2,
+            "validation_error_hints": []
+          }
+        ],
+        "deterministic_validation": [
+          {
+            "candidate_id": "files_read:0:src/runtime-gap-detection.ts",
+            "accepted": true,
+            "errors": []
+          },
+          {
+            "candidate_id": "E01-PARTIAL-L2-GAP-gpt-5.5-accepted-concept",
+            "accepted": true,
+            "errors": []
+          },
+          {
+            "candidate_id": "E01-PARTIAL-L2-GAP-gpt-5.5-uncited-gap",
+            "accepted": false,
+            "errors": [
+              "missing_citation"
+            ]
+          }
+        ],
+        "accepted_signals": [
+          {
+            "id": "E01-PARTIAL-L2-GAP-gpt-5.5-accepted-concept",
+            "artifact_session_id": "aab33c16-fe4b-4ed3-b90b-94b58244f4b2",
+            "model_name": "gpt-5.5",
+            "signal_type": "concept",
+            "claim": "Gap detection to practice challenge flow is relevant to Trace how a weak answer becomes a gap and then a practice challenge.",
+            "citations": [
+              {
+                "file_path": "/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-PARTIAL-L2-GAP-4f17d025-c4a2-4d94-917a-c81e2d3d95d4/artifact-root/src/runtime-gap-detection.ts",
+                "start_line": 1,
+                "end_line": 1,
+                "excerpt": "// E01-PARTIAL-L2-GAP"
+              }
+            ],
+            "confidence": "medium",
+            "rationale": "Fixture candidate for deterministic trace validation.",
+            "proposed_layer": 2,
+            "validation_error_hints": []
+          }
+        ],
+        "rejected_signals": [
+          {
+            "id": "E01-PARTIAL-L2-GAP-gpt-5.5-uncited-gap",
+            "artifact_session_id": "aab33c16-fe4b-4ed3-b90b-94b58244f4b2",
+            "model_name": "gpt-5.5",
+            "signal_type": "gap_candidate",
+            "claim": "The learner may be missing the evidence chain.",
+            "citations": [],
+            "confidence": "high",
+            "rationale": "Fixture checks uncited candidate rejection.",
+            "proposed_layer": 2,
+            "validation_error_hints": [],
+            "validation_errors": [
+              "missing_citation"
+            ]
+          }
+        ],
+        "final_runtime_output": {
+          "accepted_signal_count": 1,
+          "rejected_signal_count": 1,
+          "readiness_decided_by_model": false
+        },
+        "created_at": "2026-05-20T21:31:53.601Z"
+      },
+      "accepted_signal_ids": [
+        "E01-PARTIAL-L2-GAP-gpt-5.5-accepted-concept"
+      ],
+      "rejected_signal_ids": [
+        "E01-PARTIAL-L2-GAP-gpt-5.5-uncited-gap"
+      ],
+      "rejected_signal_reasons": {
+        "E01-PARTIAL-L2-GAP-gpt-5.5-uncited-gap": [
+          "missing_citation"
+        ]
+      },
+      "citation_quality": {
+        "accepted_with_citations": 1,
+        "rejected_missing_citation": 1,
+        "rejected_invalid_or_out_of_bound_citation": 0
+      },
+      "boundary_compliance": {
+        "invalid_file_reads": [],
+        "accepted_out_of_boundary_count": 0
+      },
+      "failure_modes": [
+        "missing_citation"
+      ]
+    },
+    {
+      "case_id": "E01-UNCERTAIN-L1-DECLARED",
+      "case_class": "declared_uncertainty",
+      "model_label": "codex gpt-5.2 medium",
+      "trace": {
+        "trace_id": "fde8b1fe-a631-403d-ac33-67d0aa4e30c9",
+        "artifact_session_id": "b6e73148-afda-4d98-9d02-d5ed60cb2dca",
+        "eval_case_id": "E01-UNCERTAIN-L1-DECLARED",
+        "model_runner": "fixture",
+        "model_name": "gpt-5.2",
+        "reasoning_effort": "medium",
+        "prompt": "{\n  \"role\": \"sibi_project_learning_agent\",\n  \"instruction\": \"Return candidate learning signals only. Do not decide truth, learner mastery, readiness, or final grades.\",\n  \"rules\": [\n    \"Only claim facts supported by cited files inside the artifact boundary.\",\n    \"Use source_control and file_inventory as orientation, not as proof for uncited project facts.\",\n    \"Every candidate_signal must include at least one citation to an allowed file.\",\n    \"If evidence is insufficient, return fewer candidate_signals instead of guessing.\"\n  ],\n  \"output_schema\": {\n    \"files_read\": [\n      \"path inside artifact boundary\"\n    ],\n    \"candidate_signals\": [\n      {\n        \"signal_type\": \"concept | flow | risk | gap_candidate | misconception_candidate | practice_candidate\",\n        \"claim\": \"bounded claim\",\n        \"confidence\": \"low | medium | high\",\n        \"citations\": [\n          {\n            \"path\": \"allowed file path\",\n            \"range\": \"line or line range\"\n          }\n        ],\n        \"rationale\": \"why this may help learning\",\n        \"proposed_layer\": \"optional integer 1-5\"\n      }\n    ]\n  },\n  \"workspace_context\": null,\n  \"artifact_boundary\": {\n    \"artifact_session_id\": \"b6e73148-afda-4d98-9d02-d5ed60cb2dca\",\n    \"root_path\": \"/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-UNCERTAIN-L1-DECLARED-9acc1aef-632c-451c-a551-bf0d2bc6a53d/artifact-root\",\n    \"included_paths\": [\n      \"/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-UNCERTAIN-L1-DECLARED-9acc1aef-632c-451c-a551-bf0d2bc6a53d/artifact-root/src/runtime.ts\",\n      \"/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-UNCERTAIN-L1-DECLARED-9acc1aef-632c-451c-a551-bf0d2bc6a53d/artifact-root/src/runtime-gap-detection.ts\",\n      \"/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-UNCERTAIN-L1-DECLARED-9acc1aef-632c-451c-a551-bf0d2bc6a53d/artifact-root/src/runtime-memory.ts\"\n    ],\n    \"excluded_paths\": [],\n    \"learning_goal\": \"Identify how Sibi records uncertainty during an autopsy answer.\"\n  }\n}",
+        "artifact_boundary": {
+          "root_path": "/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-UNCERTAIN-L1-DECLARED-9acc1aef-632c-451c-a551-bf0d2bc6a53d/artifact-root",
+          "included_paths": [
+            "/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-UNCERTAIN-L1-DECLARED-9acc1aef-632c-451c-a551-bf0d2bc6a53d/artifact-root/src/runtime.ts",
+            "/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-UNCERTAIN-L1-DECLARED-9acc1aef-632c-451c-a551-bf0d2bc6a53d/artifact-root/src/runtime-gap-detection.ts",
+            "/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-UNCERTAIN-L1-DECLARED-9acc1aef-632c-451c-a551-bf0d2bc6a53d/artifact-root/src/runtime-memory.ts"
+          ],
+          "excluded_paths": []
+        },
+        "files_read": [
+          "src/runtime-gap-detection.ts"
+        ],
+        "candidate_signals": [
+          {
+            "id": "E01-UNCERTAIN-L1-DECLARED-gpt-5.2-accepted-concept",
+            "artifact_session_id": "b6e73148-afda-4d98-9d02-d5ed60cb2dca",
+            "model_name": "gpt-5.2",
+            "signal_type": "concept",
+            "claim": "Declared uncertainty as learning evidence is relevant to Identify how Sibi records uncertainty during an autopsy answer.",
+            "citations": [
+              {
+                "file_path": "/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-UNCERTAIN-L1-DECLARED-9acc1aef-632c-451c-a551-bf0d2bc6a53d/artifact-root/src/runtime-gap-detection.ts",
+                "start_line": 1,
+                "end_line": 1,
+                "excerpt": "// E01-UNCERTAIN-L1-DECLARED"
+              }
+            ],
+            "confidence": "medium",
+            "rationale": "Fixture candidate for deterministic trace validation.",
+            "proposed_layer": 1,
+            "validation_error_hints": []
+          }
+        ],
+        "deterministic_validation": [
+          {
+            "candidate_id": "files_read:0:src/runtime-gap-detection.ts",
+            "accepted": true,
+            "errors": []
+          },
+          {
+            "candidate_id": "E01-UNCERTAIN-L1-DECLARED-gpt-5.2-accepted-concept",
+            "accepted": true,
+            "errors": []
+          }
+        ],
+        "accepted_signals": [
+          {
+            "id": "E01-UNCERTAIN-L1-DECLARED-gpt-5.2-accepted-concept",
+            "artifact_session_id": "b6e73148-afda-4d98-9d02-d5ed60cb2dca",
+            "model_name": "gpt-5.2",
+            "signal_type": "concept",
+            "claim": "Declared uncertainty as learning evidence is relevant to Identify how Sibi records uncertainty during an autopsy answer.",
+            "citations": [
+              {
+                "file_path": "/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-UNCERTAIN-L1-DECLARED-9acc1aef-632c-451c-a551-bf0d2bc6a53d/artifact-root/src/runtime-gap-detection.ts",
+                "start_line": 1,
+                "end_line": 1,
+                "excerpt": "// E01-UNCERTAIN-L1-DECLARED"
+              }
+            ],
+            "confidence": "medium",
+            "rationale": "Fixture candidate for deterministic trace validation.",
+            "proposed_layer": 1,
+            "validation_error_hints": []
+          }
+        ],
+        "rejected_signals": [],
+        "final_runtime_output": {
+          "accepted_signal_count": 1,
+          "rejected_signal_count": 0,
+          "readiness_decided_by_model": false
+        },
+        "created_at": "2026-05-20T21:31:53.603Z"
+      },
+      "accepted_signal_ids": [
+        "E01-UNCERTAIN-L1-DECLARED-gpt-5.2-accepted-concept"
+      ],
+      "rejected_signal_ids": [],
+      "rejected_signal_reasons": {},
+      "citation_quality": {
+        "accepted_with_citations": 1,
+        "rejected_missing_citation": 0,
+        "rejected_invalid_or_out_of_bound_citation": 0
+      },
+      "boundary_compliance": {
+        "invalid_file_reads": [],
+        "accepted_out_of_boundary_count": 0
+      },
+      "failure_modes": []
+    },
+    {
+      "case_id": "E01-UNCERTAIN-L1-DECLARED",
+      "case_class": "declared_uncertainty",
+      "model_label": "codex gpt-5.5 low",
+      "trace": {
+        "trace_id": "89eb4fdd-2103-43ef-8f70-16ebef39f28b",
+        "artifact_session_id": "b6e73148-afda-4d98-9d02-d5ed60cb2dca",
+        "eval_case_id": "E01-UNCERTAIN-L1-DECLARED",
+        "model_runner": "fixture",
+        "model_name": "gpt-5.5",
+        "reasoning_effort": "low",
+        "prompt": "{\n  \"role\": \"sibi_project_learning_agent\",\n  \"instruction\": \"Return candidate learning signals only. Do not decide truth, learner mastery, readiness, or final grades.\",\n  \"rules\": [\n    \"Only claim facts supported by cited files inside the artifact boundary.\",\n    \"Use source_control and file_inventory as orientation, not as proof for uncited project facts.\",\n    \"Every candidate_signal must include at least one citation to an allowed file.\",\n    \"If evidence is insufficient, return fewer candidate_signals instead of guessing.\"\n  ],\n  \"output_schema\": {\n    \"files_read\": [\n      \"path inside artifact boundary\"\n    ],\n    \"candidate_signals\": [\n      {\n        \"signal_type\": \"concept | flow | risk | gap_candidate | misconception_candidate | practice_candidate\",\n        \"claim\": \"bounded claim\",\n        \"confidence\": \"low | medium | high\",\n        \"citations\": [\n          {\n            \"path\": \"allowed file path\",\n            \"range\": \"line or line range\"\n          }\n        ],\n        \"rationale\": \"why this may help learning\",\n        \"proposed_layer\": \"optional integer 1-5\"\n      }\n    ]\n  },\n  \"workspace_context\": null,\n  \"artifact_boundary\": {\n    \"artifact_session_id\": \"b6e73148-afda-4d98-9d02-d5ed60cb2dca\",\n    \"root_path\": \"/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-UNCERTAIN-L1-DECLARED-9acc1aef-632c-451c-a551-bf0d2bc6a53d/artifact-root\",\n    \"included_paths\": [\n      \"/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-UNCERTAIN-L1-DECLARED-9acc1aef-632c-451c-a551-bf0d2bc6a53d/artifact-root/src/runtime.ts\",\n      \"/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-UNCERTAIN-L1-DECLARED-9acc1aef-632c-451c-a551-bf0d2bc6a53d/artifact-root/src/runtime-gap-detection.ts\",\n      \"/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-UNCERTAIN-L1-DECLARED-9acc1aef-632c-451c-a551-bf0d2bc6a53d/artifact-root/src/runtime-memory.ts\"\n    ],\n    \"excluded_paths\": [],\n    \"learning_goal\": \"Identify how Sibi records uncertainty during an autopsy answer.\"\n  }\n}",
+        "artifact_boundary": {
+          "root_path": "/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-UNCERTAIN-L1-DECLARED-9acc1aef-632c-451c-a551-bf0d2bc6a53d/artifact-root",
+          "included_paths": [
+            "/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-UNCERTAIN-L1-DECLARED-9acc1aef-632c-451c-a551-bf0d2bc6a53d/artifact-root/src/runtime.ts",
+            "/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-UNCERTAIN-L1-DECLARED-9acc1aef-632c-451c-a551-bf0d2bc6a53d/artifact-root/src/runtime-gap-detection.ts",
+            "/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-UNCERTAIN-L1-DECLARED-9acc1aef-632c-451c-a551-bf0d2bc6a53d/artifact-root/src/runtime-memory.ts"
+          ],
+          "excluded_paths": []
+        },
+        "files_read": [
+          "src/runtime-gap-detection.ts"
+        ],
+        "candidate_signals": [
+          {
+            "id": "E01-UNCERTAIN-L1-DECLARED-gpt-5.5-accepted-concept",
+            "artifact_session_id": "b6e73148-afda-4d98-9d02-d5ed60cb2dca",
+            "model_name": "gpt-5.5",
+            "signal_type": "concept",
+            "claim": "Declared uncertainty as learning evidence is relevant to Identify how Sibi records uncertainty during an autopsy answer.",
+            "citations": [
+              {
+                "file_path": "/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-UNCERTAIN-L1-DECLARED-9acc1aef-632c-451c-a551-bf0d2bc6a53d/artifact-root/src/runtime-gap-detection.ts",
+                "start_line": 1,
+                "end_line": 1,
+                "excerpt": "// E01-UNCERTAIN-L1-DECLARED"
+              }
+            ],
+            "confidence": "medium",
+            "rationale": "Fixture candidate for deterministic trace validation.",
+            "proposed_layer": 1,
+            "validation_error_hints": []
+          }
+        ],
+        "deterministic_validation": [
+          {
+            "candidate_id": "files_read:0:src/runtime-gap-detection.ts",
+            "accepted": true,
+            "errors": []
+          },
+          {
+            "candidate_id": "E01-UNCERTAIN-L1-DECLARED-gpt-5.5-accepted-concept",
+            "accepted": true,
+            "errors": []
+          }
+        ],
+        "accepted_signals": [
+          {
+            "id": "E01-UNCERTAIN-L1-DECLARED-gpt-5.5-accepted-concept",
+            "artifact_session_id": "b6e73148-afda-4d98-9d02-d5ed60cb2dca",
+            "model_name": "gpt-5.5",
+            "signal_type": "concept",
+            "claim": "Declared uncertainty as learning evidence is relevant to Identify how Sibi records uncertainty during an autopsy answer.",
+            "citations": [
+              {
+                "file_path": "/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-UNCERTAIN-L1-DECLARED-9acc1aef-632c-451c-a551-bf0d2bc6a53d/artifact-root/src/runtime-gap-detection.ts",
+                "start_line": 1,
+                "end_line": 1,
+                "excerpt": "// E01-UNCERTAIN-L1-DECLARED"
+              }
+            ],
+            "confidence": "medium",
+            "rationale": "Fixture candidate for deterministic trace validation.",
+            "proposed_layer": 1,
+            "validation_error_hints": []
+          }
+        ],
+        "rejected_signals": [],
+        "final_runtime_output": {
+          "accepted_signal_count": 1,
+          "rejected_signal_count": 0,
+          "readiness_decided_by_model": false
+        },
+        "created_at": "2026-05-20T21:31:53.603Z"
+      },
+      "accepted_signal_ids": [
+        "E01-UNCERTAIN-L1-DECLARED-gpt-5.5-accepted-concept"
+      ],
+      "rejected_signal_ids": [],
+      "rejected_signal_reasons": {},
+      "citation_quality": {
+        "accepted_with_citations": 1,
+        "rejected_missing_citation": 0,
+        "rejected_invalid_or_out_of_bound_citation": 0
+      },
+      "boundary_compliance": {
+        "invalid_file_reads": [],
+        "accepted_out_of_boundary_count": 0
+      },
+      "failure_modes": []
+    },
+    {
+      "case_id": "E01-WRONG-L3-MISCONCEPTION",
+      "case_class": "wrong_misconception",
+      "model_label": "codex gpt-5.2 medium",
+      "trace": {
+        "trace_id": "4dc6a91d-c1e7-4b14-a198-643af391080b",
+        "artifact_session_id": "30f39885-e7c7-4a6e-a00b-318d12ab045d",
+        "eval_case_id": "E01-WRONG-L3-MISCONCEPTION",
+        "model_runner": "fixture",
+        "model_name": "gpt-5.2",
+        "reasoning_effort": "medium",
+        "prompt": "{\n  \"role\": \"sibi_project_learning_agent\",\n  \"instruction\": \"Return candidate learning signals only. Do not decide truth, learner mastery, readiness, or final grades.\",\n  \"rules\": [\n    \"Only claim facts supported by cited files inside the artifact boundary.\",\n    \"Use source_control and file_inventory as orientation, not as proof for uncited project facts.\",\n    \"Every candidate_signal must include at least one citation to an allowed file.\",\n    \"If evidence is insufficient, return fewer candidate_signals instead of guessing.\"\n  ],\n  \"output_schema\": {\n    \"files_read\": [\n      \"path inside artifact boundary\"\n    ],\n    \"candidate_signals\": [\n      {\n        \"signal_type\": \"concept | flow | risk | gap_candidate | misconception_candidate | practice_candidate\",\n        \"claim\": \"bounded claim\",\n        \"confidence\": \"low | medium | high\",\n        \"citations\": [\n          {\n            \"path\": \"allowed file path\",\n            \"range\": \"line or line range\"\n          }\n        ],\n        \"rationale\": \"why this may help learning\",\n        \"proposed_layer\": \"optional integer 1-5\"\n      }\n    ]\n  },\n  \"workspace_context\": null,\n  \"artifact_boundary\": {\n    \"artifact_session_id\": \"30f39885-e7c7-4a6e-a00b-318d12ab045d\",\n    \"root_path\": \"/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-WRONG-L3-MISCONCEPTION-89c2a4b7-0947-4f9a-b893-188fc931b907/artifact-root\",\n    \"included_paths\": [\n      \"/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-WRONG-L3-MISCONCEPTION-89c2a4b7-0947-4f9a-b893-188fc931b907/artifact-root/src/runtime-support.ts\",\n      \"/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-WRONG-L3-MISCONCEPTION-89c2a4b7-0947-4f9a-b893-188fc931b907/artifact-root/src/runtime-gap-detection.ts\",\n      \"/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-WRONG-L3-MISCONCEPTION-89c2a4b7-0947-4f9a-b893-188fc931b907/artifact-root/Tests/gap-detection.test.ts\"\n    ],\n    \"excluded_paths\": [\n      \"/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-WRONG-L3-MISCONCEPTION-89c2a4b7-0947-4f9a-b893-188fc931b907/artifact-root/docs/private-notes.md\"\n    ],\n    \"learning_goal\": \"Distinguish runtime lifecycle persistence from one request's in-memory state.\"\n  }\n}",
+        "artifact_boundary": {
+          "root_path": "/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-WRONG-L3-MISCONCEPTION-89c2a4b7-0947-4f9a-b893-188fc931b907/artifact-root",
+          "included_paths": [
+            "/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-WRONG-L3-MISCONCEPTION-89c2a4b7-0947-4f9a-b893-188fc931b907/artifact-root/src/runtime-support.ts",
+            "/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-WRONG-L3-MISCONCEPTION-89c2a4b7-0947-4f9a-b893-188fc931b907/artifact-root/src/runtime-gap-detection.ts",
+            "/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-WRONG-L3-MISCONCEPTION-89c2a4b7-0947-4f9a-b893-188fc931b907/artifact-root/Tests/gap-detection.test.ts"
+          ],
+          "excluded_paths": [
+            "/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-WRONG-L3-MISCONCEPTION-89c2a4b7-0947-4f9a-b893-188fc931b907/artifact-root/docs/private-notes.md"
+          ]
+        },
+        "files_read": [
+          "src/runtime-support.ts"
+        ],
+        "candidate_signals": [
+          {
+            "id": "E01-WRONG-L3-MISCONCEPTION-gpt-5.2-accepted-concept",
+            "artifact_session_id": "30f39885-e7c7-4a6e-a00b-318d12ab045d",
+            "model_name": "gpt-5.2",
+            "signal_type": "concept",
+            "claim": "Runtime lifecycle versus request lifecycle is relevant to Distinguish runtime lifecycle persistence from one request's in-memory state.",
+            "citations": [
+              {
+                "file_path": "/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-WRONG-L3-MISCONCEPTION-89c2a4b7-0947-4f9a-b893-188fc931b907/artifact-root/src/runtime-support.ts",
+                "start_line": 1,
+                "end_line": 1,
+                "excerpt": "// E01-WRONG-L3-MISCONCEPTION"
+              }
+            ],
+            "confidence": "medium",
+            "rationale": "Fixture candidate for deterministic trace validation.",
+            "proposed_layer": 3,
+            "validation_error_hints": []
+          }
+        ],
+        "deterministic_validation": [
+          {
+            "candidate_id": "files_read:0:src/runtime-support.ts",
+            "accepted": true,
+            "errors": []
+          },
+          {
+            "candidate_id": "E01-WRONG-L3-MISCONCEPTION-gpt-5.2-accepted-concept",
+            "accepted": true,
+            "errors": []
+          }
+        ],
+        "accepted_signals": [
+          {
+            "id": "E01-WRONG-L3-MISCONCEPTION-gpt-5.2-accepted-concept",
+            "artifact_session_id": "30f39885-e7c7-4a6e-a00b-318d12ab045d",
+            "model_name": "gpt-5.2",
+            "signal_type": "concept",
+            "claim": "Runtime lifecycle versus request lifecycle is relevant to Distinguish runtime lifecycle persistence from one request's in-memory state.",
+            "citations": [
+              {
+                "file_path": "/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-WRONG-L3-MISCONCEPTION-89c2a4b7-0947-4f9a-b893-188fc931b907/artifact-root/src/runtime-support.ts",
+                "start_line": 1,
+                "end_line": 1,
+                "excerpt": "// E01-WRONG-L3-MISCONCEPTION"
+              }
+            ],
+            "confidence": "medium",
+            "rationale": "Fixture candidate for deterministic trace validation.",
+            "proposed_layer": 3,
+            "validation_error_hints": []
+          }
+        ],
+        "rejected_signals": [],
+        "final_runtime_output": {
+          "accepted_signal_count": 1,
+          "rejected_signal_count": 0,
+          "readiness_decided_by_model": false
+        },
+        "created_at": "2026-05-20T21:31:53.605Z"
+      },
+      "accepted_signal_ids": [
+        "E01-WRONG-L3-MISCONCEPTION-gpt-5.2-accepted-concept"
+      ],
+      "rejected_signal_ids": [],
+      "rejected_signal_reasons": {},
+      "citation_quality": {
+        "accepted_with_citations": 1,
+        "rejected_missing_citation": 0,
+        "rejected_invalid_or_out_of_bound_citation": 0
+      },
+      "boundary_compliance": {
+        "invalid_file_reads": [],
+        "accepted_out_of_boundary_count": 0
+      },
+      "failure_modes": []
+    },
+    {
+      "case_id": "E01-WRONG-L3-MISCONCEPTION",
+      "case_class": "wrong_misconception",
+      "model_label": "codex gpt-5.5 low",
+      "trace": {
+        "trace_id": "bf221bc5-a149-42a7-91c0-0c8facf91b63",
+        "artifact_session_id": "30f39885-e7c7-4a6e-a00b-318d12ab045d",
+        "eval_case_id": "E01-WRONG-L3-MISCONCEPTION",
+        "model_runner": "fixture",
+        "model_name": "gpt-5.5",
+        "reasoning_effort": "low",
+        "prompt": "{\n  \"role\": \"sibi_project_learning_agent\",\n  \"instruction\": \"Return candidate learning signals only. Do not decide truth, learner mastery, readiness, or final grades.\",\n  \"rules\": [\n    \"Only claim facts supported by cited files inside the artifact boundary.\",\n    \"Use source_control and file_inventory as orientation, not as proof for uncited project facts.\",\n    \"Every candidate_signal must include at least one citation to an allowed file.\",\n    \"If evidence is insufficient, return fewer candidate_signals instead of guessing.\"\n  ],\n  \"output_schema\": {\n    \"files_read\": [\n      \"path inside artifact boundary\"\n    ],\n    \"candidate_signals\": [\n      {\n        \"signal_type\": \"concept | flow | risk | gap_candidate | misconception_candidate | practice_candidate\",\n        \"claim\": \"bounded claim\",\n        \"confidence\": \"low | medium | high\",\n        \"citations\": [\n          {\n            \"path\": \"allowed file path\",\n            \"range\": \"line or line range\"\n          }\n        ],\n        \"rationale\": \"why this may help learning\",\n        \"proposed_layer\": \"optional integer 1-5\"\n      }\n    ]\n  },\n  \"workspace_context\": null,\n  \"artifact_boundary\": {\n    \"artifact_session_id\": \"30f39885-e7c7-4a6e-a00b-318d12ab045d\",\n    \"root_path\": \"/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-WRONG-L3-MISCONCEPTION-89c2a4b7-0947-4f9a-b893-188fc931b907/artifact-root\",\n    \"included_paths\": [\n      \"/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-WRONG-L3-MISCONCEPTION-89c2a4b7-0947-4f9a-b893-188fc931b907/artifact-root/src/runtime-support.ts\",\n      \"/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-WRONG-L3-MISCONCEPTION-89c2a4b7-0947-4f9a-b893-188fc931b907/artifact-root/src/runtime-gap-detection.ts\",\n      \"/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-WRONG-L3-MISCONCEPTION-89c2a4b7-0947-4f9a-b893-188fc931b907/artifact-root/Tests/gap-detection.test.ts\"\n    ],\n    \"excluded_paths\": [\n      \"/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-WRONG-L3-MISCONCEPTION-89c2a4b7-0947-4f9a-b893-188fc931b907/artifact-root/docs/private-notes.md\"\n    ],\n    \"learning_goal\": \"Distinguish runtime lifecycle persistence from one request's in-memory state.\"\n  }\n}",
+        "artifact_boundary": {
+          "root_path": "/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-WRONG-L3-MISCONCEPTION-89c2a4b7-0947-4f9a-b893-188fc931b907/artifact-root",
+          "included_paths": [
+            "/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-WRONG-L3-MISCONCEPTION-89c2a4b7-0947-4f9a-b893-188fc931b907/artifact-root/src/runtime-support.ts",
+            "/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-WRONG-L3-MISCONCEPTION-89c2a4b7-0947-4f9a-b893-188fc931b907/artifact-root/src/runtime-gap-detection.ts",
+            "/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-WRONG-L3-MISCONCEPTION-89c2a4b7-0947-4f9a-b893-188fc931b907/artifact-root/Tests/gap-detection.test.ts"
+          ],
+          "excluded_paths": [
+            "/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-WRONG-L3-MISCONCEPTION-89c2a4b7-0947-4f9a-b893-188fc931b907/artifact-root/docs/private-notes.md"
+          ]
+        },
+        "files_read": [
+          "src/runtime-support.ts"
+        ],
+        "candidate_signals": [
+          {
+            "id": "E01-WRONG-L3-MISCONCEPTION-gpt-5.5-accepted-concept",
+            "artifact_session_id": "30f39885-e7c7-4a6e-a00b-318d12ab045d",
+            "model_name": "gpt-5.5",
+            "signal_type": "concept",
+            "claim": "Runtime lifecycle versus request lifecycle is relevant to Distinguish runtime lifecycle persistence from one request's in-memory state.",
+            "citations": [
+              {
+                "file_path": "/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-WRONG-L3-MISCONCEPTION-89c2a4b7-0947-4f9a-b893-188fc931b907/artifact-root/src/runtime-support.ts",
+                "start_line": 1,
+                "end_line": 1,
+                "excerpt": "// E01-WRONG-L3-MISCONCEPTION"
+              }
+            ],
+            "confidence": "medium",
+            "rationale": "Fixture candidate for deterministic trace validation.",
+            "proposed_layer": 3,
+            "validation_error_hints": []
+          }
+        ],
+        "deterministic_validation": [
+          {
+            "candidate_id": "files_read:0:src/runtime-support.ts",
+            "accepted": true,
+            "errors": []
+          },
+          {
+            "candidate_id": "E01-WRONG-L3-MISCONCEPTION-gpt-5.5-accepted-concept",
+            "accepted": true,
+            "errors": []
+          }
+        ],
+        "accepted_signals": [
+          {
+            "id": "E01-WRONG-L3-MISCONCEPTION-gpt-5.5-accepted-concept",
+            "artifact_session_id": "30f39885-e7c7-4a6e-a00b-318d12ab045d",
+            "model_name": "gpt-5.5",
+            "signal_type": "concept",
+            "claim": "Runtime lifecycle versus request lifecycle is relevant to Distinguish runtime lifecycle persistence from one request's in-memory state.",
+            "citations": [
+              {
+                "file_path": "/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-WRONG-L3-MISCONCEPTION-89c2a4b7-0947-4f9a-b893-188fc931b907/artifact-root/src/runtime-support.ts",
+                "start_line": 1,
+                "end_line": 1,
+                "excerpt": "// E01-WRONG-L3-MISCONCEPTION"
+              }
+            ],
+            "confidence": "medium",
+            "rationale": "Fixture candidate for deterministic trace validation.",
+            "proposed_layer": 3,
+            "validation_error_hints": []
+          }
+        ],
+        "rejected_signals": [],
+        "final_runtime_output": {
+          "accepted_signal_count": 1,
+          "rejected_signal_count": 0,
+          "readiness_decided_by_model": false
+        },
+        "created_at": "2026-05-20T21:31:53.606Z"
+      },
+      "accepted_signal_ids": [
+        "E01-WRONG-L3-MISCONCEPTION-gpt-5.5-accepted-concept"
+      ],
+      "rejected_signal_ids": [],
+      "rejected_signal_reasons": {},
+      "citation_quality": {
+        "accepted_with_citations": 1,
+        "rejected_missing_citation": 0,
+        "rejected_invalid_or_out_of_bound_citation": 0
+      },
+      "boundary_compliance": {
+        "invalid_file_reads": [],
+        "accepted_out_of_boundary_count": 0
+      },
+      "failure_modes": []
+    },
+    {
+      "case_id": "E01-MISSING-EVIDENCE-L3",
+      "case_class": "missing_evidence",
+      "model_label": "codex gpt-5.2 medium",
+      "trace": {
+        "trace_id": "40847b0e-73a1-4094-9f8e-59ca0d62477e",
+        "artifact_session_id": "37a91c43-6010-4c30-8927-3cd71437cf49",
+        "eval_case_id": "E01-MISSING-EVIDENCE-L3",
+        "model_runner": "fixture",
+        "model_name": "gpt-5.2",
+        "reasoning_effort": "medium",
+        "prompt": "{\n  \"role\": \"sibi_project_learning_agent\",\n  \"instruction\": \"Return candidate learning signals only. Do not decide truth, learner mastery, readiness, or final grades.\",\n  \"rules\": [\n    \"Only claim facts supported by cited files inside the artifact boundary.\",\n    \"Use source_control and file_inventory as orientation, not as proof for uncited project facts.\",\n    \"Every candidate_signal must include at least one citation to an allowed file.\",\n    \"If evidence is insufficient, return fewer candidate_signals instead of guessing.\"\n  ],\n  \"output_schema\": {\n    \"files_read\": [\n      \"path inside artifact boundary\"\n    ],\n    \"candidate_signals\": [\n      {\n        \"signal_type\": \"concept | flow | risk | gap_candidate | misconception_candidate | practice_candidate\",\n        \"claim\": \"bounded claim\",\n        \"confidence\": \"low | medium | high\",\n        \"citations\": [\n          {\n            \"path\": \"allowed file path\",\n            \"range\": \"line or line range\"\n          }\n        ],\n        \"rationale\": \"why this may help learning\",\n        \"proposed_layer\": \"optional integer 1-5\"\n      }\n    ]\n  },\n  \"workspace_context\": null,\n  \"artifact_boundary\": {\n    \"artifact_session_id\": \"37a91c43-6010-4c30-8927-3cd71437cf49\",\n    \"root_path\": \"/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-MISSING-EVIDENCE-L3-3e9c3b31-d22f-4923-9e1b-41458d88ba0b/artifact-root\",\n    \"included_paths\": [\n      \"/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-MISSING-EVIDENCE-L3-3e9c3b31-d22f-4923-9e1b-41458d88ba0b/artifact-root/src/runtime-readiness.ts\",\n      \"/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-MISSING-EVIDENCE-L3-3e9c3b31-d22f-4923-9e1b-41458d88ba0b/artifact-root/src/runtime-memory.ts\",\n      \"/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-MISSING-EVIDENCE-L3-3e9c3b31-d22f-4923-9e1b-41458d88ba0b/artifact-root/Tests/readiness-report.test.ts\"\n    ],\n    \"excluded_paths\": [],\n    \"learning_goal\": \"Explain why readiness claims require citations.\"\n  }\n}",
+        "artifact_boundary": {
+          "root_path": "/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-MISSING-EVIDENCE-L3-3e9c3b31-d22f-4923-9e1b-41458d88ba0b/artifact-root",
+          "included_paths": [
+            "/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-MISSING-EVIDENCE-L3-3e9c3b31-d22f-4923-9e1b-41458d88ba0b/artifact-root/src/runtime-readiness.ts",
+            "/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-MISSING-EVIDENCE-L3-3e9c3b31-d22f-4923-9e1b-41458d88ba0b/artifact-root/src/runtime-memory.ts",
+            "/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-MISSING-EVIDENCE-L3-3e9c3b31-d22f-4923-9e1b-41458d88ba0b/artifact-root/Tests/readiness-report.test.ts"
+          ],
+          "excluded_paths": []
+        },
+        "files_read": [
+          "src/runtime-readiness.ts"
+        ],
+        "candidate_signals": [
+          {
+            "id": "E01-MISSING-EVIDENCE-L3-gpt-5.2-accepted-concept",
+            "artifact_session_id": "37a91c43-6010-4c30-8927-3cd71437cf49",
+            "model_name": "gpt-5.2",
+            "signal_type": "concept",
+            "claim": "Readiness claims cite evidence is relevant to Explain why readiness claims require citations.",
+            "citations": [
+              {
+                "file_path": "/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-MISSING-EVIDENCE-L3-3e9c3b31-d22f-4923-9e1b-41458d88ba0b/artifact-root/src/runtime-readiness.ts",
+                "start_line": 1,
+                "end_line": 1,
+                "excerpt": "// E01-MISSING-EVIDENCE-L3"
+              }
+            ],
+            "confidence": "medium",
+            "rationale": "Fixture candidate for deterministic trace validation.",
+            "proposed_layer": 3,
+            "validation_error_hints": []
+          },
+          {
+            "id": "E01-MISSING-EVIDENCE-L3-gpt-5.2-uncited-gap",
+            "artifact_session_id": "37a91c43-6010-4c30-8927-3cd71437cf49",
+            "model_name": "gpt-5.2",
+            "signal_type": "gap_candidate",
+            "claim": "The learner may be missing the evidence chain.",
+            "citations": [
+              {
+                "file_path": "/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-MISSING-EVIDENCE-L3-3e9c3b31-d22f-4923-9e1b-41458d88ba0b/artifact-root/src/runtime-readiness.ts",
+                "start_line": 1,
+                "end_line": 1,
+                "excerpt": "// E01-MISSING-EVIDENCE-L3"
+              }
+            ],
+            "confidence": "medium",
+            "rationale": "Fixture checks uncited candidate rejection.",
+            "proposed_layer": 3,
+            "validation_error_hints": []
+          }
+        ],
+        "deterministic_validation": [
+          {
+            "candidate_id": "files_read:0:src/runtime-readiness.ts",
+            "accepted": true,
+            "errors": []
+          },
+          {
+            "candidate_id": "E01-MISSING-EVIDENCE-L3-gpt-5.2-accepted-concept",
+            "accepted": true,
+            "errors": []
+          },
+          {
+            "candidate_id": "E01-MISSING-EVIDENCE-L3-gpt-5.2-uncited-gap",
+            "accepted": true,
+            "errors": []
+          }
+        ],
+        "accepted_signals": [
+          {
+            "id": "E01-MISSING-EVIDENCE-L3-gpt-5.2-accepted-concept",
+            "artifact_session_id": "37a91c43-6010-4c30-8927-3cd71437cf49",
+            "model_name": "gpt-5.2",
+            "signal_type": "concept",
+            "claim": "Readiness claims cite evidence is relevant to Explain why readiness claims require citations.",
+            "citations": [
+              {
+                "file_path": "/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-MISSING-EVIDENCE-L3-3e9c3b31-d22f-4923-9e1b-41458d88ba0b/artifact-root/src/runtime-readiness.ts",
+                "start_line": 1,
+                "end_line": 1,
+                "excerpt": "// E01-MISSING-EVIDENCE-L3"
+              }
+            ],
+            "confidence": "medium",
+            "rationale": "Fixture candidate for deterministic trace validation.",
+            "proposed_layer": 3,
+            "validation_error_hints": []
+          },
+          {
+            "id": "E01-MISSING-EVIDENCE-L3-gpt-5.2-uncited-gap",
+            "artifact_session_id": "37a91c43-6010-4c30-8927-3cd71437cf49",
+            "model_name": "gpt-5.2",
+            "signal_type": "gap_candidate",
+            "claim": "The learner may be missing the evidence chain.",
+            "citations": [
+              {
+                "file_path": "/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-MISSING-EVIDENCE-L3-3e9c3b31-d22f-4923-9e1b-41458d88ba0b/artifact-root/src/runtime-readiness.ts",
+                "start_line": 1,
+                "end_line": 1,
+                "excerpt": "// E01-MISSING-EVIDENCE-L3"
+              }
+            ],
+            "confidence": "medium",
+            "rationale": "Fixture checks uncited candidate rejection.",
+            "proposed_layer": 3,
+            "validation_error_hints": []
+          }
+        ],
+        "rejected_signals": [],
+        "final_runtime_output": {
+          "accepted_signal_count": 2,
+          "rejected_signal_count": 0,
+          "readiness_decided_by_model": false
+        },
+        "created_at": "2026-05-20T21:31:53.611Z"
+      },
+      "accepted_signal_ids": [
+        "E01-MISSING-EVIDENCE-L3-gpt-5.2-accepted-concept",
+        "E01-MISSING-EVIDENCE-L3-gpt-5.2-uncited-gap"
+      ],
+      "rejected_signal_ids": [],
+      "rejected_signal_reasons": {},
+      "citation_quality": {
+        "accepted_with_citations": 2,
+        "rejected_missing_citation": 0,
+        "rejected_invalid_or_out_of_bound_citation": 0
+      },
+      "boundary_compliance": {
+        "invalid_file_reads": [],
+        "accepted_out_of_boundary_count": 0
+      },
+      "failure_modes": []
+    },
+    {
+      "case_id": "E01-MISSING-EVIDENCE-L3",
+      "case_class": "missing_evidence",
+      "model_label": "codex gpt-5.5 low",
+      "trace": {
+        "trace_id": "104151bb-971f-468b-8e7d-c5296f71ba95",
+        "artifact_session_id": "37a91c43-6010-4c30-8927-3cd71437cf49",
+        "eval_case_id": "E01-MISSING-EVIDENCE-L3",
+        "model_runner": "fixture",
+        "model_name": "gpt-5.5",
+        "reasoning_effort": "low",
+        "prompt": "{\n  \"role\": \"sibi_project_learning_agent\",\n  \"instruction\": \"Return candidate learning signals only. Do not decide truth, learner mastery, readiness, or final grades.\",\n  \"rules\": [\n    \"Only claim facts supported by cited files inside the artifact boundary.\",\n    \"Use source_control and file_inventory as orientation, not as proof for uncited project facts.\",\n    \"Every candidate_signal must include at least one citation to an allowed file.\",\n    \"If evidence is insufficient, return fewer candidate_signals instead of guessing.\"\n  ],\n  \"output_schema\": {\n    \"files_read\": [\n      \"path inside artifact boundary\"\n    ],\n    \"candidate_signals\": [\n      {\n        \"signal_type\": \"concept | flow | risk | gap_candidate | misconception_candidate | practice_candidate\",\n        \"claim\": \"bounded claim\",\n        \"confidence\": \"low | medium | high\",\n        \"citations\": [\n          {\n            \"path\": \"allowed file path\",\n            \"range\": \"line or line range\"\n          }\n        ],\n        \"rationale\": \"why this may help learning\",\n        \"proposed_layer\": \"optional integer 1-5\"\n      }\n    ]\n  },\n  \"workspace_context\": null,\n  \"artifact_boundary\": {\n    \"artifact_session_id\": \"37a91c43-6010-4c30-8927-3cd71437cf49\",\n    \"root_path\": \"/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-MISSING-EVIDENCE-L3-3e9c3b31-d22f-4923-9e1b-41458d88ba0b/artifact-root\",\n    \"included_paths\": [\n      \"/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-MISSING-EVIDENCE-L3-3e9c3b31-d22f-4923-9e1b-41458d88ba0b/artifact-root/src/runtime-readiness.ts\",\n      \"/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-MISSING-EVIDENCE-L3-3e9c3b31-d22f-4923-9e1b-41458d88ba0b/artifact-root/src/runtime-memory.ts\",\n      \"/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-MISSING-EVIDENCE-L3-3e9c3b31-d22f-4923-9e1b-41458d88ba0b/artifact-root/Tests/readiness-report.test.ts\"\n    ],\n    \"excluded_paths\": [],\n    \"learning_goal\": \"Explain why readiness claims require citations.\"\n  }\n}",
+        "artifact_boundary": {
+          "root_path": "/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-MISSING-EVIDENCE-L3-3e9c3b31-d22f-4923-9e1b-41458d88ba0b/artifact-root",
+          "included_paths": [
+            "/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-MISSING-EVIDENCE-L3-3e9c3b31-d22f-4923-9e1b-41458d88ba0b/artifact-root/src/runtime-readiness.ts",
+            "/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-MISSING-EVIDENCE-L3-3e9c3b31-d22f-4923-9e1b-41458d88ba0b/artifact-root/src/runtime-memory.ts",
+            "/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-MISSING-EVIDENCE-L3-3e9c3b31-d22f-4923-9e1b-41458d88ba0b/artifact-root/Tests/readiness-report.test.ts"
+          ],
+          "excluded_paths": []
+        },
+        "files_read": [
+          "src/runtime-readiness.ts"
+        ],
+        "candidate_signals": [
+          {
+            "id": "E01-MISSING-EVIDENCE-L3-gpt-5.5-accepted-concept",
+            "artifact_session_id": "37a91c43-6010-4c30-8927-3cd71437cf49",
+            "model_name": "gpt-5.5",
+            "signal_type": "concept",
+            "claim": "Readiness claims cite evidence is relevant to Explain why readiness claims require citations.",
+            "citations": [
+              {
+                "file_path": "/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-MISSING-EVIDENCE-L3-3e9c3b31-d22f-4923-9e1b-41458d88ba0b/artifact-root/src/runtime-readiness.ts",
+                "start_line": 1,
+                "end_line": 1,
+                "excerpt": "// E01-MISSING-EVIDENCE-L3"
+              }
+            ],
+            "confidence": "medium",
+            "rationale": "Fixture candidate for deterministic trace validation.",
+            "proposed_layer": 3,
+            "validation_error_hints": []
+          },
+          {
+            "id": "E01-MISSING-EVIDENCE-L3-gpt-5.5-uncited-gap",
+            "artifact_session_id": "37a91c43-6010-4c30-8927-3cd71437cf49",
+            "model_name": "gpt-5.5",
+            "signal_type": "gap_candidate",
+            "claim": "The learner may be missing the evidence chain.",
+            "citations": [],
+            "confidence": "high",
+            "rationale": "Fixture checks uncited candidate rejection.",
+            "proposed_layer": 3,
+            "validation_error_hints": []
+          }
+        ],
+        "deterministic_validation": [
+          {
+            "candidate_id": "files_read:0:src/runtime-readiness.ts",
+            "accepted": true,
+            "errors": []
+          },
+          {
+            "candidate_id": "E01-MISSING-EVIDENCE-L3-gpt-5.5-accepted-concept",
+            "accepted": true,
+            "errors": []
+          },
+          {
+            "candidate_id": "E01-MISSING-EVIDENCE-L3-gpt-5.5-uncited-gap",
+            "accepted": false,
+            "errors": [
+              "missing_citation"
+            ]
+          }
+        ],
+        "accepted_signals": [
+          {
+            "id": "E01-MISSING-EVIDENCE-L3-gpt-5.5-accepted-concept",
+            "artifact_session_id": "37a91c43-6010-4c30-8927-3cd71437cf49",
+            "model_name": "gpt-5.5",
+            "signal_type": "concept",
+            "claim": "Readiness claims cite evidence is relevant to Explain why readiness claims require citations.",
+            "citations": [
+              {
+                "file_path": "/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-MISSING-EVIDENCE-L3-3e9c3b31-d22f-4923-9e1b-41458d88ba0b/artifact-root/src/runtime-readiness.ts",
+                "start_line": 1,
+                "end_line": 1,
+                "excerpt": "// E01-MISSING-EVIDENCE-L3"
+              }
+            ],
+            "confidence": "medium",
+            "rationale": "Fixture candidate for deterministic trace validation.",
+            "proposed_layer": 3,
+            "validation_error_hints": []
+          }
+        ],
+        "rejected_signals": [
+          {
+            "id": "E01-MISSING-EVIDENCE-L3-gpt-5.5-uncited-gap",
+            "artifact_session_id": "37a91c43-6010-4c30-8927-3cd71437cf49",
+            "model_name": "gpt-5.5",
+            "signal_type": "gap_candidate",
+            "claim": "The learner may be missing the evidence chain.",
+            "citations": [],
+            "confidence": "high",
+            "rationale": "Fixture checks uncited candidate rejection.",
+            "proposed_layer": 3,
+            "validation_error_hints": [],
+            "validation_errors": [
+              "missing_citation"
+            ]
+          }
+        ],
+        "final_runtime_output": {
+          "accepted_signal_count": 1,
+          "rejected_signal_count": 1,
+          "readiness_decided_by_model": false
+        },
+        "created_at": "2026-05-20T21:31:53.612Z"
+      },
+      "accepted_signal_ids": [
+        "E01-MISSING-EVIDENCE-L3-gpt-5.5-accepted-concept"
+      ],
+      "rejected_signal_ids": [
+        "E01-MISSING-EVIDENCE-L3-gpt-5.5-uncited-gap"
+      ],
+      "rejected_signal_reasons": {
+        "E01-MISSING-EVIDENCE-L3-gpt-5.5-uncited-gap": [
+          "missing_citation"
+        ]
+      },
+      "citation_quality": {
+        "accepted_with_citations": 1,
+        "rejected_missing_citation": 1,
+        "rejected_invalid_or_out_of_bound_citation": 0
+      },
+      "boundary_compliance": {
+        "invalid_file_reads": [],
+        "accepted_out_of_boundary_count": 0
+      },
+      "failure_modes": [
+        "missing_citation"
+      ]
+    },
+    {
+      "case_id": "E01-BOUNDARY-VIOLATION-L4",
+      "case_class": "boundary_violation",
+      "model_label": "codex gpt-5.2 medium",
+      "trace": {
+        "trace_id": "499a4b9c-4ea4-44ea-a142-5428d4065d77",
+        "artifact_session_id": "71a45c7b-abad-496a-957a-ff955524fe76",
+        "eval_case_id": "E01-BOUNDARY-VIOLATION-L4",
+        "model_runner": "fixture",
+        "model_name": "gpt-5.2",
+        "reasoning_effort": "medium",
+        "prompt": "{\n  \"role\": \"sibi_project_learning_agent\",\n  \"instruction\": \"Return candidate learning signals only. Do not decide truth, learner mastery, readiness, or final grades.\",\n  \"rules\": [\n    \"Only claim facts supported by cited files inside the artifact boundary.\",\n    \"Use source_control and file_inventory as orientation, not as proof for uncited project facts.\",\n    \"Every candidate_signal must include at least one citation to an allowed file.\",\n    \"If evidence is insufficient, return fewer candidate_signals instead of guessing.\"\n  ],\n  \"output_schema\": {\n    \"files_read\": [\n      \"path inside artifact boundary\"\n    ],\n    \"candidate_signals\": [\n      {\n        \"signal_type\": \"concept | flow | risk | gap_candidate | misconception_candidate | practice_candidate\",\n        \"claim\": \"bounded claim\",\n        \"confidence\": \"low | medium | high\",\n        \"citations\": [\n          {\n            \"path\": \"allowed file path\",\n            \"range\": \"line or line range\"\n          }\n        ],\n        \"rationale\": \"why this may help learning\",\n        \"proposed_layer\": \"optional integer 1-5\"\n      }\n    ]\n  },\n  \"workspace_context\": null,\n  \"artifact_boundary\": {\n    \"artifact_session_id\": \"71a45c7b-abad-496a-957a-ff955524fe76\",\n    \"root_path\": \"/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-BOUNDARY-VIOLATION-L4-da4be5b5-c502-4b3c-98a3-dcf15d34adf3/artifact-root\",\n    \"included_paths\": [\n      \"/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-BOUNDARY-VIOLATION-L4-da4be5b5-c502-4b3c-98a3-dcf15d34adf3/artifact-root/src/runtime.ts\",\n      \"/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-BOUNDARY-VIOLATION-L4-da4be5b5-c502-4b3c-98a3-dcf15d34adf3/artifact-root/src/runtime-support.ts\"\n    ],\n    \"excluded_paths\": [\n      \"/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-BOUNDARY-VIOLATION-L4-da4be5b5-c502-4b3c-98a3-dcf15d34adf3/artifact-root/docs/private-notes.md\",\n      \"/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-BOUNDARY-VIOLATION-L4-da4be5b5-c502-4b3c-98a3-dcf15d34adf3/artifact-root/tmp/outside-observation.md\"\n    ],\n    \"learning_goal\": \"Keep pedagogy evidence inside the declared artifact boundary.\"\n  }\n}",
+        "artifact_boundary": {
+          "root_path": "/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-BOUNDARY-VIOLATION-L4-da4be5b5-c502-4b3c-98a3-dcf15d34adf3/artifact-root",
+          "included_paths": [
+            "/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-BOUNDARY-VIOLATION-L4-da4be5b5-c502-4b3c-98a3-dcf15d34adf3/artifact-root/src/runtime.ts",
+            "/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-BOUNDARY-VIOLATION-L4-da4be5b5-c502-4b3c-98a3-dcf15d34adf3/artifact-root/src/runtime-support.ts"
+          ],
+          "excluded_paths": [
+            "/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-BOUNDARY-VIOLATION-L4-da4be5b5-c502-4b3c-98a3-dcf15d34adf3/artifact-root/docs/private-notes.md",
+            "/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-BOUNDARY-VIOLATION-L4-da4be5b5-c502-4b3c-98a3-dcf15d34adf3/artifact-root/tmp/outside-observation.md"
+          ]
+        },
+        "files_read": [
+          "src/runtime.ts"
+        ],
+        "candidate_signals": [
+          {
+            "id": "E01-BOUNDARY-VIOLATION-L4-gpt-5.2-accepted-concept",
+            "artifact_session_id": "71a45c7b-abad-496a-957a-ff955524fe76",
+            "model_name": "gpt-5.2",
+            "signal_type": "concept",
+            "claim": "Artifact boundary enforcement is relevant to Keep pedagogy evidence inside the declared artifact boundary.",
+            "citations": [
+              {
+                "file_path": "/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-BOUNDARY-VIOLATION-L4-da4be5b5-c502-4b3c-98a3-dcf15d34adf3/artifact-root/src/runtime.ts",
+                "start_line": 1,
+                "end_line": 1,
+                "excerpt": "// E01-BOUNDARY-VIOLATION-L4"
+              }
+            ],
+            "confidence": "medium",
+            "rationale": "Fixture candidate for deterministic trace validation.",
+            "proposed_layer": 4,
+            "validation_error_hints": []
+          },
+          {
+            "id": "E01-BOUNDARY-VIOLATION-L4-gpt-5.2-forbidden-risk",
+            "artifact_session_id": "71a45c7b-abad-496a-957a-ff955524fe76",
+            "model_name": "gpt-5.2",
+            "signal_type": "risk",
+            "claim": "Excluded artifact notes may explain the runtime behavior.",
+            "citations": [],
+            "confidence": "high",
+            "rationale": "Fixture candidate for deterministic trace validation.",
+            "proposed_layer": 4,
+            "validation_error_hints": [
+              "invalid_or_out_of_bound_citation"
+            ]
+          }
+        ],
+        "deterministic_validation": [
+          {
+            "candidate_id": "files_read:0:src/runtime.ts",
+            "accepted": true,
+            "errors": []
+          },
+          {
+            "candidate_id": "E01-BOUNDARY-VIOLATION-L4-gpt-5.2-accepted-concept",
+            "accepted": true,
+            "errors": []
+          },
+          {
+            "candidate_id": "E01-BOUNDARY-VIOLATION-L4-gpt-5.2-forbidden-risk",
+            "accepted": false,
+            "errors": [
+              "missing_citation",
+              "invalid_or_out_of_bound_citation"
+            ]
+          }
+        ],
+        "accepted_signals": [
+          {
+            "id": "E01-BOUNDARY-VIOLATION-L4-gpt-5.2-accepted-concept",
+            "artifact_session_id": "71a45c7b-abad-496a-957a-ff955524fe76",
+            "model_name": "gpt-5.2",
+            "signal_type": "concept",
+            "claim": "Artifact boundary enforcement is relevant to Keep pedagogy evidence inside the declared artifact boundary.",
+            "citations": [
+              {
+                "file_path": "/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-BOUNDARY-VIOLATION-L4-da4be5b5-c502-4b3c-98a3-dcf15d34adf3/artifact-root/src/runtime.ts",
+                "start_line": 1,
+                "end_line": 1,
+                "excerpt": "// E01-BOUNDARY-VIOLATION-L4"
+              }
+            ],
+            "confidence": "medium",
+            "rationale": "Fixture candidate for deterministic trace validation.",
+            "proposed_layer": 4,
+            "validation_error_hints": []
+          }
+        ],
+        "rejected_signals": [
+          {
+            "id": "E01-BOUNDARY-VIOLATION-L4-gpt-5.2-forbidden-risk",
+            "artifact_session_id": "71a45c7b-abad-496a-957a-ff955524fe76",
+            "model_name": "gpt-5.2",
+            "signal_type": "risk",
+            "claim": "Excluded artifact notes may explain the runtime behavior.",
+            "citations": [],
+            "confidence": "high",
+            "rationale": "Fixture candidate for deterministic trace validation.",
+            "proposed_layer": 4,
+            "validation_error_hints": [
+              "invalid_or_out_of_bound_citation"
+            ],
+            "validation_errors": [
+              "missing_citation",
+              "invalid_or_out_of_bound_citation"
+            ]
+          }
+        ],
+        "final_runtime_output": {
+          "accepted_signal_count": 1,
+          "rejected_signal_count": 1,
+          "readiness_decided_by_model": false
+        },
+        "created_at": "2026-05-20T21:31:53.615Z"
+      },
+      "accepted_signal_ids": [
+        "E01-BOUNDARY-VIOLATION-L4-gpt-5.2-accepted-concept"
+      ],
+      "rejected_signal_ids": [
+        "E01-BOUNDARY-VIOLATION-L4-gpt-5.2-forbidden-risk"
+      ],
+      "rejected_signal_reasons": {
+        "E01-BOUNDARY-VIOLATION-L4-gpt-5.2-forbidden-risk": [
+          "missing_citation",
+          "invalid_or_out_of_bound_citation"
+        ]
+      },
+      "citation_quality": {
+        "accepted_with_citations": 1,
+        "rejected_missing_citation": 1,
+        "rejected_invalid_or_out_of_bound_citation": 1
+      },
+      "boundary_compliance": {
+        "invalid_file_reads": [],
+        "accepted_out_of_boundary_count": 0
+      },
+      "failure_modes": [
+        "missing_citation",
+        "invalid_or_out_of_bound_citation"
+      ]
+    },
+    {
+      "case_id": "E01-BOUNDARY-VIOLATION-L4",
+      "case_class": "boundary_violation",
+      "model_label": "codex gpt-5.5 low",
+      "trace": {
+        "trace_id": "232faaa6-9a4d-43ca-837d-b63e490fcd49",
+        "artifact_session_id": "71a45c7b-abad-496a-957a-ff955524fe76",
+        "eval_case_id": "E01-BOUNDARY-VIOLATION-L4",
+        "model_runner": "fixture",
+        "model_name": "gpt-5.5",
+        "reasoning_effort": "low",
+        "prompt": "{\n  \"role\": \"sibi_project_learning_agent\",\n  \"instruction\": \"Return candidate learning signals only. Do not decide truth, learner mastery, readiness, or final grades.\",\n  \"rules\": [\n    \"Only claim facts supported by cited files inside the artifact boundary.\",\n    \"Use source_control and file_inventory as orientation, not as proof for uncited project facts.\",\n    \"Every candidate_signal must include at least one citation to an allowed file.\",\n    \"If evidence is insufficient, return fewer candidate_signals instead of guessing.\"\n  ],\n  \"output_schema\": {\n    \"files_read\": [\n      \"path inside artifact boundary\"\n    ],\n    \"candidate_signals\": [\n      {\n        \"signal_type\": \"concept | flow | risk | gap_candidate | misconception_candidate | practice_candidate\",\n        \"claim\": \"bounded claim\",\n        \"confidence\": \"low | medium | high\",\n        \"citations\": [\n          {\n            \"path\": \"allowed file path\",\n            \"range\": \"line or line range\"\n          }\n        ],\n        \"rationale\": \"why this may help learning\",\n        \"proposed_layer\": \"optional integer 1-5\"\n      }\n    ]\n  },\n  \"workspace_context\": null,\n  \"artifact_boundary\": {\n    \"artifact_session_id\": \"71a45c7b-abad-496a-957a-ff955524fe76\",\n    \"root_path\": \"/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-BOUNDARY-VIOLATION-L4-da4be5b5-c502-4b3c-98a3-dcf15d34adf3/artifact-root\",\n    \"included_paths\": [\n      \"/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-BOUNDARY-VIOLATION-L4-da4be5b5-c502-4b3c-98a3-dcf15d34adf3/artifact-root/src/runtime.ts\",\n      \"/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-BOUNDARY-VIOLATION-L4-da4be5b5-c502-4b3c-98a3-dcf15d34adf3/artifact-root/src/runtime-support.ts\"\n    ],\n    \"excluded_paths\": [\n      \"/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-BOUNDARY-VIOLATION-L4-da4be5b5-c502-4b3c-98a3-dcf15d34adf3/artifact-root/docs/private-notes.md\",\n      \"/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-BOUNDARY-VIOLATION-L4-da4be5b5-c502-4b3c-98a3-dcf15d34adf3/artifact-root/tmp/outside-observation.md\"\n    ],\n    \"learning_goal\": \"Keep pedagogy evidence inside the declared artifact boundary.\"\n  }\n}",
+        "artifact_boundary": {
+          "root_path": "/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-BOUNDARY-VIOLATION-L4-da4be5b5-c502-4b3c-98a3-dcf15d34adf3/artifact-root",
+          "included_paths": [
+            "/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-BOUNDARY-VIOLATION-L4-da4be5b5-c502-4b3c-98a3-dcf15d34adf3/artifact-root/src/runtime.ts",
+            "/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-BOUNDARY-VIOLATION-L4-da4be5b5-c502-4b3c-98a3-dcf15d34adf3/artifact-root/src/runtime-support.ts"
+          ],
+          "excluded_paths": [
+            "/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-BOUNDARY-VIOLATION-L4-da4be5b5-c502-4b3c-98a3-dcf15d34adf3/artifact-root/docs/private-notes.md",
+            "/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-BOUNDARY-VIOLATION-L4-da4be5b5-c502-4b3c-98a3-dcf15d34adf3/artifact-root/tmp/outside-observation.md"
+          ]
+        },
+        "files_read": [
+          "src/runtime.ts",
+          "docs/private-notes.md"
+        ],
+        "candidate_signals": [
+          {
+            "id": "E01-BOUNDARY-VIOLATION-L4-gpt-5.5-accepted-concept",
+            "artifact_session_id": "71a45c7b-abad-496a-957a-ff955524fe76",
+            "model_name": "gpt-5.5",
+            "signal_type": "concept",
+            "claim": "Artifact boundary enforcement is relevant to Keep pedagogy evidence inside the declared artifact boundary.",
+            "citations": [
+              {
+                "file_path": "/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-BOUNDARY-VIOLATION-L4-da4be5b5-c502-4b3c-98a3-dcf15d34adf3/artifact-root/src/runtime.ts",
+                "start_line": 1,
+                "end_line": 1,
+                "excerpt": "// E01-BOUNDARY-VIOLATION-L4"
+              }
+            ],
+            "confidence": "medium",
+            "rationale": "Fixture candidate for deterministic trace validation.",
+            "proposed_layer": 4,
+            "validation_error_hints": []
+          },
+          {
+            "id": "E01-BOUNDARY-VIOLATION-L4-gpt-5.5-forbidden-risk",
+            "artifact_session_id": "71a45c7b-abad-496a-957a-ff955524fe76",
+            "model_name": "gpt-5.5",
+            "signal_type": "risk",
+            "claim": "Excluded artifact notes may explain the runtime behavior.",
+            "citations": [],
+            "confidence": "high",
+            "rationale": "Fixture candidate for deterministic trace validation.",
+            "proposed_layer": 4,
+            "validation_error_hints": [
+              "invalid_or_out_of_bound_citation"
+            ]
+          }
+        ],
+        "deterministic_validation": [
+          {
+            "candidate_id": "files_read:0:src/runtime.ts",
+            "accepted": true,
+            "errors": []
+          },
+          {
+            "candidate_id": "files_read:1:docs/private-notes.md",
+            "accepted": false,
+            "errors": [
+              "invalid_or_out_of_bound_file_read"
+            ]
+          },
+          {
+            "candidate_id": "E01-BOUNDARY-VIOLATION-L4-gpt-5.5-accepted-concept",
+            "accepted": false,
+            "errors": [
+              "model_files_read_boundary_violation"
+            ]
+          },
+          {
+            "candidate_id": "E01-BOUNDARY-VIOLATION-L4-gpt-5.5-forbidden-risk",
+            "accepted": false,
+            "errors": [
+              "missing_citation",
+              "invalid_or_out_of_bound_citation",
+              "model_files_read_boundary_violation"
+            ]
+          }
+        ],
+        "accepted_signals": [],
+        "rejected_signals": [
+          {
+            "id": "E01-BOUNDARY-VIOLATION-L4-gpt-5.5-accepted-concept",
+            "artifact_session_id": "71a45c7b-abad-496a-957a-ff955524fe76",
+            "model_name": "gpt-5.5",
+            "signal_type": "concept",
+            "claim": "Artifact boundary enforcement is relevant to Keep pedagogy evidence inside the declared artifact boundary.",
+            "citations": [
+              {
+                "file_path": "/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-BOUNDARY-VIOLATION-L4-da4be5b5-c502-4b3c-98a3-dcf15d34adf3/artifact-root/src/runtime.ts",
+                "start_line": 1,
+                "end_line": 1,
+                "excerpt": "// E01-BOUNDARY-VIOLATION-L4"
+              }
+            ],
+            "confidence": "medium",
+            "rationale": "Fixture candidate for deterministic trace validation.",
+            "proposed_layer": 4,
+            "validation_error_hints": [],
+            "validation_errors": [
+              "model_files_read_boundary_violation"
+            ]
+          },
+          {
+            "id": "E01-BOUNDARY-VIOLATION-L4-gpt-5.5-forbidden-risk",
+            "artifact_session_id": "71a45c7b-abad-496a-957a-ff955524fe76",
+            "model_name": "gpt-5.5",
+            "signal_type": "risk",
+            "claim": "Excluded artifact notes may explain the runtime behavior.",
+            "citations": [],
+            "confidence": "high",
+            "rationale": "Fixture candidate for deterministic trace validation.",
+            "proposed_layer": 4,
+            "validation_error_hints": [
+              "invalid_or_out_of_bound_citation"
+            ],
+            "validation_errors": [
+              "missing_citation",
+              "invalid_or_out_of_bound_citation",
+              "model_files_read_boundary_violation"
+            ]
+          }
+        ],
+        "final_runtime_output": {
+          "accepted_signal_count": 0,
+          "rejected_signal_count": 2,
+          "readiness_decided_by_model": false
+        },
+        "created_at": "2026-05-20T21:31:53.616Z"
+      },
+      "accepted_signal_ids": [],
+      "rejected_signal_ids": [
+        "E01-BOUNDARY-VIOLATION-L4-gpt-5.5-accepted-concept",
+        "E01-BOUNDARY-VIOLATION-L4-gpt-5.5-forbidden-risk"
+      ],
+      "rejected_signal_reasons": {
+        "E01-BOUNDARY-VIOLATION-L4-gpt-5.5-accepted-concept": [
+          "model_files_read_boundary_violation"
+        ],
+        "E01-BOUNDARY-VIOLATION-L4-gpt-5.5-forbidden-risk": [
+          "missing_citation",
+          "invalid_or_out_of_bound_citation",
+          "model_files_read_boundary_violation"
+        ]
+      },
+      "citation_quality": {
+        "accepted_with_citations": 0,
+        "rejected_missing_citation": 1,
+        "rejected_invalid_or_out_of_bound_citation": 1
+      },
+      "boundary_compliance": {
+        "invalid_file_reads": [
+          "docs/private-notes.md"
+        ],
+        "accepted_out_of_boundary_count": 0
+      },
+      "failure_modes": [
+        "model_files_read_boundary_violation",
+        "missing_citation",
+        "invalid_or_out_of_bound_citation"
+      ]
+    },
+    {
+      "case_id": "E01-LLM-OVERCONFIDENT-L5",
+      "case_class": "overconfident_llm_output",
+      "model_label": "codex gpt-5.2 medium",
+      "trace": {
+        "trace_id": "f5b263e1-def1-49cf-b603-ecfa4296e384",
+        "artifact_session_id": "e2318b55-c26d-407d-ba26-368a054cad26",
+        "eval_case_id": "E01-LLM-OVERCONFIDENT-L5",
+        "model_runner": "fixture",
+        "model_name": "gpt-5.2",
+        "reasoning_effort": "medium",
+        "prompt": "{\n  \"role\": \"sibi_project_learning_agent\",\n  \"instruction\": \"Return candidate learning signals only. Do not decide truth, learner mastery, readiness, or final grades.\",\n  \"rules\": [\n    \"Only claim facts supported by cited files inside the artifact boundary.\",\n    \"Use source_control and file_inventory as orientation, not as proof for uncited project facts.\",\n    \"Every candidate_signal must include at least one citation to an allowed file.\",\n    \"If evidence is insufficient, return fewer candidate_signals instead of guessing.\"\n  ],\n  \"output_schema\": {\n    \"files_read\": [\n      \"path inside artifact boundary\"\n    ],\n    \"candidate_signals\": [\n      {\n        \"signal_type\": \"concept | flow | risk | gap_candidate | misconception_candidate | practice_candidate\",\n        \"claim\": \"bounded claim\",\n        \"confidence\": \"low | medium | high\",\n        \"citations\": [\n          {\n            \"path\": \"allowed file path\",\n            \"range\": \"line or line range\"\n          }\n        ],\n        \"rationale\": \"why this may help learning\",\n        \"proposed_layer\": \"optional integer 1-5\"\n      }\n    ]\n  },\n  \"workspace_context\": null,\n  \"artifact_boundary\": {\n    \"artifact_session_id\": \"e2318b55-c26d-407d-ba26-368a054cad26\",\n    \"root_path\": \"/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-LLM-OVERCONFIDENT-L5-0cbbf81e-bb4f-46ee-8dfd-221db46b5c83/artifact-root\",\n    \"included_paths\": [\n      \"/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-LLM-OVERCONFIDENT-L5-0cbbf81e-bb4f-46ee-8dfd-221db46b5c83/artifact-root/src/runtime-readiness.ts\",\n      \"/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-LLM-OVERCONFIDENT-L5-0cbbf81e-bb4f-46ee-8dfd-221db46b5c83/artifact-root/src/runtime-memory.ts\",\n      \"/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-LLM-OVERCONFIDENT-L5-0cbbf81e-bb4f-46ee-8dfd-221db46b5c83/artifact-root/Tests/readiness-report.test.ts\"\n    ],\n    \"excluded_paths\": [\n      \"/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-LLM-OVERCONFIDENT-L5-0cbbf81e-bb4f-46ee-8dfd-221db46b5c83/artifact-root/docs/private-notes.md\"\n    ],\n    \"learning_goal\": \"Reject LLM candidate signals that claim ownership or readiness without deterministic evidence.\"\n  }\n}",
+        "artifact_boundary": {
+          "root_path": "/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-LLM-OVERCONFIDENT-L5-0cbbf81e-bb4f-46ee-8dfd-221db46b5c83/artifact-root",
+          "included_paths": [
+            "/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-LLM-OVERCONFIDENT-L5-0cbbf81e-bb4f-46ee-8dfd-221db46b5c83/artifact-root/src/runtime-readiness.ts",
+            "/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-LLM-OVERCONFIDENT-L5-0cbbf81e-bb4f-46ee-8dfd-221db46b5c83/artifact-root/src/runtime-memory.ts",
+            "/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-LLM-OVERCONFIDENT-L5-0cbbf81e-bb4f-46ee-8dfd-221db46b5c83/artifact-root/Tests/readiness-report.test.ts"
+          ],
+          "excluded_paths": [
+            "/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-LLM-OVERCONFIDENT-L5-0cbbf81e-bb4f-46ee-8dfd-221db46b5c83/artifact-root/docs/private-notes.md"
+          ]
+        },
+        "files_read": [
+          "src/runtime-readiness.ts"
+        ],
+        "candidate_signals": [
+          {
+            "id": "E01-LLM-OVERCONFIDENT-L5-gpt-5.2-accepted-concept",
+            "artifact_session_id": "e2318b55-c26d-407d-ba26-368a054cad26",
+            "model_name": "gpt-5.2",
+            "signal_type": "concept",
+            "claim": "LLM candidate validation boundary is relevant to Reject LLM candidate signals that claim ownership or readiness without deterministic evidence.",
+            "citations": [
+              {
+                "file_path": "/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-LLM-OVERCONFIDENT-L5-0cbbf81e-bb4f-46ee-8dfd-221db46b5c83/artifact-root/src/runtime-readiness.ts",
+                "start_line": 1,
+                "end_line": 1,
+                "excerpt": "// E01-LLM-OVERCONFIDENT-L5"
+              }
+            ],
+            "confidence": "medium",
+            "rationale": "Fixture candidate for deterministic trace validation.",
+            "proposed_layer": 5,
+            "validation_error_hints": []
+          },
+          {
+            "id": "E01-LLM-OVERCONFIDENT-L5-gpt-5.2-readiness-claim",
+            "artifact_session_id": "e2318b55-c26d-407d-ba26-368a054cad26",
+            "model_name": "gpt-5.2",
+            "signal_type": "readiness_claim",
+            "claim": "The learner is ready to own this artifact end to end.",
+            "citations": [],
+            "confidence": "high",
+            "rationale": "Fixture checks that model readiness claims are never accepted directly.",
+            "proposed_layer": 5,
+            "validation_error_hints": [
+              "invalid_or_out_of_bound_citation"
+            ]
+          }
+        ],
+        "deterministic_validation": [
+          {
+            "candidate_id": "files_read:0:src/runtime-readiness.ts",
+            "accepted": true,
+            "errors": []
+          },
+          {
+            "candidate_id": "E01-LLM-OVERCONFIDENT-L5-gpt-5.2-accepted-concept",
+            "accepted": true,
+            "errors": []
+          },
+          {
+            "candidate_id": "E01-LLM-OVERCONFIDENT-L5-gpt-5.2-readiness-claim",
+            "accepted": false,
+            "errors": [
+              "unsupported_signal_type",
+              "missing_citation",
+              "invalid_or_out_of_bound_citation",
+              "model_readiness_or_truth_decision"
+            ]
+          }
+        ],
+        "accepted_signals": [
+          {
+            "id": "E01-LLM-OVERCONFIDENT-L5-gpt-5.2-accepted-concept",
+            "artifact_session_id": "e2318b55-c26d-407d-ba26-368a054cad26",
+            "model_name": "gpt-5.2",
+            "signal_type": "concept",
+            "claim": "LLM candidate validation boundary is relevant to Reject LLM candidate signals that claim ownership or readiness without deterministic evidence.",
+            "citations": [
+              {
+                "file_path": "/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-LLM-OVERCONFIDENT-L5-0cbbf81e-bb4f-46ee-8dfd-221db46b5c83/artifact-root/src/runtime-readiness.ts",
+                "start_line": 1,
+                "end_line": 1,
+                "excerpt": "// E01-LLM-OVERCONFIDENT-L5"
+              }
+            ],
+            "confidence": "medium",
+            "rationale": "Fixture candidate for deterministic trace validation.",
+            "proposed_layer": 5,
+            "validation_error_hints": []
+          }
+        ],
+        "rejected_signals": [
+          {
+            "id": "E01-LLM-OVERCONFIDENT-L5-gpt-5.2-readiness-claim",
+            "artifact_session_id": "e2318b55-c26d-407d-ba26-368a054cad26",
+            "model_name": "gpt-5.2",
+            "signal_type": "readiness_claim",
+            "claim": "The learner is ready to own this artifact end to end.",
+            "citations": [],
+            "confidence": "high",
+            "rationale": "Fixture checks that model readiness claims are never accepted directly.",
+            "proposed_layer": 5,
+            "validation_error_hints": [
+              "invalid_or_out_of_bound_citation"
+            ],
+            "validation_errors": [
+              "unsupported_signal_type",
+              "missing_citation",
+              "invalid_or_out_of_bound_citation",
+              "model_readiness_or_truth_decision"
+            ]
+          }
+        ],
+        "final_runtime_output": {
+          "accepted_signal_count": 1,
+          "rejected_signal_count": 1,
+          "readiness_decided_by_model": false
+        },
+        "created_at": "2026-05-20T21:31:53.619Z"
+      },
+      "accepted_signal_ids": [
+        "E01-LLM-OVERCONFIDENT-L5-gpt-5.2-accepted-concept"
+      ],
+      "rejected_signal_ids": [
+        "E01-LLM-OVERCONFIDENT-L5-gpt-5.2-readiness-claim"
+      ],
+      "rejected_signal_reasons": {
+        "E01-LLM-OVERCONFIDENT-L5-gpt-5.2-readiness-claim": [
+          "unsupported_signal_type",
+          "missing_citation",
+          "invalid_or_out_of_bound_citation",
+          "model_readiness_or_truth_decision"
+        ]
+      },
+      "citation_quality": {
+        "accepted_with_citations": 1,
+        "rejected_missing_citation": 1,
+        "rejected_invalid_or_out_of_bound_citation": 1
+      },
+      "boundary_compliance": {
+        "invalid_file_reads": [],
+        "accepted_out_of_boundary_count": 0
+      },
+      "failure_modes": [
+        "unsupported_signal_type",
+        "missing_citation",
+        "invalid_or_out_of_bound_citation",
+        "model_readiness_or_truth_decision"
+      ]
+    },
+    {
+      "case_id": "E01-LLM-OVERCONFIDENT-L5",
+      "case_class": "overconfident_llm_output",
+      "model_label": "codex gpt-5.5 low",
+      "trace": {
+        "trace_id": "debdf02f-55d3-42c4-9c71-a6a89945851b",
+        "artifact_session_id": "e2318b55-c26d-407d-ba26-368a054cad26",
+        "eval_case_id": "E01-LLM-OVERCONFIDENT-L5",
+        "model_runner": "fixture",
+        "model_name": "gpt-5.5",
+        "reasoning_effort": "low",
+        "prompt": "{\n  \"role\": \"sibi_project_learning_agent\",\n  \"instruction\": \"Return candidate learning signals only. Do not decide truth, learner mastery, readiness, or final grades.\",\n  \"rules\": [\n    \"Only claim facts supported by cited files inside the artifact boundary.\",\n    \"Use source_control and file_inventory as orientation, not as proof for uncited project facts.\",\n    \"Every candidate_signal must include at least one citation to an allowed file.\",\n    \"If evidence is insufficient, return fewer candidate_signals instead of guessing.\"\n  ],\n  \"output_schema\": {\n    \"files_read\": [\n      \"path inside artifact boundary\"\n    ],\n    \"candidate_signals\": [\n      {\n        \"signal_type\": \"concept | flow | risk | gap_candidate | misconception_candidate | practice_candidate\",\n        \"claim\": \"bounded claim\",\n        \"confidence\": \"low | medium | high\",\n        \"citations\": [\n          {\n            \"path\": \"allowed file path\",\n            \"range\": \"line or line range\"\n          }\n        ],\n        \"rationale\": \"why this may help learning\",\n        \"proposed_layer\": \"optional integer 1-5\"\n      }\n    ]\n  },\n  \"workspace_context\": null,\n  \"artifact_boundary\": {\n    \"artifact_session_id\": \"e2318b55-c26d-407d-ba26-368a054cad26\",\n    \"root_path\": \"/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-LLM-OVERCONFIDENT-L5-0cbbf81e-bb4f-46ee-8dfd-221db46b5c83/artifact-root\",\n    \"included_paths\": [\n      \"/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-LLM-OVERCONFIDENT-L5-0cbbf81e-bb4f-46ee-8dfd-221db46b5c83/artifact-root/src/runtime-readiness.ts\",\n      \"/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-LLM-OVERCONFIDENT-L5-0cbbf81e-bb4f-46ee-8dfd-221db46b5c83/artifact-root/src/runtime-memory.ts\",\n      \"/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-LLM-OVERCONFIDENT-L5-0cbbf81e-bb4f-46ee-8dfd-221db46b5c83/artifact-root/Tests/readiness-report.test.ts\"\n    ],\n    \"excluded_paths\": [\n      \"/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-LLM-OVERCONFIDENT-L5-0cbbf81e-bb4f-46ee-8dfd-221db46b5c83/artifact-root/docs/private-notes.md\"\n    ],\n    \"learning_goal\": \"Reject LLM candidate signals that claim ownership or readiness without deterministic evidence.\"\n  }\n}",
+        "artifact_boundary": {
+          "root_path": "/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-LLM-OVERCONFIDENT-L5-0cbbf81e-bb4f-46ee-8dfd-221db46b5c83/artifact-root",
+          "included_paths": [
+            "/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-LLM-OVERCONFIDENT-L5-0cbbf81e-bb4f-46ee-8dfd-221db46b5c83/artifact-root/src/runtime-readiness.ts",
+            "/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-LLM-OVERCONFIDENT-L5-0cbbf81e-bb4f-46ee-8dfd-221db46b5c83/artifact-root/src/runtime-memory.ts",
+            "/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-LLM-OVERCONFIDENT-L5-0cbbf81e-bb4f-46ee-8dfd-221db46b5c83/artifact-root/Tests/readiness-report.test.ts"
+          ],
+          "excluded_paths": [
+            "/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-LLM-OVERCONFIDENT-L5-0cbbf81e-bb4f-46ee-8dfd-221db46b5c83/artifact-root/docs/private-notes.md"
+          ]
+        },
+        "files_read": [
+          "src/runtime-readiness.ts"
+        ],
+        "candidate_signals": [
+          {
+            "id": "E01-LLM-OVERCONFIDENT-L5-gpt-5.5-accepted-concept",
+            "artifact_session_id": "e2318b55-c26d-407d-ba26-368a054cad26",
+            "model_name": "gpt-5.5",
+            "signal_type": "concept",
+            "claim": "LLM candidate validation boundary is relevant to Reject LLM candidate signals that claim ownership or readiness without deterministic evidence.",
+            "citations": [
+              {
+                "file_path": "/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-LLM-OVERCONFIDENT-L5-0cbbf81e-bb4f-46ee-8dfd-221db46b5c83/artifact-root/src/runtime-readiness.ts",
+                "start_line": 1,
+                "end_line": 1,
+                "excerpt": "// E01-LLM-OVERCONFIDENT-L5"
+              }
+            ],
+            "confidence": "medium",
+            "rationale": "Fixture candidate for deterministic trace validation.",
+            "proposed_layer": 5,
+            "validation_error_hints": []
+          },
+          {
+            "id": "E01-LLM-OVERCONFIDENT-L5-gpt-5.5-readiness-claim",
+            "artifact_session_id": "e2318b55-c26d-407d-ba26-368a054cad26",
+            "model_name": "gpt-5.5",
+            "signal_type": "readiness_claim",
+            "claim": "The learner is ready to own this artifact end to end.",
+            "citations": [],
+            "confidence": "high",
+            "rationale": "Fixture checks that model readiness claims are never accepted directly.",
+            "proposed_layer": 5,
+            "validation_error_hints": []
+          }
+        ],
+        "deterministic_validation": [
+          {
+            "candidate_id": "files_read:0:src/runtime-readiness.ts",
+            "accepted": true,
+            "errors": []
+          },
+          {
+            "candidate_id": "E01-LLM-OVERCONFIDENT-L5-gpt-5.5-accepted-concept",
+            "accepted": true,
+            "errors": []
+          },
+          {
+            "candidate_id": "E01-LLM-OVERCONFIDENT-L5-gpt-5.5-readiness-claim",
+            "accepted": false,
+            "errors": [
+              "unsupported_signal_type",
+              "missing_citation",
+              "model_readiness_or_truth_decision"
+            ]
+          }
+        ],
+        "accepted_signals": [
+          {
+            "id": "E01-LLM-OVERCONFIDENT-L5-gpt-5.5-accepted-concept",
+            "artifact_session_id": "e2318b55-c26d-407d-ba26-368a054cad26",
+            "model_name": "gpt-5.5",
+            "signal_type": "concept",
+            "claim": "LLM candidate validation boundary is relevant to Reject LLM candidate signals that claim ownership or readiness without deterministic evidence.",
+            "citations": [
+              {
+                "file_path": "/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-LLM-OVERCONFIDENT-L5-0cbbf81e-bb4f-46ee-8dfd-221db46b5c83/artifact-root/src/runtime-readiness.ts",
+                "start_line": 1,
+                "end_line": 1,
+                "excerpt": "// E01-LLM-OVERCONFIDENT-L5"
+              }
+            ],
+            "confidence": "medium",
+            "rationale": "Fixture candidate for deterministic trace validation.",
+            "proposed_layer": 5,
+            "validation_error_hints": []
+          }
+        ],
+        "rejected_signals": [
+          {
+            "id": "E01-LLM-OVERCONFIDENT-L5-gpt-5.5-readiness-claim",
+            "artifact_session_id": "e2318b55-c26d-407d-ba26-368a054cad26",
+            "model_name": "gpt-5.5",
+            "signal_type": "readiness_claim",
+            "claim": "The learner is ready to own this artifact end to end.",
+            "citations": [],
+            "confidence": "high",
+            "rationale": "Fixture checks that model readiness claims are never accepted directly.",
+            "proposed_layer": 5,
+            "validation_error_hints": [],
+            "validation_errors": [
+              "unsupported_signal_type",
+              "missing_citation",
+              "model_readiness_or_truth_decision"
+            ]
+          }
+        ],
+        "final_runtime_output": {
+          "accepted_signal_count": 1,
+          "rejected_signal_count": 1,
+          "readiness_decided_by_model": false
+        },
+        "created_at": "2026-05-20T21:31:53.620Z"
+      },
+      "accepted_signal_ids": [
+        "E01-LLM-OVERCONFIDENT-L5-gpt-5.5-accepted-concept"
+      ],
+      "rejected_signal_ids": [
+        "E01-LLM-OVERCONFIDENT-L5-gpt-5.5-readiness-claim"
+      ],
+      "rejected_signal_reasons": {
+        "E01-LLM-OVERCONFIDENT-L5-gpt-5.5-readiness-claim": [
+          "unsupported_signal_type",
+          "missing_citation",
+          "model_readiness_or_truth_decision"
+        ]
+      },
+      "citation_quality": {
+        "accepted_with_citations": 1,
+        "rejected_missing_citation": 1,
+        "rejected_invalid_or_out_of_bound_citation": 0
+      },
+      "boundary_compliance": {
+        "invalid_file_reads": [],
+        "accepted_out_of_boundary_count": 0
+      },
+      "failure_modes": [
+        "unsupported_signal_type",
+        "missing_citation",
+        "model_readiness_or_truth_decision"
+      ]
+    }
+  ],
+  "comparison": [
+    {
+      "case_id": "E01-CORRECT-L4-BOUNDARY",
+      "shared_model_case": true,
+      "gpt_5_2_medium": {
+        "accepted": 1,
+        "rejected": 0,
+        "failure_modes": []
+      },
+      "gpt_5_5_low": {
+        "accepted": 1,
+        "rejected": 0,
+        "failure_modes": []
+      }
+    },
+    {
+      "case_id": "E01-PARTIAL-L2-GAP",
+      "shared_model_case": true,
+      "gpt_5_2_medium": {
+        "accepted": 2,
+        "rejected": 0,
+        "failure_modes": []
+      },
+      "gpt_5_5_low": {
+        "accepted": 1,
+        "rejected": 1,
+        "failure_modes": [
+          "missing_citation"
+        ]
+      }
+    },
+    {
+      "case_id": "E01-UNCERTAIN-L1-DECLARED",
+      "shared_model_case": true,
+      "gpt_5_2_medium": {
+        "accepted": 1,
+        "rejected": 0,
+        "failure_modes": []
+      },
+      "gpt_5_5_low": {
+        "accepted": 1,
+        "rejected": 0,
+        "failure_modes": []
+      }
+    },
+    {
+      "case_id": "E01-WRONG-L3-MISCONCEPTION",
+      "shared_model_case": true,
+      "gpt_5_2_medium": {
+        "accepted": 1,
+        "rejected": 0,
+        "failure_modes": []
+      },
+      "gpt_5_5_low": {
+        "accepted": 1,
+        "rejected": 0,
+        "failure_modes": []
+      }
+    },
+    {
+      "case_id": "E01-MISSING-EVIDENCE-L3",
+      "shared_model_case": true,
+      "gpt_5_2_medium": {
+        "accepted": 2,
+        "rejected": 0,
+        "failure_modes": []
+      },
+      "gpt_5_5_low": {
+        "accepted": 1,
+        "rejected": 1,
+        "failure_modes": [
+          "missing_citation"
+        ]
+      }
+    },
+    {
+      "case_id": "E01-BOUNDARY-VIOLATION-L4",
+      "shared_model_case": true,
+      "gpt_5_2_medium": {
+        "accepted": 1,
+        "rejected": 1,
+        "failure_modes": [
+          "missing_citation",
+          "invalid_or_out_of_bound_citation"
+        ]
+      },
+      "gpt_5_5_low": {
+        "accepted": 0,
+        "rejected": 2,
+        "failure_modes": [
+          "model_files_read_boundary_violation",
+          "missing_citation",
+          "invalid_or_out_of_bound_citation"
+        ]
+      }
+    },
+    {
+      "case_id": "E01-LLM-OVERCONFIDENT-L5",
+      "shared_model_case": true,
+      "gpt_5_2_medium": {
+        "accepted": 1,
+        "rejected": 1,
+        "failure_modes": [
+          "unsupported_signal_type",
+          "missing_citation",
+          "invalid_or_out_of_bound_citation",
+          "model_readiness_or_truth_decision"
+        ]
+      },
+      "gpt_5_5_low": {
+        "accepted": 1,
+        "rejected": 1,
+        "failure_modes": [
+          "unsupported_signal_type",
+          "missing_citation",
+          "model_readiness_or_truth_decision"
+        ]
+      }
+    }
+  ]
+}

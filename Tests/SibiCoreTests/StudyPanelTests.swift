@@ -219,14 +219,14 @@ final class StudyPanelTests: XCTestCase {
                     throw RuntimeClientError.processFailure("unexpected answer")
                 }
             ),
-            environment: ["SIBI_WORKSPACE_FIXTURE_MODEL_RESPONSE_PATH": "docs/specs/deep-ownership-workspace/fixtures/live-workspace-session.json"]
+            environment: ["SIBI_WORKSPACE_FIXTURE_MODEL_RESPONSE_PATH": "evals/deep-ownership-workspace/fixtures/live-workspace-session.json"]
         )
 
         await model.startLiveWorkspace(goal: "Explain this project A-Z", rootPath: "/tmp/sibi")
 
         XCTAssertEqual(
             recorder.startWorkspacePayload?.fixture_model_response_path,
-            "docs/specs/deep-ownership-workspace/fixtures/live-workspace-session.json"
+            "evals/deep-ownership-workspace/fixtures/live-workspace-session.json"
         )
         XCTAssertEqual(model.liveWorkspaceSession?.workspace_session.workspace_session_id, "ws-1")
         XCTAssertEqual(model.statusText, "Live workspace session started.")
@@ -247,7 +247,7 @@ final class StudyPanelTests: XCTestCase {
                     throw RuntimeClientError.processFailure("unexpected answer")
                 }
             ),
-            environment: ["SIBI_WORKSPACE_FIXTURE_MODEL_RESPONSE_PATH": "docs/specs/deep-ownership-workspace/fixtures/live-workspace-session.json"]
+            environment: ["SIBI_WORKSPACE_FIXTURE_MODEL_RESPONSE_PATH": "evals/deep-ownership-workspace/fixtures/live-workspace-session.json"]
         )
 
         await model.startLiveWorkspace(
@@ -279,7 +279,7 @@ final class StudyPanelTests: XCTestCase {
                     throw RuntimeClientError.processFailure("unexpected answer")
                 }
             ),
-            environment: ["SIBI_WORKSPACE_FIXTURE_MODEL_RESPONSE_PATH": "docs/specs/deep-ownership-workspace/fixtures/live-workspace-session.json"]
+            environment: ["SIBI_WORKSPACE_FIXTURE_MODEL_RESPONSE_PATH": "evals/deep-ownership-workspace/fixtures/live-workspace-session.json"]
         )
 
         await model.startLiveWorkspace(
@@ -290,7 +290,7 @@ final class StudyPanelTests: XCTestCase {
 
         XCTAssertEqual(
             recorder.startWorkspacePayload?.fixture_model_response_path,
-            "docs/specs/deep-ownership-workspace/fixtures/live-workspace-session.json"
+            "evals/deep-ownership-workspace/fixtures/live-workspace-session.json"
         )
         XCTAssertEqual(model.liveWorkspaceSession?.workspace_session.workspace_session_id, "ws-1")
         XCTAssertEqual(model.statusText, "Live workspace session started.")

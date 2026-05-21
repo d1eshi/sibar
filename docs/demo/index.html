@@ -492,7 +492,7 @@ section { margin: 32px 0; }
   </p>
   <p class="spec-ref">
     Spec: docs/specs/selfhost/05_public_demo_prototype.md &middot;
-    Fixtures: docs/specs/selfhost/pilot/reports/VAL-EVAL-006-selfhost-benchmark.json
+    Fixtures: evals/attempt-readiness/reports/VAL-EVAL-007-selfhost-benchmark.json
   </p>
 </header>
 
@@ -540,10 +540,10 @@ section { margin: 32px 0; }
         <ul>
           <li>src/ — runtime, evals, scripts</li>
           <li>Tests/ — test suite</li>
-          <li>sibar.selfhost.manifest.json</li>
+          <li>evals/attempt-readiness/manifest.json</li>
           <li>package.json, tsconfig.json</li>
           <li>pnpm-lock.yaml</li>
-          <li>docs/specs/selfhost/pilot/ — gold cases, mastery checks</li>
+          <li>evals/attempt-readiness/ — manifest, mastery checks, gold cases</li>
         </ul>
       </div>
       <div class="boundary-col excluded">
@@ -684,7 +684,7 @@ section { margin: 32px 0; }
   <div class="fixture-label">FIXTURE-BACKED PROTOTYPE</div>
   <p style="margin-top:6px;">
     Demo data traced to
-    <code>docs/specs/selfhost/pilot/reports/VAL-EVAL-006-selfhost-benchmark.json</code>
+    <code>evals/attempt-readiness/reports/VAL-EVAL-007-selfhost-benchmark.json</code>
     &middot; Cases GC-001 through GC-008
   </p>
   <p style="margin-top:4px;">
@@ -716,12 +716,12 @@ const DEMO_FIXTURES = {
     case_id: "GC-001",
     concept: "artifact_boundary",
     operation: "trace",
-    source_report: "docs/specs/selfhost/pilot/reports/VAL-EVAL-006-selfhost-benchmark.json",
+    source_report: "evals/attempt-readiness/reports/VAL-EVAL-007-selfhost-benchmark.json",
     observed_finding: "readiness",
     gap_type: null,
     issue_candidate_type: "none",
     readiness: "ready to modify with guardrails",
-    user_evidence: "I would trace boundary control in `sibar.selfhost.manifest.json` and `src/runtime-concept-graph.ts`, cite at least one included file path such as `src/runtime-support.ts` and one excluded path in the manifest, and explain that only listed included paths can support artifact evidence.",
+    user_evidence: "I would trace boundary control in `evals/attempt-readiness/manifest.json` and `src/runtime-concept-graph.ts`, cite at least one included file path such as `src/runtime-support.ts` and one excluded path in the manifest, and explain that only listed included paths can support artifact evidence.",
     repo_evidence: [
       { path: "src/runtime-concept-graph.ts", rationale: "Boundary traversal logic (included/excluded checks and inventory walk) defines what is in-scope for concept graph evidence.", excerpt: "export function buildConceptGraph" },
       { path: "src/runtime-support.ts", rationale: "Core types and shared session metadata describe the boundary contract used when reading sessions and sessions' path fields.", excerpt: "included_paths: string[];" },
@@ -738,7 +738,7 @@ const DEMO_FIXTURES = {
     case_id: "GC-002",
     concept: "artifact_boundary",
     operation: "trace",
-    source_report: "docs/specs/selfhost/pilot/reports/VAL-EVAL-006-selfhost-benchmark.json",
+    source_report: "evals/attempt-readiness/reports/VAL-EVAL-007-selfhost-benchmark.json",
     observed_finding: "evidence_gap",
     gap_type: "evidence_gap",
     issue_candidate_type: "LearningGap",
@@ -760,7 +760,7 @@ const DEMO_FIXTURES = {
     case_id: "GC-003",
     concept: "artifact_boundary",
     operation: "trace",
-    source_report: "docs/specs/selfhost/pilot/reports/VAL-EVAL-006-selfhost-benchmark.json",
+    source_report: "evals/attempt-readiness/reports/VAL-EVAL-007-selfhost-benchmark.json",
     observed_finding: "flow_gap",
     gap_type: "flow_gap",
     issue_candidate_type: "LearningGap",
@@ -782,7 +782,7 @@ const DEMO_FIXTURES = {
     case_id: "GC-006",
     concept: "artifact_boundary",
     operation: "trace",
-    source_report: "docs/specs/selfhost/pilot/reports/VAL-EVAL-006-selfhost-benchmark.json",
+    source_report: "evals/attempt-readiness/reports/VAL-EVAL-007-selfhost-benchmark.json",
     observed_finding: "false_confidence_gap",
     gap_type: "false_confidence_gap",
     issue_candidate_type: "LearningGap",
@@ -804,7 +804,7 @@ const DEMO_FIXTURES = {
     case_id: "GC-008",
     concept: "artifact_boundary",
     operation: "trace",
-    source_report: "docs/specs/selfhost/pilot/reports/VAL-EVAL-006-selfhost-benchmark.json",
+    source_report: "evals/attempt-readiness/reports/VAL-EVAL-007-selfhost-benchmark.json",
     observed_finding: "design_induced_gap",
     gap_type: "design_induced_gap",
     issue_candidate_type: "DesignIssue",

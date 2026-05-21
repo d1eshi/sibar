@@ -1,7 +1,14 @@
-# Self-Hosted MVP Pilot: Mastery Checks
+# Self-Hosted MVP Pilot
 
-This folder contains the first-slice self-hosted pilot fixtures required by
-`sibar.selfhost.manifest.json`.
+This folder is a Markdown-only documentation entry point for the historical
+self-hosted MVP pilot specs.
+
+Operational artifacts moved out of `docs/`:
+
+- Eval manifest, mastery checks, gold cases, and reports:
+  `evals/attempt-readiness/`
+- Prototype HTML, scripts, screenshots, and fixture UI assets:
+  `prototypes/attempt-readiness/`
 
 Scope:
 
@@ -11,11 +18,11 @@ Scope:
 - `repair_practice_generation`
 - `readiness_report_generation`
 
-This is a fixture-only slice for the deterministic MVP contract:
+The deterministic MVP contract is still the same:
 
 - Manifest
 - Mastery checks
 - Re-evaluation prompts and expected repair/task behavior
 
-No evaluator runtime code, loader code, or dataset generation is included in this
-pilot fixture package.
+This docs folder should not contain JSON reports, datasets, executable
+fixtures, prototype HTML, scripts, or generated image assets.

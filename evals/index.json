@@ -1,0 +1,59 @@
+{
+  "schema": "SibarEvalCatalog",
+  "version": 1,
+  "purpose": "Repo-root entrypoint for discoverable eval suites, their generated artifacts, and the commands that produce reports.",
+  "suites": [
+    {
+      "suite_id": "attempt-readiness",
+      "title": "Attempt readiness loop evals",
+      "summary": "Evaluates bounded repo evidence, simulated user answers, gap labels, repair actions, re-evaluation prompts, and readiness labels.",
+      "manifest_path": "evals/attempt-readiness/eval-suite.json",
+      "docs": [
+        "evals/attempt-readiness/docs/01_selfhost_boundary.md",
+        "evals/attempt-readiness/docs/02_evaluation_contract.md",
+        "evals/attempt-readiness/docs/04_selfhost_gap_detection_benchmark.md"
+      ],
+      "tags": [
+        "attempt-readiness",
+        "gold-cases",
+        "gap-detection",
+        "repair-loop",
+        "readiness"
+      ]
+    },
+    {
+      "suite_id": "workspace-plan-adapters",
+      "title": "WorkspacePlan adapter evals",
+      "summary": "Evaluates WorkspaceIntent parsing, provider-neutral model IO normalization, WorkspacePlan validation, Rust fixture execution, and offline Codex runner metadata.",
+      "manifest_path": "evals/workspace-plan-adapters/eval-suite.json",
+      "docs": [
+        "evals/workspace-plan-adapters/docs/15_workspace_intent_compiler.md",
+        "evals/workspace-plan-adapters/docs/16_llm_adapter_contract.md",
+        "evals/workspace-plan-adapters/docs/19_workspace_trace_contract_gate.md"
+      ],
+      "tags": [
+        "workspace-plan",
+        "llm-adapter",
+        "rust-runner",
+        "codex-exec",
+        "fixtures"
+      ]
+    },
+    {
+      "suite_id": "pedagogy-layers",
+      "title": "Pedagogy layer coverage evals",
+      "summary": "Evaluates deterministic pedagogy cases and semantic coverage for layers, answer classes, gap labels, operations, evidence conditions, and loop stages.",
+      "manifest_path": "evals/pedagogy-layers/eval-suite.json",
+      "docs": [
+        "evals/pedagogy-layers/README.md"
+      ],
+      "tags": [
+        "pedagogy",
+        "layers",
+        "coverage",
+        "deterministic",
+        "no-llm"
+      ]
+    }
+  ]
+}

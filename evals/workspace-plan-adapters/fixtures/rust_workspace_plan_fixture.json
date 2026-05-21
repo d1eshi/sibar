@@ -1,0 +1,50 @@
+{
+  "objective": "Entender el flujo inicial del runtime de forma acotada.",
+  "bounded_objective": true,
+  "nodes": [
+    {
+      "id": "node-runtime-entry",
+      "title": "Inspeccionar punto de entrada del runtime",
+      "prerequisites": [
+        "src/runtime.ts"
+      ],
+      "concepts": [
+        "runtime",
+        "entrypoint",
+        "boundary"
+      ],
+      "source_links": [
+        {
+          "evidence_id": "evidence-01-src-runtime-ts",
+          "rationale": "Entrada mínima para trazar el runtime."
+        }
+      ],
+      "artifact_requirement": {
+        "id": "artifact-runtime-entry",
+        "path": "src/runtime.ts",
+        "requires": "Entrada y contrato del runtime"
+      },
+      "is_advanced": false
+    }
+  ],
+  "next_actions": [
+    {
+      "label": "Revisar runtime entry",
+      "target_node_id": "node-runtime-entry",
+      "visible": true
+    },
+    {
+      "label": "Producir evidencia acotada",
+      "target_node_id": "node-runtime-entry",
+      "visible": true
+    }
+  ],
+  "artifact_requirements": [
+    {
+      "id": "artifact-runtime-entry",
+      "path": "src/runtime.ts",
+      "requires": "Entrada y contrato del runtime"
+    }
+  ],
+  "questions_if_blocked": []
+}

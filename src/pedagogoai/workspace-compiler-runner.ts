@@ -144,6 +144,7 @@ export type WorkspaceCompilerRunnerResult = {
 const DEFAULT_RUST_BINARY = "cargo";
 const DEFAULT_TIMEOUT_MS = 45_000;
 const DEFAULT_WORKDIR = process.cwd();
+const WORKSPACE_COMPILER_RUNNER_ADAPTERS = new Set<string>(["fixture", "codex-exec"]);
 
 function dedupe(values: string[]): string[] {
   const seen = new Set<string>();
@@ -261,7 +262,10 @@ export function buildRustWorkspaceIntent(
 export function buildRustWorkspaceCompilerCommand(
   options: RustWorkspaceCompilerOptions = {},
 ): RustWorkspaceRunnerArgs {
-  const adapter = options.adapter === "codex-exec" ? "codex-exec" : "fixture";
+  const adapter = options.adapter ?? "fixture";
+  if (!WORKSPACE_COMPILER_RUNNER_ADAPTERS.has(adapter)) {
+    throw new Error(`Unknown workspace compiler adapter: ${adapter}`);
+  }
   const binary = options.rustBinary?.trim() || DEFAULT_RUST_BINARY;
   const args = [
     "run",
@@ -304,13 +308,82 @@ function isRustWorkspacePlan(value: unknown): value is RustWorkspacePlan {
   );
 }
 
+function candidatePlanFromParsedOutput(parsed: unknown): unknown {
+  if (typeof parsed !== "object" || parsed === null) return parsed;
+  return (parsed as Record<string, unknown>).candidate_plan ?? parsed;
+}
+
+function parseCandidatePlan(parsed: unknown): RustWorkspacePlan | null {
+  const candidate = candidatePlanFromParsedOutput(parsed);
+  return isRustWorkspacePlan(candidate) ? candidate : null;
+}
+
+function extractJsonObjects(rawOutput: string): unknown[] {
+  const parsedObjects: unknown[] = [];
+  for (let start = rawOutput.indexOf("{"); start !== -1; start = rawOutput.indexOf("{", start + 1)) {
+    let depth = 0;
+    let inString = false;
+    let escaped = false;
+
+    for (let index = start; index < rawOutput.length; index += 1) {
+      const char = rawOutput[index];
+
+      if (inString) {
+        if (escaped) {
+          escaped = false;
+        } else if (char === "\\") {
+          escaped = true;
+        } else if (char === "\"") {
+          inString = false;
+        }
+        continue;
+      }
+
+      if (char === "\"") {
+        inString = true;
+      } else if (char === "{") {
+        depth += 1;
+      } else if (char === "}") {
+        depth -= 1;
+        if (depth === 0) {
+          const candidate = rawOutput.slice(start, index + 1);
+          try {
+            parsedObjects.push(JSON.parse(candidate));
+          } catch {
+            // Keep scanning; logs may contain brace-like text before the JSON payload.
+          }
+          break;
+        }
+      }
+    }
+  }
+  return parsedObjects;
+}
+
 export function parseRustWorkspacePlan(rawOutput: string): RustWorkspacePlan {
-  const parsed = JSON.parse(rawOutput) as Record<string, unknown>;
-  const candidate = parsed?.candidate_plan ?? parsed;
-  if (!isRustWorkspacePlan(candidate)) {
+  const trimmedOutput = rawOutput.trim();
+  if (!trimmedOutput) {
+    throw new Error("Rust workspace compiler output is empty.");
+  }
+
+  try {
+    const directPlan = parseCandidatePlan(JSON.parse(trimmedOutput));
+    if (directPlan) return directPlan;
+    throw new Error("Rust workspace compiler output is not a valid WorkspacePlan.");
+  } catch (error) {
+    if (!(error instanceof SyntaxError)) throw error;
+  }
+
+  const parsedObjects = extractJsonObjects(rawOutput);
+  for (const parsedObject of parsedObjects) {
+    const candidatePlan = parseCandidatePlan(parsedObject);
+    if (candidatePlan) return candidatePlan;
+  }
+
+  if (parsedObjects.length > 0) {
     throw new Error("Rust workspace compiler output is not a valid WorkspacePlan.");
   }
-  return candidate;
+  throw new Error("Rust workspace compiler output does not contain valid JSON.");
 }
 
 function inferArtifactKindFromNode(node: RustWorkspaceNode): EvidenceRequirement["artifact_kind"] {
@@ -555,6 +628,10 @@ export function runRustWorkspaceCompiler(
     const output = commandResult.stdout?.toString() ?? "";
     const rustWorkspacePlan = parseRustWorkspacePlan(output);
     const workspacePlan = rustWorkspacePlanToPedagogoPlan(workspaceIntent, rustWorkspacePlan);
+    const validation = validateWorkspacePlan(workspacePlan);
+    if (!validation.valid) {
+      throw new Error(`Mapped WorkspacePlan failed validation: ${validation.problems.join("; ")}`);
+    }
     return {
       runner: {
         status: "completed",
@@ -568,10 +645,10 @@ export function runRustWorkspaceCompiler(
       workspace_intent: workspaceIntent,
       workspace_plan: workspacePlan,
       preview: formatWorkspacePlanPreview(workspacePlan),
-      validation: validateWorkspacePlan(workspacePlan),
+      validation,
     };
   } catch (error) {
-    const adapter = options.adapter === "codex-exec" ? "codex-exec" : "fixture";
+    const adapter = options.adapter ?? "fixture";
     const binary = options.rustBinary?.trim() || DEFAULT_RUST_BINARY;
     const args = [
       "run",

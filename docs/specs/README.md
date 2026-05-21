@@ -6,15 +6,17 @@ Treat these as the specs that govern the launch track.
 
 ## Spec-Driven Development Map
 
-Sibi uses spec-driven development with three spec layers:
+Sibi uses spec-driven development with explicit docs/eval/prototype routing:
 
 1. `docs/specs/`: Foundation specs. These are product and architecture
    contracts. They define what Sibi promises, what it refuses to do, and which
    invariants must survive implementation.
-2. `docs/specs/selfhost/`: Executable MVP specs. These are the active specs for
-   building, testing, and iterating self-hosted MVP features.
-3. `docs/specs/selfhost/pilot/`: Harness artifacts. These contain mastery
-   checks, gold cases, reports, and fixtures that prove executable specs.
+2. `docs/specs/selfhost/`: Executable MVP specs. These are the active Markdown
+   specs for building, testing, and iterating self-hosted MVP features.
+3. `evals/attempt-readiness/`: Operational eval assets for the attempt-readiness
+   loop: manifest, mastery checks, gold cases, and generated reports.
+4. `prototypes/attempt-readiness/`: Throwaway review prototypes and captured
+   assets for the attempt-readiness specs.
 
 A developer should read the foundation specs as conceptual contracts and the
 self-hosted specs as live implementation gates. The self-hosted specs record
@@ -55,9 +57,11 @@ Artifact Intake
 
 For this MVP execution layer, active routing is explicit:
 
-1. Self-hosted MVP artifacts must live under `docs/specs/selfhost/` and
-   `docs/specs/selfhost/pilot/`.
-2. Only an explicit later worker brief may revise this route.
+1. Self-hosted MVP docs must live under `docs/specs/selfhost/` as Markdown.
+2. Eval manifests, datasets, fixtures, and generated reports must live under
+   `evals/`.
+3. Prototype HTML, scripts, and assets must live under `prototypes/`.
+4. Only an explicit later worker brief may revise this route.
 
 Historical references to mission packs may remain in the repository, but they do
 not define current artifact destinations for this layer.
@@ -133,7 +137,7 @@ A prototype is required when an iteration needs human review of:
 Prototype source files or captured assets live under:
 
 ```text
-docs/specs/selfhost/pilot/prototypes/<spec-id>/<iteration-id>/
+prototypes/attempt-readiness/<spec-id>/<iteration-id>/
 ```
 
 Every prototype must identify:

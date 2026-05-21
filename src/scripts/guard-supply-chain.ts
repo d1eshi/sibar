@@ -50,7 +50,7 @@ const SCAN_FILES = [
 
 /** Directories to scan recursively for .html and .ts files. */
 const SCAN_DIRS = [
-  "docs/specs/selfhost/pilot/prototypes",
+  "prototypes/attempt-readiness",
   "docs/demo",
   "src/scripts",
 ];
@@ -234,7 +234,7 @@ function* walkDir(dir: string, ext: string): Generator<string> {
  */
 function checkPrototypeFiles(): Violation[] {
   const violations: Violation[] = [];
-  const protoDir = resolve(REPO_ROOT, "docs/specs/selfhost/pilot/prototypes");
+  const protoDir = resolve(REPO_ROOT, "prototypes/attempt-readiness");
   if (!fileExists(protoDir)) return violations;
 
   for (const file of walkDir(protoDir, ".html")) {

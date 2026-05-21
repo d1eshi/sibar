@@ -14,7 +14,7 @@ import {
 } from "../src/runtime-deep-ownership.ts";
 
 const ROOT = resolve(process.cwd());
-const FIXTURE_PATH = "docs/specs/deep-ownership-workspace/fixtures/sibi-pedagogy-loop.json";
+const FIXTURE_PATH = "evals/deep-ownership-workspace/fixtures/sibi-pedagogy-loop.json";
 
 function loadFixture(): DeepOwnershipFixture {
   if (!existsSync(FIXTURE_PATH)) {
