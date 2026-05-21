@@ -3,7 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sibar Early Access</title>
+<title>Sibar - Workspace creativo para aprender construyendo</title>
+<meta name="description" content="Sibar convierte una fuente tecnica en un workspace interactivo de evidencia, preguntas, practica y readiness.">
 <script>
 window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
 window.va("beforeSend", (event) => {
@@ -26,149 +27,182 @@ if (location.protocol !== "file:" && location.hostname !== "localhost" && locati
 <link rel="stylesheet" href="styles/reader.css">
 </head>
 <body>
-<main>
-  <section class="start-screen" id="startView">
-    <div class="brand-lockup" aria-label="Sibar">
-      <span class="brand-letter primary">S</span>
-      <span class="brand-letter">i</span>
-      <span class="brand-letter">b</span>
-      <span class="brand-letter">a</span>
-      <span class="brand-letter">r</span>
+<header class="site-header" aria-label="Navegacion principal">
+  <a class="brand" href="#top" aria-label="Sibar inicio">
+    <span>S</span>
+    <strong>Sibar</strong>
+  </a>
+  <nav class="site-nav" aria-label="Secciones">
+    <a href="#demo">Demo</a>
+    <a href="#loop">Loop</a>
+    <a href="#early-access">Early access</a>
+  </nav>
+  <a class="header-cta" href="#early-access">Pedir acceso</a>
+</header>
+
+<main id="top">
+  <section class="hero section-band" aria-labelledby="hero-title">
+    <div class="hero-copy">
+      <p class="eyebrow">Workspace de aprendizaje creativo</p>
+      <h1 id="hero-title">No estudies el codigo. Provocalo hasta que te responda.</h1>
+      <p class="hero-lede">Sibar toma una fuente tecnica y arma un espacio de tres paneles: evidencia real, pregunta incomoda y practica concreta. Menos resumen. Mas friccion util.</p>
+      <div class="hero-actions">
+        <a class="primary-action" href="#demo">Ver la demo</a>
+        <a class="secondary-action" href="#early-access">Entrar al early access</a>
+      </div>
     </div>
-    <p class="brand-mark">Build-to-Learn</p>
-    <h1 class="start-mark">Estudia una fuente tecnica con evidencia.</h1>
-    <p class="start-subtitle">Lee, marca lo importante y guarda dudas o ideas para volver con mas claridad.</p>
 
-    <form class="ingest-form" id="loadForm">
-      <label class="ingest-label" for="urlInput">Pega una URL para empezar</label>
-      <div class="ingest-row">
-        <input class="source-input" id="urlInput" type="url" placeholder="https://..." autocomplete="url">
-        <button class="primary-btn" type="submit">Estudiar</button>
-        <button class="secondary-btn" type="button" id="sampleBtn">Ver demo</button>
+    <div class="signal-stack" aria-label="Senales del workspace">
+      <div class="signal-card active">
+        <span>01</span>
+        <strong>Boundaries antes que charla</strong>
+        <p>La fuente se separa en evidencia incluida, excluida y supuestos fragiles.</p>
       </div>
-      <p class="trial-note">La prueba guarda tus notas en este navegador. El workspace completo abre por early access.</p>
-    </form>
-
-    <ul class="source-examples" aria-label="Tipos de fuente">
-      <li class="source-chip"><span>Articulo</span><small>Argumento o ensayo tecnico</small></li>
-      <li class="source-chip"><span>Paper</span><small>Abstract, metodo o conclusion</small></li>
-      <li class="source-chip"><span>Docs</span><small>API, framework o arquitectura</small></li>
-      <li class="source-chip"><span>Post tecnico</span><small>Decisiones, tradeoffs o guia</small></li>
-    </ul>
-
-    <section class="early-access-card" aria-label="Early access">
-      <div>
-        <p class="early-access-kicker">Early access</p>
-        <h2>Workspace completo por cohortes</h2>
-        <p>Deja tu correo y, si queres, tu handle de X. Te contacto cuando abramos la siguiente tanda.</p>
+      <div class="signal-card">
+        <span>02</span>
+        <strong>Preguntas que muerden</strong>
+        <p>El sistema pregunta por ownership antes de explicar la solucion.</p>
       </div>
-      <form class="early-access-form" id="earlyAccessForm">
-        <input id="earlyAccessEmail" name="email" type="email" placeholder="tu@email.com" autocomplete="email" required>
-        <input id="earlyAccessXHandle" name="x_handle" type="text" placeholder="@x_handle opcional" autocomplete="off" inputmode="text">
-        <button class="secondary-btn small" type="submit">Pedir acceso</button>
-        <p class="early-access-status" id="earlyAccessStatus" aria-live="polite"></p>
-      </form>
-    </section>
-
-    <section class="recent-sources" id="recentSources" aria-label="Lecturas recientes" hidden>
-      <div class="recent-header">
-        <span>Recientes</span>
-        <span id="historyCount">0</span>
+      <div class="signal-card">
+        <span>03</span>
+        <strong>Readiness visible</strong>
+        <p>La salida no es confianza magica: es una lectura acotada de gaps.</p>
       </div>
-      <nav class="history-list" id="historyList" aria-label="Ultimos articulos leidos"></nav>
-    </section>
-
-    <section class="ghost-reader" aria-label="Vista de lectura futura">
-      <div class="ghost-line title"></div>
-      <div class="ghost-line mid"></div>
-      <div class="ghost-line mid"></div>
-      <div class="ghost-line"></div>
-      <div class="ghost-line short"></div>
-      <br>
-      <div class="ghost-line mid"></div>
-      <div class="ghost-line"></div>
-      <div class="ghost-line"></div>
-      <div class="ghost-line mid"></div>
-    </section>
-    <p class="screen-status" id="status"></p>
-  </section>
-
-  <section class="early-access-screen" id="earlyAccessView" hidden>
-    <p class="brand-mark">Sibar early access</p>
-    <h1 class="access-title">El reader es solo la entrada.</h1>
-    <p class="access-copy" id="earlyAccessReason">Ya probaste las fuentes reales incluidas en esta prueba publica.</p>
-    <p class="access-copy">Estamos abriendo el workspace completo por cohortes: artefactos reales, preguntas de ownership, deteccion de gaps, practica y readiness.</p>
-    <div class="access-actions">
-      <a class="primary-btn access-link" href="mailto:hello@sibar.app?subject=Early%20access%20Sibar&body=Quiero%20early%20access%20a%20Sibar.%0A%0AQuiero%20entender%20mejor:%20">Solicitar early access</a>
-      <button class="secondary-btn" type="button" id="emptySampleBtn">Ver demo</button>
     </div>
   </section>
 
-  <section class="loading-screen" id="loadingView" hidden>
-    <div class="loading-block">
-      <p class="loading-kicker">Cargando fuente</p>
-      <div class="loading-title"></div>
-      <div class="loading-line"></div>
-      <div class="loading-line wide"></div>
-      <div class="loading-line short"></div>
+  <section class="workspace-demo section-band" id="demo" aria-labelledby="demo-title">
+    <div class="section-intro">
+      <p class="eyebrow">Demo interactiva</p>
+      <h2 id="demo-title">El workspace en la landing, no escondido atras de una promesa.</h2>
+      <p>Click en los pasos o ejecuta el loop. La demo es fixture-backed: muestra el comportamiento que queremos vender sin fingir ingestion live.</p>
+    </div>
+
+    <div class="demo-shell" data-active-step="source">
+      <div class="demo-toolbar">
+        <div>
+          <span class="window-dot ink"></span>
+          <span class="window-dot amber"></span>
+          <span class="window-dot green"></span>
+        </div>
+        <strong>Sibar workspace / transformer attention</strong>
+        <button class="run-btn" type="button" id="runDemoBtn">Run loop</button>
+      </div>
+
+      <div class="demo-grid">
+        <aside class="demo-steps" aria-label="Pasos de la demo">
+          <button class="step-btn active" type="button" data-step="source">
+            <span>Fuente</span>
+            <strong>Boundary map</strong>
+          </button>
+          <button class="step-btn" type="button" data-step="question">
+            <span>Pregunta</span>
+            <strong>Ownership check</strong>
+          </button>
+          <button class="step-btn" type="button" data-step="readiness">
+            <span>Salida</span>
+            <strong>Gap + repair</strong>
+          </button>
+        </aside>
+
+        <section class="demo-panel evidence-panel" aria-label="Panel de evidencia">
+          <div class="panel-head">
+            <span>Evidencia</span>
+            <strong id="evidenceTitle">Artifact boundary</strong>
+          </div>
+          <div class="code-card">
+            <pre><code id="demoCode">included:
+  - attention score formula
+  - masking rule
+  - residual path note
+
+excluded:
+  - training recipe
+  - optimizer claims</code></pre>
+          </div>
+          <div class="evidence-pills" id="evidencePills">
+            <span class="pill strong">cited</span>
+            <span class="pill">bounded</span>
+            <span class="pill">not a summary</span>
+          </div>
+        </section>
+
+        <section class="demo-panel work-panel" aria-label="Panel de trabajo">
+          <div class="panel-head">
+            <span>Pregunta activa</span>
+            <strong id="workTitle">What breaks first?</strong>
+          </div>
+          <p class="work-question" id="workQuestion">Si removemos la mascara causal, que afirmacion del articulo deja de ser verdadera?</p>
+          <div class="answer-box">
+            <span class="cursor-line"></span>
+            <p id="answerText">Tu respuesta todavia no prueba el boundary. Sibar pide evidencia antes de darte la explicacion completa.</p>
+          </div>
+          <div class="mini-actions">
+            <button type="button" data-demo-answer="weak">Responder rapido</button>
+            <button type="button" data-demo-answer="strong">Responder con evidencia</button>
+          </div>
+        </section>
+
+        <section class="demo-panel result-panel" aria-label="Panel de readiness">
+          <div class="panel-head">
+            <span>Readiness</span>
+            <strong id="resultTitle">No aprobado todavia</strong>
+          </div>
+          <div class="readiness-meter" aria-label="Readiness 42 por ciento">
+            <span id="readinessFill"></span>
+          </div>
+          <p id="resultCopy">Gap detectado: confundis mecanismo local con garantia global. La reparacion es escribir un contraejemplo pequeno.</p>
+          <ul class="repair-list" id="repairList">
+            <li>Marcar la linea que justifica causal masking.</li>
+            <li>Escribir un input donde mirar el futuro rompe la prediccion.</li>
+            <li>Reintentar con una respuesta de 4 frases.</li>
+          </ul>
+        </section>
+      </div>
     </div>
   </section>
 
-  <section class="reader-view" id="readerView" hidden>
-    <header class="saved-header">
-      <div class="sibi-wordmark">Sibar</div>
-      <button class="saved-chip" type="button" id="savedChip" hidden>0 guardadas</button>
-    </header>
-
-    <main class="article-shell">
-      <article class="article" id="article">
-        <h1 id="articleTitle"></h1>
-        <div class="article-rule"></div>
-        <div class="article-body" id="articleBody"></div>
+  <section class="loop-section section-band" id="loop" aria-labelledby="loop-title">
+    <div class="section-intro compact">
+      <p class="eyebrow">Tres secciones, una tesis</p>
+      <h2 id="loop-title">La landing tiene que sentirse como el producto.</h2>
+    </div>
+    <div class="loop-cards">
+      <article>
+        <span>01</span>
+        <h3>Fuente entra</h3>
+        <p>No prometemos magia general. Acotamos la fuente, declaramos el boundary y mostramos que queda fuera.</p>
       </article>
-    </main>
+      <article>
+        <span>02</span>
+        <h3>Persona responde</h3>
+        <p>La interaccion empieza cuando el usuario intenta explicar. Ahi aparece la verdad del aprendizaje.</p>
+      </article>
+      <article>
+        <span>03</span>
+        <h3>Workspace empuja</h3>
+        <p>El sistema devuelve evidencia, gap, reparacion y readiness. No una felicitacion barata.</p>
+      </article>
+    </div>
+  </section>
+
+  <section class="access-section section-band" id="early-access" aria-labelledby="access-title">
+    <div class="access-copy-block">
+      <p class="eyebrow">Early access</p>
+      <h2 id="access-title">Estoy abriendo Sibar con gente que aprende rompiendo cosas.</h2>
+      <p>Deja tu correo y, si queres, tu handle de X. La siguiente tanda va a probar el workspace con fuentes reales, artefactos y loops de readiness.</p>
+    </div>
+    <form class="access-form" id="earlyAccessForm">
+      <label for="earlyAccessEmail">Email</label>
+      <input id="earlyAccessEmail" name="email" type="email" placeholder="tu@email.com" autocomplete="email" required>
+      <label for="earlyAccessXHandle">X handle <span>opcional</span></label>
+      <input id="earlyAccessXHandle" name="x_handle" type="text" placeholder="@usuario" autocomplete="off" inputmode="text">
+      <button class="primary-action" type="submit">Pedir early access</button>
+      <p class="form-status" id="earlyAccessStatus" aria-live="polite"></p>
+    </form>
   </section>
 </main>
 
-<form class="save-popover floating" id="selectionCard" hidden>
-  <div class="card-label">Seleccion</div>
-  <p class="selection-text" id="selectionText"></p>
-  <textarea id="selectionNote" placeholder="Nota breve..."></textarea>
-  <div class="kind-row" role="tablist" aria-label="Tipo de nota">
-    <button class="small kind-btn active" type="button" role="tab" aria-selected="true" data-kind="highlight">Highlight</button>
-    <button class="small kind-btn" type="button" role="tab" aria-selected="false" data-kind="question">Pregunta</button>
-    <button class="small kind-btn" type="button" role="tab" aria-selected="false" data-kind="key">Idea</button>
-  </div>
-  <div class="actions">
-    <button class="primary-btn small" type="button" id="saveSelectionBtn">Guardar</button>
-    <button class="secondary-btn small" type="button" id="clearSelectionBtn">Cancelar</button>
-  </div>
-</form>
-
-<aside class="saved-drawer" id="savedDrawer" hidden>
-  <header class="saved-drawer-header">
-    <div>
-      <p class="drawer-kicker">Sibar / Reader</p>
-      <h2>Guardadas</h2>
-    </div>
-    <button class="icon-btn" type="button" id="closeSavedBtn" aria-label="Cerrar">×</button>
-  </header>
-  <section class="loose-note">
-    <textarea id="looseNote" placeholder="Nota atomica..."></textarea>
-    <span class="input-hint">⌘/Ctrl + Enter para guardar</span>
-    <button class="primary-btn small" type="button" id="saveLooseBtn">Guardar nota</button>
-  </section>
-  <section class="notes" id="notes"></section>
-</aside>
-
-<div class="saved-toast" id="savedToast" hidden>Guardado</div>
-
-<div class="toolbar" id="selectionToolbar">
-  <button type="button" data-toolbar-kind="highlight">Highlight</button>
-  <button type="button" data-toolbar-kind="question">Pregunta</button>
-  <button type="button" data-toolbar-kind="key">Idea</button>
-</div>
-
-<script type="module" src="scripts/app.js"></script>
+<script type="module" src="scripts/landing.js"></script>
 </body>
 </html>

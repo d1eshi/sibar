@@ -25,6 +25,17 @@ release yet.
 - Moved generated workspace UI references under
   `docs/specs/ui/workspace-tauri/assets/`.
 
+### Changed - Public Web Landing
+
+- Replaced the public `web/` first page with a one-page creative landing that
+  embeds a three-panel Sibar workspace demo, a strong product headline, and a
+  simplified early access form.
+- Moved the landing interaction to `web/scripts/landing.js`, including clickable
+  demo states, a simulated workspace loop, answer-state transitions, and reuse
+  of the existing early access API.
+- Added local dev-server routing for the early access API so the public landing
+  form can be exercised during web development.
+
 ### Docs - UI Technology Architecture (Tauri Workspace)
 
 - Added `docs/specs/ui/01_ui_technology_architecture.md` as a transversal UI
