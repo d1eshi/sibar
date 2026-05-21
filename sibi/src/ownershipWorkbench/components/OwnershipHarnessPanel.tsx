@@ -73,7 +73,12 @@ export function OwnershipHarnessPanel({
           </section>
         )}
 
-        <ReviewGuidePanel boundary={boundary} boundaryState={boundaryState} reviewQueue={reviewQueue} />
+        <ReviewGuidePanel
+          boundary={boundary}
+          boundaryState={boundaryState}
+          reviewQueue={reviewQueue}
+          showDetailedQueue={isLabView}
+        />
 
         <section className="ownershipSection">
           <p className="panelSub">Stage 3</p>

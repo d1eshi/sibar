@@ -18,6 +18,8 @@ release yet.
   prompt.
 - Moved the local derivation lab out of the default user-facing right panel and
   behind explicit local/debug query params: `?view=lab` or `?lab=1`.
+- Simplified the default review guide to a compact current-step flow, while
+  keeping the full priority queue and trace detail available in lab mode.
 
 ### Docs - Sibi Ownership Workbench Review Guide
 
@@ -26,6 +28,8 @@ release yet.
   prompt as a later stage.
 - Documented that the derivation lab is a local trace/debug view, not part of
   the default ownership UI.
+- Clarified that the default ownership UI shows the current queue step and next
+  action, while full queue details live behind `?view=lab` or `?lab=1`.
 
 ### Internal - Sibi Ownership Workbench Review Guide
 
@@ -33,6 +37,8 @@ release yet.
   prioritized queue fixtures, and avoiding open-chat framing.
 - Added deterministic workbench coverage for query-param lab activation and
   hiding `OwnershipLabPanel` from the default harness view.
+- Added deterministic workbench coverage that gates the detailed priority queue
+  behind lab mode.
 
 ### Docs - Deep Ownership Workspace North Star
 

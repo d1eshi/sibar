@@ -99,14 +99,16 @@ Sibi debe empezar como una ceremonia de revisión guiada:
 
 ```text
 Sibi dice qué va a revisar
-  -> muestra archivos/boundaries en cola priorizada
-  -> explica prioridad, razón de orden y siguiente paso
+  -> muestra el current step de la cola priorizada
+  -> explica por qué empieza ahí y cuál es la siguiente acción
   -> revisa la superficie tocada antes de inferir callers
   -> recién entonces pide probar ownership
 ```
 
 La cola de revisión existe para anclar el ownership prompt en evidencia. Debe
-mostrar, como mínimo:
+existir completa en el lab local, pero la UI default debe resumirla como una
+guía compacta y secuencial: foco actual, razón para empezar ahí y siguiente
+acción. La cola completa debe mostrar, como mínimo:
 
 - archivo o boundary;
 - si fue tocado por el diff;
@@ -117,8 +119,8 @@ mostrar, como mínimo:
 El prompt de ownership es una etapa de la secuencia, no el primer concepto de la
 UI. El lab de derivación local no forma parte de la UI default del usuario. Debe
 abrirse explícitamente como vista local/debug con `?view=lab` o `?lab=1`, para
-revisar traces, derivación de estado o reportes de usuario sin sobrecargar el
-flujo normal.
+revisar la cola completa, traces, derivación de estado o reportes de usuario sin
+sobrecargar el flujo normal.
 
 Ejemplos:
 

@@ -110,8 +110,8 @@ what it is about to inspect before asking for ownership:
 
 ```text
 Review touched surface
-  -> prioritize changed files and ownership boundaries
-  -> state why each item is ordered there
+  -> show the current prioritized queue step
+  -> state why the review starts there
   -> name the next check
   -> ask for the ownership attempt
 ```
@@ -119,8 +119,10 @@ Review touched surface
 The queue should make the relationship between files and boundaries explicit.
 Touched files are usually reviewed first, but only because they provide the
 initial evidence for a boundary. Supporting tests and inferred callers can follow
-when they are needed to prove or falsify the boundary. Each queue item should
-show:
+when they are needed to prove or falsify the boundary. The default UI should
+keep this compact and sequential: current focus, why that item starts first, and
+the next action. The full queue belongs in the local lab, where each queue item
+should show:
 
 - file or boundary name;
 - touched status;
@@ -131,8 +133,8 @@ show:
 The ownership prompt is a stage in this sequence. The local derivation lab is
 not part of the default user-facing UI. It should open only through an explicit
 local/debug query param such as `?view=lab` or `?lab=1`, where it can show trace
-derivation, state projection, and report context without overwhelming the normal
-flow.
+derivation, the full priority queue, state projection, and report context
+without overwhelming the normal flow.
 
 Anti-patterns for the wedge:
 

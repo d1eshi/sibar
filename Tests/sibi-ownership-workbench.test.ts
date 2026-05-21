@@ -242,23 +242,56 @@ test("ReviewGuidePanel defines a first-run review sequence without free chat lan
   );
   assert.match(
     guideSource,
-    /Priority queue/,
-    "ReviewGuidePanel should render a prioritized review queue",
+    /Current queue focus/,
+    "ReviewGuidePanel should expose a compact current queue focus in the default path",
   );
   assert.match(
     guideSource,
-    /Touched[\s\S]*Reason[\s\S]*Next step/,
-    "ReviewGuidePanel should show touched status, order reason, and next step",
+    /Start here[\s\S]*Next action/,
+    "ReviewGuidePanel should show why the current item starts first and the next action",
   );
   assert.match(
     guideSource,
-    /Request ownership attempt/,
-    "ReviewGuidePanel should make the ownership prompt a stage of the sequence",
+    /Later: request the ownership attempt/,
+    "ReviewGuidePanel should make the ownership prompt a later stage of the sequence",
   );
   assert.doesNotMatch(
     guideSource,
     /ask anything|anything about|chat freely|free chat|chat libre/i,
     "ReviewGuidePanel must not frame the workbench as open chat",
+  );
+});
+
+test("ReviewGuidePanel gates detailed priority queue behind lab mode", () => {
+  const guideSource = readFileSync(
+    new URL("../sibi/src/ownershipWorkbench/components/ReviewGuidePanel.tsx", import.meta.url),
+    "utf8",
+  );
+
+  assert.match(
+    guideSource,
+    /showDetailedQueue\?: boolean/,
+    "ReviewGuidePanel should accept a flag for the detailed lab queue",
+  );
+  assert.match(
+    guideSource,
+    /showDetailedQueue = false/,
+    "ReviewGuidePanel should default to the compact user-facing queue",
+  );
+  assert.match(
+    guideSource,
+    /\{showDetailedQueue && \([\s\S]*Priority queue[\s\S]*reviewQueue\.map/,
+    "ReviewGuidePanel should only render the full priority queue when requested",
+  );
+  assert.match(
+    guideSource,
+    /Touched[\s\S]*Reason[\s\S]*Next step/,
+    "the detailed lab queue should show touched status, order reason, and next step",
+  );
+  assert.match(
+    guideSource,
+    /const currentItem = reviewQueue\[0\]/,
+    "the compact default path should focus on only the first queue item",
   );
 });
 
@@ -302,6 +335,11 @@ test("OwnershipHarnessPanel renders review guide before prompt and gates the loc
     harnessSource,
     /reviewQueue=\{reviewQueue\}/,
     "OwnershipHarnessPanel should pass review queue data into ReviewGuidePanel",
+  );
+  assert.match(
+    harnessSource,
+    /showDetailedQueue=\{isLabView\}/,
+    "OwnershipHarnessPanel should reserve the full priority queue for lab mode",
   );
   assert.doesNotMatch(
     harnessSource,
