@@ -59,6 +59,16 @@ release yet.
 - Added `Tests/shared-core-entrypoints.test.ts` to validate entrypoint availability,
   append-only behavior for memory helpers, and boundary-surface independence.
 
+### Added - Slice 3 Memory Core Invariants
+
+- Added pure consistency checks for `MemoryStore` in `src/memory-core/index.ts`
+  (`getMemoryStoreProblems` + `validateMemoryStore`), including subject,
+  attempt, gap, and transfer reference invariants.
+- Added `Tests/memory-core.test.ts` with happy-path, missing-subject, missing-
+  attempt, missing-gap, missing-transfer-subject, and append-only behavior coverage.
+- Kept `memory-core` append helpers pure and unchanged at API boundaries while adding
+  explicit traceability validation before persistence or runtime-store integration.
+
 ### Docs - Tauri Workspace UI Specs
 
 - Added mission-track study specs for the frontier lab readiness flow, including
