@@ -47,6 +47,18 @@ release yet.
 - Added a deterministic shared core boundary eval that guards core imports,
   Sibi workspace separation, and required global gate declarations.
 
+### Added - Slice 2 Shared Core Entrypoints
+
+- Added `src/ownership-core/index.ts` as a minimal ownership boundary shim with
+  copyable contract types and explicit extraction-ownership metadata.
+- Added `src/pedagogy-core/index.ts` as a deterministic facade over existing
+  pedagogy runtime contracts and functions.
+- Added `src/memory-core/index.ts` with an append-only `MemoryStore`, subject and
+  evidence/attempt/gap/repair/review/transfer/artifact/event structures, and pure
+  helper functions for immutable updates.
+- Added `Tests/shared-core-entrypoints.test.ts` to validate entrypoint availability,
+  append-only behavior for memory helpers, and boundary-surface independence.
+
 ### Docs - Tauri Workspace UI Specs
 
 - Added mission-track study specs for the frontier lab readiness flow, including
