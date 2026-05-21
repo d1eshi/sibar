@@ -25,6 +25,19 @@ release yet.
   source fixture the first MVP path and keep Sibi-repo ownership as internal
   regression context.
 
+### Added - Slice Final Sibi Ownership-Review Wedge
+
+- Converted `sibi/src/ownershipReview.ts` into a direct re-export shim of
+  `src/ownership-core/diff-review.ts` to keep Sibi and core review contracts in
+  parity by default.
+- Updated `sibi/README.md` and added `sibi/docs/ownership-wedge.md` to document
+  the wedge flow (input, goal, gaps, evidence/tests, read path, status),
+  added explicit LLM/runtime split, and specified the future claim-verifier
+  contract direction.
+- Clarified that this slice still avoids any direct `WorkspaceIntent` /
+  PedagogoAI adapter dependency and intentionally does not wire
+  `Open Sibar session`.
+
 ### Docs - Deep Ownership Workspace Pruning
 
 - Pruned `docs/specs/deep-ownership-workspace/` from the pre-consolidation spec
