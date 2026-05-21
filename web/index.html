@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sibar - Workspace creativo para aprender construyendo</title>
-<meta name="description" content="Sibar convierte una fuente tecnica en un workspace interactivo de evidencia, preguntas, practica y readiness.">
+<title>Sibar - Resolver cognitive debt</title>
+<meta name="description" content="Sibar convierte software generado o desconocido en entendimiento profundo, aplicable y replicable.">
 <script>
 window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
 window.va("beforeSend", (event) => {
@@ -42,11 +42,11 @@ if (location.protocol !== "file:" && location.hostname !== "localhost" && locati
 <main id="top">
   <section class="hero section-band" aria-labelledby="hero-title">
     <div class="hero-copy">
-      <p class="eyebrow">Workspace de aprendizaje creativo</p>
-      <h1 id="hero-title">No estudies el codigo. Provocalo hasta que te responda.</h1>
-      <p class="hero-lede">Sibar toma una fuente tecnica y arma un espacio de tres paneles: evidencia real, pregunta incomoda y practica concreta. Menos resumen. Mas friccion util.</p>
+      <p class="eyebrow">Comprehension layer para software generado</p>
+      <h1 id="hero-title">Vamos a resolver el cognitive debt.</h1>
+      <p class="hero-lede">Los agentes ya producen codigo mas rapido que nuestra capacidad de entenderlo. Sibar convierte ese output en conocimiento profundo, aplicable y replicable.</p>
       <div class="hero-actions">
-        <a class="primary-action" href="#demo">Ver la demo</a>
+        <a class="primary-action" href="#demo">Ver el workspace</a>
         <a class="secondary-action" href="#early-access">Entrar al early access</a>
       </div>
     </div>
@@ -54,18 +54,18 @@ if (location.protocol !== "file:" && location.hostname !== "localhost" && locati
     <div class="signal-stack" aria-label="Senales del workspace">
       <div class="signal-card active">
         <span>01</span>
-        <strong>Boundaries antes que charla</strong>
-        <p>La fuente se separa en evidencia incluida, excluida y supuestos fragiles.</p>
+        <strong>Deuda cognitiva visible</strong>
+        <p>El workspace separa lo que sabes explicar de lo que solo aceptaste porque el agente lo genero.</p>
       </div>
       <div class="signal-card">
         <span>02</span>
-        <strong>Preguntas que muerden</strong>
-        <p>El sistema pregunta por ownership antes de explicar la solucion.</p>
+        <strong>Entendimiento aplicable</strong>
+        <p>No alcanza con leer. Tenes que predecir cambios, defender tradeoffs y modificar una parte acotada.</p>
       </div>
       <div class="signal-card">
         <span>03</span>
-        <strong>Readiness visible</strong>
-        <p>La salida no es confianza magica: es una lectura acotada de gaps.</p>
+        <strong>Memoria replicable</strong>
+        <p>Lo aprendido queda como evidencia, misconception resuelta y practica reutilizable en el proximo artefacto.</p>
       </div>
     </div>
   </section>
@@ -73,8 +73,8 @@ if (location.protocol !== "file:" && location.hostname !== "localhost" && locati
   <section class="workspace-demo section-band" id="demo" aria-labelledby="demo-title">
     <div class="section-intro">
       <p class="eyebrow">Demo interactiva</p>
-      <h2 id="demo-title">Una muestra del workspace, funcionando como pieza central.</h2>
-      <p>Click en los pasos o ejecuta el loop. La demo muestra el tipo de presion que Sibar pone sobre una fuente: evidencia, respuesta y readiness.</p>
+      <h2 id="demo-title">Del codigo que aparece al conocimiento que podes usar.</h2>
+      <p>Click en los pasos o ejecuta el loop. La demo muestra como Sibar convierte un artefacto desconocido en evidencia, intento propio y readiness acotado.</p>
     </div>
 
     <div class="demo-shell" data-active-step="source">
@@ -84,57 +84,57 @@ if (location.protocol !== "file:" && location.hostname !== "localhost" && locati
           <span class="window-dot amber"></span>
           <span class="window-dot green"></span>
         </div>
-        <strong>Sibar workspace / transformer attention</strong>
+        <strong>Sibar workspace / generated repo debt</strong>
         <button class="run-btn" type="button" id="runDemoBtn">Run loop</button>
       </div>
 
       <div class="demo-grid">
         <aside class="demo-steps" aria-label="Pasos de la demo">
           <button class="step-btn active" type="button" data-step="source">
-            <span>Fuente</span>
-            <strong>Boundary map</strong>
+            <span>Artefacto</span>
+            <strong>Debt map</strong>
           </button>
           <button class="step-btn" type="button" data-step="question">
-            <span>Pregunta</span>
+            <span>Ownership</span>
             <strong>Ownership check</strong>
           </button>
           <button class="step-btn" type="button" data-step="readiness">
-            <span>Salida</span>
-            <strong>Gap + repair</strong>
+            <span>Memoria</span>
+            <strong>Apply + retain</strong>
           </button>
         </aside>
 
         <section class="demo-panel evidence-panel" aria-label="Panel de evidencia">
           <div class="panel-head">
             <span>Evidencia</span>
-            <strong id="evidenceTitle">Artifact boundary</strong>
+            <strong id="evidenceTitle">Debt boundary</strong>
           </div>
           <div class="code-card">
-            <pre><code id="demoCode">included:
-  - attention score formula
-  - masking rule
-  - residual path note
+            <pre><code id="demoCode">generated:
+  - auth middleware
+  - cached data loader
+  - optimistic save path
 
-excluded:
-  - training recipe
-  - optimizer claims</code></pre>
+unknown:
+  - invalidation rule
+  - retry behavior</code></pre>
           </div>
           <div class="evidence-pills" id="evidencePills">
-            <span class="pill strong">cited</span>
+            <span class="pill strong">owned</span>
             <span class="pill">bounded</span>
-            <span class="pill">not a summary</span>
+            <span class="pill">transferable</span>
           </div>
         </section>
 
         <section class="demo-panel work-panel" aria-label="Panel de trabajo">
           <div class="panel-head">
             <span>Pregunta activa</span>
-            <strong id="workTitle">What breaks first?</strong>
+            <strong id="workTitle">Can you change it?</strong>
           </div>
-          <p class="work-question" id="workQuestion">Si removemos la mascara causal, que afirmacion del articulo deja de ser verdadera?</p>
+          <p class="work-question" id="workQuestion">Si cambia el cache key, que comportamiento se rompe primero y donde lo verificas?</p>
           <div class="answer-box">
             <span class="cursor-line"></span>
-            <p id="answerText">Tu respuesta todavia no prueba el boundary. Sibar pide evidencia antes de darte la explicacion completa.</p>
+            <p id="answerText">Todavia hay deuda cognitiva: podes nombrar la pieza, pero no predecir su fallo con evidencia.</p>
           </div>
           <div class="mini-actions">
             <button type="button" data-demo-answer="weak">Responder rapido</button>
@@ -145,16 +145,16 @@ excluded:
         <section class="demo-panel result-panel" aria-label="Panel de readiness">
           <div class="panel-head">
             <span>Readiness</span>
-            <strong id="resultTitle">No aprobado todavia</strong>
+            <strong id="resultTitle">Debt abierto</strong>
           </div>
           <div class="readiness-meter" aria-label="Readiness 42 por ciento">
             <span id="readinessFill"></span>
           </div>
-          <p id="resultCopy">Gap detectado: confundis mecanismo local con garantia global. La reparacion es escribir un contraejemplo pequeno.</p>
+          <p id="resultCopy">Gap detectado: entendimiento nominal sin capacidad de cambio. La reparacion es una modificacion pequena con prediccion previa.</p>
           <ul class="repair-list" id="repairList">
-            <li>Marcar la linea que justifica causal masking.</li>
-            <li>Escribir un input donde mirar el futuro rompe la prediccion.</li>
-            <li>Reintentar con una respuesta de 4 frases.</li>
+            <li>Marcar la funcion que define el cache key.</li>
+            <li>Predecir que estado queda stale despues del cambio.</li>
+            <li>Hacer un patch minimo y explicar por que no rompe el loader.</li>
           </ul>
         </section>
       </div>
@@ -164,8 +164,8 @@ excluded:
   <section class="access-section section-band" id="early-access" aria-labelledby="access-title">
     <div class="access-copy-block">
       <p class="eyebrow">Early access</p>
-      <h2 id="access-title">Estoy abriendo Sibar con gente que aprende rompiendo cosas.</h2>
-      <p>Deja tu correo y, si queres, tu handle de X. La siguiente tanda va a probar el workspace con fuentes reales, artefactos y loops de readiness.</p>
+      <h2 id="access-title">Estoy abriendo Sibar con builders que ya sienten esta deuda.</h2>
+      <p>Deja tu correo y, si queres, tu handle de X. La siguiente tanda va a probar Sibar sobre software generado, repos desconocidos y loops de entendimiento durable.</p>
     </div>
     <form class="access-form" id="earlyAccessForm">
       <label for="earlyAccessEmail">Email</label>

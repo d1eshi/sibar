@@ -35,6 +35,9 @@ release yet.
   of the existing early access API.
 - Added local dev-server routing for the early access API so the public landing
   form can be exercised during web development.
+- Reframed the landing copy around cognitive debt, durable technical
+  understanding, and applying/repeating knowledge across generated or unfamiliar
+  software.
 
 ### Docs - UI Technology Architecture (Tauri Workspace)
 
