@@ -146,22 +146,13 @@ a {
 }
 
 .hero-copy {
-  position: relative;
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   grid-template-rows: auto auto;
   column-gap: clamp(18px, 4vw, 54px);
   row-gap: 8px;
   align-items: center;
-  border-top: 1px solid rgba(23, 22, 19, 0.16);
-  border-bottom: 1px solid rgba(23, 22, 19, 0.16);
-  background: rgba(255, 250, 240, 0.42);
-  padding: 26px 0 28px;
-  transform: skewY(-0.55deg);
-}
-
-.hero-copy > * {
-  transform: skewY(0.55deg);
+  padding: 16px 0 18px;
 }
 
 .eyebrow {
