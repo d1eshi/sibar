@@ -40,6 +40,8 @@ release yet.
   software.
 - Replaced the explanatory interactive demo block with a static embedded
   workspace preview based on the Tauri research workspace surface.
+- Compressed the landing hero into a horizontal cognitive-debt statement so the
+  workspace preview appears sooner.
 
 ### Docs - UI Technology Architecture (Tauri Workspace)
 
