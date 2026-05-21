@@ -110,6 +110,30 @@ release yet.
 - Added `Tests/ownership-core.test.ts` and updated `Tests/sibi-ownership-review.test.ts`
   for direct core coverage plus core/Sibi review parity on representative diffs.
 
+### Added - Slice 0 Ownership Workbench Shell
+
+- Replaced the prior paste-and-summary UI in `sibi/src/App.tsx` with a fixture-backed
+  static Ownership Workbench shell.
+- Added a three-panel app layout (ownership-aware file tree, code/diff panel, and
+  ownership harness) plus a dedicated evidence drawer.
+- Implemented line-numbered code and diff views with evidence and current boundary
+  highlighting, stable line selection, and one static boundary prompt cycle.
+- Added an attempt-first ownership harness flow: current boundary, evidence list,
+  ownership prompt, attempt textarea, `Submit attempt` / `Ask for hint` /
+  `Mark unknown`, diagnosis, smallest repair, and return condition outputs.
+- Kept behavior static and fixture-backed (no filesystem scanning, no model calls,
+  no explain-first UX path).
+
+### Changed - Slice 0 Workbench Adapters
+
+- Swapped Slice 0 file tree and code/diff panels to public package backends:
+  `@pierre/trees` + `@pierre/trees/react` and `@pierre/diffs`.
+- Added library-shaped fixture adapters (`CodeViewFileItem`, `CodeViewDiffItem`,
+  `fileTreePaths`, and node path metadata) so static fixtures feed renderer inputs
+  without custom render logic.
+- Kept fixtures as Slice 0 demo inputs only and documented that they are not the
+  architecture/source-of-truth contract for future ownership/evidence/runtime layers.
+
 ### Docs - Tauri Workspace UI Specs
 
 - Added mission-track study specs for the frontier lab readiness flow, including
