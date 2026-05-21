@@ -233,7 +233,7 @@ test("CodeDiffPanel renders the CodeView adapter instead of vanilla CodeView", (
   );
 });
 
-test("OwnershipHarnessPanel wires a selection-aware lab contract", () => {
+test("OwnershipHarnessPanel wires a local derivation lab contract", () => {
   const harnessSource = readFileSync(
     new URL("../sibi/src/ownershipWorkbench/components/OwnershipHarnessPanel.tsx", import.meta.url),
     "utf8",
@@ -266,6 +266,21 @@ test("OwnershipHarnessPanel wires a selection-aware lab contract", () => {
     assert.match(labSource, new RegExp(`${propName}:`), `OwnershipLabPanel props should include ${propName}`);
   }
   assert.match(labSource, /evidenceForSelection/, "OwnershipLabPanel should derive line-matched evidence");
+  assert.match(
+    labSource,
+    /User-facing state/,
+    "OwnershipLabPanel should label the projected state as the user-facing state input",
+  );
+  assert.match(
+    labSource,
+    /State source/,
+    "OwnershipLabPanel should name the state source instead of showing a standalone public badge",
+  );
+  assert.match(
+    labSource,
+    /fileStates\[boundary\.filePath\][\s\S]*active boundary state[\s\S]*attempt gate/,
+    "OwnershipLabPanel should describe the local state derivation path",
+  );
   assert.match(
     labSource,
     /No range selected; showing active boundary context\./,
