@@ -1,9 +1,10 @@
 import type {
-  AttemptResult,
   BoundaryState,
   EvidenceRef,
   LineSelection,
   OwnershipBoundary,
+  OwnershipSessionQuestion,
+  OwnershipSessionState,
   ReviewQueueItem,
   ViewMode,
   WorkbenchSurfaceMode,
@@ -24,34 +25,31 @@ interface OwnershipHarnessPanelProps {
   boundary: OwnershipBoundary;
   boundaryState: BoundaryState;
   reviewQueue: ReviewQueueItem[];
+  sessionQuestions: OwnershipSessionQuestion[];
+  sessionState: OwnershipSessionState;
   surfaceMode: WorkbenchSurfaceMode;
   labContext: OwnershipLabContext | null;
   attemptText: string;
-  attemptResult: AttemptResult | null;
-  showHint: boolean;
   onAttemptChange: (next: string) => void;
   onSubmitAttempt: () => void;
-  onShowHint: () => void;
   onMarkUnknown: () => void;
-  onReattempt: () => void;
 }
 
 export function OwnershipHarnessPanel({
   boundary,
   boundaryState,
   reviewQueue,
+  sessionQuestions,
+  sessionState,
   surfaceMode,
   labContext,
   attemptText,
-  attemptResult,
-  showHint,
   onAttemptChange,
   onSubmitAttempt,
-  onShowHint,
   onMarkUnknown,
-  onReattempt,
 }: OwnershipHarnessPanelProps): React.ReactElement {
   const isLabView = surfaceMode === "lab" && labContext != null;
+  const currentQuestion = sessionState.isComplete ? null : sessionQuestions[sessionState.currentIndex] ?? null;
 
   return (
     <aside className="panel ownershipPanel">
@@ -80,70 +78,77 @@ export function OwnershipHarnessPanel({
           showDetailedQueue={isLabView}
         />
 
-        <section className="ownershipSection">
-          <p className="panelSub">Stage 3</p>
-          <h2>Ownership prompt</h2>
-          <ol>
-            {boundary.prompt.map((line) => (
-              <li key={line}>{line}</li>
-            ))}
-          </ol>
+        <section className="ownershipSession" aria-label="Guided ownership review session">
+          <div className="sessionHeader">
+            <p className="panelSub">
+              {sessionState.isComplete
+                ? `Sibi step ${sessionQuestions.length} / ${sessionQuestions.length}`
+                : `Sibi step ${Math.min(sessionState.currentIndex + 1, sessionQuestions.length)} / ${sessionQuestions.length}`}
+            </p>
+            <h2>{currentQuestion ? currentQuestion.title : "Session complete"}</h2>
+            {currentQuestion && <p className="sessionFile">{currentQuestion.filePath}</p>}
+          </div>
+
+          {currentQuestion && (
+            <>
+              <section className="sessionQuestion" aria-label="Current Sibi question">
+                <p>{currentQuestion.prompt}</p>
+                <span>{currentQuestion.intent}</span>
+              </section>
+
+              {sessionState.showHintLadder && (
+                <section className="hintLadder" aria-label="Minimal context hint ladder">
+                  <h3>Contexto mínimo</h3>
+                  <ol>
+                    {currentQuestion.hintLadder.map((hint) => (
+                      <li key={hint}>{hint}</li>
+                    ))}
+                  </ol>
+                </section>
+              )}
+
+              <label className="attemptField">
+                <span>Tu respuesta</span>
+                <textarea
+                  value={attemptText}
+                  onChange={(event) => onAttemptChange(event.target.value)}
+                  placeholder="Respondé solo este paso de ownership."
+                  rows={5}
+                />
+              </label>
+
+              <div className="primaryActions">
+                <button type="button" onClick={onSubmitAttempt}>
+                  Submit attempt
+                </button>
+                <button type="button" onClick={onMarkUnknown} className="secondary">
+                  Mark unknown
+                </button>
+              </div>
+            </>
+          )}
+
+          {sessionState.lastFeedback && (
+            <section className="sessionFeedback" aria-live="polite">
+              <p>{sessionState.lastFeedback}</p>
+            </section>
+          )}
+
+          {sessionState.observations.length > 0 && (
+            <section className="sessionObservations" aria-label="Session observations">
+              <h3>Observations</h3>
+              <ul>
+                {sessionState.observations.map((observation) => (
+                  <li key={observation.id}>
+                    <strong>{observation.reason}</strong>
+                    <span>{observation.filePath}</span>
+                    <p>{observation.note}</p>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
         </section>
-
-        <label className="attemptField">
-          <span>User attempt</span>
-          <textarea
-            value={attemptText}
-            onChange={(event) => onAttemptChange(event.target.value)}
-            placeholder="Write your ownership attempt before diagnosis."
-            rows={6}
-          />
-        </label>
-
-        <div className="primaryActions">
-          <button type="button" onClick={onSubmitAttempt} disabled={!attemptText.trim()}>
-            Submit attempt
-          </button>
-          <button type="button" onClick={onShowHint} className="secondary">
-            Ask for hint
-          </button>
-          <button type="button" onClick={onMarkUnknown} className="secondary">
-            Mark unknown
-          </button>
-        </div>
-
-        {showHint && !attemptResult && (
-          <section className="ownershipSection">
-            <h2>Hint</h2>
-            <p>
-              Focus on the caller path: describe what breaks if `createSession` returns `null` and which
-              consumer logic is now required.
-            </p>
-          </section>
-        )}
-
-        {attemptResult && (
-          <section className="ownershipSection ownershipResult">
-            <h2>Diagnosis</h2>
-            <p>{attemptResult.summary}</p>
-            {attemptResult.gapReason && (
-              <p>
-                <strong>Gap:</strong> {attemptResult.gapReason}
-              </p>
-            )}
-            <p>
-              <strong>Smallest repair:</strong> {attemptResult.smallestRepair}
-            </p>
-            <p>
-              <strong>Return condition:</strong> {attemptResult.returnCondition}
-            </p>
-            <div className="attemptActions">
-              <button type="button" className="secondary" onClick={onReattempt}>
-                Re-attempt
-              </button>
-            </div>
-          </section>
-        )}
 
         {isLabView && (
           <OwnershipLabPanel

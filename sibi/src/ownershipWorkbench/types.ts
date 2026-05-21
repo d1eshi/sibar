@@ -46,6 +46,46 @@ export type ReviewQueueItem = {
   state: BoundaryState;
 };
 
+export type OwnershipSessionGapReason = "no answer" | "inconclusive" | "could not connect caller/test";
+
+export type OwnershipSessionObservation = {
+  id: string;
+  filePath: string;
+  reason: OwnershipSessionGapReason;
+  note: string;
+};
+
+export type OwnershipSessionQuestion = {
+  id: string;
+  filePath: string;
+  title: string;
+  prompt: string;
+  intent: string;
+  hintLadder: string[];
+};
+
+export type OwnershipSessionState = {
+  currentIndex: number;
+  isComplete: boolean;
+  weakAttemptStreak: number;
+  observations: OwnershipSessionObservation[];
+  lastFeedback: string | null;
+  showHintLadder: boolean;
+};
+
+export type OwnershipSessionAdvance =
+  | {
+      kind: "advanced";
+      state: OwnershipSessionState;
+      observation?: OwnershipSessionObservation;
+    }
+  | {
+      kind: "complete";
+      state: OwnershipSessionState;
+      feedback: string;
+      observation?: OwnershipSessionObservation;
+    };
+
 export type LineSelection = {
   startLine: number;
   endLine: number;

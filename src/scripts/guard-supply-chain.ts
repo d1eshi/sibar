@@ -21,12 +21,21 @@ const GUARD_FILE = resolve(import.meta.dirname ?? process.cwd(), basename(import
 
 /** Baseline devDependencies present when pnpm migration started. */
 const BASELINE_DEV_DEPENDENCIES = new Set([
+  "@playwright/test",
   "@types/node",
+  "@types/react",
+  "@types/react-dom",
   "typescript",
+  "vite",
 ]);
 
-/** Baseline dependencies (empty for this project). */
-const BASELINE_DEPENDENCIES: Set<string> = new Set();
+/** Baseline dependencies present for the Sibi workbench. */
+const BASELINE_DEPENDENCIES = new Set([
+  "@pierre/diffs",
+  "@pierre/trees",
+  "react",
+  "react-dom",
+]);
 
 /** Files the guard scans for command-string violations (individual files). */
 const SCAN_FILES = [

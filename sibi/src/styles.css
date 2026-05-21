@@ -435,6 +435,106 @@ textarea {
   border-bottom: 1px solid #edf0f1;
 }
 
+.ownershipSession {
+  display: grid;
+  gap: 0;
+  border-bottom: 1px solid #dbe5e7;
+}
+
+.sessionHeader,
+.sessionQuestion,
+.hintLadder,
+.sessionFeedback,
+.sessionObservations {
+  display: grid;
+  gap: 6px;
+  padding: 10px 14px;
+  border-bottom: 1px solid #edf1f2;
+}
+
+.sessionHeader h2 {
+  margin: 0;
+  color: #203534;
+  font-size: 16px;
+  line-height: 1.2;
+}
+
+.sessionFile {
+  margin: 0;
+  color: #607477;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+
+.sessionQuestion {
+  background: #f7fbfa;
+}
+
+.sessionQuestion p,
+.sessionFeedback p,
+.sessionObservations p {
+  margin: 0;
+  color: #213433;
+  font-size: 13px;
+  line-height: 1.35;
+}
+
+.sessionQuestion span {
+  color: #607477;
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.hintLadder {
+  background: #fffaf1;
+}
+
+.hintLadder h3,
+.sessionObservations h3 {
+  margin: 0;
+  color: #2f403f;
+  font-size: 13px;
+}
+
+.hintLadder ol,
+.sessionObservations ul {
+  margin: 0;
+  padding-left: 18px;
+}
+
+.hintLadder li {
+  color: #3d3931;
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.sessionFeedback {
+  background: #f5f8f8;
+}
+
+.sessionObservations ul {
+  display: grid;
+  gap: 7px;
+}
+
+.sessionObservations li {
+  color: #213433;
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.sessionObservations strong {
+  display: inline-block;
+  margin-right: 6px;
+}
+
+.sessionObservations span {
+  color: #607477;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  overflow-wrap: anywhere;
+}
+
 .ownershipLab {
   border-bottom: 1px solid #dbe5e7;
   background: #fbfdfd;

@@ -16,6 +16,14 @@ release yet.
 - Changed the ownership harness first-run experience to open with a guided
   review sequence and prioritized file/boundary queue before the ownership
   prompt.
+- Added a step-by-step ownership session where Sibi asks the current
+  file/check question, advances on empty, unknown, or inconclusive attempts, and
+  records bounded observations for missing evidence.
+- Added relation-focused questions for supporting tests and inferred callers so
+  `session.test.ts` and `consumer.ts` ask the user to connect files instead of
+  summarizing them in isolation.
+- Added a minimal hint ladder that appears after repeated weak attempts while
+  keeping the default right panel compact.
 - Moved the local derivation lab out of the default user-facing right panel and
   behind explicit local/debug query params: `?view=lab` or `?lab=1`.
 - Simplified the default review guide to a compact current-step flow, while
@@ -35,6 +43,13 @@ release yet.
 
 - Added deterministic workbench coverage for review guide rendering order,
   prioritized queue fixtures, and avoiding open-chat framing.
+- Added deterministic coverage for the guided ownership session state machine
+  and Playwright coverage for default review flow, gap observations, hint
+  ladder behavior, and lab-mode traces.
+- Added Playwright E2E scripts/config for the Sibi workbench and updated the
+  supply-chain guard baseline for `@playwright/test`.
+- Switched Sibi Vite scripts to the native config loader and a JS config so
+  local sandbox runs avoid Vite temp writes under `node_modules/.vite-temp`.
 - Added deterministic workbench coverage for query-param lab activation and
   hiding `OwnershipLabPanel` from the default harness view.
 - Added deterministic workbench coverage that gates the detailed priority queue
