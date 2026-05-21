@@ -483,6 +483,31 @@ test("OwnershipHarnessPanel renders review guide before guided session and gates
   );
 });
 
+test("workbench CSS gives the ownership harness a wide primary desktop column", () => {
+  const styles = readFileSync(new URL("../sibi/src/styles.css", import.meta.url), "utf8");
+
+  assert.match(
+    styles,
+    /grid-template-columns:\s*248px minmax\(430px, 1fr\) minmax\(460px, 32vw\);/,
+    "desktop layout should reserve a wide responsive column for the ownership harness",
+  );
+  assert.match(
+    styles,
+    /\.ownershipPanel\s*\{[\s\S]*box-shadow:/,
+    "ownership harness panel should have stronger visual presence than a passive metadata rail",
+  );
+  assert.match(
+    styles,
+    /\.ownershipSession\s*\{[\s\S]*margin: 14px;[\s\S]*box-shadow:/,
+    "guided ownership session should read as the primary interaction surface inside the harness",
+  );
+  assert.match(
+    styles,
+    /\.attemptField textarea\s*\{[\s\S]*min-height: 150px;/,
+    "ownership attempt textarea should be large enough for the guided attempt",
+  );
+});
+
 test("workbench surface mode is derived from local query params", async () => {
   const { getWorkbenchSurfaceMode } = await loadSurfaceModeModule();
 

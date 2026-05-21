@@ -30,7 +30,7 @@ textarea {
 .workbenchRoot {
   min-height: 100dvh;
   display: grid;
-  grid-template-columns: 280px minmax(540px, 1fr) 360px;
+  grid-template-columns: 248px minmax(430px, 1fr) minmax(460px, 32vw);
   grid-template-rows: minmax(0, 1fr) 340px;
   grid-template-areas:
     "files code harness"
@@ -66,11 +66,14 @@ textarea {
   grid-template-rows: auto minmax(0, 1fr);
   min-height: 0;
   overflow: hidden;
+  border-color: #b9cacc;
+  box-shadow: 0 18px 42px rgba(36, 68, 66, 0.11);
 }
 
 .ownershipPanelBody {
   min-height: 0;
   overflow: auto;
+  background: #f6faf9;
 }
 
 .evidencePanel {
@@ -86,6 +89,25 @@ textarea {
   display: flex;
   flex-direction: column;
   gap: 4px;
+}
+
+.ownershipPanel > .panelHeader {
+  padding: 18px 20px;
+  border-bottom-color: #bdcfd0;
+  background: #183f39;
+}
+
+.ownershipPanel > .panelHeader .panelSub {
+  color: #b8d6d0;
+}
+
+.ownershipPanel > .panelHeader h1 {
+  color: #f8fcfb;
+  font-size: 25px;
+}
+
+.ownershipPanel > .panelHeader .boundaryTitle {
+  color: #d8e8e5;
 }
 
 .panelSub {
@@ -243,7 +265,7 @@ textarea {
 
 .reviewGuide {
   border-bottom: 1px solid #dbe5e7;
-  background: #fbfdfd;
+  background: #ffffff;
 }
 
 .reviewGuideIntro,
@@ -251,14 +273,14 @@ textarea {
 .reviewBoundaryFocus {
   display: grid;
   gap: 6px;
-  padding: 12px 14px;
+  padding: 14px 18px;
   border-bottom: 1px solid #edf1f2;
 }
 
 .reviewGuideIntro h2 {
   margin: 0;
   color: #203534;
-  font-size: 16px;
+  font-size: 18px;
   line-height: 1.2;
 }
 
@@ -267,7 +289,7 @@ textarea {
 .reviewBoundaryFocus p {
   margin: 0;
   color: #314846;
-  font-size: 12px;
+  font-size: 13px;
   line-height: 1.35;
 }
 
@@ -315,7 +337,7 @@ textarea {
 .reviewCurrentFocus dd {
   margin: 0;
   color: #213433;
-  font-size: 12px;
+  font-size: 13px;
   line-height: 1.35;
 }
 
@@ -438,7 +460,12 @@ textarea {
 .ownershipSession {
   display: grid;
   gap: 0;
-  border-bottom: 1px solid #dbe5e7;
+  margin: 14px;
+  border: 1px solid #bfd2d4;
+  border-radius: 8px;
+  background: #ffffff;
+  box-shadow: 0 12px 26px rgba(31, 64, 62, 0.1);
+  overflow: hidden;
 }
 
 .sessionHeader,
@@ -447,15 +474,19 @@ textarea {
 .sessionFeedback,
 .sessionObservations {
   display: grid;
-  gap: 6px;
-  padding: 10px 14px;
+  gap: 8px;
+  padding: 14px 16px;
   border-bottom: 1px solid #edf1f2;
+}
+
+.sessionHeader {
+  background: #eef7f5;
 }
 
 .sessionHeader h2 {
   margin: 0;
   color: #203534;
-  font-size: 16px;
+  font-size: 20px;
   line-height: 1.2;
 }
 
@@ -468,7 +499,7 @@ textarea {
 }
 
 .sessionQuestion {
-  background: #f7fbfa;
+  background: #fbfefe;
 }
 
 .sessionQuestion p,
@@ -476,13 +507,13 @@ textarea {
 .sessionObservations p {
   margin: 0;
   color: #213433;
-  font-size: 13px;
+  font-size: 15px;
   line-height: 1.35;
 }
 
 .sessionQuestion span {
   color: #607477;
-  font-size: 12px;
+  font-size: 13px;
   line-height: 1.35;
 }
 
@@ -711,27 +742,35 @@ textarea {
 
 .attemptField {
   display: grid;
-  gap: 6px;
-  padding: 10px 14px;
+  gap: 8px;
+  padding: 14px 16px;
   color: #243736;
+  font-weight: 750;
 }
 
 .attemptField textarea {
-  border: 1px solid #d3dde0;
+  border: 1px solid #b9cacc;
   border-radius: 8px;
-  min-height: 118px;
-  padding: 10px;
+  min-height: 150px;
+  padding: 12px;
   resize: vertical;
   color: #223636;
+  background: #ffffff;
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
   line-height: 1.35;
+  box-shadow: inset 0 1px 0 rgba(25, 55, 52, 0.06);
+}
+
+.attemptField textarea:focus {
+  border-color: #214f47;
+  outline: 3px solid rgba(33, 79, 71, 0.16);
 }
 
 .primaryActions,
 .attemptActions {
   display: flex;
-  gap: 8px;
-  padding: 0 14px 12px;
+  gap: 10px;
+  padding: 0 16px 16px;
   flex-wrap: wrap;
 }
 
@@ -741,11 +780,11 @@ button.primary,
 button.secondary {
   border: 1px solid transparent;
   border-radius: 7px;
-  padding: 8px 12px;
-  min-height: 36px;
+  padding: 10px 14px;
+  min-height: 40px;
   cursor: pointer;
   font-weight: 700;
-  font-size: 12px;
+  font-size: 13px;
 }
 
 button {
@@ -756,6 +795,11 @@ button.active,
 .primaryActions button:first-child {
   background: #214f47;
   color: #f8fcfb;
+}
+
+.primaryActions button:first-child {
+  padding-inline: 18px;
+  box-shadow: 0 8px 18px rgba(33, 79, 71, 0.18);
 }
 
 .primaryActions button.secondary,
