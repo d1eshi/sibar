@@ -15,6 +15,7 @@
     "eval:workspace-model-io-boundary": "node --experimental-strip-types src/evals/workspace-model-io-boundary.ts",
     "eval:pedagogy-coverage": "node --experimental-strip-types src/evals/pedagogy-coverage.ts",
     "eval:pedagogy-core-coverage": "node --experimental-strip-types src/evals/pedagogy-core-coverage.ts",
+    "eval:shared-core-boundaries": "node --experimental-strip-types src/evals/shared-core-boundaries.ts",
     "eval:selfhost-pilot": "node --experimental-strip-types src/evals/selfhost-pilot.ts",
     "eval:selfhost-freeform": "node --experimental-strip-types src/evals/selfhost-freeform.ts",
     "eval:selfhost-benchmark": "node --experimental-strip-types src/evals/selfhost-benchmark.ts",

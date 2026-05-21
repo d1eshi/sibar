@@ -44,6 +44,8 @@ release yet.
   and model-output validation so new features do not bypass the core.
 - Added a sequential implementation plan that starts with entrypoint wrappers
   and shims before any destructive poda or duplicate taxonomy.
+- Added a deterministic shared core boundary eval that guards core imports,
+  Sibi workspace separation, and required global gate declarations.
 
 ### Docs - Tauri Workspace UI Specs
 
