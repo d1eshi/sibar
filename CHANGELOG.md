@@ -134,6 +134,25 @@ release yet.
 - Kept fixtures as Slice 0 demo inputs only and documented that they are not the
   architecture/source-of-truth contract for future ownership/evidence/runtime layers.
 
+### Added - Slice 0 Workbench Adapter Regression Coverage
+
+- Added `Tests/sibi-ownership-workbench.test.ts` to prevent regressions in the
+  Ownership Workbench adapter layer, including file-tree leaf-path validation,
+  strict `fixtureDiff` parsing via `parsePatchFiles`, and `codeViewDiffItemsByPath`
+  coverage for expected fixture files.
+
+### Fixed - Slice 0 Workbench Runtime Stability
+
+- Fixed a localhost runtime blank screen by passing only file paths into
+  `@pierre/trees/react` while preserving directory nodes in `fileTreeNodeByPath`
+  for metadata and decoration lookup.
+- Repaired malformed fixture diff content in `ownershipWorkbench/fixtures.ts` to match
+  `@pierre/diffs` unified diff parsing and added guarded fixture parse error
+  handling that keeps the app running with file mode in case parsing fails.
+- Kept build-time chunk warning behavior unchanged for now (`vite` large chunk
+  warning still appears from syntax-highlighting/runtime bundle size; not part of
+  this fix scope).
+
 ### Docs - Tauri Workspace UI Specs
 
 - Added mission-track study specs for the frontier lab readiness flow, including
