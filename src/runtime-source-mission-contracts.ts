@@ -31,29 +31,29 @@ export type SourceIntakeDiagnostic = {
   source_ref?: string;
 };
 
-export type SourceIntakeMetadata = {
-  source_title?: string;
-  extracted_at?: string;
-  canonical_url?: string;
-  source_hash?: string;
-};
+export type SourceInputReferenceString = string;
 
-export type SourceIntakeRefs = {
-  raw_text_ref?: string;
-  readable_text_ref?: string;
-  source_excerpt_ref?: string;
-};
+export type SourceIntakeSourceKind = SourceInputKind;
 
 export type SourceIntakeResult = {
   schema: "SourceIntakeResult";
   version: SourceMissionSchemaVersion;
   id: string;
-  source_intent_id: string;
+  source_id: string;
+  source_kind: SourceIntakeSourceKind;
+  canonical_url?: SourceInputReferenceString;
+  title?: string;
+  author?: string;
+  published_at?: string;
+  fetched_at?: string;
+  raw_text_ref: string;
+  readable_text_ref: string;
   extraction_status: SourceIntakeExtractionStatus;
-  metadata: SourceIntakeMetadata;
-  refs: SourceIntakeRefs;
   diagnostics: SourceIntakeDiagnostic[];
+  source_intent_id?: string;
 };
+
+export type SourceSignalConfidence = "low" | "medium" | "high";
 
 export type SourceSignalKind =
   | "goal"
@@ -73,7 +73,7 @@ export type SourceSignal = {
   kind: SourceSignalKind;
   label: string;
   source_excerpt_ref: string;
-  confidence: number;
+  confidence: SourceSignalConfidence;
   user_relevance: SourceSignalUserRelevance;
 };
 
@@ -108,10 +108,9 @@ export type MissionPreview = {
   user_goal: string;
   source_summary: string;
   proposed_tracks: ProposedTrack[];
-  proposed_sessions?: ProposedSession[];
-  first_sessions: string[];
+  first_sessions: ProposedSession[];
   open_questions: string[];
-  confidence: number;
+  confidence: SourceSignalConfidence;
 };
 
 export type SourceMissionValidationIssue = {
