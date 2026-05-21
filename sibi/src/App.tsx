@@ -21,8 +21,10 @@ import {
 } from "./ownershipWorkbench/fixtures";
 import {
   evaluateAttempt,
+  getActiveBoundaryState,
   getLineSelectionText,
   groupedEvidence,
+  withBoundaryFileState,
 } from "./ownershipWorkbench/helpers";
 import type { ViewMode } from "./ownershipWorkbench/types";
 
@@ -31,7 +33,6 @@ export default function App() {
   const [viewMode, setViewMode] = React.useState<ViewMode>("diff");
   const [selection, setSelection] = React.useState<LineSelection | null>(null);
   const [fileStates, setFileStates] = React.useState<Record<string, BoundaryState>>(initialFileStates);
-  const [boundaryState, setBoundaryState] = React.useState<BoundaryState>("unvisited");
   const [attemptText, setAttemptText] = React.useState("");
   const [attemptResult, setAttemptResult] = React.useState<AttemptResult | null>(null);
   const [showHint, setShowHint] = React.useState(false);
@@ -39,6 +40,7 @@ export default function App() {
   const evidenceGroups = React.useMemo(() => groupedEvidence(fixtureEvidence), []);
   const codeViewFileItem = codeViewFileItemsByPath[selectedFile];
   const codeViewDiffItem = codeViewDiffItemsByPath[selectedFile];
+  const boundaryState = getActiveBoundaryState(fileStates, ownershipBoundary);
 
   React.useEffect(() => {
     setSelection(null);
@@ -47,21 +49,19 @@ export default function App() {
   function submitAttempt() {
     const result = evaluateAttempt(attemptText, ownershipBoundary);
     setAttemptResult(result);
-    setBoundaryState(result.state);
     setShowHint(false);
 
-    const nextStates: Record<string, BoundaryState> = {
-      ...fileStates,
-      "src/api/session.ts":
-        result.state === "owned"
-          ? "owned"
-          : result.state === "questionable"
-            ? "questionable"
-            : "partial",
-      "src/api/session.test.ts": result.state === "owned" ? "owned" : "attempted",
-      "src/runtime/consumer.ts": result.state === "owned" ? "attempted" : "attempted",
-    };
-    setFileStates(nextStates);
+    setFileStates((prev) =>
+      withBoundaryFileState(
+        {
+          ...prev,
+          "src/api/session.test.ts": result.state === "owned" ? "owned" : "attempted",
+          "src/runtime/consumer.ts": "attempted",
+        },
+        ownershipBoundary,
+        result.state,
+      ),
+    );
   }
 
   function markUnknown() {
@@ -73,11 +73,10 @@ export default function App() {
         "Re-run with an attempt focused on null handling and the caller safety path.",
       returnCondition: ownershipBoundary.returnCondition,
     };
-    setBoundaryState("questionable");
     setAttemptResult(unknownResult);
     setFileStates((prev) => ({
       ...prev,
-      "src/api/session.ts": "questionable",
+      [ownershipBoundary.filePath]: unknownResult.state,
     }));
   }
 

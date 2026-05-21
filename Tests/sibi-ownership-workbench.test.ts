@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { CodeView as VanillaCodeView, parsePatchFiles } from "@pierre/diffs";
 import { PierreCodeView } from "../sibi/src/ownershipWorkbench/components/PierreCodeView.ts";
+import type { BoundaryState } from "../sibi/src/ownershipWorkbench/types.ts";
 
 type OwnershipWorkbenchFixtures = typeof import("../sibi/src/ownershipWorkbench/fixtures.ts");
 type OwnershipWorkbenchHelpers = typeof import("../sibi/src/ownershipWorkbench/helpers.ts");
@@ -102,6 +103,52 @@ test("groupedEvidence groups fixture evidence by confidence", async () => {
       conflict: ["E-004"],
     },
   );
+});
+
+test("active ownership boundary state is projected from the boundary file state", async () => {
+  const fixtures = await loadFixturesModule();
+  const helpers = await loadHelpersModule();
+
+  assert.equal(fixtures.ownershipBoundary.filePath, "src/api/session.ts");
+  assert.equal(fixtures.initialFileStates[fixtures.ownershipBoundary.filePath], "gap");
+  assert.equal(
+    helpers.getActiveBoundaryState(fixtures.initialFileStates, fixtures.ownershipBoundary),
+    "gap",
+    "initial harness and lab state should match the file tree boundary file state",
+  );
+  assert.equal(
+    helpers.getActiveBoundaryState({}, fixtures.ownershipBoundary),
+    "unvisited",
+    "missing boundary file state should fall back to unvisited",
+  );
+});
+
+test("boundary state projection preserves evaluated states for tree, harness, and lab", async () => {
+  const fixtures = await loadFixturesModule();
+  const helpers = await loadHelpersModule();
+  const evaluatedStates: BoundaryState[] = ["gap", "partial", "owned", "questionable"];
+
+  for (const state of evaluatedStates) {
+    const fileStates = helpers.withBoundaryFileState(
+      fixtures.initialFileStates,
+      fixtures.ownershipBoundary,
+      state,
+    );
+    const treeState = helpers.getNodeState(
+      fixtures.fileTreeNodeByPath[fixtures.ownershipBoundary.filePath],
+      fileStates,
+    );
+    const activeBoundaryState = helpers.getActiveBoundaryState(fileStates, fixtures.ownershipBoundary);
+
+    assert.equal(fileStates["src/api/session.ts"], state);
+    assert.equal(treeState, state, `file tree should preserve ${state}`);
+    assert.equal(activeBoundaryState, state, `harness and lab should preserve ${state}`);
+    assert.equal(
+      fileStates["src/api/session.test.ts"],
+      fixtures.initialFileStates["src/api/session.test.ts"],
+      "projecting the active boundary state should not rewrite sibling file states",
+    );
+  }
 });
 
 test("evidenceForSelection returns evidence overlapping the selected range", async () => {

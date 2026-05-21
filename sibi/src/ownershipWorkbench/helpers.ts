@@ -85,6 +85,24 @@ export function getNodeReason(node: TreeNode, fileStates: Record<string, Boundar
   return getNodeReason(firstProblem, fileStates);
 }
 
+export function getActiveBoundaryState(
+  fileStates: Record<string, BoundaryState>,
+  boundary: OwnershipBoundary,
+): BoundaryState {
+  return fileStates[boundary.filePath] ?? "unvisited";
+}
+
+export function withBoundaryFileState(
+  fileStates: Record<string, BoundaryState>,
+  boundary: OwnershipBoundary,
+  state: BoundaryState,
+): Record<string, BoundaryState> {
+  return {
+    ...fileStates,
+    [boundary.filePath]: state,
+  };
+}
+
 export function isInBoundary(filePath: string, lineNumber: number, boundary: OwnershipBoundary): boolean {
   if (filePath !== boundary.filePath) return false;
   return lineNumber >= boundary.startLine && lineNumber <= boundary.endLine;
