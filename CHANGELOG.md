@@ -54,6 +54,9 @@ release yet.
   supply-chain guard baseline for `@playwright/test`.
 - Switched Sibi Vite scripts to the native config loader and a JS config so
   local sandbox runs avoid Vite temp writes under `node_modules/.vite-temp`.
+- Scoped the Sibi Vite Rollup warning handler to filter only the known
+  `@pierre/*` React bundle `"use client"` module directive noise while leaving
+  unrelated build warnings visible.
 - Added deterministic workbench coverage for query-param lab activation and
   hiding `OwnershipLabPanel` from the default harness view.
 - Added deterministic workbench coverage that gates the detailed priority queue
