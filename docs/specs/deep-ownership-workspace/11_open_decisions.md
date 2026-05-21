@@ -203,6 +203,50 @@ math, experiments, and parameter reasoning.
 
 Status: open.
 
+### Decision: Mission Language For Goal-Driven Study
+
+Options:
+
+1. `Mission -> Track -> Session -> Artifact`
+2. nested workspace objects
+3. source documentation tree
+4. course/module/lesson vocabulary
+
+Recommendation:
+
+Use `Mission -> Track -> Session -> Artifact` for user-facing goal-driven study.
+Keep `Workspace*` names internally where already established.
+
+Reason:
+
+The frontier lab readiness case starts from a career goal and source-backed
+conversation context. Calling the JAX docs a workspace inside another workspace
+obscures the relationship. A mission can own tracks, and tracks can own sessions
+without making the user navigate a deep tree.
+
+Status: accepted for new mission-oriented UI unless changed later.
+
+### Decision: Full Source Trees In Track UI
+
+Options:
+
+1. show the full source tree as the default navigation
+2. show a curated queue and keep the source tree in an advanced Source Map
+3. hide source structure entirely
+
+Recommendation:
+
+Show a curated queue by default and expose the full source tree only as Source
+Map.
+
+Reason:
+
+Documentation sidebars with dozens of topics create the same overwhelm as
+generic learning platforms. The product value is the selected next operation and
+artifact evidence, not raw topic enumeration.
+
+Status: accepted for Tauri mission-track UI.
+
 ## Blockers
 
 No open decision blocks the first morning prototype.

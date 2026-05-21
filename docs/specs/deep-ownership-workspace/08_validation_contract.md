@@ -205,6 +205,41 @@ Evidence expected:
 2. operation field
 3. blocked whole-repo/global claims
 
+### VAL-PED-004: Track Queues Are Curated With Rationale
+
+For a mission track with many possible source topics, Sibi shows a small
+curated queue by default and stores a rationale for session placement.
+
+Evidence expected:
+
+1. `CuratedTrackQueue` projection
+2. placement signals for visible, locked, deferred, or inserted sessions
+3. advanced source map separated from the primary queue
+
+### VAL-PED-005: Artifact Recommendations Are Operation-Scoped
+
+For a session, recommended artifacts must follow from the active operation,
+source type, and evidence requirements.
+
+Evidence expected:
+
+1. `ArtifactRecommendation` object
+2. recommended, optional, and blocked artifact groups
+3. visible rationale for the primary recommended artifact
+
+### VAL-PED-006: User Path Mutation Is Explicit
+
+When a user says a session is too hard, too easy, or requests a session from a
+selected source slice, Sibi emits a bounded path mutation proposal instead of
+silently rewriting the mission.
+
+Evidence expected:
+
+1. `PathMutationProposal`
+2. affected sessions
+3. return condition
+4. user confirmation state when the mutation changes the track
+
 ## Command And Mutation Assertions
 
 ### VAL-CMD-001: Read-Only Commands Become Evidence

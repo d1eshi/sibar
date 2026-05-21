@@ -219,6 +219,17 @@ The prototype can graduate into the app surface.
 
 Recommended sequence:
 
+1. Add a static mission fixture for the frontier lab readiness example.
+2. Render `Home -> Mission Brief -> Focused Track Queue -> Active Session`.
+3. Keep the full source outline behind an advanced Source Map.
+4. Add deterministic readiness gates for the first sessions.
+5. Add deterministic artifact recommendations from operation and source type.
+6. Add explicit path mutation proposals for "too hard", "too easy", and
+   "create a session from this selection".
+7. Only then allow model-assisted prerequisite and artifact recommendations.
+
+App graduation sequence:
+
 1. keep web prototype until interaction is clear
 2. wrap with Tauri
 3. add filesystem bridge

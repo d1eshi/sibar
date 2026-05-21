@@ -83,6 +83,12 @@ understanding.
 20. `19_workspace_trace_contract_gate.md` is a prerequisite contract gate for
     workspace creation attempts, LLM run traces, session histories, compaction,
     and replay.
+21. `20_mission_track_session_model.md` defines mission, track, session, and
+    artifact as the product model for goal-driven programs such as frontier lab
+    readiness.
+22. `21_curated_track_pedagogy_contract.md` separates curated track queues,
+    prerequisite routing, artifact recommendation, readiness gates, and path
+    mutation from the UI presentation.
 
 ## Naming Decision
 

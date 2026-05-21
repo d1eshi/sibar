@@ -13,6 +13,10 @@ release yet.
 
 ### Docs - Tauri Workspace UI Specs
 
+- Added mission-track study specs for the frontier lab readiness flow, including
+  `Mission -> Track -> Session -> Artifact` vocabulary, focused track queues,
+  source-map separation, prerequisite routing, artifact recommendation, and
+  explicit path mutation proposals.
 - Split `docs/specs/ui/` into `web/` and `workspace-tauri/` as the UI source of
   truth for public web surfaces and the direct Tauri workspace prototype.
 - Added `Workspace Home` as the canonical default Tauri entry screen so existing
