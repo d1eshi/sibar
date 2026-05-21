@@ -11,6 +11,11 @@ accepted specs and iterations, not by raw commit count.
 Use this section for changes that have landed but are not part of a tagged
 release yet.
 
+### Docs - Attempt Readiness Prototype Pruning
+
+- Removed obsolete attempt-readiness prototype artifacts and generated visual
+  assets so future worktree creation does not need to carry stale binary deletes.
+
 ### Docs - Deep Ownership Workspace North Star
 
 - Added a current north-star entrypoint for the source-driven MVP:
