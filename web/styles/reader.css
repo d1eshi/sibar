@@ -185,7 +185,6 @@ h1 {
 .rotating-source {
   position: relative;
   display: inline-block;
-  min-width: 4.35em;
   color: #7a2f25;
   transition:
     opacity 180ms ease,
