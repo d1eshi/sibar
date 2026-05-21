@@ -12,10 +12,22 @@ const lineBoundaryByConfidence: Record<
   EvidenceConfidence,
   (acc: EvidenceByConfidence, entry: EvidenceRef) => EvidenceRef[]
 > = {
-  observed: (acc, entry) => acc.observed.concat(entry),
-  inferred: (acc, entry) => acc.inferred.concat(entry),
-  unverified: (acc, entry) => acc.unverified.concat(entry),
-  conflict: (acc, entry) => acc.conflict.concat(entry),
+  observed: (acc, entry) => {
+    acc.observed.push(entry);
+    return acc.observed;
+  },
+  inferred: (acc, entry) => {
+    acc.inferred.push(entry);
+    return acc.inferred;
+  },
+  unverified: (acc, entry) => {
+    acc.unverified.push(entry);
+    return acc.unverified;
+  },
+  conflict: (acc, entry) => {
+    acc.conflict.push(entry);
+    return acc.conflict;
+  },
 };
 
 export const ownershipStatePriority: BoundaryState[] = [
@@ -91,6 +103,39 @@ export function evidenceForLine(
     const end = Number.parseInt(match[2], 10);
     return lineNumber >= start && lineNumber <= end;
   });
+}
+
+export function getEvidenceLineRange(entry: EvidenceRef): { filePath: string; startLine: number; endLine: number } | null {
+  const match = /^(.*):(\d+)-(\d+)$/.exec(entry.location);
+  if (!match) return null;
+
+  return {
+    filePath: match[1],
+    startLine: Number.parseInt(match[2], 10),
+    endLine: Number.parseInt(match[3], 10),
+  };
+}
+
+export function evidenceOverlapsRange(
+  entry: EvidenceRef,
+  filePath: string,
+  startLine: number,
+  endLine: number,
+): boolean {
+  const lineRange = getEvidenceLineRange(entry);
+  if (!lineRange || lineRange.filePath !== filePath) return false;
+  return lineRange.startLine <= endLine && lineRange.endLine >= startLine;
+}
+
+export function evidenceForSelection(
+  evidence: EvidenceRef[],
+  filePath: string,
+  selection: LineSelection | null,
+): EvidenceRef[] {
+  if (!selection) return [];
+  const startLine = Math.min(selection.startLine, selection.endLine);
+  const endLine = Math.max(selection.startLine, selection.endLine);
+  return evidence.filter((entry) => evidenceOverlapsRange(entry, filePath, startLine, endLine));
 }
 
 export function getLineSelectionText(selection: LineSelection | null): string {
