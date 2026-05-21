@@ -182,6 +182,21 @@ h1 {
   line-height: 0.96;
 }
 
+.rotating-source {
+  position: relative;
+  display: inline-block;
+  min-width: 4.35em;
+  color: #7a2f25;
+  transition:
+    opacity 180ms ease,
+    transform 180ms ease;
+}
+
+.rotating-source.is-switching {
+  opacity: 0;
+  transform: translateY(0.16em);
+}
+
 .hero-lede {
   grid-column: 1 / -1;
   max-width: none;
