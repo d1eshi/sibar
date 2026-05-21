@@ -7,10 +7,10 @@
   "passed": true,
   "aggregate": {
     "total_cases": 5,
-    "passed_cases": 2,
+    "passed_cases": 5,
     "failed_cases": 0,
-    "skipped_cases": 3,
-    "files_checked": 4,
+    "skipped_cases": 0,
+    "files_checked": 7,
     "violations": 0,
     "declared_gates": 10,
     "expected_gates": 10
@@ -19,31 +19,31 @@
     {
       "id": "SCB-001-OWNERSHIP-CORE-IMPORTS",
       "title": "ownership-core stays free of host, surface, and adapter imports.",
-      "status": "skipped",
+      "status": "passed",
       "checked_paths": [
         "src/ownership-core"
       ],
-      "files_checked": 0,
+      "files_checked": 1,
       "violations": []
     },
     {
       "id": "SCB-002-PEDAGOGY-CORE-IMPORTS",
       "title": "pedagogy-core stays free of host, surface, and adapter imports.",
-      "status": "skipped",
+      "status": "passed",
       "checked_paths": [
         "src/pedagogy-core"
       ],
-      "files_checked": 0,
+      "files_checked": 1,
       "violations": []
     },
     {
       "id": "SCB-003-MEMORY-CORE-IMPORTS",
       "title": "memory-core stays free of host, surface, and adapter imports.",
-      "status": "skipped",
+      "status": "passed",
       "checked_paths": [
         "src/memory-core"
       ],
-      "files_checked": 0,
+      "files_checked": 1,
       "violations": []
     },
     {
