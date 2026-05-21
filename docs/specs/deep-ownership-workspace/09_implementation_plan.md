@@ -219,14 +219,15 @@ The prototype can graduate into the app surface.
 
 Recommended sequence:
 
-1. Add a static mission fixture for the frontier lab readiness example.
-2. Render `Home -> Mission Brief -> Focused Track Queue -> Active Session`.
-3. Keep the full source outline behind an advanced Source Map.
-4. Add deterministic readiness gates for the first sessions.
-5. Add deterministic artifact recommendations from operation and source type.
-6. Add explicit path mutation proposals for "too hard", "too easy", and
+1. Add a static source-intent fixture for the frontier lab readiness example.
+2. Render `Home -> Source Intake -> Mission Preview -> Mission Brief`.
+3. Render `Mission Brief -> Focused Track Queue -> Active Session`.
+4. Keep the full source outline behind an advanced Source Map.
+5. Add deterministic readiness gates for the first sessions.
+6. Add deterministic artifact recommendations from operation and source type.
+7. Add explicit path mutation proposals for "too hard", "too easy", and
    "create a session from this selection".
-7. Only then allow model-assisted prerequisite and artifact recommendations.
+8. Only then allow model-assisted prerequisite and artifact recommendations.
 
 App graduation sequence:
 

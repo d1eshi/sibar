@@ -247,6 +247,30 @@ artifact evidence, not raw topic enumeration.
 
 Status: accepted for Tauri mission-track UI.
 
+### Decision: First MVP Intake Shape
+
+Options:
+
+1. heavy multi-field workspace intent onboarding
+2. URL or pasted source plus one short user reason
+3. fully automatic URL-to-course generation
+4. chat-only conversation with no review contract
+
+Recommendation:
+
+Use URL or pasted source plus one short user reason, then show a mission preview
+before creation.
+
+Reason:
+
+The frontier lab example only works if Sibi can extract explicit source signals
+such as JAX tutorials, the scaling book, the 10M transformer exercise, Chinchilla
+derivation, and Pallas kernel work while still letting the user explain why this
+source matters. A heavy onboarding form slows the prototype, while full
+automatic generation hides uncertainty and creates overwhelming paths.
+
+Status: accepted for source-driven MVP prototype.
+
 ## Blockers
 
 No open decision blocks the first morning prototype.

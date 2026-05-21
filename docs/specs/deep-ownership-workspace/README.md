@@ -89,6 +89,9 @@ understanding.
 22. `21_curated_track_pedagogy_contract.md` separates curated track queues,
     prerequisite routing, artifact recommendation, readiness gates, and path
     mutation from the UI presentation.
+23. `22_source_intent_ingestion_mvp.md` defines the first dynamic MVP path for
+    URL/pasted-source intake, source signal extraction, mission preview, and
+    review-before-create.
 
 ## Naming Decision
 

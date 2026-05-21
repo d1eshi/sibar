@@ -47,6 +47,19 @@ Evidence expected:
 2. visible attempt history
 3. readiness report citing the attempt when relevant
 
+### VAL-LOOP-004: Source Intent Creates A Reviewable Mission Preview
+
+Given a URL or pasted source plus a short user reason, Sibi produces a
+reviewable mission preview before creating the mission.
+
+Evidence expected:
+
+1. `SourceIntentInput`
+2. `SourceIntakeResult`
+3. extracted `SourceSignal` objects
+4. `MissionPreview`
+5. user-visible review state before mission creation
+
 ## Artifact Assertions
 
 ### VAL-ARTIFACT-001: Sibi Generates A Thinking Artifact
@@ -239,6 +252,17 @@ Evidence expected:
 2. affected sessions
 3. return condition
 4. user confirmation state when the mutation changes the track
+
+### VAL-PED-007: Source Signals Remain Distinct From Sessions
+
+Source extraction must not turn every detected resource, exercise, or claim into
+an immediate study session.
+
+Evidence expected:
+
+1. source signals stored separately from proposed sessions
+2. deferred or optional signals visible in the preview
+3. user selection or compiler rationale for the first sessions
 
 ## Command And Mutation Assertions
 
