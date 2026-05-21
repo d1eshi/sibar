@@ -16,6 +16,15 @@ release yet.
 - Removed obsolete attempt-readiness prototype artifacts and generated visual
   assets so future worktree creation does not need to carry stale binary deletes.
 
+### Changed - Public Web Landing
+
+- Reframed the public landing around Sibi as an ownership engine for
+  AI-generated software, centered on cognitive debt, demonstrated ownership, and
+  the Diff Ownership Review wedge.
+- Replaced workspace-oriented copy and preview with a manifest, ownership
+  boundary map, diff evidence surface, attempt diagnosis loop, and ownership
+  quality metrics.
+
 ### Docs - Deep Ownership Workspace North Star
 
 - Added a current north-star entrypoint for the source-driven MVP:

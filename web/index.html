@@ -3,10 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sibar - De leer papers a construir entendimiento</title>
-<meta name="description" content="Sibar convierte research tecnico en un workspace de evidencia, artifacts, codigo y memoria para estudiar profundo aplicando lo aprendido.">
-<meta property="og:title" content="Sibar - Research workspace para estudiar profundo">
-<meta property="og:description" content="De leer papers, blogs, lecturas y apuntes a construir entendimiento con evidencia, artifacts, codigo y memoria.">
+<title>Sibi - Ownership engine for AI-generated software</title>
+<meta name="description" content="Sibi convierte codigo generado con AI en deuda cognitiva visible y te hace demostrar ownership boundary por boundary.">
+<meta property="og:title" content="Sibi - Cognitive debt to ownership recovery">
+<meta property="og:description" content="El primer ownership engine para equipos que producen software mas rapido de lo que pueden entenderlo.">
 <script>
 window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
 window.va("beforeSend", (event) => {
@@ -30,13 +30,14 @@ if (location.protocol !== "file:" && location.hostname !== "localhost" && locati
 </head>
 <body>
 <header class="site-header" aria-label="Navegacion principal">
-  <a class="brand" href="#top" aria-label="Sibar inicio">
+  <a class="brand" href="#top" aria-label="Sibi inicio">
     <span>S</span>
-    <strong>Sibar</strong>
+    <strong>Sibi</strong>
   </a>
   <nav class="site-nav" aria-label="Secciones">
-    <a href="#demo">Workspace</a>
-    <a href="#artifacts">Artifacts</a>
+    <a href="#manifesto">Manifesto</a>
+    <a href="#review">Review</a>
+    <a href="#ownership">Ownership</a>
     <a href="#early-access">Early access</a>
   </nav>
   <a class="header-cta" href="#early-access">Pedir acceso</a>
@@ -45,166 +46,211 @@ if (location.protocol !== "file:" && location.hostname !== "localhost" && locati
 <main id="top">
   <section class="hero section-band" aria-labelledby="hero-title">
     <div class="hero-copy">
-      <h1 id="hero-title">De leer <span class="rotating-source" id="rotatingSource" data-terms="papers,blogs,lecturas,apuntes">papers</span> a construir entendimiento.</h1>
-      <p class="hero-lede">Sibar convierte research tecnico en un workspace de evidencia, artifacts, codigo y memoria para estudiar profundo aplicando lo aprendido.</p>
+      <p class="eyebrow">Cognitive debt -> ownership recovery</p>
+      <h1 id="hero-title">La AI hizo software mas rapido que el entendimiento humano.</h1>
+      <p class="hero-lede">Sibi no es otro assistant que explica codigo. Es un ownership engine para equipos que necesitan probar que entienden, pueden modificar y pueden defender lo que ahora son capaces de crear demasiado rapido.</p>
       <div class="hero-actions">
-        <a class="primary-action" href="#demo">Ver el workspace</a>
-        <a class="secondary-action" href="#early-access">Entrar al early access</a>
+        <a class="primary-action" href="#review">Ver Diff Ownership Review</a>
+        <a class="secondary-action" href="#manifesto">Leer el manifiesto</a>
       </div>
     </div>
-    <aside class="hero-instrument" aria-label="Sibar workflow">
-      <span>Source</span>
-      <strong>Claim selected</strong>
-      <span>Artifact</span>
-      <strong>Notebook check</strong>
-      <span>Memory</span>
-      <strong>Formula ready</strong>
+
+    <aside class="hero-ledger" aria-label="Cognitive debt ledger">
+      <div>
+        <span>Diff</span>
+        <strong>+423 lines</strong>
+      </div>
+      <div>
+        <span>Tests</span>
+        <strong>3 passing</strong>
+      </div>
+      <div class="danger">
+        <span>Ownership</span>
+        <strong>weak runtime boundary</strong>
+      </div>
+      <div class="danger">
+        <span>Debt delta</span>
+        <strong>+ high</strong>
+      </div>
     </aside>
   </section>
 
-  <section class="workspace-demo section-band" id="demo" aria-label="Sibar workspace preview">
-    <div class="tauri-window">
-      <div class="tauri-titlebar">
+  <section class="manifesto section-band" id="manifesto" aria-labelledby="manifesto-title">
+    <div class="manifesto-copy">
+      <p class="eyebrow">Manifesto</p>
+      <h2 id="manifesto-title">No mas respuestas antes de evidencia.</h2>
+      <p>Los equipos ya pueden generar codigo, features, diffs y arquitecturas a una velocidad que sus modelos mentales no pueden absorber. El resultado no es solo deuda tecnica. Es deuda cognitiva: codigo que existe, compila y quizas funciona, pero que nadie puede explicar con claridad.</p>
+    </div>
+    <div class="manifesto-lines" aria-label="Sibi manifesto statements">
+      <p>Copilot explica codigo.</p>
+      <p>ChatGPT responde preguntas.</p>
+      <p><strong>Sibi convierte codigo en deuda cognitiva visible.</strong></p>
+      <p><strong>Sibi exige evidencia de comprension.</strong></p>
+    </div>
+  </section>
+
+  <section class="review-section section-band" id="review" aria-label="Diff Ownership Review">
+    <div class="product-shell">
+      <div class="product-titlebar">
         <span class="window-dot ink"></span>
         <span class="window-dot amber"></span>
         <span class="window-dot green"></span>
-        <strong>Sibar Research Workspace</strong>
-        <em>Focused workspace: embeddings</em>
+        <strong>Diff Ownership Review</strong>
+        <em>PR #42 / runtime boundary</em>
       </div>
 
-      <div class="workspace-preview">
-        <aside class="preview-path" aria-label="Workspace study path">
-          <div class="preview-path-head">
-            <span class="preview-glyph" aria-hidden="true"></span>
-            <strong>Study Path</strong>
-            <h2>Focused workspace: embeddings</h2>
-            <p>2 of 5</p>
-            <span class="preview-progress"><span></span></span>
-          </div>
-          <ol class="preview-node-list">
-            <li data-state="complete">
-              <span>1</span>
-              <strong>Embedding basics</strong>
+      <div class="review-grid">
+        <aside class="ownership-map" aria-label="Ownership map">
+          <header>
+            <p>Changed boundaries</p>
+            <strong>7 touched</strong>
+          </header>
+          <ol>
+            <li data-state="owned">
+              <span></span>
+              <div>
+                <strong>Prompt Generation</strong>
+                <em>owned</em>
+              </div>
             </li>
-            <li data-state="ready" class="selected">
-              <span>2</span>
-              <strong>Failure cases</strong>
-              <ol>
-                <li class="selected"><em>2.1</em> Boundary checks</li>
-                <li><em>2.2</em> Evidence check</li>
-              </ol>
+            <li data-state="partial">
+              <span></span>
+              <div>
+                <strong>Evidence Collection</strong>
+                <em>partial: weak test evidence</em>
+              </div>
             </li>
-            <li>
-              <span>3</span>
-              <strong>Toy implementation</strong>
+            <li data-state="gap" class="selected">
+              <span></span>
+              <div>
+                <strong>Runtime Validation</strong>
+                <em>gap: confuses validation with evaluation</em>
+              </div>
             </li>
-            <li data-state="locked">
-              <span>4</span>
-              <strong>Retrieval trade-offs</strong>
+            <li data-state="blocked">
+              <span></span>
+              <div>
+                <strong>Repair Planning</strong>
+                <em>blocked: missing prerequisite</em>
+              </div>
             </li>
           </ol>
         </aside>
 
-        <section class="preview-study" aria-label="Workspace study surface">
-          <header class="preview-study-head">
-            <p>Current study</p>
-            <h2>Where do embeddings fail in real retrieval?</h2>
+        <section class="diff-panel" aria-label="Selected diff">
+          <header>
+            <p>Selected boundary</p>
+            <h2>Attempt Evaluation vs Ownership Validation</h2>
           </header>
-          <section class="preview-open-node">
-            <h3>Selected learning node</h3>
-            <div>
-              <strong>Failure cases</strong>
-              <span>Resume with equation material in this session.</span>
-            </div>
-          </section>
-          <section class="preview-evidence">
-            <header>
-              <h3>Evidence from sources <span>4</span></h3>
-              <button type="button" tabindex="-1">View all</button>
-            </header>
+          <div class="code-surface" aria-label="Code diff preview">
+            <p><span>18</span><code>export function validateOwnershipAttempt(input) {</code></p>
+            <p class="add"><span>19</span><code>+ const evidence = collectRuntimeEvidence(input.diff);</code></p>
+            <p class="add"><span>20</span><code>+ const claim = buildOwnershipClaim(evidence.boundary);</code></p>
+            <p><span>21</span><code>  return judgeAttempt({</code></p>
+            <p class="add"><span>22</span><code>+   requiredDeletionRisk: evidence.downstreamConsumers,</code></p>
+            <p class="remove"><span>23</span><code>-   score: explainWithLLM(input.answer),</code></p>
+            <p><span>24</span><code>  });</code></p>
+          </div>
+          <div class="evidence-row">
             <article>
-              <span data-source="paper"></span>
-              <div>
-                <strong>Embedding overview paper excerpt</strong>
-                <em>Wu et al. - arXiv:2309.12345 - 2023</em>
-              </div>
-              <q>Short queries and out-of-domain language often break semantic generalization...</q>
+              <span>imports</span>
+              <strong>12</strong>
             </article>
             <article>
-              <span data-source="code"></span>
-              <div>
-                <strong>Local toy retrieval notebook</strong>
-                <em>Local artifact - Notebook - 2024</em>
-              </div>
-              <q>Nearest neighbors drift when the query distribution shifts...</q>
+              <span>callers</span>
+              <strong>4</strong>
             </article>
-          </section>
+            <article>
+              <span>tests</span>
+              <strong>3 pass</strong>
+            </article>
+            <article class="risk">
+              <span>unowned risk</span>
+              <strong>2</strong>
+            </article>
+          </div>
         </section>
 
-        <aside class="preview-tutor" aria-label="Sibar tutor guidance">
+        <aside class="attempt-panel" aria-label="Ownership attempt loop">
           <header>
-            <span class="preview-tutor-glyph" aria-hidden="true"></span>
-            <strong>Sibar Tutor</strong>
+            <p>Current claim</p>
+            <strong>Prove ownership</strong>
           </header>
-          <section class="preview-status">
-            <strong>You're on track</strong>
-            <p>Keep going with purpose.</p>
-            <span><span></span></span>
+          <section class="question-block">
+            <h3>Explain in your own words</h3>
+            <ol>
+              <li>What is being evaluated?</li>
+              <li>What evidence proves it?</li>
+              <li>What breaks if this layer is removed?</li>
+            </ol>
           </section>
-          <section class="preview-guidance">
-            <h3>Focus guidance</h3>
-            <article>
-              <strong>Focus</strong>
-              <p>Identify the failure case.</p>
-            </article>
-            <article>
-              <strong>Consider</strong>
-              <p>Compare source claim and artifact.</p>
-            </article>
-            <article>
-              <strong>Produce</strong>
-              <p>Create one evidence-backed note.</p>
-            </article>
+          <section class="attempt-box" aria-label="User attempt preview">
+            <p>The runtime checks if the answer is good and then marks the boundary as owned.</p>
           </section>
-          <section class="preview-readiness">
-            <h3>Readiness</h3>
-            <strong>78%</strong>
-            <p>Good readiness</p>
+          <section class="diagnosis-box">
+            <h3>Diagnosis</h3>
+            <p>You explained purpose, but confused evaluation with validation and gave no deletion-risk argument.</p>
+          </section>
+          <section class="repair-box">
+            <h3>Next smallest repair</h3>
+            <p>Before continuing, distinguish "checking answer quality" from "proving ownership of a system boundary".</p>
           </section>
         </aside>
       </div>
     </div>
   </section>
 
-  <section class="signal-section section-band" id="artifacts" aria-labelledby="artifacts-title">
+  <section class="metrics-section section-band" id="ownership" aria-labelledby="ownership-title">
     <div class="signal-intro">
-      <p class="eyebrow">Artifacts generables</p>
-      <h2 id="artifacts-title">El estudio termina en piezas que podes volver a usar.</h2>
+      <p class="eyebrow">Ownership quality</p>
+      <h2 id="ownership-title">Cada diff aumenta o reduce deuda cognitiva.</h2>
     </div>
-    <div class="signal-stack">
-      <div class="signal-card active">
-        <span>paper / evidencia</span>
-        <strong>Fuentes seleccionadas, claims y dudas en un mismo lugar.</strong>
-        <p>El workspace separa evidencia, notas y preguntas abiertas para que cada lectura tenga trazabilidad.</p>
-      </div>
-      <div class="signal-card">
-        <span>codigo reproducible</span>
-        <strong>Pequenos experimentos que prueban si entendiste.</strong>
-        <p>Converti una idea del material en un snippet, notebook o verificacion local que puedas repetir.</p>
-      </div>
-      <div class="signal-card">
-        <span>conocimiento / formulas</span>
-        <strong>Reglas, formulas y conexiones listas para aplicar.</strong>
-        <p>Lo aprendido queda como memoria de trabajo: definiciones, relaciones y pasos para volver sin empezar de cero.</p>
-      </div>
+    <div class="metric-stack">
+      <article class="metric-card active">
+        <span>formula</span>
+        <strong>Cognitive Debt = Code Surface Area - Demonstrated Ownership</strong>
+        <p>No es una metrica matematica cerrada. Es una forma de volver visible la brecha entre lo que el sistema hace y lo que el equipo puede defender.</p>
+      </article>
+      <article class="metric-card">
+        <span>coverage</span>
+        <strong>Ownership Coverage</strong>
+        <p>Changed boundaries: 7. Proven ownership: 3. Partial: 2. Unowned risk: 2. Coverage: 43%.</p>
+      </article>
+      <article class="metric-card">
+        <span>loop</span>
+        <strong>Attempt -> diagnosis -> repair -> retry</strong>
+        <p>Sibi no entrega una explicacion final. Guia un loop hasta que el usuario pueda explicar, modificar y defender la boundary.</p>
+      </article>
+      <article class="metric-card">
+        <span>memory</span>
+        <strong>Longitudinal ownership memory</strong>
+        <p>GitHub conoce commits. Cursor conoce contexto. Sibi conoce tu relacion cognitiva con tu sistema.</p>
+      </article>
+    </div>
+  </section>
+
+  <section class="principles section-band" aria-label="Sibi principles">
+    <div>
+      <p class="eyebrow">Anti-pattern</p>
+      <h2>Sibi no existe para explicarte mas cosas.</h2>
+    </div>
+    <div class="principle-grid">
+      <article>
+        <span>No</span>
+        <p>Explain file. Summarize folder. Ask anything about codebase. Generate docs.</p>
+      </article>
+      <article>
+        <span>Yes</span>
+        <p>Prove ownership. Diagnose gap. Repair boundary. Re-attempt. Track debt.</p>
+      </article>
     </div>
   </section>
 
   <section class="access-section section-band" id="early-access" aria-labelledby="access-title">
     <div class="access-copy-block">
       <p class="eyebrow">Early access</p>
-      <h2 id="access-title">Estoy abriendo Sibar con builders que ya sienten esta deuda.</h2>
-      <p>Deja tu correo y, si queres, tu handle de X. La siguiente tanda va a probar Sibar sobre papers, notas, codigo, formulas y loops de entendimiento durable.</p>
+      <h2 id="access-title">Para builders que ya sienten cognitive debt.</h2>
+      <p>Deja tu correo y, si queres, tu handle de X. La siguiente tanda va a probar Sibi sobre diffs reales, boundaries tocadas, intentos de ownership y reparaciones minimas.</p>
     </div>
     <form class="access-form" id="earlyAccessForm">
       <label for="earlyAccessEmail">Email</label>
