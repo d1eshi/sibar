@@ -30,6 +30,9 @@ release yet.
 - Added a selection-aware ownership lab inside the harness panel so code/diff
   highlights surface range, boundary state, trace, signal, schema, and relevant
   evidence context without turning the harness into an explain-first flow.
+- Reframed the ownership lab as a local derivation inspector, making the
+  user-facing state, state source, and attempt-gate derivation explicit instead
+  of rendering a second public-facing state badge.
 - Fixed evidence grouping so the bottom evidence drawer renders observed,
   inferred, unverified, and conflict fixture evidence instead of empty groups.
 

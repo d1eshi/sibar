@@ -82,13 +82,23 @@ export function OwnershipLabPanel({
   ];
 
   return (
-    <section className="ownershipLab" aria-label="Ownership selection lab">
+    <section className="ownershipLab" aria-label="Ownership derivation lab">
       <div className="labHeader">
         <div>
-          <p className="panelSub">Selection lab</p>
+          <p className="panelSub">Derivation lab</p>
           <h2>{rangeText(selection)}</h2>
+          <p className="labHeaderNote">Local inspector for boundary projection and attempt-gate inputs.</p>
         </div>
-        <span className={`stateBadge ${boundaryState}-state`}>{labelForState(boundaryState)}</span>
+        <div className="labDerivationSummary" aria-label="Boundary state derivation">
+          <span>
+            <strong>User-facing state</strong>
+            {labelForState(boundaryState)}
+          </span>
+          <span>
+            <strong>State source</strong>
+            boundary file projection -&gt; harness/tree state
+          </span>
+        </div>
       </div>
 
       <div className="labSection">
@@ -138,8 +148,16 @@ export function OwnershipLabPanel({
         <h3>Schema</h3>
         <dl className="labFacts compact">
           <div>
-            <dt>State</dt>
+            <dt>User-facing state</dt>
             <dd>{labelForState(boundaryState)}</dd>
+          </div>
+          <div>
+            <dt>State source</dt>
+            <dd>boundary file projection -&gt; harness/tree state</dd>
+          </div>
+          <div>
+            <dt>Derivation</dt>
+            <dd>fileStates[boundary.filePath] -&gt; active boundary state -&gt; attempt gate</dd>
           </div>
           <div>
             <dt>Expected proof</dt>
