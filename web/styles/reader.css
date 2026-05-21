@@ -234,8 +234,7 @@ h1 {
   transform: rotate(1.5deg);
 }
 
-.signal-card span,
-.loop-cards span {
+.signal-card span {
   color: var(--red);
   font-family: var(--mono);
   font-size: 12px;
@@ -260,10 +259,6 @@ h1 {
 .section-intro {
   max-width: 760px;
   margin-bottom: 28px;
-}
-
-.section-intro.compact {
-  max-width: 640px;
 }
 
 .section-intro h2,
@@ -536,46 +531,12 @@ code {
   background: rgba(255, 250, 240, 0.045);
 }
 
-.loop-section {
-  padding: 72px 0;
-}
-
-.loop-cards {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 14px;
-}
-
-.loop-cards article {
-  min-height: 260px;
-  display: grid;
-  align-content: space-between;
-  border: 1px solid rgba(23, 22, 19, 0.16);
-  border-radius: 8px;
-  background: rgba(255, 250, 240, 0.68);
-  padding: 22px;
-}
-
-.loop-cards h3 {
-  margin: 32px 0 10px;
-  font-family: var(--serif);
-  font-size: 35px;
-  font-weight: 500;
-  line-height: 1;
-}
-
-.loop-cards p {
-  margin: 0;
-  color: #514b42;
-  line-height: 1.5;
-}
-
 .access-section {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(320px, 430px);
   gap: 48px;
   align-items: start;
-  padding: 80px 0 110px;
+  padding: 42px 0 110px;
 }
 
 .access-form {
@@ -653,10 +614,6 @@ code {
   .demo-panel {
     border-right: 0;
     border-bottom: 1px solid rgba(255, 250, 240, 0.13);
-  }
-
-  .loop-cards {
-    grid-template-columns: 1fr;
   }
 }
 
