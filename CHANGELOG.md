@@ -38,6 +38,8 @@ release yet.
 - Reframed the landing copy around cognitive debt, durable technical
   understanding, and applying/repeating knowledge across generated or unfamiliar
   software.
+- Replaced the explanatory interactive demo block with a static embedded
+  workspace preview based on the Tauri research workspace surface.
 
 ### Docs - UI Technology Architecture (Tauri Workspace)
 
