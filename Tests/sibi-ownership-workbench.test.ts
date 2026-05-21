@@ -1,6 +1,8 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { parsePatchFiles } from "@pierre/diffs";
+import { readFileSync } from "node:fs";
+import { CodeView as VanillaCodeView, parsePatchFiles } from "@pierre/diffs";
+import { PierreCodeView } from "../sibi/src/ownershipWorkbench/components/PierreCodeView.ts";
 
 type OwnershipWorkbenchFixtures = typeof import("../sibi/src/ownershipWorkbench/fixtures.ts");
 
@@ -73,4 +75,45 @@ test("codeViewDiffItemsByPath includes diff entries for expected files", async (
 test("fixture import should not log console errors in the happy path", async () => {
   await loadFixturesModule();
   assert.equal(fixtureImportConsoleErrors.length, 0, "fixture import logged one or more console errors");
+});
+
+test("ownership workbench CodeView adapter uses the React entrypoint", () => {
+  assert.notEqual(
+    PierreCodeView,
+    VanillaCodeView,
+    "Ownership Workbench must not render the vanilla CodeView constructor as JSX",
+  );
+  assert.equal(
+    typeof (PierreCodeView as { prototype?: { setup?: unknown } }).prototype?.setup,
+    "undefined",
+    "React CodeView adapter should not expose the vanilla CodeView instance API on its prototype",
+  );
+});
+
+test("CodeDiffPanel renders the CodeView adapter instead of vanilla CodeView", () => {
+  const source = readFileSync(
+    new URL("../sibi/src/ownershipWorkbench/components/CodeDiffPanel.tsx", import.meta.url),
+    "utf8",
+  );
+
+  assert.match(
+    source,
+    /import\s+\{\s*PierreCodeView\s*\}\s+from\s+["']\.\/PierreCodeView["']/,
+    "CodeDiffPanel should import the ownership workbench CodeView adapter",
+  );
+  assert.doesNotMatch(
+    source,
+    /import\s+(?!type\b)[\s\S]*?\bCodeView\b[\s\S]*?\bfrom\s+["']@pierre\/diffs["']/,
+    "CodeDiffPanel must not import the vanilla CodeView from @pierre/diffs",
+  );
+  assert.doesNotMatch(
+    source,
+    /<CodeView(?:[\s>]|<)/,
+    "CodeDiffPanel must not render the vanilla CodeView JSX element",
+  );
+  assert.match(
+    source,
+    /<PierreCodeView(?:[\s>]|<)/,
+    "CodeDiffPanel should render the ownership workbench CodeView adapter",
+  );
 });
