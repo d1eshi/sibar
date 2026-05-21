@@ -66,31 +66,21 @@ The center panel must support:
 
 Preferred direction:
 
-- use a proven file tree renderer such as the `trees.software` React FileTree API
-  if licensing and package fit are acceptable;
-- use a proven code/diff renderer such as `diffs.com` CodeView if licensing and
-  package fit are acceptable;
-- otherwise keep the renderer interface compatible with replacing the local
-  prototype later.
+- use `@pierre/trees` and `@pierre/trees/react` in Slice 0:
+  `useFileTree(...)` + `<FileTree model={model} />`;
+- use `@pierre/diffs` for code/diff rendering:
+  `CodeView`, `parsePatchFiles`, `CodeViewFileItem`, `CodeViewDiffItem`, and
+  line/selection annotations (`LineAnnotation`, `DiffLineAnnotation`, `CodeViewLineSelection`) in Slice 0;
+- keep an explicit adapter boundary from fixtures to package inputs so library migration can
+  be removed behind a single module later.
 
-Renderer abstraction:
+Slice 0 fixture adapter outputs should align to package shapes:
 
-```ts
-type CodeSelection = {
-  file_path: string;
-  start_line: number;
-  end_line: number;
-};
+`parsePatchFiles` -> file-diff file collection, then
+`CodeViewFileItem` / `CodeViewDiffItem` maps keyed by file path for the `CodeView`.
 
-type CodeViewInput = {
-  file_path: string;
-  language: string;
-  content: string;
-  diff?: string;
-  evidence_refs: EvidenceRef[];
-  selected_boundary_id?: string;
-};
-```
+Slice 0 fixture data is intentionally demo-only, demo-selected by default, and should not be treated as
+canonical source-of-truth for architecture, evidence, or evaluation contracts.
 
 ## Ownership Harness Panel
 
@@ -160,4 +150,5 @@ Empty states should drive the user into the loop:
 - "Select a boundary to prove ownership."
 - "Submit an attempt before Sibi diagnoses this gap."
 
-Do not use empty states that invite open-ended chat.
+Once `load`/`select-empty` states exist, these messages become required and should replace generic fallback text.
+While fallback rendering remains fixture-bound, avoid empty-state copy that invites open-ended chat.

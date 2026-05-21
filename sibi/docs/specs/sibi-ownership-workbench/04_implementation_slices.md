@@ -9,18 +9,28 @@ Deliverables:
 - Vite/React route or app entry for Sibi Ownership Workbench.
 - Static fixture with file tree, one diff, one boundary, one prompt.
 - Three-panel layout plus evidence drawer.
+- Library-backed presentation in Slice 0:
+  - use `@pierre/trees` / `@pierre/trees/react` for file-tree UI;
+  - use `@pierre/diffs` for code and diff rendering.
 - Maintain modular React structure for this slice:
   - fixture data/types/helpers in dedicated module(s),
+  - explicit Slice 0 adapters that transform fixture records into `@pierre/trees` and `@pierre/diffs` public item shapes,
   - dedicated components for file tree, code/diff view, ownership harness, and evidence drawer,
   - `App` kept as behavior/state orchestration only.
-- Prefer component modules well below 500 lines (avoid monolithic React files).
+- Prefer component modules that stay focused: avoid >500-line monoliths and avoid
+  excessive hyper-granular splits / unnecessary tiny recursive component decomposition.
 
 Acceptance:
 
 - reviewer can see the final product shape;
 - no model call;
 - no filesystem access;
+- no live scanning of repo contents (fixture-backed adapters only);
+- no persistent state beyond current local interaction;
 - no explain-first UI.
+- Slice 0 fixtures are demo-only and selected by default.
+- Once `load` and `select-empty` states are introduced, their empty-state copy is required;
+  fixture-only fallback renderings still must avoid chat invitations.
 
 ## Slice 1 - Deterministic Repo Inventory
 
