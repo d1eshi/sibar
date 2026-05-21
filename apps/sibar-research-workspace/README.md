@@ -3,19 +3,57 @@
 This is a static second-app product slice intended to run as a desktop shell
 workspace for the Deep Ownership flow.
 
-## Run the static slice
+## React migration slice 0 (static)
 
-- Open `index.html` directly in a browser.
-- The page is intentionally offline and offline-first:
-  - no network request for state
-  - local interaction only
-  - sample roadmap, source-to-roadmap compiler, and attempt loop are deterministic
+- Start the React shell from repository root:
+  - `pnpm workspace:dev`
+- Build the static React entry:
+  - `pnpm workspace:build`
+- Optional preview from build output:
+  - `pnpm workspace:preview`
+
+This slice renders the onboarding prototype screen only: native style topbar, intent
+fields, and static preview column. It does not connect to Rust, runners, or the
+compiler path.
+
+## React migration slice 1 (interactive onboarding)
+
+- Converted the onboarding screen to controlled form fields for intent, source,
+  constraint, and optional background fields.
+- `Review workspace plan` now computes a deterministic local workspace preview from
+  the current intent/source payload and enables the next workspace action.
+- In this slice, the first-session action updated local flow state and surfaced a
+  local "First session ready" status before workspace navigation was introduced.
+- No fetch calls, Tauri invoke calls, or Rust/compiler execution is performed in
+  this step.
+
+## React migration slice 2 (workspace shell, overview, and first session)
+
+- Added the dedicated `WorkspaceShell` boundary so onboarding renders inside a
+  reusable native-style container.
+- `OnboardingFlow` now emits an `onOpenWorkspace` callback from `Open workspace`
+  after local preview generation.
+- Added a workspace overview screen that follows the study-path reference:
+  left learning rail, current-study center, source evidence, tutor guidance, and
+  readiness before opening a learning node.
+- Added a workspace home screen with existing workspaces and session resume/open
+  actions:
+  - `New workspace`
+  - `Open` / `Resume`
+- Added a static first-session workspace surface with reducer-backed selection state:
+  - study path rail
+  - session workbench
+  - selected learning-material surface
+  - compact readiness/source panel
+- No fetch calls, Tauri invoke calls, compiler integration, runner sidecar, or
+  external execution calls were added in this slice.
 
 ## Tauri shell
 
 - The app shell scaffold is in `src-tauri/`.
-- `src-tauri/tauri.conf.json` points `frontendDist` at `../` so the shell serves
-  this app folder directly.
+- `src-tauri/tauri.conf.json` uses the Vite workspace dev/build flow:
+  `beforeDevCommand` runs `pnpm workspace:dev`, `beforeBuildCommand` runs
+  `pnpm workspace:build`, and `frontendDist` is set to `dist`.
 - `src-tauri/Cargo.toml` and `src-tauri/src/main.rs` define a minimal, standard
   launch path.
 
@@ -25,9 +63,8 @@ then run the conventional Tauri command from this folder.
 
 ## Product surface checks in this slice
 
-- Native-style shell with left learning tree, focused session, and Discussion panel
-- 3-column workspace: learning tree, Today session, contextual Discussion
-- Three visible next actions: Read, Code, Explain
-- Source-to-roadmap behavior
-- Attempt-first reconstruction flow and hint ladder
-- Bottom artifact/evidence/recall strip
+- Native-style topbar and prototype onboarding viewport.
+- Intent input fields (`What are you trying to build...`, source, constraint and
+  optional background/outputs).
+- Static proposed plan preview column with first-session outcome and disabled first
+  action.
