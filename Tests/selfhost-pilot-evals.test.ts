@@ -7,8 +7,8 @@ import { spawnSync } from "node:child_process";
 
 import { runSelfhostPilotEval } from "../src/evals/selfhost-pilot.ts";
 
-const DEFAULT_MANIFEST_PATH = "sibar.selfhost.manifest.json";
-const DEFAULT_GOLD_CASE_INDEX = "docs/specs/selfhost/pilot/gold-cases/index.json";
+const DEFAULT_MANIFEST_PATH = "evals/attempt-readiness/manifest.json";
+const DEFAULT_GOLD_CASE_INDEX = "evals/attempt-readiness/gold-cases/index.json";
 const BENCHMARK_ANSWER_CLASSES = [
   "correct_grounded",
   "correct_uncited",

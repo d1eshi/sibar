@@ -1,0 +1,244 @@
+{
+  "generated_at": "2026-05-14T03:31:43.043Z",
+  "validation": "VAL-EVAL-008-selfhost-freeform-first-slice",
+  "gold_case_index_path": "evals/attempt-readiness/gold-cases/index.json",
+  "cases": [
+    {
+      "case_id": "GC-001",
+      "mastery_check_id": "SC-001-artifact-boundary",
+      "expected_finding_type": "readiness",
+      "observed_finding_type": "readiness",
+      "expected_issue_candidate_type": "none",
+      "observed_issue_candidate_type": "none",
+      "user_evidence_attached": true,
+      "repo_evidence_attached": true,
+      "passed": true,
+      "finding": {
+        "finding_type": "readiness",
+        "gap_present": false,
+        "concept_id": "artifact_boundary",
+        "operation": "trace",
+        "readiness": "ready to modify with guardrails",
+        "issue_candidate_type": "none",
+        "user_evidence_excerpt": "I would trace boundary control in `evals/attempt-readiness/manifest.json` and `src/runtime-concept-graph.ts`, cite at least one included file path such as `src/runtime-support.ts` and one excluded path in the manifest, and explain that only listed included paths can support artifact evidence.",
+        "repo_evidence_citations": [
+          {
+            "path": "src/runtime-concept-graph.ts",
+            "rationale": "Boundary traversal logic (included/excluded checks and inventory walk) defines what is in-scope for concept graph evidence.",
+            "excerpt": "linePattern: /\\b(artifact_session|included_paths|excluded_paths|selection|summary|writeState|readState)\\b/,",
+            "exists": true
+          },
+          {
+            "path": "src/runtime-support.ts",
+            "rationale": "Core types and shared session metadata describe the boundary contract used when reading sessions and sessions' path fields.",
+            "excerpt": "included_paths: string[];",
+            "exists": true
+          },
+          {
+            "path": "Tests/concept-graph.test.ts",
+            "rationale": "Tests show boundary expectations, especially evidence filtering and exclusion behavior.",
+            "excerpt": "\"export type ArtifactSession = { artifact_session_id: string; included_paths: string[]; excluded_paths: string[] };\",",
+            "exists": true
+          }
+        ],
+        "user_evidence_attached": true,
+        "repo_evidence_attached": true,
+        "contradiction_or_insufficiency": "No gap: the answer cites in-boundary repo paths and gives bounded readiness only.",
+        "missing_reasoning_step": "No missing step for this bounded check.",
+        "repair_task": null,
+        "reevaluation_prompt": null
+      }
+    },
+    {
+      "case_id": "GC-002",
+      "mastery_check_id": "SC-001-artifact-boundary",
+      "expected_finding_type": "evidence_gap",
+      "observed_finding_type": "evidence_gap",
+      "expected_issue_candidate_type": "LearningGap",
+      "observed_issue_candidate_type": "LearningGap",
+      "user_evidence_attached": true,
+      "repo_evidence_attached": true,
+      "passed": true,
+      "finding": {
+        "finding_type": "evidence_gap",
+        "gap_present": true,
+        "concept_id": "artifact_boundary",
+        "operation": "trace",
+        "readiness": "not ready yet",
+        "issue_candidate_type": "LearningGap",
+        "user_evidence_excerpt": "Boundary checks are based on manifest paths and should include src and Tests.",
+        "repo_evidence_citations": [
+          {
+            "path": "src/runtime-concept-graph.ts",
+            "rationale": "Boundary traversal logic (included/excluded checks and inventory walk) defines what is in-scope for concept graph evidence.",
+            "excerpt": "linePattern: /\\b(artifact_session|included_paths|excluded_paths|selection|summary|writeState|readState)\\b/,",
+            "exists": true
+          },
+          {
+            "path": "src/runtime-support.ts",
+            "rationale": "Core types and shared session metadata describe the boundary contract used when reading sessions and sessions' path fields.",
+            "excerpt": "included_paths: string[];",
+            "exists": true
+          },
+          {
+            "path": "Tests/concept-graph.test.ts",
+            "rationale": "Tests show boundary expectations, especially evidence filtering and exclusion behavior.",
+            "excerpt": "\"export type ArtifactSession = { artifact_session_id: string; included_paths: string[]; excluded_paths: string[] };\",",
+            "exists": true
+          }
+        ],
+        "user_evidence_attached": true,
+        "repo_evidence_attached": true,
+        "contradiction_or_insufficiency": "The answer may be semantically plausible, but it does not cite concrete in-boundary repo evidence.",
+        "missing_reasoning_step": "Attach path-specific repo citations to the conceptual explanation.",
+        "repair_task": "Restate the same answer with explicit in-boundary file citations and one allowed/blocked path example.",
+        "reevaluation_prompt": "Using the same trace operation, evaluate boundary behavior when only `Tests/` is included and `src/` is excluded; explain how this changes evidence admissibility."
+      }
+    },
+    {
+      "case_id": "GC-003",
+      "mastery_check_id": "SC-001-artifact-boundary",
+      "expected_finding_type": "flow_gap",
+      "observed_finding_type": "flow_gap",
+      "expected_issue_candidate_type": "LearningGap",
+      "observed_issue_candidate_type": "LearningGap",
+      "user_evidence_attached": true,
+      "repo_evidence_attached": true,
+      "passed": true,
+      "finding": {
+        "finding_type": "flow_gap",
+        "gap_present": true,
+        "concept_id": "artifact_boundary",
+        "operation": "trace",
+        "readiness": "not ready yet",
+        "issue_candidate_type": "LearningGap",
+        "user_evidence_excerpt": "I know included paths matter, but I mixed whether the include list is validated during session creation or graph generation, so I cannot explain the full sequence end-to-end.",
+        "repo_evidence_citations": [
+          {
+            "path": "src/runtime-concept-graph.ts",
+            "rationale": "Boundary traversal logic (included/excluded checks and inventory walk) defines what is in-scope for concept graph evidence.",
+            "excerpt": "linePattern: /\\b(artifact_session|included_paths|excluded_paths|selection|summary|writeState|readState)\\b/,",
+            "exists": true
+          },
+          {
+            "path": "src/runtime-support.ts",
+            "rationale": "Core types and shared session metadata describe the boundary contract used when reading sessions and sessions' path fields.",
+            "excerpt": "included_paths: string[];",
+            "exists": true
+          },
+          {
+            "path": "Tests/concept-graph.test.ts",
+            "rationale": "Tests show boundary expectations, especially evidence filtering and exclusion behavior.",
+            "excerpt": "\"export type ArtifactSession = { artifact_session_id: string; included_paths: string[]; excluded_paths: string[] };\",",
+            "exists": true
+          }
+        ],
+        "user_evidence_attached": true,
+        "repo_evidence_attached": true,
+        "contradiction_or_insufficiency": "The answer names boundary concepts but cannot trace the full sequence across the slice.",
+        "missing_reasoning_step": "Connect session setup, graph generation, filtering, and citation emission in order.",
+        "repair_task": "Trace the boundary sequence end-to-end and connect each phase to repository evidence.",
+        "reevaluation_prompt": "Using the same trace operation, evaluate boundary behavior when only `Tests/` is included and `src/` is excluded; explain how this changes evidence admissibility."
+      }
+    },
+    {
+      "case_id": "GC-006",
+      "mastery_check_id": "SC-001-artifact-boundary",
+      "expected_finding_type": "false_confidence_gap",
+      "observed_finding_type": "false_confidence_gap",
+      "expected_issue_candidate_type": "LearningGap",
+      "observed_issue_candidate_type": "LearningGap",
+      "user_evidence_attached": true,
+      "repo_evidence_attached": true,
+      "passed": true,
+      "finding": {
+        "finding_type": "false_confidence_gap",
+        "gap_present": true,
+        "concept_id": "artifact_boundary",
+        "operation": "trace",
+        "readiness": "not ready yet",
+        "issue_candidate_type": "LearningGap",
+        "user_evidence_excerpt": "I am certain all files under the repo root are in scope unless they are literally impossible to open, so excluded paths do not matter for this slice.",
+        "repo_evidence_citations": [
+          {
+            "path": "src/runtime-concept-graph.ts",
+            "rationale": "Boundary traversal logic (included/excluded checks and inventory walk) defines what is in-scope for concept graph evidence.",
+            "excerpt": "linePattern: /\\b(artifact_session|included_paths|excluded_paths|selection|summary|writeState|readState)\\b/,",
+            "exists": true
+          },
+          {
+            "path": "src/runtime-support.ts",
+            "rationale": "Core types and shared session metadata describe the boundary contract used when reading sessions and sessions' path fields.",
+            "excerpt": "included_paths: string[];",
+            "exists": true
+          },
+          {
+            "path": "Tests/concept-graph.test.ts",
+            "rationale": "Tests show boundary expectations, especially evidence filtering and exclusion behavior.",
+            "excerpt": "\"export type ArtifactSession = { artifact_session_id: string; included_paths: string[]; excluded_paths: string[] };\",",
+            "exists": true
+          }
+        ],
+        "user_evidence_attached": true,
+        "repo_evidence_attached": true,
+        "contradiction_or_insufficiency": "The answer is high-confidence while contradicting the boundary rule that exclusions matter.",
+        "missing_reasoning_step": "Check the confidence claim against manifest include/exclude evidence before asserting scope.",
+        "repair_task": "Re-ground the confidence claim by contrasting manifest boundaries with excluded-path behavior.",
+        "reevaluation_prompt": "Using the same trace operation, evaluate boundary behavior when only `Tests/` is included and `src/` is excluded; explain how this changes evidence admissibility."
+      }
+    },
+    {
+      "case_id": "GC-008",
+      "mastery_check_id": "SC-001-artifact-boundary",
+      "expected_finding_type": "design_induced_gap",
+      "observed_finding_type": "design_induced_gap",
+      "expected_issue_candidate_type": "DesignIssue",
+      "observed_issue_candidate_type": "DesignIssue",
+      "user_evidence_attached": true,
+      "repo_evidence_attached": true,
+      "passed": true,
+      "finding": {
+        "finding_type": "design_induced_gap",
+        "gap_present": true,
+        "concept_id": "artifact_boundary",
+        "operation": "trace",
+        "readiness": "not ready yet",
+        "issue_candidate_type": "DesignIssue",
+        "user_evidence_excerpt": "The manifest looks like a style document, not an enforcement rule, so I kept adding references from docs and excluded directories to avoid missing anything.",
+        "repo_evidence_citations": [
+          {
+            "path": "src/runtime-concept-graph.ts",
+            "rationale": "Boundary traversal logic (included/excluded checks and inventory walk) defines what is in-scope for concept graph evidence.",
+            "excerpt": "linePattern: /\\b(artifact_session|included_paths|excluded_paths|selection|summary|writeState|readState)\\b/,",
+            "exists": true
+          },
+          {
+            "path": "src/runtime-support.ts",
+            "rationale": "Core types and shared session metadata describe the boundary contract used when reading sessions and sessions' path fields.",
+            "excerpt": "included_paths: string[];",
+            "exists": true
+          },
+          {
+            "path": "Tests/concept-graph.test.ts",
+            "rationale": "Tests show boundary expectations, especially evidence filtering and exclusion behavior.",
+            "excerpt": "\"export type ArtifactSession = { artifact_session_id: string; included_paths: string[]; excluded_paths: string[] };\",",
+            "exists": true
+          }
+        ],
+        "user_evidence_attached": true,
+        "repo_evidence_attached": true,
+        "contradiction_or_insufficiency": "The answer treats the manifest as unclear product affordance rather than executed boundary policy.",
+        "missing_reasoning_step": "Separate product wording confusion from the executable enforcement behavior.",
+        "repair_task": "Clarify the product affordance that makes manifest enforcement visible, then retry the boundary trace.",
+        "reevaluation_prompt": "Using the same trace operation, evaluate boundary behavior when only `Tests/` is included and `src/` is excluded; explain how this changes evidence admissibility."
+      }
+    }
+  ],
+  "aggregate": {
+    "total_cases": 5,
+    "passed_cases": 5,
+    "failed_cases": 0,
+    "user_evidence_attached_cases": 5,
+    "repo_evidence_attached_cases": 5
+  }
+}

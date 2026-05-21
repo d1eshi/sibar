@@ -105,7 +105,7 @@ export type TraceabilityReport = {
 // Demo fixture data
 // ---------------------------------------------------------------------------
 
-export const BENCHMARK_REPORT_PATH = "docs/specs/selfhost/pilot/reports/VAL-EVAL-006-selfhost-benchmark.json";
+export const BENCHMARK_REPORT_PATH = "evals/attempt-readiness/reports/VAL-EVAL-007-selfhost-benchmark.json";
 
 /**
  * The freeform evaluator report contains the detailed evidence-bearing fields
@@ -114,14 +114,14 @@ export const BENCHMARK_REPORT_PATH = "docs/specs/selfhost/pilot/reports/VAL-EVAL
  * reference this freeform report as their source_report_path so that VAL-CROSS-001
  * traceability checks can verify the evidence actually exists in the referenced artifact.
  */
-const FREEFORM_REPORT_PATH = "docs/specs/selfhost/pilot/reports/VAL-EVAL-008-selfhost-freeform.json";
+const FREEFORM_REPORT_PATH = "evals/attempt-readiness/reports/VAL-EVAL-008-selfhost-freeform.json";
 
 /**
  * Demo fixtures — one per answer state.
  *
  * Evidence-bearing fields (user_evidence, repo_evidence, repair_task,
  * reevaluation_prompt) are derived from the freeform evaluator report
- * (`docs/specs/selfhost/pilot/reports/VAL-EVAL-008-selfhost-freeform.json`).
+ * (`evals/attempt-readiness/reports/VAL-EVAL-008-selfhost-freeform.json`).
  *
  * Benchmark report is used separately for spec-closure gating
  * (`specs02to04Passed`, `demoClaimsAreGated`) and summary consistency.
@@ -141,7 +141,7 @@ export const DEMO_FIXTURES: DemoFixtureEntry[] = [
     issue_candidate_type: "none",
     readiness: "ready to modify with guardrails",
     user_evidence:
-      "I would trace boundary control in `sibar.selfhost.manifest.json` and `src/runtime-concept-graph.ts`, cite at least one included file path such as `src/runtime-support.ts` and one excluded path in the manifest, and explain that only listed included paths can support artifact evidence.",
+      "I would trace boundary control in `evals/attempt-readiness/manifest.json` and `src/runtime-concept-graph.ts`, cite at least one included file path such as `src/runtime-support.ts` and one excluded path in the manifest, and explain that only listed included paths can support artifact evidence.",
     repo_evidence: [
       {
         path: "src/runtime-concept-graph.ts",

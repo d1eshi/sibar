@@ -1,0 +1,36 @@
+{
+  "id": "GC-022",
+  "mastery_check_id": "SC-003-gap-detection",
+  "concept_id": "gap_detection",
+  "operation": "debug",
+  "answer_class": "overconfident_wrong",
+  "simulated_user_answer": "I am absolutely sure wrong answers with `gap_confirmed` are still confirmed if they sound syntactically correct.",
+  "declared_confidence": "high",
+  "expected_gap_type": "false_confidence_gap",
+  "expected_layer": 4,
+  "expected_severity": "critical",
+  "expected_confidence": "high",
+  "required_repo_evidence": [
+    {
+      "path": "src/runtime-gap-detection.ts",
+      "rationale": "Defines that incorrect content can become `gap_confirmed` with high certainty gap output."
+    },
+    {
+      "path": "src/runtime-support.ts",
+      "rationale": "Defines high-severity pathways and output confidence."
+    },
+    {
+      "path": "Tests/gap-detection.test.ts",
+      "rationale": "Validates high-confidence wrong-answer behavior for gap-confirmed."
+    }
+  ],
+  "forbidden_claims": [
+    "Claiming high-confidence wrong answers are acceptable.",
+    "Ignoring content correctness checks for false confidence."
+  ],
+  "acceptable_repair_task": "Repair should force explicit contradiction checks and evidence-backed correction before confidence increase.",
+  "acceptable_issue_candidate_type": "LearningGap",
+  "expected_readiness": "not ready yet",
+  "notes": "Designed to catch overconfident incorrect claims with high severity.",
+  "expected_gap_present": true
+}

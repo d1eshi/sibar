@@ -63,6 +63,6 @@
     "voice, screen capture, editor plugins, or ambient observation",
     "multi-user dashboards"
   ],
-  "mastery_check_index": "docs/specs/selfhost/pilot/mastery-checks/index.json",
-  "gold_case_index": "docs/specs/selfhost/pilot/gold-cases/index.json"
+  "mastery_check_index": "evals/attempt-readiness/mastery-checks/index.json",
+  "gold_case_index": "evals/attempt-readiness/gold-cases/index.json"
 }

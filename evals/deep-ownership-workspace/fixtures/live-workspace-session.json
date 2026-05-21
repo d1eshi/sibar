@@ -1,0 +1,22 @@
+{
+  "model": "fixture-model",
+  "reasoning_effort": "fixture",
+  "files_read": [
+    "src/runtime.ts"
+  ],
+  "candidate_signals": [
+    {
+      "signal_type": "flow",
+      "claim": "The runtime entrypoint dispatches behavior by inspecting payload.command.",
+      "confidence": "medium",
+      "citations": [
+        {
+          "path": "src/runtime.ts",
+          "range": "1-2"
+        }
+      ],
+      "rationale": "The file dispatches on command after loading the payload object.",
+      "proposed_layer": 3
+    }
+  ]
+}

@@ -1,0 +1,126 @@
+{
+  "id": "E01-LLM-OVERCONFIDENT-L5",
+  "title": "Overconfident model candidate is rejected when it lacks valid citations",
+  "case_class": "overconfident_llm_output",
+  "artifact_fixture": "fixtures/sibi-runtime-mini",
+  "artifact_boundary": {
+    "root": "fixtures/sibi-runtime-mini",
+    "included_paths": [
+      "src/runtime-readiness.ts",
+      "src/runtime-memory.ts",
+      "Tests/readiness-report.test.ts"
+    ],
+    "excluded_paths": [
+      "docs/private-notes.md",
+      "../outside-repo/secrets.md"
+    ]
+  },
+  "learning_goal": "Reject LLM candidate signals that claim ownership or readiness without deterministic evidence.",
+  "concept_under_test": {
+    "id": "llm-candidate-validation",
+    "label": "LLM candidate validation boundary",
+    "layer_target": 5
+  },
+  "user_answer": {
+    "kind": "not_applicable",
+    "text": "This case evaluates a recorded LLM fixture response, not a learner answer.",
+    "declared_confidence": "not_applicable"
+  },
+  "llm_fixture_response": {
+    "model": "fixture-model",
+    "reasoning_effort": "fixture",
+    "candidate_signals": [
+      {
+        "signal_type": "readiness_claim",
+        "claim": "The learner is ready to own readiness reporting end to end.",
+        "confidence": "high",
+        "citations": [
+          {
+            "path": "docs/private-notes.md",
+            "range": "unbounded note"
+          }
+        ]
+      },
+      {
+        "signal_type": "concept_claim",
+        "claim": "Readiness reports do not need evidence indexes when confidence is high.",
+        "confidence": "high",
+        "citations": []
+      }
+    ]
+  },
+  "expected_layer": {
+    "level": 5,
+    "label": "Fluent Ownership",
+    "rationale": "The fixture asserts L5 ownership, but deterministic validation must reject the claim because evidence is forbidden or missing."
+  },
+  "expected_gap": {
+    "should_create": true,
+    "severity": "critical",
+    "confidence": "high",
+    "observed_layer": 1,
+    "reason": "Overconfident uncited or forbidden model claims are not accepted as truth."
+  },
+  "expected_misconception": {
+    "should_create": true,
+    "label": "LLM decides readiness",
+    "reason": "The fixture treats model confidence as sufficient proof of readiness."
+  },
+  "expected_challenge": {
+    "should_create": true,
+    "challenge_type": "risk_analysis",
+    "expected_evidence": [
+      "rejected candidate signal",
+      "missing citation error",
+      "forbidden citation error"
+    ]
+  },
+  "expected_readiness": {
+    "claim": "not ready yet",
+    "confidence": "high",
+    "must_cite_evidence": true
+  },
+  "required_evidence": [
+    {
+      "path": "src/runtime-readiness.ts",
+      "range": "readiness claim citation requirement",
+      "expectation": "Allowed evidence must show accepted readiness claims require evidence ids."
+    },
+    {
+      "path": "Tests/readiness-report.test.ts",
+      "range": "unsupported claim rejection or evidence assertion",
+      "expectation": "Allowed evidence should demonstrate deterministic citation checks."
+    }
+  ],
+  "forbidden_evidence": [
+    {
+      "path": "docs/private-notes.md",
+      "reason": "Explicitly excluded from the artifact boundary."
+    },
+    {
+      "path": "../outside-repo/secrets.md",
+      "reason": "Outside the declared artifact root."
+    }
+  ],
+  "boundary_expectations": {
+    "accepted_evidence_must_be_inside_boundary": true,
+    "reject_forbidden_evidence": true,
+    "expected_rejection_reason": "missing_or_forbidden_citation"
+  },
+  "gap_readiness_expectations": {
+    "create_gap": true,
+    "create_challenge": true,
+    "persist_declared_uncertainty": false,
+    "allowed_readiness_claims": [
+      "not ready yet"
+    ],
+    "disallowed_readiness_claims": [
+      "ready to own",
+      "ready to modify with guardrails"
+    ]
+  },
+  "validation_notes": [
+    "This case is offline-replayable and requires no live model call.",
+    "It prepares F09/E03 to reject model candidate signals unless deterministic boundary and evidence validation passes."
+  ]
+}

@@ -1,0 +1,36 @@
+{
+  "id": "GC-030",
+  "mastery_check_id": "SC-004-repair-practice-generation",
+  "concept_id": "repair_practice_generation",
+  "operation": "modify",
+  "answer_class": "overconfident_wrong",
+  "simulated_user_answer": "I am sure any challenge can be `hard` and `now` because confidence is high, so one generic prompt is enough for every gap.",
+  "declared_confidence": "high",
+  "expected_gap_type": "false_confidence_gap",
+  "expected_layer": 4,
+  "expected_severity": "critical",
+  "expected_confidence": "high",
+  "required_repo_evidence": [
+    {
+      "path": "src/runtime-practice.ts",
+      "rationale": "Critical severity specifically changes due_after and difficulty."
+    },
+    {
+      "path": "src/runtime-gap-detection.ts",
+      "rationale": "Critical gap labels can still arrive from content-level mismatch."
+    },
+    {
+      "path": "Tests/practice-challenges.test.ts",
+      "rationale": "Confirms hard/now is not unconditional across all gaps."
+    }
+  ],
+  "forbidden_claims": [
+    "Applying the same due_after/difficulty to all cases.",
+    "Ignoring critical gap severity."
+  ],
+  "acceptable_repair_task": "Repair should force evidence-specific severity mapping and explicit prompt shape from challenge helpers.",
+  "acceptable_issue_candidate_type": "LearningGap",
+  "expected_readiness": "not ready yet",
+  "notes": "Designed to ensure false confidence is surfaced for incorrect challenge mapping.",
+  "expected_gap_present": true
+}

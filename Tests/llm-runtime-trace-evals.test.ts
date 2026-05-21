@@ -28,6 +28,7 @@ test("LLM runtime trace evals compare required Codex configs over identical fixt
     assert.equal(report.live_run.status, "blocked");
     assert.match(report.live_run.guidance, /SIBI_CODEX_COMMAND/);
     assert.equal(report.dataset.benchmark_quality_claim, false);
+    assert.equal(report.dataset.index_path, "evals/pedagogy-layers/dataset/index.json");
 
     for (const caseID of report.shared_case_ids) {
       const paired = report.cases.filter((entry) => entry.case_id === caseID);

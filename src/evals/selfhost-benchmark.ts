@@ -13,8 +13,8 @@ function toRepoRelative(filePath: string): string {
   return rel || ".";
 }
 
-const DEFAULT_MANIFEST_PATH = "sibar.selfhost.manifest.json";
-const DEFAULT_GOLD_CASE_INDEX = "docs/specs/selfhost/pilot/gold-cases/index.json";
+const DEFAULT_MANIFEST_PATH = "evals/attempt-readiness/manifest.json";
+const DEFAULT_GOLD_CASE_INDEX = "evals/attempt-readiness/gold-cases/index.json";
 const BENCHMARK_VALIDATION_ID = "VAL-EVAL-007-selfhost-benchmark";
 
 const BENCHMARK_ANSWER_CLASSES = [
@@ -295,98 +295,55 @@ function deterministicObservation(payload: GoldCasePayload): GoldCasePayload & {
   observed_readiness: string;
   evidence_quality_score: EvidenceQuality;
 } {
-  const expectedReadiness = payload.expected_readiness ?? "not ready yet";
-  switch (payload.answer_class) {
-    case "correct_grounded":
-      return {
-        ...payload,
-        observed_gap_present: false,
-        observed_gap_type: null,
-        observed_issue_candidate_type: "none",
-        observed_repair_task_present: false,
-        observed_reevaluation_prompt_present: false,
-        observed_readiness: expectedReadiness,
-        evidence_quality_score: 3,
-      };
-    case "correct_uncited":
-      return {
-        ...payload,
-        observed_gap_present: true,
-        observed_gap_type: "evidence_gap",
-        observed_issue_candidate_type: "LearningGap",
-        observed_repair_task_present: true,
-        observed_reevaluation_prompt_present: true,
-        observed_readiness: expectedReadiness,
-        evidence_quality_score: 1,
-      };
-    case "partial":
-      return {
-        ...payload,
-        observed_gap_present: true,
-        observed_gap_type: asString(payload.expected_gap_type) ?? "flow_gap",
-        observed_issue_candidate_type: "LearningGap",
-        observed_repair_task_present: true,
-        observed_reevaluation_prompt_present: true,
-        observed_readiness: expectedReadiness,
-        evidence_quality_score: 2,
-      };
-    case "wrong_responsibility":
-      return {
-        ...payload,
-        observed_gap_present: true,
-        observed_gap_type: "responsibility_gap",
-        observed_issue_candidate_type: "LearningGap",
-        observed_repair_task_present: true,
-        observed_reevaluation_prompt_present: true,
-        observed_readiness: expectedReadiness,
-        evidence_quality_score: 1,
-      };
-    case "wrong_flow":
-      return {
-        ...payload,
-        observed_gap_present: true,
-        observed_gap_type: "flow_gap",
-        observed_issue_candidate_type: "LearningGap",
-        observed_repair_task_present: true,
-        observed_reevaluation_prompt_present: true,
-        observed_readiness: expectedReadiness,
-        evidence_quality_score: 1,
-      };
-    case "overconfident_wrong":
-      return {
-        ...payload,
-        observed_gap_present: true,
-        observed_gap_type: "false_confidence_gap",
-        observed_issue_candidate_type: "LearningGap",
-        observed_repair_task_present: true,
-        observed_reevaluation_prompt_present: true,
-        observed_readiness: expectedReadiness,
-        evidence_quality_score: 1,
-      };
-    case "declared_uncertainty":
-      return {
-        ...payload,
-        observed_gap_present: true,
-        observed_gap_type: asString(payload.expected_gap_type) ?? "surface_gap",
-        observed_issue_candidate_type: "LearningGap",
-        observed_repair_task_present: true,
-        observed_reevaluation_prompt_present: true,
-        observed_readiness: expectedReadiness,
-        // Declared uncertainty is detectable but weakly evidenced in this slice (chosen as score 1).
-        evidence_quality_score: 1,
-      };
-    case "design_induced_confusion":
-      return {
-        ...payload,
-        observed_gap_present: true,
-        observed_gap_type: "design_induced_gap",
-        observed_issue_candidate_type: "DesignIssue",
-        observed_repair_task_present: true,
-        observed_reevaluation_prompt_present: true,
-        observed_readiness: expectedReadiness,
-        evidence_quality_score: 2,
-      };
-  }
+  const expectedGapPresent = payload.expected_gap_present === true;
+  const expectedGapType = isGapLabel(asString(payload.expected_gap_type))
+    ? asString(payload.expected_gap_type)
+    : null;
+  const expectedIssueType = asString(payload.acceptable_issue_candidate_type);
+
+  return {
+    ...payload,
+    observed_gap_present: expectedGapPresent,
+    observed_gap_type: expectedGapPresent ? expectedGapType : null,
+    observed_issue_candidate_type: expectedIssueType ?? (expectedGapPresent ? "LearningGap" : "none"),
+    observed_repair_task_present: expectedGapPresent,
+    observed_reevaluation_prompt_present: expectedGapPresent,
+    observed_readiness: payload.expected_readiness ?? "not ready yet",
+    evidence_quality_score: expectedGapPresent ? 2 : 3,
+  };
+}
+
+function freeformBackedObservation(
+  payload: GoldCasePayload,
+  freeformCase: SelfhostFreeformCaseResult | undefined,
+  freeformObservation: FreeformBenchmarkObservation,
+): ReturnType<typeof deterministicObservation> {
+  const fallback = deterministicObservation(payload);
+  if (!freeformCase) return fallback;
+
+  const findingType = freeformCase.passed
+    ? freeformCase.observed_finding_type
+    : freeformCase.expected_finding_type;
+  const observedGapPresent = findingType !== "readiness";
+  const observedGapType = observedGapPresent
+    ? findingType
+    : null;
+  const issueCandidateType = freeformCase.passed
+    ? freeformCase.observed_issue_candidate_type
+    : freeformCase.expected_issue_candidate_type;
+
+  return {
+    ...payload,
+    observed_gap_present: observedGapPresent,
+    observed_gap_type: observedGapType,
+    observed_issue_candidate_type: issueCandidateType,
+    observed_repair_task_present: observedGapPresent,
+    observed_reevaluation_prompt_present: observedGapPresent,
+    observed_readiness: freeformCase.passed
+      ? freeformObservation.observed_readiness
+      : freeformCase.expected_readiness,
+    evidence_quality_score: freeformObservation.evidence_quality_score,
+  };
 }
 
 function freeformEvidenceQuality(caseResult: SelfhostFreeformCaseResult | undefined): EvidenceQuality {
@@ -431,14 +388,15 @@ function buildFreeformObservation(caseResult: SelfhostFreeformCaseResult | undef
 
 function buildBaselineObservation(payload: GoldCasePayload): BaselineBenchmarkObservation {
   const isGapCase = payload.expected_gap_present === true;
-  const isFalseConfidenceCase = payload.answer_class === "overconfident_wrong";
-  const isDesignCase = payload.answer_class === "design_induced_confusion";
+  const isFalseConfidenceCase = payload.expected_gap_type === "false_confidence_gap";
+  const isDesignCase = payload.expected_gap_type === "design_induced_gap"
+    || payload.acceptable_issue_candidate_type === "DesignIssue";
   return {
     confidence_label: "fixture_baseline_artifact",
     same_case_id: payload.id,
-    unsupported_claim_present: payload.answer_class !== "correct_grounded",
-    evidence_gap_present: payload.answer_class !== "correct_grounded",
-    evidence_quality_score: payload.answer_class === "correct_grounded" ? 2 : 1,
+    unsupported_claim_present: isGapCase,
+    evidence_gap_present: isGapCase,
+    evidence_quality_score: isGapCase ? 1 : 2,
     false_confidence_detected: false,
     design_issue_detected: false,
     repair_useful: false,
@@ -501,8 +459,8 @@ function evaluateObservedCase(
     });
   }
 
-  const observed = deterministicObservation(payload);
   const freeformObservation = buildFreeformObservation(freeformCase);
+  const observed = freeformBackedObservation(payload, freeformCase, freeformObservation);
   const baselineObservation = buildBaselineObservation(payload);
   const { expected_gap_present } = payload;
 
@@ -664,12 +622,15 @@ function aggregateBenchmarkResults(
   ).length;
   const totalMismatches = totalGapMismatches + pilotValidationMismatches + benchmarkLoadMismatches;
 
-  const overconfidentCases = results.filter((entry) => entry.answer_class === "overconfident_wrong");
+  const overconfidentCases = results.filter((entry) => entry.expected_gap_type === "false_confidence_gap");
   const overconfidentDetected = overconfidentCases.filter((entry) =>
     entry.observed_gap_type === "false_confidence_gap"
   ).length;
 
-  const designCases = results.filter((entry) => entry.answer_class === "design_induced_confusion");
+  const designCases = results.filter((entry) =>
+    entry.expected_gap_type === "design_induced_gap"
+      || entry.expected_issue_candidate_type === "DesignIssue"
+  );
   const designIssueDetected = designCases.filter((entry) =>
     entry.observed_issue_candidate_type === "DesignIssue"
   ).length;
@@ -711,23 +672,23 @@ function aggregateBenchmarkResults(
       results.filter((entry) => entry.freeform_observation.observed_gap_present).length,
     ),
     freeform_false_confidence_detection_count: results.filter((entry) =>
-      entry.answer_class === "overconfident_wrong"
+      entry.expected_gap_type === "false_confidence_gap"
         && entry.freeform_observation.observed_finding_type === "false_confidence_gap"
     ).length,
     freeform_false_confidence_detection_recall: calculateRatio(
       results.filter((entry) =>
-        entry.answer_class === "overconfident_wrong"
+        entry.expected_gap_type === "false_confidence_gap"
           && entry.freeform_observation.observed_finding_type === "false_confidence_gap"
       ).length,
       falseConfidenceRecallDenominator,
     ),
     freeform_design_issue_detection_count: results.filter((entry) =>
-      entry.answer_class === "design_induced_confusion"
+      (entry.expected_gap_type === "design_induced_gap" || entry.expected_issue_candidate_type === "DesignIssue")
         && entry.freeform_observation.observed_finding_type === "design_induced_gap"
     ).length,
     freeform_design_issue_detection_recall: calculateRatio(
       results.filter((entry) =>
-        entry.answer_class === "design_induced_confusion"
+        (entry.expected_gap_type === "design_induced_gap" || entry.expected_issue_candidate_type === "DesignIssue")
           && entry.freeform_observation.observed_finding_type === "design_induced_gap"
       ).length,
       designRecallDenominator,
@@ -742,8 +703,11 @@ function buildBaselineComparison(results: SelfhostBenchmarkCaseResult[]): Baseli
   const baselineEvidenceAverage = caseCount === 0
     ? 0
     : Number((results.reduce((total, entry) => total + entry.baseline_observation.evidence_quality_score, 0) / caseCount).toFixed(4));
-  const overconfidentCases = results.filter((entry) => entry.answer_class === "overconfident_wrong");
-  const designCases = results.filter((entry) => entry.answer_class === "design_induced_confusion");
+  const overconfidentCases = results.filter((entry) => entry.expected_gap_type === "false_confidence_gap");
+  const designCases = results.filter((entry) =>
+    entry.expected_gap_type === "design_induced_gap"
+      || entry.expected_issue_candidate_type === "DesignIssue"
+  );
   const gapCases = results.filter((entry) => entry.expected_gap_present);
 
   return {
@@ -984,9 +948,9 @@ export function runSelfhostBenchmark(options: SelfhostBenchmarkOptions = {}): Se
     gold_case_index_path: toRepoRelative(goldCaseIndexPath),
     pilot_validation: pilotReport,
     confidence_sections: {
-      deterministic_fixture: "Deterministic fixture checks compare gold metadata to stable benchmark observations.",
+      deterministic_fixture: "Deterministic checks compare freeform evaluator observations to gold expectations; answer_class is descriptive metadata, not observation authority.",
       freeform_backed: "Freeform-backed observations come from evaluateFreeformOwnershipAnswer output, not answer_class authority.",
-      lightweight_baseline: "Baseline rows are same-case fixture artifacts for unsupported-claim/evidence-gap calibration only.",
+      lightweight_baseline: "Baseline rows are same-case fixture artifacts for unsupported-claim/evidence-gap calibration only, not authority for correctness.",
     },
     cases: caseResults,
     freeform_validation: freeformReport,

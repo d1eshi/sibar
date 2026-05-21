@@ -1,0 +1,36 @@
+{
+  "id": "GC-001",
+  "mastery_check_id": "SC-001-artifact-boundary",
+  "concept_id": "artifact_boundary",
+  "operation": "trace",
+  "answer_class": "correct_grounded",
+  "simulated_user_answer": "I would trace boundary control in `evals/attempt-readiness/manifest.json` and `src/runtime-concept-graph.ts`, cite at least one included file path such as `src/runtime-support.ts` and one excluded path in the manifest, and explain that only listed included paths can support artifact evidence.",
+  "declared_confidence": "high",
+  "expected_gap_type": null,
+  "expected_layer": 4,
+  "expected_severity": "later",
+  "expected_confidence": "high",
+  "required_repo_evidence": [
+    {
+      "path": "src/runtime-concept-graph.ts",
+      "rationale": "Defines traversal that applies included and excluded path logic for artifact sessions."
+    },
+    {
+      "path": "src/runtime-support.ts",
+      "rationale": "Defines shared session and evidence types used by boundary-based questioning."
+    },
+    {
+      "path": "Tests/concept-graph.test.ts",
+      "rationale": "Shows expected behavior when excluded paths are not allowed in supported graph evidence."
+    }
+  ],
+  "forbidden_claims": [
+    "Claiming full repo ownership from one boundary trace.",
+    "Treating excluded paths as legitimate evidence in the same answer."
+  ],
+  "acceptable_repair_task": "No repair task; this is a fully grounded correct trace.",
+  "acceptable_issue_candidate_type": "none",
+  "expected_readiness": "ready to modify with guardrails",
+  "notes": "Grounded boundary trace should pass with no gap; evidence remains within included paths.",
+  "expected_gap_present": false
+}

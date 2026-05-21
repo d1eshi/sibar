@@ -1,0 +1,26 @@
+{
+  "generated_at": "2026-05-20T17:05:17.258Z",
+  "validation": "VAL-EVAL-006-selfhost-pilot",
+  "manifest_path": "evals/attempt-readiness/manifest.json",
+  "gold_case_index_path": "evals/attempt-readiness/gold-cases/index.json",
+  "mastery_check_index_path": "evals/attempt-readiness/mastery-checks/index.json",
+  "aggregate": {
+    "total_checks": 1495,
+    "total_mismatches": 0,
+    "checks_passed": 1495,
+    "checks_failed": 0,
+    "cases_checked": 40,
+    "answer_class_distribution": {
+      "correct_grounded": 5,
+      "correct_uncited": 5,
+      "partial": 5,
+      "wrong_responsibility": 5,
+      "wrong_flow": 5,
+      "overconfident_wrong": 5,
+      "declared_uncertainty": 5,
+      "design_induced_confusion": 5
+    },
+    "out_of_scope_required_evidence_paths": 0
+  },
+  "mismatches": []
+}
