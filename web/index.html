@@ -70,93 +70,116 @@ if (location.protocol !== "file:" && location.hostname !== "localhost" && locati
     </div>
   </section>
 
-  <section class="workspace-demo section-band" id="demo" aria-labelledby="demo-title">
-    <div class="section-intro">
-      <p class="eyebrow">Demo interactiva</p>
-      <h2 id="demo-title">Del codigo que aparece al conocimiento que podes usar.</h2>
-      <p>Click en los pasos o ejecuta el loop. La demo muestra como Sibar convierte un artefacto desconocido en evidencia, intento propio y readiness acotado.</p>
-    </div>
-
-    <div class="demo-shell" data-active-step="source">
-      <div class="demo-toolbar">
-        <div>
-          <span class="window-dot ink"></span>
-          <span class="window-dot amber"></span>
-          <span class="window-dot green"></span>
-        </div>
-        <strong>Sibar workspace / generated repo debt</strong>
-        <button class="run-btn" type="button" id="runDemoBtn">Run loop</button>
+  <section class="workspace-demo section-band" id="demo" aria-label="Sibar workspace preview">
+    <div class="tauri-window">
+      <div class="tauri-titlebar">
+        <span class="window-dot ink"></span>
+        <span class="window-dot amber"></span>
+        <span class="window-dot green"></span>
+        <strong>Sibar Research Workspace</strong>
+        <em>Focused workspace: embeddings</em>
       </div>
 
-      <div class="demo-grid">
-        <aside class="demo-steps" aria-label="Pasos de la demo">
-          <button class="step-btn active" type="button" data-step="source">
-            <span>Artefacto</span>
-            <strong>Debt map</strong>
-          </button>
-          <button class="step-btn" type="button" data-step="question">
-            <span>Ownership</span>
-            <strong>Ownership check</strong>
-          </button>
-          <button class="step-btn" type="button" data-step="readiness">
-            <span>Memoria</span>
-            <strong>Apply + retain</strong>
-          </button>
+      <div class="workspace-preview">
+        <aside class="preview-path" aria-label="Workspace study path">
+          <div class="preview-path-head">
+            <span class="preview-glyph" aria-hidden="true"></span>
+            <strong>Study Path</strong>
+            <h2>Focused workspace: embeddings</h2>
+            <p>2 of 5</p>
+            <span class="preview-progress"><span></span></span>
+          </div>
+          <ol class="preview-node-list">
+            <li data-state="complete">
+              <span>1</span>
+              <strong>Embedding basics</strong>
+            </li>
+            <li data-state="ready" class="selected">
+              <span>2</span>
+              <strong>Failure cases</strong>
+              <ol>
+                <li class="selected"><em>2.1</em> Boundary checks</li>
+                <li><em>2.2</em> Evidence check</li>
+              </ol>
+            </li>
+            <li>
+              <span>3</span>
+              <strong>Toy implementation</strong>
+            </li>
+            <li data-state="locked">
+              <span>4</span>
+              <strong>Retrieval trade-offs</strong>
+            </li>
+          </ol>
         </aside>
 
-        <section class="demo-panel evidence-panel" aria-label="Panel de evidencia">
-          <div class="panel-head">
-            <span>Evidencia</span>
-            <strong id="evidenceTitle">Debt boundary</strong>
-          </div>
-          <div class="code-card">
-            <pre><code id="demoCode">generated:
-  - auth middleware
-  - cached data loader
-  - optimistic save path
-
-unknown:
-  - invalidation rule
-  - retry behavior</code></pre>
-          </div>
-          <div class="evidence-pills" id="evidencePills">
-            <span class="pill strong">owned</span>
-            <span class="pill">bounded</span>
-            <span class="pill">transferable</span>
-          </div>
+        <section class="preview-study" aria-label="Workspace study surface">
+          <header class="preview-study-head">
+            <p>Current study</p>
+            <h2>Where do embeddings fail in real retrieval?</h2>
+          </header>
+          <section class="preview-open-node">
+            <h3>Selected learning node</h3>
+            <div>
+              <strong>Failure cases</strong>
+              <span>Resume with equation material in this session.</span>
+            </div>
+          </section>
+          <section class="preview-evidence">
+            <header>
+              <h3>Evidence from sources <span>4</span></h3>
+              <button type="button" tabindex="-1">View all</button>
+            </header>
+            <article>
+              <span data-source="paper"></span>
+              <div>
+                <strong>Embedding overview paper excerpt</strong>
+                <em>Wu et al. - arXiv:2309.12345 - 2023</em>
+              </div>
+              <q>Short queries and out-of-domain language often break semantic generalization...</q>
+            </article>
+            <article>
+              <span data-source="code"></span>
+              <div>
+                <strong>Local toy retrieval notebook</strong>
+                <em>Local artifact - Notebook - 2024</em>
+              </div>
+              <q>Nearest neighbors drift when the query distribution shifts...</q>
+            </article>
+          </section>
         </section>
 
-        <section class="demo-panel work-panel" aria-label="Panel de trabajo">
-          <div class="panel-head">
-            <span>Pregunta activa</span>
-            <strong id="workTitle">Can you change it?</strong>
-          </div>
-          <p class="work-question" id="workQuestion">Si cambia el cache key, que comportamiento se rompe primero y donde lo verificas?</p>
-          <div class="answer-box">
-            <span class="cursor-line"></span>
-            <p id="answerText">Todavia hay deuda cognitiva: podes nombrar la pieza, pero no predecir su fallo con evidencia.</p>
-          </div>
-          <div class="mini-actions">
-            <button type="button" data-demo-answer="weak">Responder rapido</button>
-            <button type="button" data-demo-answer="strong">Responder con evidencia</button>
-          </div>
-        </section>
-
-        <section class="demo-panel result-panel" aria-label="Panel de readiness">
-          <div class="panel-head">
-            <span>Readiness</span>
-            <strong id="resultTitle">Debt abierto</strong>
-          </div>
-          <div class="readiness-meter" aria-label="Readiness 42 por ciento">
-            <span id="readinessFill"></span>
-          </div>
-          <p id="resultCopy">Gap detectado: entendimiento nominal sin capacidad de cambio. La reparacion es una modificacion pequena con prediccion previa.</p>
-          <ul class="repair-list" id="repairList">
-            <li>Marcar la funcion que define el cache key.</li>
-            <li>Predecir que estado queda stale despues del cambio.</li>
-            <li>Hacer un patch minimo y explicar por que no rompe el loader.</li>
-          </ul>
-        </section>
+        <aside class="preview-tutor" aria-label="Sibar tutor guidance">
+          <header>
+            <span class="preview-tutor-glyph" aria-hidden="true"></span>
+            <strong>Sibar Tutor</strong>
+          </header>
+          <section class="preview-status">
+            <strong>You're on track</strong>
+            <p>Keep going with purpose.</p>
+            <span><span></span></span>
+          </section>
+          <section class="preview-guidance">
+            <h3>Focus guidance</h3>
+            <article>
+              <strong>Focus</strong>
+              <p>Identify the failure case.</p>
+            </article>
+            <article>
+              <strong>Consider</strong>
+              <p>Compare source claim and artifact.</p>
+            </article>
+            <article>
+              <strong>Produce</strong>
+              <p>Create one evidence-backed note.</p>
+            </article>
+          </section>
+          <section class="preview-readiness">
+            <h3>Readiness</h3>
+            <strong>78%</strong>
+            <p>Good readiness</p>
+          </section>
+        </aside>
       </div>
     </div>
   </section>
