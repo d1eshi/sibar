@@ -5,6 +5,11 @@
 Sibi turns a source the user cares about into a source-backed mission for deep
 technical ownership.
 
+Sibi also owns the first commercial wedge: reviewing AI-assisted technical work
+for ownership gaps before the user accepts or merges it. That wedge and the
+source-driven mission surface must share core ownership, pedagogy, and memory
+contracts instead of becoming separate products.
+
 The MVP starts from:
 
 ```text
@@ -79,6 +84,7 @@ Current active specs:
 2. `01_source_to_mission_mvp.md`
 3. `02_runtime_boundary.md`
 4. `03_validation_and_plan.md`
+5. `04_shared_core_boundaries.md`
 
 When older references in reports or changelog history disagree with these files,
 these files win.

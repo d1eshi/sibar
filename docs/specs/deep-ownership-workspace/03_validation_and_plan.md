@@ -11,6 +11,10 @@
    product-facing MVP path.
 7. Pedagogy intelligence is fixture first, deterministic gates second, explicit
    path mutation third, LLM-assisted recommendations later.
+8. Sibi ownership review is the first wedge for AI-assisted work, while Sibar
+   Workspace remains the deeper source/research surface for repairing gaps.
+9. Shared ownership, pedagogy, and memory boundaries must wrap existing runtime
+   contracts before any destructive poda or duplicate taxonomy is introduced.
 
 ## Open Decisions
 
@@ -78,7 +82,35 @@ pedagogy-validated before projection.
 Blocked, failed, cancelled, and repair-needed source-intent attempts are stored
 as trace records.
 
+### VAL-CORE-001: Core Does Not Import Surfaces Or Host Effects
+
+Ownership, pedagogy, and memory core entrypoints do not import UI, DOM, Tauri,
+filesystem, shell execution, model runners, or workspace surface adapters.
+
+### VAL-CORE-002: Sibi Does Not Depend On WorkspaceIntent
+
+Sibi ownership review may produce a neutral handoff artifact, but it must not
+import WorkspaceIntent, PedagogoAI workspace adapters, or Sibar Workspace UI
+code.
+
+### VAL-CORE-003: Taxonomies Are Not Duplicated
+
+New core entrypoints must wrap, re-export, or migrate existing gap, readiness,
+evidence, and repair contracts instead of creating parallel definitions.
+
 ## Implementation Plan
+
+### Phase 0: Shared Core Boundaries
+
+Create shared core entrypoints and import-boundary checks before further poda:
+
+1. ownership core boundary,
+2. pedagogy core boundary,
+3. memory core contract,
+4. neutral Sibi-to-Workspace handoff artifact,
+5. adapter/surface dependency rules.
+
+Do not delete or rename existing `runtime-*` entrypoints in this phase.
 
 ### Phase 1: Static Source Fixture
 
@@ -154,4 +186,12 @@ Relevant test target when source-driven docs affect workspace-intent expectation
 
 ```text
 pnpm test -- Tests/pedagogoai-workspace-intent.test.ts
+```
+
+Relevant targets when shared core boundaries change:
+
+```text
+pnpm test -- Tests/sibi-ownership-review.test.ts
+pnpm test -- Tests/pedagogoai-architecture.test.ts
+pnpm eval:pedagogy-core-coverage
 ```
