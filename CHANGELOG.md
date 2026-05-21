@@ -13,6 +13,10 @@ release yet.
 
 ### Changed - Sibi Ownership Workbench Review Guide
 
+- Made the Ownership Harness the primary desktop workspace with a wider
+  responsive right column, stronger header treatment, and a more prominent
+  guided ownership session/input area while keeping code and diff visible as
+  evidence context.
 - Changed the ownership harness first-run experience to open with a guided
   review sequence and prioritized file/boundary queue before the ownership
   prompt.

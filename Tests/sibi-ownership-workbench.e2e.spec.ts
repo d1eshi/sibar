@@ -1,11 +1,17 @@
 import { expect, test } from "@playwright/test";
 
 test("default workbench starts a guided ownership session without lab traces", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto("/");
 
   await expect(page.getByLabel("Guided ownership review session")).toBeVisible();
   await expect(page.getByLabel("Current Sibi question")).toContainText("Repasá `src/api/session.ts`");
   await expect(page.getByLabel("Ownership derivation lab")).toHaveCount(0);
+
+  const harnessBox = await page.locator(".ownershipPanel").boundingBox();
+  const codeBox = await page.locator(".codePanel").boundingBox();
+  expect(harnessBox?.width).toBeGreaterThan(430);
+  expect(codeBox?.width).toBeGreaterThan(500);
 });
 
 test("empty submit advances to the relation question and records no-answer gap", async ({ page }) => {
