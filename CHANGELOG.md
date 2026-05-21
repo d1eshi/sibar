@@ -11,6 +11,59 @@ accepted specs and iterations, not by raw commit count.
 Use this section for changes that have landed but are not part of a tagged
 release yet.
 
+### Docs - Tauri Workspace UI Specs
+
+- Split `docs/specs/ui/` into `web/` and `workspace-tauri/` as the UI source of
+  truth for public web surfaces and the direct Tauri workspace prototype.
+- Added `Workspace Home` as the canonical default Tauri entry screen so existing
+  workspaces, pending sessions, blocked intents, and resume paths are visible
+  before creating more work.
+- Updated the workspace UI flow to separate global home, create-workspace
+  onboarding, workspace study-path overview, and active learning node actions.
+- Added source maps that extract dispersed UI decisions from older specs,
+  reports, product docs, and prototypes.
+- Moved generated workspace UI references under
+  `docs/specs/ui/workspace-tauri/assets/`.
+
+### Docs - UI Technology Architecture (Tauri Workspace)
+
+- Added `docs/specs/ui/01_ui_technology_architecture.md` as a transversal UI
+  architecture spec for the Tauri workspace.
+- Added `docs/specs/ui/workspace-tauri/04_react_migration_plan.md` to translate
+  the static Tauri prototype into React by flow slices.
+- Declared React + TypeScript + Vite as the UI baseline with CSS Modules plus
+  tokens as the initial styling strategy.
+- Clarified the Rust/Tauri native boundary and that runner/sidecar/runtime
+  effects are out-of-scope for UI specs (handoff to deep-ownership execution and
+  adapter specs).
+- Added static-first, bounded-state, and component-boundary constraints to avoid
+  "AI slop," including file-size limits and component-boundary rules.
+
+### Changed - Tauri Workspace UI Prototype
+
+- Refined the static Tauri workspace prototype toward a native two-surface flow:
+  compact workspace-intent onboarding followed by a focused study workspace.
+- Removed user-facing `Read / Build / Recall` choice buttons from the active
+  session flow. Workspace overview now uses a single selected-node/session open
+  action, and active session renders the selected node material surface directly
+  by typed render mode.
+- Added typed material-mode projection for active node views (`paper`, `note`,
+  `artifact`, `code`, `equation`, `math`, and `fallback`) and surfaced recall as
+  a guidance/review status instead of a primary action.
+- Implemented the runtime entry as `Workspace Home` (static first), with simple
+  fixtures for existing workspaces (`Embeddings`, `RAG`, `JAX`) and action routing:
+  `New workspace`, `Open`, and `Resume` to either study-path overview or active
+  learning-material session.
+- Reworked the workspace home layout to fit the Tauri desktop viewport as a
+  single-screen workspace surface, with compact header and side-by-side resume
+  panels instead of a long scrolling page.
+- Matched the workspace home to the generated visual reference with a dedicated
+  continue column, compact workspace rows, readiness meters, and local-data
+  footer treatment.
+- Reworked the active node session into a viewport-bounded reader layout:
+  study path rail, material/source tree, central scrollable reader canvas, and
+  compact guide/readiness rail.
+
 ### Added - Workspace Intent First Flow
 
 - Added the Workspace Intent spec as the first user-facing Sibar Research
@@ -93,6 +146,55 @@ release yet.
 - Added a pending Workspace Trace contract gate for durable intent attempts, LLM
   run traces, session history, compaction, replay, and failed workspace creation
   diagnostics.
+
+### Added - Workspace React Slice 0
+
+- Added a React + TypeScript + Vite bootstrap for the Tauri workspace app in
+  `apps/sibar-research-workspace` with `workspace:dev`, `workspace:build`, and
+  `workspace:preview` scripts.
+- Replaced the legacy HTML monolith with a React mount and a static onboarding
+  screen (native topbar, intent fields, preview rail/column) rendered from
+  `apps/sibar-research-workspace/src/main.tsx` and `src/App.tsx`.
+- Added global style entry and CSS module styles for the slice-0 viewport while
+  keeping legacy scripts/CSS untouched for later migration slices.
+
+### Changed - Tauri Workspace Onboarding (Slice 1)
+
+- Reworked the React onboarding screen into an interactive flow with controlled
+  intent/source/constraint inputs and optional background fields.
+- Added local deterministic preview generation on `Review workspace plan` from the
+  current inputs, and a clear local transition state when `Open workspace`
+  is pressed.
+
+### Changed - Tauri Workspace Shell (Slice 2)
+
+- Extracted the native topbar into a dedicated `WorkspaceShell` boundary.
+
+### Changed - Tauri Workspace Active Session
+
+- Aligned the React `Active Node Session` screen with the Workspace Overview /
+  Study Path visual language, including the editorial study panel, path rail,
+  Read / Build / Recall action cards, source evidence, and guide/readiness rail.
+- Promoted shared workspace color, typography, radius, and shadow values into
+  reusable CSS tokens for the onboarding, overview, and session surfaces.
+- Added reducer-backed workspace session UI state for selected node, mini-node,
+  source, and active action (`Read`/`Build`/`Recall`) with a compact
+  readiness panel visibility flag.
+- Reworked the workspace overview between onboarding and the active session into
+  the study-path reference layout: left learning rail, current-study center,
+  source evidence, tutor guidance, and readiness before entering a node.
+- Added the static active-session workspace view composed of `WorkspaceShell`,
+  `StudyPathRail`, and `SessionWorkbench`.
+- Hooked onboarding to open the workspace overview after local preview
+  generation, with no fetch/Tauri/runner integrations in this slice.
+
+### Changed - Tauri Workspace Onboarding Layout
+
+- Reworked the onboarding surface to run full-width/full-height instead of inside
+  a centered fake desktop window.
+- Removed the fake macOS chrome and top toolbar from the Tauri workspace shell.
+- Simplified the onboarding preview title so user intent stays inside the plan
+  body instead of becoming an oversized, wrapping headline.
 
 ### Fixed - Codex Workspace Output Schema Strictness
 

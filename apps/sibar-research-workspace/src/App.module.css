@@ -1,0 +1,431 @@
+.researchShell {
+  min-height: 100dvh;
+  width: 100%;
+  display: block;
+  background: var(--surface-page);
+}
+
+.nativeWindow {
+  min-height: 100dvh;
+  width: 100%;
+  overflow: hidden;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr);
+  background: var(--surface-raised);
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.shellSurface {
+  min-height: 100dvh;
+  display: block;
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 0 16px;
+  background: rgba(255, 252, 247, 0.96);
+  border-bottom: 1px solid var(--divider);
+}
+
+.windowCluster {
+  display: flex;
+  gap: 7px;
+}
+
+.windowDot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.red {
+  background: #ff5f57;
+}
+
+.amber {
+  background: #ffbd2e;
+}
+
+.green {
+  background: #28c840;
+}
+
+.brandMark,
+.topbarDocument,
+.topbarDiscussion,
+.sourceChip,
+.pageControls,
+.todayRow,
+.missionFields,
+.artifactStripHeader,
+.sidebarSectionTitle,
+.sidebarFooter,
+.discussionHeader,
+.nodeReaderHeader,
+.miniNodeSection > h3 {
+  display: flex;
+  align-items: center;
+}
+
+.brandMark {
+  gap: 8px;
+  min-width: 116px;
+}
+
+.brandSymbol {
+  width: 22px;
+  height: 22px;
+  color: var(--surface-panel-warm);
+  background: var(--accent);
+  border-radius: 50%;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  display: inline-grid;
+  place-items: center;
+}
+
+.topbarDocument {
+  gap: 8px;
+  min-width: 0;
+  color: var(--text-secondary);
+  font-size: 13px;
+  justify-content: center;
+  flex: 1;
+}
+
+.topbarSpacer {
+  flex: 0 0 20px;
+}
+
+.topbarDiscussion {
+  gap: 6px;
+  min-width: 142px;
+  padding-left: 12px;
+  border-left: 1px solid var(--divider);
+  color: var(--text-primary);
+  font-size: 13px;
+  font-weight: 650;
+}
+
+.iconButton {
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  display: inline-grid;
+  place-items: center;
+  border-color: transparent;
+  background: transparent;
+  color: var(--text-secondary);
+}
+
+.iconButton:hover,
+.iconButton:focus-visible {
+  background: var(--surface-soft);
+}
+
+.intentScreen {
+  min-height: 100dvh;
+  display: grid;
+  grid-template-columns: minmax(420px, 0.9fr) minmax(520px, 1.1fr);
+  overflow: auto;
+  background: var(--surface-page);
+}
+
+.intentRail {
+  min-height: 100%;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  gap: 48px;
+  padding: 38px 28px;
+  border-right: 1px solid var(--divider);
+  color: var(--text-muted);
+}
+
+.intentRailMark {
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  color: var(--surface-panel-warm);
+  background: var(--teal);
+  font-family: var(--font-mono);
+  font-weight: 800;
+}
+
+.intentRail ol {
+  position: relative;
+  display: grid;
+  align-content: center;
+  gap: 32px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.intentRail ol::before {
+  content: "";
+  position: absolute;
+  left: 8px;
+  top: 18px;
+  bottom: 18px;
+  width: 1px;
+  background: var(--divider);
+}
+
+.intentRail li {
+  position: relative;
+  padding-left: 28px;
+  font-size: 13px;
+}
+
+.intentRail li::before {
+  content: "";
+  position: absolute;
+  left: 3px;
+  top: 7px;
+  width: 11px;
+  height: 11px;
+  border: 1px solid var(--text-muted);
+  border-radius: 50%;
+  background: var(--surface-page);
+}
+
+.intentStepActive {
+  color: var(--text-primary);
+  font-weight: 650;
+}
+
+.intentStepActive::before {
+  border-color: var(--teal);
+  background: var(--teal);
+}
+
+.intentForm,
+.intentPreview {
+  align-self: stretch;
+  display: grid;
+  gap: 10px;
+}
+
+.intentForm {
+  align-content: start;
+  max-width: none;
+  padding: 64px 72px 56px;
+  border-right: 1px solid var(--divider);
+}
+
+.intentForm h1,
+.intentPreview h2 {
+  margin: 0;
+}
+
+.intentForm h1 {
+  max-width: 18ch;
+  font-family: var(--font-serif);
+  font-size: 46px;
+  line-height: 1;
+  font-weight: 500;
+  text-wrap: balance;
+}
+
+.eyebrow {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 12px;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.intentCopy {
+  max-width: 52ch;
+  color: var(--text-secondary);
+}
+
+.intentForm label {
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.intentForm textarea,
+.intentForm input {
+  max-width: 620px;
+  padding: 12px 14px;
+  background: var(--surface-panel);
+}
+
+.intentForm textarea {
+  resize: none;
+}
+
+.intentSecondaryFields {
+  display: grid;
+  gap: 12px;
+  color: var(--text-secondary);
+}
+
+.intentSecondaryFields summary {
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.intentSecondaryFields[open] {
+  padding: 12px;
+  border: 1px solid var(--divider);
+  border-radius: var(--radius);
+  background: var(--surface-panel-warm);
+}
+
+.intentFieldGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.intentFieldGrid > div {
+  display: grid;
+  gap: 8px;
+}
+
+.intentActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+
+.generateButton {
+  justify-self: start;
+  min-width: 210px;
+  background: var(--teal);
+  color: var(--surface-panel-warm);
+  border-color: var(--teal);
+  font-weight: 700;
+}
+
+.intentPreview {
+  align-content: start;
+  padding: 74px 80px 64px;
+  background: var(--surface-soft);
+  border: 0;
+}
+
+.sectionKicker {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.intentPreview h2 {
+  max-width: 22ch;
+  font-family: var(--font-serif);
+  font-size: 52px;
+  line-height: 1;
+  font-weight: 500;
+  text-wrap: balance;
+}
+
+.firstSessionCallout {
+  display: grid;
+  gap: 4px;
+  padding: 18px 0;
+  background: transparent;
+  border: 0;
+  border-top: 1px solid var(--divider);
+  border-bottom: 1px solid var(--divider);
+  border-radius: 0;
+}
+
+.firstSessionCallout span {
+  color: var(--text-muted);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.firstSessionCallout strong {
+  font-size: 1rem;
+}
+
+.muted {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 14px;
+}
+
+.itemList {
+  margin: 0;
+  padding-left: 16px;
+  display: grid;
+  gap: 4px;
+}
+
+.itemList li {
+  color: var(--text-secondary);
+}
+
+.contractStatus {
+  min-height: 1.8em;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+@media (max-width: 1180px) {
+  .intentScreen {
+    grid-template-columns: 1fr;
+  }
+
+  .intentPreview {
+    padding: 32px 48px 48px;
+    border-top: 1px solid var(--divider);
+  }
+
+  .intentForm {
+    padding: 48px;
+    border-right: 0;
+  }
+}
+
+@media (max-width: 840px) {
+  .topbar {
+    gap: 8px;
+  }
+
+  .topbarDiscussion,
+  .pageControls,
+  .missionFields {
+    display: none;
+  }
+
+  .intentScreen {
+    grid-template-columns: 1fr;
+  }
+
+  .intentRail {
+    display: none;
+  }
+
+  .intentForm,
+  .intentPreview {
+    padding: 28px 20px;
+  }
+
+  .intentForm h1 {
+    max-width: 16ch;
+    font-size: 36px;
+  }
+
+  .intentFieldGrid {
+    grid-template-columns: 1fr;
+  }
+}
