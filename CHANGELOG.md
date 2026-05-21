@@ -108,6 +108,20 @@ release yet.
   app that compiles the intent through the core contract layer before opening
   the first session.
 
+### Added - Source Mission Runtime Contracts (MVP)
+
+- Added source-to-mission contract definitions in
+  `src/runtime-source-mission-contracts.ts`:
+  `SourceIntentInput`, `SourceIntakeResult`, `SourceSignal`, `MissionPreview`,
+  `ProposedTrack`, and `ProposedSession`.
+- Added pure validators in `src/runtime-source-mission-validate.ts` for the same
+  contract chain: source intent/input kinds, intake status/diagnostics, signal
+  integrity, and mission preview invariants (`first_sessions` cap, track/session
+  references, and source-backed references).
+- Added `Tests/source-mission-contracts.test.ts` covering frontier-lab valid payload,
+  missing `user_reason`, bad URL, non-referenced sessions/tracks, unknown track
+  IDs, first-session cap, and blocked-source diagnostics.
+
 ### Added - Workspace Rust Compiler Bridge
 
 - Added a new PedagogoAI bridge module for invoking the Rust
