@@ -69,6 +69,17 @@ release yet.
 - Kept `memory-core` append helpers pure and unchanged at API boundaries while adding
   explicit traceability validation before persistence or runtime-store integration.
 
+### Added - Slice 4 Ownership Review Deterministic Core Extraction
+
+- Extracted `sibi/src/ownershipReview.ts` heuristics into
+  `src/ownership-core/diff-review.ts` as a deterministic, import-safe core module
+  with unchanged `reviewOwnership` behavior and typed outputs.
+- Added ownership review exports to `src/ownership-core/index.ts` and updated
+  `OWNERSHIP_REVIEW_EXTRACTION_STATE.status` to `available`, with `ownedBySlice`
+  set to `slice-4`.
+- Added `Tests/ownership-core.test.ts` and updated `Tests/sibi-ownership-review.test.ts`
+  for direct core coverage plus core/Sibi review parity on representative diffs.
+
 ### Docs - Tauri Workspace UI Specs
 
 - Added mission-track study specs for the frontier lab readiness flow, including

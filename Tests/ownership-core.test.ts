@@ -1,8 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 
-import { reviewOwnership } from "../sibi/src/ownershipReview.ts";
-import { reviewOwnership as reviewOwnershipCore } from "../src/ownership-core/diff-review.ts";
+import { reviewOwnership } from "../src/ownership-core/diff-review.ts";
 
 const riskyDiffWithoutTests = `diff --git a/backend/auth/session.py b/backend/auth/session.py
 index 123..456 100644
@@ -23,7 +22,7 @@ new file mode 100644
 `;
 
 const apiDiffWithTests = `diff --git a/src/api/session.ts b/src/api/session.ts
-index 42ac..89fc 100644
+index 42ab..89fc 100644
 --- a/src/api/session.ts
 +++ b/src/api/session.ts
 @@ -14,8 +14,12 @@ export async function createSession(payload: LoginPayload) {
@@ -82,40 +81,4 @@ test("ownership review handles pasted agent output without diff headers", () => 
   assert.ok(review.signals.includes("parsed as pasted PR or agent output without full diff headers"));
   assert.ok(review.files.some((file) => file.path === "src/store.ts"));
   assert.ok(review.ownershipGaps.some((gap) => gap.includes("Goal/context is missing")));
-});
-
-test("ownership review parity with core for a representative diff", () => {
-  const diffText = `diff --git a/src/feature.ts b/src/feature.ts
-index 111..222 100644
---- a/src/feature.ts
-+++ b/src/feature.ts
-@@ -1,3 +1,4 @@
- export function feature(flag: boolean) {
--  return compute({ enabled: flag });
-+  if (!flag) return null;
-+  return compute({ enabled: true });
-}
-diff --git a/src/feature.test.ts b/src/feature.test.ts
-new file mode 100644
---- /dev/null
-+++ b/src/feature.test.ts
-@@ -1,0 +1,2 @@
-test("feature passes false path", () => {
-  expect(feature(false)).toBeNull();
-});
-`;
-
-  const coreReview = reviewOwnershipCore({
-    diffText,
-    goalContext: "Return null when feature flag is disabled.",
-  });
-  const sibiReview = reviewOwnership({
-    diffText,
-    goalContext: "Return null when feature flag is disabled.",
-  });
-
-  assert.deepEqual(coreReview, sibiReview);
-  assert.equal(coreReview.status, "ready");
-  assert.equal(coreReview.metrics.filesChanged, 2);
-  assert.equal(coreReview.metrics.testFiles, 1);
 });

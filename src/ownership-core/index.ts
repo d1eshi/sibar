@@ -1,17 +1,19 @@
 /**
  * Ownership Core boundary facade.
  *
- * Slice 2 introduces the boundary only; deterministic review extraction remains owned
- * by a later slice and is intentionally not implemented yet.
+ * Slice 4 moves deterministic ownership review extraction into this shared core while
+ * keeping the Sibi UI boundary unconnected until the final slice.
  */
 
 export const OWNERSHIP_CORE_BOUNDARY_VERSION = "0.1.0-slice-2";
 
 export const OWNERSHIP_REVIEW_EXTRACTION_STATE = {
-  status: "pending",
-  ownedBySlice: "slice-3-or-later",
-  message: "Diff/PR/agent-output review extraction is planned for a later slice.",
+  status: "available",
+  ownedBySlice: "slice-4",
+  message: "Diff/PR/agent-output review extraction has been extracted into core and is ready for deterministic review use.",
 } as const;
+
+export * from "./diff-review.ts";
 
 export type OwnershipReviewDiffSourceKind = "diff" | "pr" | "agent_output" | "code_selection";
 

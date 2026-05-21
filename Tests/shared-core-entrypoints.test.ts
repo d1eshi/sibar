@@ -27,8 +27,8 @@ function expectNoSurfaceImports(modulePath: CoreModulePath): void {
 
 test("shared core entrypoints exist and are deterministic boundary facades", () => {
   assert.equal(ownershipCore.OWNERSHIP_CORE_BOUNDARY_VERSION, "0.1.0-slice-2");
-  assert.equal(ownershipCore.OWNERSHIP_REVIEW_EXTRACTION_STATE.status, "pending");
-  assert.match(ownershipCore.OWNERSHIP_REVIEW_EXTRACTION_STATE.ownedBySlice, /slice-3-or-later/i);
+  assert.equal(ownershipCore.OWNERSHIP_REVIEW_EXTRACTION_STATE.status, "available");
+  assert.match(ownershipCore.OWNERSHIP_REVIEW_EXTRACTION_STATE.ownedBySlice, /slice-4/i);
 
   assert.equal(pedagogyCore.PEDAGOGY_CORE_BOUNDARY_VERSION, "0.1.0");
   assert.equal(typeof pedagogyCore.evaluateFullLoop, "function");
