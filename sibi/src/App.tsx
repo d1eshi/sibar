@@ -107,6 +107,10 @@ export default function App() {
       />
 
       <OwnershipHarnessPanel
+        selectedFile={selectedFile}
+        viewMode={viewMode}
+        selection={selection}
+        selectionSummaryText={getLineSelectionText(selection)}
         boundary={ownershipBoundary}
         boundaryState={boundaryState}
         evidenceRefs={fixtureEvidence}

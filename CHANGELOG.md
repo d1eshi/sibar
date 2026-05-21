@@ -25,6 +25,14 @@ release yet.
   source fixture the first MVP path and keep Sibi-repo ownership as internal
   regression context.
 
+### Changed - Sibi Ownership Workbench Lab
+
+- Added a selection-aware ownership lab inside the harness panel so code/diff
+  highlights surface range, boundary state, trace, signal, schema, and relevant
+  evidence context without turning the harness into an explain-first flow.
+- Fixed evidence grouping so the bottom evidence drawer renders observed,
+  inferred, unverified, and conflict fixture evidence instead of empty groups.
+
 ### Docs - Sibi Ownership Harness
 
 - Clarified the Sibi manifesto around cognitive debt recovery: AI-assisted work

@@ -63,9 +63,14 @@ textarea {
 .ownershipPanel {
   grid-area: harness;
   display: grid;
-  grid-template-rows: auto auto auto auto auto auto 1fr;
+  grid-template-rows: auto minmax(0, 1fr);
   min-height: 0;
   overflow: hidden;
+}
+
+.ownershipPanelBody {
+  min-height: 0;
+  overflow: auto;
 }
 
 .evidencePanel {
@@ -243,7 +248,40 @@ textarea {
   border-bottom: 1px solid #edf0f1;
 }
 
+.ownershipLab {
+  border-bottom: 1px solid #dbe5e7;
+  background: #fbfdfd;
+}
+
+.labHeader {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 14px;
+  border-bottom: 1px solid #edf1f2;
+}
+
+.labHeader h2 {
+  margin: 2px 0 0;
+  font-size: 15px;
+  line-height: 1.2;
+  color: #203534;
+}
+
+.labSection {
+  display: grid;
+  gap: 6px;
+  padding: 9px 14px;
+  border-bottom: 1px solid #edf1f2;
+}
+
+.labSection:last-child {
+  border-bottom: 0;
+}
+
 .ownershipSection h2,
+.labSection h3,
 .evidenceGroup h2 {
   margin: 0;
   font-size: 13px;
@@ -258,10 +296,90 @@ textarea {
 
 .ownershipSection p,
 .ownershipSection li,
+.labSection p,
 .evidenceGroup li {
   margin: 0;
   color: #213433;
   line-height: 1.35;
+}
+
+.labFacts {
+  display: grid;
+  gap: 5px;
+  margin: 0;
+}
+
+.labFacts div {
+  display: grid;
+  grid-template-columns: 74px minmax(0, 1fr);
+  gap: 8px;
+}
+
+.labFacts.compact div {
+  grid-template-columns: 92px minmax(0, 1fr);
+}
+
+.labFacts dt {
+  color: #708083;
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.labFacts dd {
+  margin: 0;
+  color: #213433;
+  font-size: 12px;
+  line-height: 1.35;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.signalRow {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.signalPill {
+  border: 1px solid #cfdcde;
+  border-radius: 999px;
+  background: #eef5f5;
+  color: #25413f;
+  font-size: 10px;
+  font-weight: 800;
+  padding: 3px 7px;
+  text-transform: uppercase;
+}
+
+.labHint {
+  color: #68787b;
+  font-size: 12px;
+}
+
+.labEvidenceList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 7px;
+}
+
+.labEvidenceList li {
+  border: 1px solid #e3ecee;
+  border-radius: 8px;
+  background: #ffffff;
+  padding: 8px;
+}
+
+.labEvidenceList strong {
+  font-size: 12px;
+  color: #213433;
+}
+
+.labEvidenceList p {
+  margin-top: 4px;
+  font-size: 12px;
 }
 
 .ownershipSection li + li,
