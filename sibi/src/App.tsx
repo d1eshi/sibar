@@ -27,9 +27,13 @@ import {
   groupedEvidence,
   withBoundaryFileState,
 } from "./ownershipWorkbench/helpers";
+import { getWorkbenchSurfaceMode } from "./ownershipWorkbench/surfaceMode";
 import type { ViewMode } from "./ownershipWorkbench/types";
 
 export default function App() {
+  const workbenchSurfaceMode = getWorkbenchSurfaceMode(
+    typeof window === "undefined" ? "" : window.location.search,
+  );
   const [selectedFile, setSelectedFile] = React.useState(initialFile);
   const [viewMode, setViewMode] = React.useState<ViewMode>("diff");
   const [selection, setSelection] = React.useState<LineSelection | null>(null);
@@ -42,6 +46,17 @@ export default function App() {
   const codeViewFileItem = codeViewFileItemsByPath[selectedFile];
   const codeViewDiffItem = codeViewDiffItemsByPath[selectedFile];
   const boundaryState = getActiveBoundaryState(fileStates, ownershipBoundary);
+  const selectionSummaryText = getLineSelectionText(selection);
+  const labContext =
+    workbenchSurfaceMode === "lab"
+      ? {
+          selectedFile,
+          viewMode,
+          selection,
+          selectionSummaryText,
+          evidenceRefs: fixtureEvidence,
+        }
+      : null;
 
   React.useEffect(() => {
     setSelection(null);
@@ -99,7 +114,7 @@ export default function App() {
         selectedFile={selectedFile}
         mode={viewMode}
         selection={selection}
-        selectionSummaryText={getLineSelectionText(selection)}
+        selectionSummaryText={selectionSummaryText}
         codeViewFileItem={codeViewFileItem}
         codeViewDiffItem={codeViewDiffItem}
         setMode={(nextMode) => setViewMode(nextMode)}
@@ -107,14 +122,11 @@ export default function App() {
       />
 
       <OwnershipHarnessPanel
-        selectedFile={selectedFile}
-        viewMode={viewMode}
-        selection={selection}
-        selectionSummaryText={getLineSelectionText(selection)}
         boundary={ownershipBoundary}
         boundaryState={boundaryState}
-        evidenceRefs={fixtureEvidence}
         reviewQueue={ownershipReviewQueue}
+        surfaceMode={workbenchSurfaceMode}
+        labContext={labContext}
         attemptText={attemptText}
         attemptResult={attemptResult}
         showHint={showHint}

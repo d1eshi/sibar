@@ -16,19 +16,23 @@ release yet.
 - Changed the ownership harness first-run experience to open with a guided
   review sequence and prioritized file/boundary queue before the ownership
   prompt.
-- Moved the local derivation lab into a secondary/internal section after the
-  user-facing guide and ownership attempt stage.
+- Moved the local derivation lab out of the default user-facing right panel and
+  behind explicit local/debug query params: `?view=lab` or `?lab=1`.
 
 ### Docs - Sibi Ownership Workbench Review Guide
 
 - Defined the first-run review sequence in the ownership wedge and boundary
   docs, including touched status, priority, order reason, next step, and the
   prompt as a later stage.
+- Documented that the derivation lab is a local trace/debug view, not part of
+  the default ownership UI.
 
 ### Internal - Sibi Ownership Workbench Review Guide
 
 - Added deterministic workbench coverage for review guide rendering order,
   prioritized queue fixtures, and avoiding open-chat framing.
+- Added deterministic workbench coverage for query-param lab activation and
+  hiding `OwnershipLabPanel` from the default harness view.
 
 ### Docs - Deep Ownership Workspace North Star
 

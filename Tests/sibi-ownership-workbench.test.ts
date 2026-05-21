@@ -7,12 +7,14 @@ import type { BoundaryState } from "../sibi/src/ownershipWorkbench/types.ts";
 
 type OwnershipWorkbenchFixtures = typeof import("../sibi/src/ownershipWorkbench/fixtures.ts");
 type OwnershipWorkbenchHelpers = typeof import("../sibi/src/ownershipWorkbench/helpers.ts");
+type OwnershipWorkbenchSurfaceMode = typeof import("../sibi/src/ownershipWorkbench/surfaceMode.ts");
 
 const EXPECTED_DIFF_FILES = ["src/api/session.ts", "src/api/session.test.ts"] as const;
 const DIRECTORY_PATHS = ["src", "src/api", "src/runtime"] as const;
 
 let cachedFixtures: OwnershipWorkbenchFixtures | null = null;
 let cachedHelpers: OwnershipWorkbenchHelpers | null = null;
+let cachedSurfaceMode: OwnershipWorkbenchSurfaceMode | null = null;
 let fixtureImportConsoleErrors: unknown[] = [];
 
 async function loadFixturesModule(): Promise<OwnershipWorkbenchFixtures> {
@@ -42,6 +44,15 @@ async function loadHelpersModule(): Promise<OwnershipWorkbenchHelpers> {
 
   cachedHelpers = (await import("../sibi/src/ownershipWorkbench/helpers.ts")) as OwnershipWorkbenchHelpers;
   return cachedHelpers;
+}
+
+async function loadSurfaceModeModule(): Promise<OwnershipWorkbenchSurfaceMode> {
+  if (cachedSurfaceMode != null) {
+    return cachedSurfaceMode;
+  }
+
+  cachedSurfaceMode = (await import("../sibi/src/ownershipWorkbench/surfaceMode.ts")) as OwnershipWorkbenchSurfaceMode;
+  return cachedSurfaceMode;
 }
 
 test("fixture file tree paths only include leaf file paths", async () => {
@@ -251,7 +262,7 @@ test("ReviewGuidePanel defines a first-run review sequence without free chat lan
   );
 });
 
-test("OwnershipHarnessPanel renders review guide before prompt and internal lab", () => {
+test("OwnershipHarnessPanel renders review guide before prompt and gates the local lab", () => {
   const harnessSource = readFileSync(
     new URL("../sibi/src/ownershipWorkbench/components/OwnershipHarnessPanel.tsx", import.meta.url),
     "utf8",
@@ -269,9 +280,24 @@ test("OwnershipHarnessPanel renders review guide before prompt and internal lab"
 
   assert.ok(guideIndex >= 0, "OwnershipHarnessPanel should render ReviewGuidePanel");
   assert.ok(promptIndex >= 0, "OwnershipHarnessPanel should still render the ownership prompt");
-  assert.ok(labIndex >= 0, "OwnershipHarnessPanel should still render the internal lab");
+  assert.ok(labIndex >= 0, "OwnershipHarnessPanel should still define the local lab render path");
   assert.ok(guideIndex < promptIndex, "review guide should render before ownership prompt");
   assert.ok(promptIndex < labIndex, "ownership prompt should render before the secondary lab");
+  assert.match(
+    harnessSource,
+    /const isLabView = surfaceMode === "lab" && labContext != null/,
+    "OwnershipHarnessPanel should derive a lab-only render flag from the surface mode",
+  );
+  assert.match(
+    harnessSource,
+    /\{isLabView && \([\s\S]*<OwnershipLabPanel/,
+    "OwnershipHarnessPanel should not render OwnershipLabPanel in the default user-facing view",
+  );
+  assert.match(
+    harnessSource,
+    /Local trace lab/,
+    "OwnershipHarnessPanel should label the query-param view as a local trace lab",
+  );
   assert.match(
     harnessSource,
     /reviewQueue=\{reviewQueue\}/,
@@ -281,6 +307,46 @@ test("OwnershipHarnessPanel renders review guide before prompt and internal lab"
     harnessSource,
     /ask anything|anything about|chat freely|free chat|chat libre/i,
     "OwnershipHarnessPanel must not frame the workbench as open chat",
+  );
+});
+
+test("workbench surface mode is derived from local query params", async () => {
+  const { getWorkbenchSurfaceMode } = await loadSurfaceModeModule();
+
+  assert.equal(getWorkbenchSurfaceMode(""), "default");
+  assert.equal(getWorkbenchSurfaceMode("?file=src/api/session.ts"), "default");
+  assert.equal(getWorkbenchSurfaceMode("?view=lab"), "lab");
+  assert.equal(getWorkbenchSurfaceMode("?lab=1"), "lab");
+  assert.equal(getWorkbenchSurfaceMode("?view=review&lab=1"), "lab");
+});
+
+test("App passes a query-derived surface mode into the ownership harness", () => {
+  const appSource = readFileSync(new URL("../sibi/src/App.tsx", import.meta.url), "utf8");
+
+  assert.match(
+    appSource,
+    /import\s+\{\s*getWorkbenchSurfaceMode\s*\}\s+from\s+["']\.\/ownershipWorkbench\/surfaceMode["']/,
+    "App should use the deterministic surface-mode helper",
+  );
+  assert.match(
+    appSource,
+    /getWorkbenchSurfaceMode\([\s\S]*window\.location\.search[\s\S]*\)/,
+    "App should derive lab mode from the URL query string",
+  );
+  assert.match(
+    appSource,
+    /surfaceMode=\{workbenchSurfaceMode\}/,
+    "App should pass the derived mode into OwnershipHarnessPanel",
+  );
+  assert.match(
+    appSource,
+    /workbenchSurfaceMode === "lab"[\s\S]*\? \{[\s\S]*evidenceRefs: fixtureEvidence[\s\S]*\}[\s\S]*: null/,
+    "App should pass lab derivation context only in the query-param lab view",
+  );
+  assert.match(
+    appSource,
+    /labContext=\{labContext\}/,
+    "App should pass the gated lab context into OwnershipHarnessPanel",
   );
 });
 
@@ -342,7 +408,7 @@ test("OwnershipHarnessPanel wires a local derivation lab contract", () => {
   );
   assert.match(
     harnessSource,
-    /<OwnershipLabPanel[\s\S]*selectedFile=\{selectedFile\}[\s\S]*viewMode=\{viewMode\}[\s\S]*selection=\{selection\}[\s\S]*selectionSummaryText=\{selectionSummaryText\}[\s\S]*boundary=\{boundary\}[\s\S]*boundaryState=\{boundaryState\}[\s\S]*evidenceRefs=\{evidenceRefs\}/,
+    /<OwnershipLabPanel[\s\S]*selectedFile=\{labContext\.selectedFile\}[\s\S]*viewMode=\{labContext\.viewMode\}[\s\S]*selection=\{labContext\.selection\}[\s\S]*selectionSummaryText=\{labContext\.selectionSummaryText\}[\s\S]*boundary=\{boundary\}[\s\S]*boundaryState=\{boundaryState\}[\s\S]*evidenceRefs=\{labContext\.evidenceRefs\}/,
     "OwnershipHarnessPanel should pass the selection contract through to the lab",
   );
 

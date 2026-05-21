@@ -406,6 +406,10 @@ textarea {
   background: #fbfdfd;
 }
 
+.labModeNotice {
+  background: #f6fbfb;
+}
+
 .labHeader {
   display: flex;
   align-items: flex-start;
