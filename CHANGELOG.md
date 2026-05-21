@@ -28,13 +28,22 @@ release yet.
 ### Docs - Deep Ownership Workspace Pruning
 
 - Pruned `docs/specs/deep-ownership-workspace/` from the pre-consolidation spec
-  pack to five canonical files: README, current north star, source-to-mission
-  MVP, runtime boundary, and validation/plan.
+  pack to the canonical spec set anchored by README, current north star,
+  source-to-mission MVP, runtime boundary, and validation/plan.
 - Consolidated mission/track/session/artifact, source-intent ingestion, focused
   queues, runtime boundaries, trace requirements, validation assertions, and
   implementation order into the new canonical docs.
 - Updated UI specs, reports, and tests to point at the canonical docs instead of
   deleted pre-consolidation specs.
+
+### Docs - Shared Core Boundaries
+
+- Added a shared core boundary spec for separating Sibi ownership review, Sibar
+  Workspace, ownership-core, pedagogy-core, memory-core, adapters, and surfaces.
+- Documented global gates for ownership, pedagogy, readiness, repair, memory,
+  and model-output validation so new features do not bypass the core.
+- Added a sequential implementation plan that starts with entrypoint wrappers
+  and shims before any destructive poda or duplicate taxonomy.
 
 ### Docs - Tauri Workspace UI Specs
 
