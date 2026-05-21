@@ -54,6 +54,24 @@
         "deterministic",
         "no-llm"
       ]
+    },
+    {
+      "suite_id": "shared-core-boundaries",
+      "title": "Shared core boundary guardrails",
+      "summary": "Evaluates deterministic import boundaries for shared core and Sibi plus the global gates declared by the shared core boundary spec.",
+      "manifest_path": "evals/shared-core-boundaries/eval-suite.json",
+      "docs": [
+        "evals/shared-core-boundaries/README.md",
+        "docs/specs/deep-ownership-workspace/04_shared_core_boundaries.md"
+      ],
+      "tags": [
+        "shared-core",
+        "boundaries",
+        "imports",
+        "guardrails",
+        "deterministic",
+        "no-llm"
+      ]
     }
   ]
 }
