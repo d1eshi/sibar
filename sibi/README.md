@@ -29,3 +29,10 @@ pnpm run sibi:build
 
 The first input path is pasted text. A future Sibar session handoff can reuse the
 review output as the starting artifact.
+
+## Boundaries
+
+The product and runtime boundaries for this wedge live in
+[`docs/ownership-boundaries.md`](docs/ownership-boundaries.md). New Sibi
+features should preserve that split: the model proposes claims, while the
+runtime validates evidence, scope, pedagogy, readiness, and handoff shape.
