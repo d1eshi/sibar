@@ -42,6 +42,9 @@ release yet.
   workspace preview based on the Tauri research workspace surface.
 - Compressed the landing hero into a horizontal cognitive-debt statement so the
   workspace preview appears sooner.
+- Reframed the public hero around the current research workspace wedge:
+  converting papers and technical research into evidence, artifacts, code,
+  formulas, and durable understanding.
 
 ### Docs - UI Technology Architecture (Tauri Workspace)
 
