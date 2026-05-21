@@ -122,6 +122,11 @@ release yet.
   missing `user_reason`, bad URL, non-referenced sessions/tracks, unknown track
   IDs, first-session cap, and blocked-source diagnostics.
 
+- Corrected the MVP contract shape to match the canonical source-driven boundary:
+  signal and mission confidence became categorical (`low|medium|high`), `SourceIntakeResult`
+  now exposes canonical fields directly (`source_id`, `source_kind`, text refs),
+  and `MissionPreview.first_sessions` now carries session objects.
+
 ### Added - Workspace Rust Compiler Bridge
 
 - Added a new PedagogoAI bridge module for invoking the Rust

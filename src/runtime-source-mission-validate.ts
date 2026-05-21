@@ -10,14 +10,12 @@ import type {
   SourceIntakeDiagnostic,
   SourceIntakeDiagnosticSeverity,
   SourceIntakeExtractionStatus,
-  SourceIntakeMetadata,
-  SourceIntakeRefs,
   SourceIntakeResult,
   SourceIntentInput,
+  SourceSignal,
   SourceMissionSchemaVersion,
   SourceMissionValidationIssue,
   SourceMissionValidationResult,
-  SourceSignal,
   SourceSignalKind,
   SourceSignalUserRelevance,
   ProposedTrackStatus,
@@ -47,6 +45,7 @@ const SIGNAL_KINDS = new Set<SourceSignalKind>([
   "output",
   "prerequisite",
 ]);
+const SOURCE_MISSION_CONFIDENCE_VALUES = new Set(["low", "medium", "high"]);
 const USER_RELEVANCE_VALUES = new Set<SourceSignalUserRelevance>([
   "explicit",
   "inferred",
@@ -78,6 +77,15 @@ function asRecord(value: unknown): RecordInput | null {
 
 function trimValue(value: unknown): string {
   return typeof value === "string" ? value.trim() : "";
+}
+
+function isHttpUrl(value: string): boolean {
+  try {
+    const parsed = new URL(value);
+    return parsed.protocol === "http:" || parsed.protocol === "https:";
+  } catch {
+    return false;
+  }
 }
 
 function addIssue(
@@ -126,29 +134,15 @@ function validateSourceInput(
     );
     return null;
   }
-  if (kind === "url") {
-    try {
-      const parsed = new URL(value);
-      if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
-        addIssue(
-          issues,
-          `${context}_url_scheme`,
-          "source_input.value must be http(s) URL.",
-          `${context}.value`,
-          value,
-        );
-        return null;
-      }
-    } catch {
-      addIssue(
-        issues,
-        `${context}_url_invalid`,
-        "source_input.value must be a plausible http(s) URL string.",
-        `${context}.value`,
-        value,
-      );
-      return null;
-    }
+  if (kind === "url" && !isHttpUrl(value)) {
+    addIssue(
+      issues,
+      `${context}_url_invalid`,
+      "source_input.value must be a plausible http(s) URL string.",
+      `${context}.value`,
+      value,
+    );
+    return null;
   }
 
   return { kind, value };
@@ -174,45 +168,23 @@ function validateStringArray(
   return items.filter(Boolean);
 }
 
-function validateConfidence(raw: unknown, context: string, issues: SourceMissionValidationIssue[]): number | null {
-  if (typeof raw !== "number" || !Number.isFinite(raw) || raw < 0 || raw > 1) {
-    addIssue(issues, `${context}_confidence`, `${context} confidence must be a number in [0,1].`, context, String(raw ?? ""));
+function validateConfidence(
+  raw: unknown,
+  context: string,
+  issues: SourceMissionValidationIssue[],
+): "low" | "medium" | "high" | null {
+  const confidence = trimValue(raw);
+  if (!SOURCE_MISSION_CONFIDENCE_VALUES.has(confidence)) {
+    addIssue(
+      issues,
+      `${context}_confidence`,
+      `${context} confidence must be low, medium, or high.`,
+      context,
+      confidence,
+    );
     return null;
   }
-  return raw;
-}
-
-function validateMetadata(
-  raw: unknown,
-  issues: SourceMissionValidationIssue[],
-  context: string,
-): SourceIntakeMetadata {
-  const payload = asRecord(raw) ?? {};
-  if (!asRecord(raw)) {
-    addIssue(issues, `${context}_not_object`, `${context} must be an object.`);
-    return {};
-  }
-  return payload as SourceIntakeMetadata;
-}
-
-function validateRefs(
-  raw: unknown,
-  issues: SourceMissionValidationIssue[],
-  context: string,
-): SourceIntakeRefs {
-  const payload = asRecord(raw);
-  if (!payload) {
-    addIssue(issues, `${context}_not_object`, `${context} must be an object.`);
-    return {};
-  }
-  const normalized = payload as SourceIntakeRefs;
-  const hasAny = Boolean(
-    trimValue(normalized.raw_text_ref) || trimValue(normalized.readable_text_ref) || trimValue(normalized.source_excerpt_ref),
-  );
-  if (!hasAny) {
-    addIssue(issues, `${context}_empty`, `${context} should include at least one reference.`);
-  }
-  return normalized;
+  return confidence as "low" | "medium" | "high";
 }
 
 function validateDiagnosticArray(
@@ -324,13 +296,18 @@ function validateProposedSession(
   issues: SourceMissionValidationIssue[],
   index: number,
   existingIds: Set<string>,
+  contextName = "proposed_sessions",
 ): ProposedSession | null {
   const payload = asRecord(raw);
   if (!payload) {
-    addIssue(issues, `proposed_sessions[${index}]_not_object`, `proposed_sessions[${index}] must be an object.`);
+    addIssue(
+      issues,
+      `${contextName}[${index}]_not_object`,
+      `${contextName}[${index}] must be an object.`,
+    );
     return null;
   }
-  const context = `proposed_sessions[${index}]`;
+  const context = `${contextName}[${index}]`;
   const id = trimValue(payload.id);
   const trackId = trimValue(payload.track_id);
   const title = trimValue(payload.title);
@@ -485,10 +462,17 @@ export function validateSourceIntakeResult(
   const schema = trimValue(raw.schema);
   const version = trimValue(raw.version);
   const id = trimValue(raw.id);
+  const sourceId = trimValue(raw.source_id);
+  const sourceKind = trimValue(raw.source_kind);
   const sourceIntentId = trimValue(raw.source_intent_id);
   const extractionStatus = trimValue(raw.extraction_status) as SourceIntakeExtractionStatus;
-  const metadata = validateMetadata(raw.metadata, issues, "source_intake_result.metadata");
-  const refs = validateRefs(raw.refs, issues, "source_intake_result.refs");
+  const canonicalUrl = trimValue(raw.canonical_url);
+  const title = trimValue(raw.title);
+  const author = trimValue(raw.author);
+  const publishedAt = trimValue(raw.published_at);
+  const fetchedAt = trimValue(raw.fetched_at);
+  const rawTextRef = trimValue(raw.raw_text_ref);
+  const readableTextRef = trimValue(raw.readable_text_ref);
   const diagnostics = validateDiagnosticArray(raw.diagnostics, issues, "source_intake_result.diagnostics");
 
   if (schema !== SOURCE_INTAKE_SCHEMA) {
@@ -500,7 +484,35 @@ export function validateSourceIntakeResult(
     addIssue(issues, "source_intake_version_mismatch", "Unsupported SourceIntakeResult version.", "version", version);
   }
   if (!id) addIssue(issues, "source_intake_id", "id is required.", "id");
-  if (!sourceIntentId) addIssue(issues, "source_intake_source_intent_id", "source_intent_id is required.", "source_intent_id");
+  if (!sourceId) addIssue(issues, "source_intake_source_id", "source_id is required.", "source_id");
+  if (!SOURCE_INPUT_KINDS.has(sourceKind as SourceInputKind)) {
+    addIssue(
+      issues,
+      "source_intake_source_kind",
+      "source_kind must be one of url, pasted_text, selected_text, or file.",
+      "source_kind",
+      sourceKind,
+    );
+  }
+  if (Object.prototype.hasOwnProperty.call(raw, "source_intent_id") && !sourceIntentId) {
+    addIssue(
+      issues,
+      "source_intake_source_intent_id",
+      "source_intent_id must be a non-empty string.",
+      "source_intent_id",
+    );
+  }
+  if (canonicalUrl && !isHttpUrl(canonicalUrl)) {
+    addIssue(
+      issues,
+      "source_intake_canonical_url_invalid",
+      "canonical_url must be a plausible http(s) URL string.",
+      "canonical_url",
+      canonicalUrl,
+    );
+  }
+  if (!rawTextRef) addIssue(issues, "source_intake_raw_text_ref", "raw_text_ref is required.", "raw_text_ref");
+  if (!readableTextRef) addIssue(issues, "source_intake_readable_text_ref", "readable_text_ref is required.", "readable_text_ref");
   if (!EXTRACTION_STATUSES.has(extractionStatus)) {
     addIssue(
       issues,
@@ -531,10 +543,17 @@ export function validateSourceIntakeResult(
       schema: SOURCE_INTAKE_SCHEMA,
       version: version as SourceMissionSchemaVersion,
       id,
-      source_intent_id: sourceIntentId,
+      source_id: sourceId,
+      source_kind: sourceKind as SourceInputKind,
+      ...(canonicalUrl ? { canonical_url: canonicalUrl } : {}),
+      ...(title ? { title } : {}),
+      ...(author ? { author } : {}),
+      ...(publishedAt ? { published_at: publishedAt } : {}),
+      ...(fetchedAt ? { fetched_at: fetchedAt } : {}),
+      raw_text_ref: rawTextRef,
+      readable_text_ref: readableTextRef,
       extraction_status: extractionStatus,
-      metadata,
-      refs,
+      ...(sourceIntentId ? { source_intent_id: sourceIntentId } : {}),
       diagnostics,
     },
   };
@@ -647,8 +666,7 @@ export function validateMissionPreview(
   const missionRationale = trimValue(raw.mission_rationale);
   const userGoal = trimValue(raw.user_goal);
   const sourceSummary = trimValue(raw.source_summary);
-  const firstSessions = validateStringArray(raw.first_sessions, issues, "mission_preview.first_sessions");
-  const openQuestions = validateStringArray(raw.open_questions, issues, "mission_preview.open_questions", { optional: true });
+  const openQuestions = validateStringArray(raw.open_questions, issues, "mission_preview.open_questions");
   const confidence = validateConfidence(raw.confidence, "mission_preview", issues);
 
   if (schema !== MISSION_PREVIEW_SCHEMA) {
@@ -662,16 +680,6 @@ export function validateMissionPreview(
   if (!missionRationale) addIssue(issues, "mission_preview_mission_rationale", "mission_rationale is required.", "mission_rationale");
   if (!userGoal) addIssue(issues, "mission_preview_user_goal", "user_goal is required.", "user_goal");
   if (!sourceSummary) addIssue(issues, "mission_preview_source_summary", "source_summary is required.", "source_summary");
-  if (firstSessions.length === 0) {
-    addIssue(issues, "mission_preview_first_sessions_required", "At least one first session is required.");
-  }
-  if (firstSessions.length > 5) {
-    addIssue(issues, "mission_preview_first_sessions_max", "first_sessions must not exceed 5 entries.");
-  }
-  if (!Array.isArray(raw.proposed_tracks)) {
-    addIssue(issues, "mission_preview_proposed_tracks_not_array", "proposed_tracks must be an array.");
-  }
-
   const trackIds = new Set<string>();
   const tracks: ProposedTrack[] = [];
   if (Array.isArray(raw.proposed_tracks)) {
@@ -680,24 +688,29 @@ export function validateMissionPreview(
       if (track) tracks.push(track);
     }
   } else {
-    raw.proposed_tracks = [];
+    addIssue(issues, "mission_preview_proposed_tracks_not_array", "proposed_tracks must be an array.");
+  }
+
+  const firstSessionIds = new Set<string>();
+  const firstSessions: ProposedSession[] = [];
+  if (Array.isArray(raw.first_sessions)) {
+    for (let index = 0; index < raw.first_sessions.length; index += 1) {
+      const session = validateProposedSession(raw.first_sessions[index], issues, index, firstSessionIds, "first_sessions");
+      if (session) firstSessions.push(session);
+    }
+  } else {
+    addIssue(issues, "mission_preview_first_sessions_not_array", "first_sessions must be an array.");
+  }
+
+  if (firstSessions.length === 0) {
+    addIssue(issues, "mission_preview_first_sessions_required", "At least one first session is required.");
+  }
+  if (firstSessions.length > 5) {
+    addIssue(issues, "mission_preview_first_sessions_max", "first_sessions must not exceed 5 entries.");
   }
 
   if (tracks.length === 0) {
     addIssue(issues, "mission_preview_proposed_tracks_required", "At least one proposed track is required.");
-  }
-
-  const sessionIds = new Set<string>();
-  const sessions: ProposedSession[] = [];
-  if (raw.proposed_sessions !== undefined) {
-    if (!Array.isArray(raw.proposed_sessions)) {
-      addIssue(issues, "mission_preview_proposed_sessions_not_array", "proposed_sessions must be an array.");
-    } else {
-      for (let index = 0; index < raw.proposed_sessions.length; index += 1) {
-        const session = validateProposedSession(raw.proposed_sessions[index], issues, index, sessionIds);
-        if (session) sessions.push(session);
-      }
-    }
   }
 
   if (tracks.length === 0) {
@@ -725,35 +738,23 @@ export function validateMissionPreview(
     }
   }
 
-  for (const firstTrackId of firstSessions) {
-    if (!knownTrackIds.has(firstTrackId)) {
+  for (const firstSession of firstSessions) {
+    if (!knownTrackIds.has(firstSession.track_id)) {
       addIssue(
         issues,
         "mission_preview_unknown_track_reference",
-        `first_sessions references unknown track: ${firstTrackId}`,
+        `first_sessions[${firstSession.id}] references unknown track: ${firstSession.track_id}`,
         "mission_preview.first_sessions",
-        firstTrackId,
+        firstSession.track_id,
       );
     }
-  }
-
-  for (const session of sessions) {
-    if (!knownTrackIds.has(session.track_id)) {
-      addIssue(
-        issues,
-        "mission_preview_unknown_track_reference",
-        `Session ${session.id} references unknown track_id: ${session.track_id}`,
-        `proposed_sessions[${session.id}].track_id`,
-        session.track_id,
-      );
-    }
-    for (const signalRef of session.source_slice_refs) {
+    for (const signalRef of firstSession.source_slice_refs) {
       if (!knownSignalIds.has(signalRef)) {
         addIssue(
           issues,
           "mission_preview_unknown_signal_reference",
-          `Session ${session.id} references unknown source signal: ${signalRef}`,
-          `proposed_sessions[${session.id}].source_slice_refs`,
+          `first_sessions[${firstSession.id}] references unknown source signal: ${signalRef}`,
+          `first_sessions[${firstSession.id}].source_slice_refs`,
           signalRef,
         );
       } else {
@@ -802,7 +803,6 @@ export function validateMissionPreview(
       user_goal: userGoal,
       source_summary: sourceSummary,
       proposed_tracks: tracks,
-      ...(sessions.length > 0 ? { proposed_sessions: sessions } : {}),
       first_sessions: firstSessions,
       open_questions: openQuestions,
       confidence,

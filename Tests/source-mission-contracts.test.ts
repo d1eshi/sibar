@@ -28,16 +28,17 @@ function makeValidFrontierLabPayload() {
     schema: "SourceIntakeResult",
     version: "0.1.0",
     id: "INTAKE-FRONI-LAB-001",
+    source_id: "SOURCE-FRONI-LAB-001",
+    source_kind: "url",
+    canonical_url: "https://www.frontierlab.org/jax-notes",
+    title: "Frontier Lab notes",
+    author: "Frontier Lab",
+    published_at: "2026-05-21T11:40:00Z",
+    fetched_at: "2026-05-21T12:00:10Z",
+    raw_text_ref: "frontier-lab/source.txt",
+    readable_text_ref: "frontier-lab/clean.txt",
     source_intent_id: "INTENT-FRONI-LAB-001",
     extraction_status: "completed",
-    metadata: {
-      source_title: "Frontier Lab notes",
-      extracted_at: "2026-05-21T12:00:10Z",
-    },
-    refs: {
-      raw_text_ref: "frontier-lab/source.txt",
-      readable_text_ref: "frontier-lab/clean.txt",
-    },
     diagnostics: [
       {
         code: "ok.partial_summary",
@@ -55,7 +56,7 @@ function makeValidFrontierLabPayload() {
       kind: "resource",
       label: "JAX tutorials",
       source_excerpt_ref: "frontier-lab#segment-001",
-      confidence: 0.93,
+      confidence: "high",
       user_relevance: "explicit",
     },
     {
@@ -65,7 +66,7 @@ function makeValidFrontierLabPayload() {
       kind: "resource",
       label: "The JAX scaling book",
       source_excerpt_ref: "frontier-lab#segment-002",
-      confidence: 0.9,
+      confidence: "high",
       user_relevance: "explicit",
     },
     {
@@ -75,7 +76,7 @@ function makeValidFrontierLabPayload() {
       kind: "output",
       label: "A rough 10M parameter transformer in JAX, Flax, and Optax",
       source_excerpt_ref: "frontier-lab#segment-003",
-      confidence: 0.92,
+      confidence: "medium",
       user_relevance: "inferred",
     },
     {
@@ -85,7 +86,7 @@ function makeValidFrontierLabPayload() {
       kind: "claim",
       label: "Chinchilla dense-vs-MoE derivation",
       source_excerpt_ref: "frontier-lab#segment-004",
-      confidence: 0.88,
+      confidence: "medium",
       user_relevance: "explicit",
     },
     {
@@ -95,7 +96,7 @@ function makeValidFrontierLabPayload() {
       kind: "skill_area",
       label: "Pallas kernel work",
       source_excerpt_ref: "frontier-lab#segment-005",
-      confidence: 0.85,
+      confidence: "low",
       user_relevance: "explicit",
     },
   ];
@@ -123,13 +124,13 @@ function makeValidFrontierLabPayload() {
         status: "optional",
       },
     ],
-    proposed_sessions: [
+    first_sessions: [
       {
         id: "SES-001",
         track_id: "TRK-FOUNDATION",
         title: "Read source and map claims",
         source_slice_refs: ["SIG-FRONI-001", "SIG-FRONI-002"],
-        operation: "Map the source excerptes into a 1-page summary and one question.",
+        operation: "Map the source excerpts into a 1-page summary and one question.",
         recommended_artifacts: ["technical note", "recall card"],
         status: "now",
       },
@@ -143,9 +144,8 @@ function makeValidFrontierLabPayload() {
         status: "next",
       },
     ],
-    first_sessions: ["TRK-FOUNDATION", "TRK-IMPLEMENTATION"],
     open_questions: ["Which claim is most risky to implement first?"],
-    confidence: 0.84,
+    confidence: "high",
   };
 
   return { sourceIntent, sourceIntake, sourceSignals, missionPreview };
@@ -179,7 +179,51 @@ test("missing user_reason fails", () => {
   assert.equal(result.issues.some((issue) => issue.code === "source_intent_input_user_reason"), true);
 });
 
-test("SourceSignal cannot be implicit session without signal references", () => {
+test("SourceSignal confidence must be categorical", () => {
+  const payload = makeValidFrontierLabPayload();
+  const invalidSignals = [
+    {
+      ...payload.sourceSignals[0],
+      confidence: "n/a",
+    },
+    ...payload.sourceSignals.slice(1),
+  ];
+
+  const result = validateSourceSignals(invalidSignals);
+  assert.equal(result.ok, false);
+  assert.equal(result.issues.some((issue) => issue.code === "source_signal_confidence"), true);
+});
+
+test("MissionPreview confidence must be categorical", () => {
+  const payload = makeValidFrontierLabPayload();
+  const invalidMissionPreview = {
+    ...payload.missionPreview,
+    confidence: "n/a",
+  };
+
+  const result = validateMissionPreview(invalidMissionPreview, payload.sourceSignals);
+  assert.equal(result.ok, false);
+  assert.equal(result.issues.some((issue) => issue.code === "mission_preview_confidence"), true);
+});
+
+test("SourceIntakeResult must use canonical source fields", () => {
+  const payload = makeValidFrontierLabPayload();
+  const invalidIntake = {
+    ...payload.sourceIntake,
+    raw_text_ref: "",
+    readable_text_ref: "",
+  };
+
+  const result = validateSourceIntakeResult(invalidIntake);
+  assert.equal(result.ok, false);
+  assert.equal(
+    result.issues.some((issue) =>
+      issue.code === "source_intake_raw_text_ref" || issue.code === "source_intake_readable_text_ref"),
+    true,
+  );
+});
+
+test("SourceSignal cannot be implicit session without source signal references", () => {
   const payload = makeValidFrontierLabPayload();
   const invalidMissionPreview = {
     ...payload.missionPreview,
@@ -190,12 +234,12 @@ test("SourceSignal cannot be implicit session without signal references", () => 
       },
       ...payload.missionPreview.proposed_tracks.slice(1),
     ],
-    proposed_sessions: [
+    first_sessions: [
       {
-        ...payload.missionPreview.proposed_sessions[1],
+        ...payload.missionPreview.first_sessions[0],
         source_slice_refs: ["SIG-MISSING-TWO"],
       },
-      ...payload.missionPreview.proposed_sessions.slice(1),
+      ...payload.missionPreview.first_sessions.slice(1),
     ],
   };
 
@@ -209,7 +253,13 @@ test("unknown track id in first_sessions fails", () => {
   const payload = makeValidFrontierLabPayload();
   const invalidMissionPreview = {
     ...payload.missionPreview,
-    first_sessions: ["TRK-FOUNDATION", "TRK-UNKNOWN"],
+    first_sessions: [
+      {
+        ...payload.missionPreview.first_sessions[0],
+        track_id: "TRK-UNKNOWN",
+      },
+      ...payload.missionPreview.first_sessions.slice(1),
+    ],
   };
 
   const result = validateMissionPreview(invalidMissionPreview, payload.sourceSignals);
@@ -221,43 +271,44 @@ test("first_sessions above 5 fails", () => {
   const payload = makeValidFrontierLabPayload();
   const invalidMissionPreview = {
     ...payload.missionPreview,
-    proposed_tracks: payload.missionPreview.proposed_tracks.concat([
-      {
-        id: "TRK-A",
-        title: "Track extra 1",
-        rationale: "Extra bounded track for cap test.",
-        source_signal_ids: ["SIG-FRONI-001"],
-        status: "deferred",
-      },
-      {
-        id: "TRK-B",
-        title: "Track extra 2",
-        rationale: "Extra bounded track for cap test.",
-        source_signal_ids: ["SIG-FRONI-002"],
-        status: "deferred",
-      },
-      {
-        id: "TRK-C",
-        title: "Track extra 3",
-        rationale: "Extra bounded track for cap test.",
-        source_signal_ids: ["SIG-FRONI-003"],
-        status: "deferred",
-      },
-      {
-        id: "TRK-D",
-        title: "Track extra 4",
-        rationale: "Extra bounded track for cap test.",
-        source_signal_ids: ["SIG-FRONI-004"],
-        status: "deferred",
-      },
-    ]),
     first_sessions: [
-      "TRK-FOUNDATION",
-      "TRK-IMPLEMENTATION",
-      "TRK-A",
-      "TRK-B",
-      "TRK-C",
-      "TRK-D",
+      ...payload.missionPreview.first_sessions,
+      {
+        id: "SES-003",
+        track_id: "TRK-FOUNDATION",
+        title: "Second foundation session",
+        source_slice_refs: ["SIG-FRONI-001"],
+        operation: "Add a second bounded reading checkpoint from the same source.",
+        recommended_artifacts: ["brief note"],
+        status: "later",
+      },
+      {
+        id: "SES-004",
+        track_id: "TRK-FOUNDATION",
+        title: "Third foundation session",
+        source_slice_refs: ["SIG-FRONI-002"],
+        operation: "Add a follow-up checkpoint with one open question.",
+        recommended_artifacts: ["recall card"],
+        status: "later",
+      },
+      {
+        id: "SES-005",
+        track_id: "TRK-FOUNDATION",
+        title: "Fourth foundation session",
+        source_slice_refs: ["SIG-FRONI-003"],
+        operation: "Consolidate a claim with a compact question map.",
+        recommended_artifacts: ["comparison chart"],
+        status: "later",
+      },
+      {
+        id: "SES-006",
+        track_id: "TRK-FOUNDATION",
+        title: "Fifth foundation session",
+        source_slice_refs: ["SIG-FRONI-004"],
+        operation: "Map remaining claims into a compact practice action.",
+        recommended_artifacts: ["practice script"],
+        status: "later",
+      },
     ],
   };
 
@@ -280,7 +331,8 @@ test("bad URL source input fails", () => {
   assert.equal(result.ok, false);
   assert.equal(
     result.issues.some((issue) =>
-      issue.code === "source_intent_input.source_input_url_invalid" || issue.code === "source_intent_input_url_invalid"),
+      issue.code === "source_intent_input.source_input_url_invalid"
+      || issue.code === "source_intent_input_url_invalid"),
     true,
   );
 });
