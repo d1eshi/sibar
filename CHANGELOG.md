@@ -17,6 +17,9 @@ release yet.
   `Mission -> Track -> Session -> Artifact` vocabulary, focused track queues,
   source-map separation, prerequisite routing, artifact recommendation, and
   explicit path mutation proposals.
+- Added source-intent ingestion MVP specs for creating a mission preview from a
+  URL or pasted source plus one user reason, including source signal extraction,
+  review-before-create, and source-to-mission UI behavior.
 - Split `docs/specs/ui/` into `web/` and `workspace-tauri/` as the UI source of
   truth for public web surfaces and the direct Tauri workspace prototype.
 - Added `Workspace Home` as the canonical default Tauri entry screen so existing
