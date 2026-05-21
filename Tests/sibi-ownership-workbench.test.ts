@@ -5,11 +5,13 @@ import { CodeView as VanillaCodeView, parsePatchFiles } from "@pierre/diffs";
 import { PierreCodeView } from "../sibi/src/ownershipWorkbench/components/PierreCodeView.ts";
 
 type OwnershipWorkbenchFixtures = typeof import("../sibi/src/ownershipWorkbench/fixtures.ts");
+type OwnershipWorkbenchHelpers = typeof import("../sibi/src/ownershipWorkbench/helpers.ts");
 
 const EXPECTED_DIFF_FILES = ["src/api/session.ts", "src/api/session.test.ts"] as const;
 const DIRECTORY_PATHS = ["src", "src/api", "src/runtime"] as const;
 
 let cachedFixtures: OwnershipWorkbenchFixtures | null = null;
+let cachedHelpers: OwnershipWorkbenchHelpers | null = null;
 let fixtureImportConsoleErrors: unknown[] = [];
 
 async function loadFixturesModule(): Promise<OwnershipWorkbenchFixtures> {
@@ -30,6 +32,15 @@ async function loadFixturesModule(): Promise<OwnershipWorkbenchFixtures> {
   } finally {
     console.error = originalConsoleError;
   }
+}
+
+async function loadHelpersModule(): Promise<OwnershipWorkbenchHelpers> {
+  if (cachedHelpers != null) {
+    return cachedHelpers;
+  }
+
+  cachedHelpers = (await import("../sibi/src/ownershipWorkbench/helpers.ts")) as OwnershipWorkbenchHelpers;
+  return cachedHelpers;
 }
 
 test("fixture file tree paths only include leaf file paths", async () => {
@@ -77,6 +88,63 @@ test("fixture import should not log console errors in the happy path", async () 
   assert.equal(fixtureImportConsoleErrors.length, 0, "fixture import logged one or more console errors");
 });
 
+test("groupedEvidence groups fixture evidence by confidence", async () => {
+  const fixtures = await loadFixturesModule();
+  const helpers = await loadHelpersModule();
+  const grouped = helpers.groupedEvidence(fixtures.fixtureEvidence);
+
+  assert.deepEqual(
+    Object.fromEntries(Object.entries(grouped).map(([confidence, entries]) => [confidence, entries.map((entry) => entry.id)])),
+    {
+      observed: ["E-001"],
+      inferred: ["E-002"],
+      unverified: ["E-003"],
+      conflict: ["E-004"],
+    },
+  );
+});
+
+test("evidenceForSelection returns evidence overlapping the selected range", async () => {
+  const fixtures = await loadFixturesModule();
+  const helpers = await loadHelpersModule();
+
+  assert.deepEqual(
+    helpers
+      .evidenceForSelection(fixtures.fixtureEvidence, "src/api/session.ts", {
+        startLine: 12,
+        endLine: 13,
+      })
+      .map((entry) => entry.id),
+    ["E-001"],
+  );
+
+  assert.deepEqual(
+    helpers.evidenceForSelection(fixtures.fixtureEvidence, "src/api/session.ts", {
+      startLine: 9,
+      endLine: 11,
+    }),
+    [],
+  );
+
+  assert.deepEqual(
+    helpers
+      .evidenceForSelection(fixtures.fixtureEvidence, "src/runtime/consumer.ts", {
+        startLine: 41,
+        endLine: 53,
+      })
+      .map((entry) => entry.id),
+    ["E-002"],
+  );
+
+  assert.deepEqual(
+    helpers.evidenceForSelection(fixtures.fixtureEvidence, "src/api/session.ts", {
+      startLine: 20,
+      endLine: 24,
+    }),
+    [],
+  );
+});
+
 test("ownership workbench CodeView adapter uses the React entrypoint", () => {
   assert.notEqual(
     PierreCodeView,
@@ -115,5 +183,50 @@ test("CodeDiffPanel renders the CodeView adapter instead of vanilla CodeView", (
     source,
     /<PierreCodeView(?:[\s>]|<)/,
     "CodeDiffPanel should render the ownership workbench CodeView adapter",
+  );
+});
+
+test("OwnershipHarnessPanel wires a selection-aware lab contract", () => {
+  const harnessSource = readFileSync(
+    new URL("../sibi/src/ownershipWorkbench/components/OwnershipHarnessPanel.tsx", import.meta.url),
+    "utf8",
+  );
+  const labSource = readFileSync(
+    new URL("../sibi/src/ownershipWorkbench/components/OwnershipLabPanel.tsx", import.meta.url),
+    "utf8",
+  );
+
+  assert.match(
+    harnessSource,
+    /import\s+\{\s*OwnershipLabPanel\s*\}\s+from\s+["']\.\/OwnershipLabPanel["']/,
+    "OwnershipHarnessPanel should import the selection lab subcomponent",
+  );
+  assert.match(
+    harnessSource,
+    /<OwnershipLabPanel[\s\S]*selectedFile=\{selectedFile\}[\s\S]*viewMode=\{viewMode\}[\s\S]*selection=\{selection\}[\s\S]*selectionSummaryText=\{selectionSummaryText\}[\s\S]*boundary=\{boundary\}[\s\S]*boundaryState=\{boundaryState\}[\s\S]*evidenceRefs=\{evidenceRefs\}/,
+    "OwnershipHarnessPanel should pass the selection contract through to the lab",
+  );
+
+  for (const propName of [
+    "selectedFile",
+    "viewMode",
+    "selection",
+    "selectionSummaryText",
+    "boundary",
+    "boundaryState",
+    "evidenceRefs",
+  ]) {
+    assert.match(labSource, new RegExp(`${propName}:`), `OwnershipLabPanel props should include ${propName}`);
+  }
+  assert.match(labSource, /evidenceForSelection/, "OwnershipLabPanel should derive line-matched evidence");
+  assert.match(
+    labSource,
+    /No range selected; showing active boundary context\./,
+    "OwnershipLabPanel should not describe an absent selection as an out-of-bound selected range",
+  );
+  assert.doesNotMatch(
+    labSource,
+    /boundary\.returnCondition/,
+    "OwnershipLabPanel should not reveal the return condition before an attempt",
   );
 });
