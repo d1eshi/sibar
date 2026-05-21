@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Sibar - De leer papers a construir entendimiento</title>
 <meta name="description" content="Sibar convierte research tecnico en un workspace de evidencia, artifacts, codigo y memoria para estudiar profundo aplicando lo aprendido.">
+<meta property="og:title" content="Sibar - Research workspace para estudiar profundo">
+<meta property="og:description" content="De leer papers, blogs, lecturas y apuntes a construir entendimiento con evidencia, artifacts, codigo y memoria.">
 <script>
 window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
 window.va("beforeSend", (event) => {
@@ -33,7 +35,8 @@ if (location.protocol !== "file:" && location.hostname !== "localhost" && locati
     <strong>Sibar</strong>
   </a>
   <nav class="site-nav" aria-label="Secciones">
-    <a href="#demo">Demo</a>
+    <a href="#demo">Workspace</a>
+    <a href="#artifacts">Artifacts</a>
     <a href="#early-access">Early access</a>
   </nav>
   <a class="header-cta" href="#early-access">Pedir acceso</a>
@@ -49,6 +52,14 @@ if (location.protocol !== "file:" && location.hostname !== "localhost" && locati
         <a class="secondary-action" href="#early-access">Entrar al early access</a>
       </div>
     </div>
+    <aside class="hero-instrument" aria-label="Sibar workflow">
+      <span>Source</span>
+      <strong>Claim selected</strong>
+      <span>Artifact</span>
+      <strong>Notebook check</strong>
+      <span>Memory</span>
+      <strong>Formula ready</strong>
+    </aside>
   </section>
 
   <section class="workspace-demo section-band" id="demo" aria-label="Sibar workspace preview">
@@ -165,22 +176,26 @@ if (location.protocol !== "file:" && location.hostname !== "localhost" && locati
     </div>
   </section>
 
-  <section class="signal-section section-band" aria-label="Como Sibar convierte research en entendimiento">
+  <section class="signal-section section-band" id="artifacts" aria-labelledby="artifacts-title">
+    <div class="signal-intro">
+      <p class="eyebrow">Artifacts generables</p>
+      <h2 id="artifacts-title">El estudio termina en piezas que podes volver a usar.</h2>
+    </div>
     <div class="signal-stack">
       <div class="signal-card active">
-        <span>01</span>
-        <strong>Evidencia visible</strong>
-        <p>El workspace separa claims, fuentes y dudas para que el estudio empiece desde material trazable.</p>
+        <span>paper / evidencia</span>
+        <strong>Fuentes seleccionadas, claims y dudas en un mismo lugar.</strong>
+        <p>El workspace separa evidencia, notas y preguntas abiertas para que cada lectura tenga trazabilidad.</p>
       </div>
       <div class="signal-card">
-        <span>02</span>
-        <strong>Artifacts aplicables</strong>
-        <p>No alcanza con leer. Construis artifacts de paper, codigo, conocimiento y formulas que prueban uso real.</p>
+        <span>codigo reproducible</span>
+        <strong>Pequenos experimentos que prueban si entendiste.</strong>
+        <p>Converti una idea del material en un snippet, notebook o verificacion local que puedas repetir.</p>
       </div>
       <div class="signal-card">
-        <span>03</span>
-        <strong>Memoria replicable</strong>
-        <p>Lo aprendido queda como notas, conexiones y practica reutilizable para volver sin empezar de cero.</p>
+        <span>conocimiento / formulas</span>
+        <strong>Reglas, formulas y conexiones listas para aplicar.</strong>
+        <p>Lo aprendido queda como memoria de trabajo: definiciones, relaciones y pasos para volver sin empezar de cero.</p>
       </div>
     </div>
   </section>

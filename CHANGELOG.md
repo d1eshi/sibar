@@ -27,6 +27,9 @@ release yet.
 
 ### Changed - Public Web Landing
 
+- Refined the public landing visual system toward a premium, minimal research
+  workspace feel, with a more neutral palette, compact hero instrumentation,
+  polished static workspace preview, and clearer generated-artifact narrative.
 - Replaced the public `web/` first page with a one-page creative landing that
   embeds a three-panel Sibar workspace demo, a strong product headline, and a
   simplified early access form.
