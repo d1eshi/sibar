@@ -2,14 +2,51 @@
 
 ## Purpose
 
-This directory defines the next ambitious Sibi product surface:
+This directory defines Sibi's deep technical ownership product surface:
 
 > Sibi turns real technical artifacts into deep, evidence-backed ownership loops
 > that force the user to think, derive, build, test, and remember.
 
-This is not a generic repo chat, a passive explainer, or a cloned editor. It is
-a Sibi-native spec pack that captures product, architecture, UI, and validation
-detail without depending on an external orchestration format.
+The current product north is source-driven mission creation:
+
+```text
+URL or pasted source + one user reason
+  -> explicit source signals
+  -> reviewable MissionPreview
+  -> Mission Brief
+  -> Focused Track Queue
+  -> Active Session
+  -> Artifact evidence
+```
+
+This is not a generic repo chat, a passive explainer, a cloned editor, or ten
+separate apps. It is one Sibi-native product direction with historical reference
+material below it.
+
+## Current Authority
+
+When docs conflict, use this authority order:
+
+1. `00_current_north_star.md`
+2. `22_source_intent_ingestion_mvp.md`
+3. `20_mission_track_session_model.md`
+4. `21_curated_track_pedagogy_contract.md`
+5. `08_validation_contract.md`
+6. `09_implementation_plan.md`
+7. `11_open_decisions.md`
+
+Product-facing hierarchy is:
+
+```text
+Mission
+  -> Track
+       -> Session
+            -> Artifact
+```
+
+Internal contracts may still use `Workspace*` names where existing runtime code
+or schemas require them. Do not expose "workspace inside workspace" as product
+language.
 
 ## Why This Exists
 
@@ -45,53 +82,65 @@ LLMs, optimization, Rust systems, ML from scratch, papers, math formulas, and
 large unfamiliar repos. Sibi should help them build without letting them fake
 understanding.
 
-## Directory Reading Order
+## Current MVP Reading Path
 
-1. `00_new_app_tauri_workspace.md` is the current source spec for the second Tauri app.
-2. `00_north_star.md` explains the product ambition, first user, and moat.
-3. `01_deep_ownership_loop.md` defines the core loop and data contract.
-4. `02_workspace_architecture.md` defines the headless core, desktop surfaces,
-   adapters, storage, and trust boundaries.
-5. `03_ui_product_surface.md` defines the Sibi Lens and Sibi Workspace/Lab UI.
-6. `04_generated_thinking_artifacts.md` defines artifacts such as code slices,
-   diagrams, equation breakdowns, paper excerpts, hypothesis tables, and
-   experiments.
-7. `05_codebase_and_research_intelligence.md` defines how Sibi reads repos,
-   tests, docs, papers, notebooks, and large directories without pretending
-   context is infinite.
-8. `06_pedagogy_memory_and_readiness.md` defines the attempt-first rules,
-   prerequisite ladders, memory, and readiness.
-9. `07_commands_workspace_signals_and_mutation.md` defines commands, signals,
-   study mutations, and product mutations.
-10. `08_validation_contract.md` defines `VAL-*` assertions that implementation
-   must satisfy.
-11. `09_implementation_plan.md` defines a product implementation sequence.
-12. `11_open_decisions.md` lists decisions that remain intentionally open.
-13. `12_ui_reference_components.md` extracts reproducible UI components from
-    the Sibi Lens + Lab iteration references.
-14. `13_tauri_second_app_product_plan.md` is the derived/historical plan for this workspace.
-15. `14_workspace_intent_flow.md` defines Workspace Intent as the first
-    user-facing create-workspace flow before a pre-filled workspace appears.
-16. `15_workspace_intent_compiler.md` defines the Rust `WorkspaceIntentCompiler`
-    contract for `user_intent + source_bundle + existing_state -> WorkspacePlan`.
-17. `16_llm_adapter_contract.md` defines external LLM adapter behavior:
-    fixture first, then `codex-exec`, then `openai-api`/`opencode`/local.
-18. `17_workspace_execution_pipeline.md` defines source bundle prep, adapter calls,
-    validation/repair/block, and projection emission (`WorkspacePlan` + snapshot).
-19. `18_workspace_ui_reproducibility.md` defines stable UI projection fields, 2–3
-    visible next actions, evidence/artifact requirements, and locked advanced nodes.
-20. `19_workspace_trace_contract_gate.md` is a prerequisite contract gate for
-    workspace creation attempts, LLM run traces, session histories, compaction,
-    and replay.
-21. `20_mission_track_session_model.md` defines mission, track, session, and
-    artifact as the product model for goal-driven programs such as frontier lab
-    readiness.
-22. `21_curated_track_pedagogy_contract.md` separates curated track queues,
-    prerequisite routing, artifact recommendation, readiness gates, and path
-    mutation from the UI presentation.
-23. `22_source_intent_ingestion_mvp.md` defines the first dynamic MVP path for
-    URL/pasted-source intake, source signal extraction, mission preview, and
-    review-before-create.
+Read these first if you are implementing or reviewing the current product slice:
+
+1. `00_current_north_star.md` defines the current source-driven MVP and resolves
+   product hierarchy.
+2. `22_source_intent_ingestion_mvp.md` defines URL/pasted-source intake, source
+   signal extraction, `MissionPreview`, and review-before-create.
+3. `20_mission_track_session_model.md` defines `Mission -> Track -> Session ->
+   Artifact`.
+4. `21_curated_track_pedagogy_contract.md` defines focused queues, Source Map
+   separation, readiness gates, artifact recommendations, and path mutation.
+5. `08_validation_contract.md` defines `VAL-*` assertions that current and future
+   implementation must satisfy.
+6. `09_implementation_plan.md` defines the current implementation sequence.
+7. `11_open_decisions.md` records accepted decisions and remaining open questions.
+
+## Runtime Contract Path
+
+Read these when implementing the compiler, adapter, execution, projection, or
+trace layer. They are still useful, but they use internal `Workspace*` vocabulary:
+
+1. `15_workspace_intent_compiler.md`
+2. `16_llm_adapter_contract.md`
+3. `17_workspace_execution_pipeline.md`
+4. `18_workspace_ui_reproducibility.md`
+5. `19_workspace_trace_contract_gate.md`
+
+Map internal `WorkspacePlan`/`WorkspaceSnapshot` outputs to mission-language UI
+objects before presenting them to users.
+
+## Foundation Reference Path
+
+These specs define the broader deep-ownership foundation. They are reference
+material, not the shortest path for the current MVP:
+
+1. `00_north_star.md`
+2. `01_deep_ownership_loop.md`
+3. `02_workspace_architecture.md`
+4. `03_ui_product_surface.md`
+5. `04_generated_thinking_artifacts.md`
+6. `05_codebase_and_research_intelligence.md`
+7. `06_pedagogy_memory_and_readiness.md`
+8. `07_commands_workspace_signals_and_mutation.md`
+9. `12_ui_reference_components.md`
+
+## Historical Or Superseded Product Notes
+
+These files record prior exploration and should not be read as current MVP
+authority:
+
+1. `00_new_app_tauri_workspace.md` is a historical conversation-derived app
+   sketch. Use only for product texture and UI instincts.
+2. `13_tauri_second_app_product_plan.md` is a derived/historical Tauri plan. Use
+   for UI motifs only after checking current MVP authority.
+3. `14_workspace_intent_flow.md` captures the earlier heavy Workspace Intent
+   flow. It is superseded for first-run intake by
+   `22_source_intent_ingestion_mvp.md`, but remains background for internal
+   compiler naming.
 
 ## Naming Decision
 
@@ -123,50 +172,55 @@ Do not start by building an editor.
 Start with:
 
 ```text
-headless core
-  + artifact workspace UI
-  + read-only code/research rendering
-  + generated thinking artifacts
-  + attempt-first pedagogy
-  + evidence-backed readiness
+source intake
+  + source signal extraction
+  + reviewable mission preview
+  + focused track queue
+  + active session
+  + artifact evidence
+  + scoped readiness
 ```
 
 Editing integrations should remain adapters. Sibi may open files in VS Code,
 Cursor, or another editor, but the moat belongs in the ownership runtime and
 workspace memory, not in editor chrome.
 
-## Morning Target
+## Current MVP Target
 
-The first morning target is not full mastery of a 200k LOC repo.
+The current MVP target is not full mastery of a 200k LOC repo or a complete
+curriculum from one article.
 
-The first morning target is:
+The current MVP target is:
 
-> Given this Sibi repo directory and a learning goal, Sibi can create a visible
-> Deep Ownership Workspace that shows one bounded concept slice, one generated
-> thinking artifact, one attempt-first prompt, supporting evidence, and a first
-> readiness limitation.
+> Given a URL or pasted source plus one sentence explaining why it matters, Sibi
+> can extract explicit source signals, show a reviewable `MissionPreview`, create
+> a mission brief, open a focused track queue, and start one active session with
+> source-backed artifact expectations.
 
 Minimum visible proof:
 
-1. a selected artifact boundary
-2. a repo/file evidence inventory
-3. one important code slice
-4. one visual or structured thinking artifact
-5. one user operation prompt
-6. one evidence panel
-7. one gap or readiness panel
-8. one next repair action
+1. source intake accepts URL or pasted text plus user reason
+2. extracted source signals remain distinct from sessions
+3. mission preview appears before create
+4. mission brief uses `Mission -> Track -> Session -> Artifact`
+5. focused queue shows only a small next path
+6. Source Map exists as secondary/advanced navigation
+7. active session has one source slice and one required operation
+8. recommended artifacts and readiness scope are visible
 
-## Runtime Topology for the Workspace Slice
+## Runtime Topology For The Current Slice
 
 The runtime is always this sequence:
 
-1. UI onboarding captures `WorkspaceIntent` and selected source boundary.
+1. UI captures `SourceIntentInput`: URL or pasted source plus user reason.
 2. Tauri/Rust receives the request and creates an execution job.
-3. Rust invokes the adapter (`fixture` or `codex-exec`, then API/local fallback) as a
-   controlled child process via `stdin` JSON payload and schema.
-4. Rust validates parse/schema/pedagogy and classifies job outcome.
-5. Rust emits `WorkspacePlan` + reproducible workspace snapshot to UI.
+3. Source intake fetches or stores readable source text with diagnostics.
+4. Source signal extraction identifies explicit goals, resources, exercises,
+   claims, and prerequisites.
+5. Rust invokes a fixture or adapter only behind the host boundary.
+6. Rust validates parse/schema/pedagogy and classifies job outcome.
+7. Rust emits internal `WorkspacePlan`/snapshot data projected to mission UI:
+   `MissionPreview`, mission brief, focused queue, and active session.
 
 The UI does not expose a "Run Codex runner" button and does not know adapter
 details. It renders job progression via states:
@@ -182,10 +236,13 @@ details. It renders job progression via states:
 No timeout strategy is defined as the main failure path. Cancellation is explicit
 and terminal (`cancelled`) through job control.
 
-## Reproducible Live Workspace Repro
+## Legacy Live Workspace Repro
 
-For deterministic developer verification of the live ownership loop (no external LLM call),
-use the committed fixture:
+The committed live workspace fixture remains useful for internal regression
+checks, but it is not the current product-facing MVP path.
+
+For deterministic developer verification of the legacy ownership loop (no
+external LLM call), use the committed fixture:
 
 - `evals/deep-ownership-workspace/fixtures/live-workspace-session.json`
 

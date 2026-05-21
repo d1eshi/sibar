@@ -1,5 +1,10 @@
 # 14: Workspace Intent Flow
 
+Status: historical/reference for first-run product intake. The heavy
+`WorkspaceIntent` form in this document is superseded by
+`22_source_intent_ingestion_mvp.md` for the current MVP. Keep this document as
+background for internal `Workspace*` compiler naming and bounded-plan contracts.
+
 ## Goal
 
 Define the first user-facing flow for Sibar Research Workspace: the user creates

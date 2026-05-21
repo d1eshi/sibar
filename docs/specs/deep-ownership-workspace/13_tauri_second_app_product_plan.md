@@ -1,5 +1,10 @@
 # 13: Tauri Second App Product Plan
 
+Status: historical/reference. This plan is useful for UI motifs and earlier app
+shape, but it is not current MVP authority. The current product path is
+source-driven mission creation: `SourceIntentInput -> MissionPreview -> Mission
+Brief -> Focused Track Queue -> Active Session`.
+
 This plan defines the second Sibar app slice for a native desktop workspace shell.
 It is intentionally separate from the existing Swift panel and follows the
 Web-first workspace model while giving a Tauri-first runtime surface.

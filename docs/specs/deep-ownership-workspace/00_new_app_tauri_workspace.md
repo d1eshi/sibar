@@ -1,3 +1,12 @@
+# Historical Conversation Note: Tauri Workspace Sketch
+
+Status: historical/reference. This note preserves early product exploration for
+the second Tauri workspace. It is not current MVP authority. Use
+`00_current_north_star.md`, `22_source_intent_ingestion_mvp.md`,
+`20_mission_track_session_model.md`, and
+`21_curated_track_pedagogy_contract.md` for the current source-driven mission
+path.
+
 Sí. Lo que estás imaginando para **Sibar** no es “otra app de cursos” ni “ChatGPT con documentos”. Es más parecido a un **workspace nativo de formación investigadora**.
 
 La imagen mental sería esta:

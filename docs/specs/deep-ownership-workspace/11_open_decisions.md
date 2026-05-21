@@ -4,8 +4,8 @@
 
 List decisions that remain open after creating this spec pack.
 
-These should not block the first morning prototype unless explicitly marked as a
-blocker.
+These should not block the current source-driven MVP unless explicitly marked as
+a blocker.
 
 ## Naming
 
@@ -186,22 +186,25 @@ Status: open, not blocking.
 
 ## Product Scope
 
-### Decision: First External Learning Domain
+### Decision: First Source-Driven Fixture
 
 Options:
 
-1. Sibi self-hosted repo ownership
-2. RL toy repo
-3. LLM-from-scratch repo
-4. Rust systems repo
-5. paper-to-implementation artifact
+1. frontier lab blog source-intent fixture
+2. Sibi self-hosted repo ownership
+3. RL toy repo
+4. LLM-from-scratch repo
+5. Rust systems repo
+6. paper-to-implementation artifact
 
 Recommendation:
 
-Dogfood with Sibi first, then add an RL toy repo because it exercises code,
-math, experiments, and parameter reasoning.
+Use the frontier lab blog source-intent fixture first because it exercises the
+current product path: source signal extraction, user reason, mission preview,
+focused queue, and review-before-create. Keep Sibi self-hosted repo ownership as
+an internal regression fixture for the deep ownership loop.
 
-Status: open.
+Status: accepted for source-driven MVP prototype.
 
 ### Decision: Mission Language For Goal-Driven Study
 
@@ -273,13 +276,15 @@ Status: accepted for source-driven MVP prototype.
 
 ## Blockers
 
-No open decision blocks the first morning prototype.
+No open decision blocks the current source-driven MVP.
 
 The first prototype can proceed with:
 
 1. static web UI
-2. deterministic fixture
-3. this repo as source
-4. read-only evidence
-5. no product mutation
-6. no editor dependency
+2. deterministic frontier lab source fixture
+3. URL/pasted-source intake shell
+4. mission preview before create
+5. focused track queue
+6. read-only evidence
+7. no product mutation
+8. no editor dependency

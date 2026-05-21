@@ -11,6 +11,20 @@ accepted specs and iterations, not by raw commit count.
 Use this section for changes that have landed but are not part of a tagged
 release yet.
 
+### Docs - Deep Ownership Workspace North Star
+
+- Added a current north-star entrypoint for the source-driven MVP:
+  URL/pasted source plus one user reason -> source signals -> MissionPreview ->
+  Mission Brief -> Focused Track Queue -> Active Session.
+- Reorganized the deep ownership spec README into current MVP, runtime contract,
+  foundation reference, and historical/superseded reading paths.
+- Marked older broad Tauri/workspace-intent notes as historical/reference so
+  they do not compete with `Mission -> Track -> Session -> Artifact` product
+  hierarchy.
+- Updated open decisions and implementation plan to make the frontier lab
+  source fixture the first MVP path and keep Sibi-repo ownership as internal
+  regression context.
+
 ### Docs - Tauri Workspace UI Specs
 
 - Added mission-track study specs for the frontier lab readiness flow, including
