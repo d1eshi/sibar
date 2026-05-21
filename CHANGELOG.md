@@ -25,6 +25,23 @@ release yet.
   source fixture the first MVP path and keep Sibi-repo ownership as internal
   regression context.
 
+### Docs - Sibi Ownership Harness
+
+- Clarified the Sibi manifesto around cognitive debt recovery: AI-assisted work
+  can compile and pass tests while human ownership remains blocked.
+- Added the `Prove ownership` interaction rule, replacing explain-first flows
+  with attempt-first diagnosis, smallest repair, re-attempt, and scoped
+  readiness updates.
+- Defined ownership boundaries as the primary unit instead of files, with
+  cognitive file-tree states such as `owned`, `partial`, `gap`, `blocked`, and
+  `questionable`.
+- Documented the evidence extraction layer as the alternative to building a
+  custom AST: cheap deterministic signals, LLM evidence extraction, strict
+  contracts, verification, and confidence scoring.
+- Added `sibi/docs/specs/sibi-ownership-workbench/` as the implementation-ready
+  spec pack for the repo tree, code/diff view, ownership harness panel,
+  evidence extraction contract, and staged build slices.
+
 ### Added - Slice Final Sibi Ownership-Review Wedge
 
 - Converted `sibi/src/ownershipReview.ts` into a direct re-export shim of

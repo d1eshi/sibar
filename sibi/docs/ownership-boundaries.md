@@ -11,6 +11,26 @@ output; Sibi turns it into scoped ownership claims, evidence-backed questions,
 gaps, artifacts, and readiness. Later repo connectors, PR integrations, and
 agent-session imports must preserve the same boundaries.
 
+## Manifesto
+
+AI made software faster than human understanding.
+
+Teams can now generate code, features, diffs, and architectures at a speed their
+mental models cannot absorb. The result is not just technical debt. It is
+cognitive debt: code that exists, passes tests, may even ship, but is not truly
+owned by the people responsible for it.
+
+Sibi does not explain your codebase to you.
+
+It makes you prove ownership of it:
+
+- one boundary at a time;
+- one attempt at a time;
+- one gap at a time.
+
+The wedge is not "learn faster" or "ask anything about a codebase." The wedge is
+cognitive debt recovery for AI-generated or AI-assisted software.
+
 ## Product Boundary
 
 Sibi exists to answer one operational question:
@@ -39,6 +59,102 @@ accepted AI work - demonstrated human ownership
 Do not sell this as a precise scientific metric in the MVP. The product should
 say it detects ownership gaps, not that it fully measures cognitive debt.
 
+Every diff should be treated as a mutation over ownership, not only as a code
+change. The product loop must ask:
+
+1. What changed in the system?
+2. What changed in the user's mental model?
+3. Did the gap between system behavior and demonstrated ownership grow or shrink?
+
+Tests passing is not enough. Sibi can say that code compiles while ownership is
+still blocked.
+
+## Ownership Harness
+
+Sibi should feel like an ownership harness, not a code explainer. The default
+interaction is attempt-first:
+
+```text
+User selects diff/file/directory
+  -> Sibi builds deterministic context
+  -> Sibi asks an ownership claim
+  -> user attempts an explanation
+  -> Sibi diagnoses the gap
+  -> Sibi gives the smallest repair
+  -> user retries
+  -> ownership state updates
+```
+
+The primary action is not:
+
+```text
+Explain this file with LLM
+```
+
+The primary action is:
+
+```text
+Prove ownership
+```
+
+The UI may offer hints, but it must not make explanation the first move. A user
+does not prove ownership by reading an answer. They prove ownership by attempting
+an operation and having that attempt checked against evidence.
+
+Anti-patterns for the wedge:
+
+- explain file;
+- summarize folder;
+- ask anything about codebase;
+- generate docs as the main output;
+- mark readiness before the user attempts the boundary.
+
+Preferred product verbs:
+
+- prove ownership;
+- diagnose gap;
+- repair boundary;
+- re-attempt;
+- track debt;
+- schedule revisit.
+
+## Ownership Boundaries
+
+The core unit is not necessarily a file. The core unit is an ownership boundary:
+
+```text
+boundary = a technical responsibility the user must be able to explain, modify,
+and defend with evidence
+```
+
+A file can contain multiple boundaries, and one boundary can cross several
+files. The product should avoid asking only "what does this file do?" when the
+real gap is a boundary distinction such as:
+
+- where attempt evaluation ends and deterministic validation begins;
+- where evidence collection ends and pedagogical judgment begins;
+- who consumes a runtime contract;
+- what would break if a validation layer disappeared.
+
+File-tree state should be cognitive, not just technical. Valid states include:
+
+- `unvisited`;
+- `attempted`;
+- `owned`;
+- `partial`;
+- `gap`;
+- `blocked`;
+- `questionable`.
+
+Every non-owned state needs a reason, for example:
+
+- `gap: cannot explain deletion risk`;
+- `gap: confuses caller with consumer`;
+- `gap: understands function, not boundary`;
+- `gap: no evidence from tests/specs`;
+- `gap: overconfident but wrong`;
+- `blocked: missing prerequisite boundary`.
+
 ## Runtime Split
 
 The LLM may propose meaning. The runtime decides what enters the system.
@@ -65,6 +181,73 @@ LLM output
   -> pedagogy validation
   -> UI projection
 ```
+
+The runtime builds evidence such as imports, exports, callers, tests, touched
+files, spec links, docs references, runtime logs, eval results, naming
+inconsistencies, suspected dead code, and dependency depth. The LLM interprets
+human attempts and proposes semantic structure, but it does not own the truth of
+the system.
+
+## Evidence Extraction Layer
+
+Sibi should not build a custom AST engine for the first wedge. That is expensive,
+fragile, and pulls the product into compiler, parser, LSP, and language-server
+work before the ownership loop is proven.
+
+The first architecture should be hybrid:
+
+```text
+cheap deterministic signals
+  + LLM evidence extraction
+  + strict contracts
+  + verification / confidence scoring
+```
+
+Do not call this an AST. Call it an evidence extraction layer.
+
+The goal is not perfect language understanding. The goal is enough verified
+evidence to ask a human whether they own the changed boundary.
+
+Evidence must be separated by confidence and source:
+
+- `observed`: cheap facts the runtime can verify, such as file exists, symbol
+  text appears, import string exists, export keyword exists, nearby test exists,
+  git diff touched file, or path matches a known pattern;
+- `inferred`: semantic interpretations the LLM can propose, such as likely
+  responsibility, likely boundary, naming mismatch, or layer confusion;
+- `unverified`: hypotheses that can only become questions until checked, such as
+  dead-code suspicion, deletion safety, main-entrypoint claims, or unclear
+  boundary claims.
+
+Rules:
+
+- no source means no high confidence;
+- inferred claims cannot become ownership facts;
+- unverified claims can only become questions;
+- observed facts may update the evidence graph;
+- conflicts between LLM claims and runtime checks lower confidence or block the
+  claim from readiness.
+
+Start semantic. Verify cheaply. Specialize only where repeated errors create
+product pain.
+
+Initial deterministic checks can be simple:
+
+```text
+rg "export function"
+rg "export const"
+rg "from './"
+git diff --name-only
+git grep "symbolName"
+```
+
+Language-specific analyzers can be introduced later where they pay for
+themselves:
+
+- TypeScript: `ts-morph` or the TypeScript Compiler API;
+- Python: built-in `ast`;
+- Rust: `cargo metadata` or rust-analyzer;
+- Go: `go/parser`.
 
 ## Non-Goals For Now
 
@@ -100,6 +283,40 @@ type OwnershipClaim = {
   claim: string;
   evidence_refs: EvidenceRef[];
   confidence: "low" | "medium" | "high";
+};
+
+type EvidenceItem = {
+  kind: "observed" | "inferred" | "unverified";
+  claim: string;
+  source?: {
+    file_path?: string;
+    start_line?: number;
+    end_line?: number;
+    symbol?: string;
+  };
+  confidence: "low" | "medium" | "high";
+  verification_needed?: string;
+};
+
+type CodeEvidence = {
+  file_path: string;
+  language: "ts" | "tsx" | "js" | "jsx" | "py" | "rs" | "go" | "unknown";
+  symbols: Array<{
+    name: string;
+    kind: "function" | "class" | "type" | "constant" | "component" | "unknown";
+    exported: boolean;
+    responsibility_claim?: string;
+  }>;
+  imports: Array<{
+    source: string;
+    imported_names?: string[];
+  }>;
+  possible_callers?: Array<{
+    symbol: string;
+    callers: string[];
+    confidence: "low" | "medium" | "high";
+  }>;
+  risk_claims: EvidenceItem[];
 };
 
 type OwnershipGap = {
