@@ -27,7 +27,9 @@
     "guard:supply-chain": "node --experimental-strip-types src/scripts/guard-supply-chain.ts",
     "workspace:dev": "vite apps/sibar-research-workspace --host 127.0.0.1 --strictPort --port 5173",
     "workspace:build": "vite build apps/sibar-research-workspace",
-    "workspace:preview": "vite preview apps/sibar-research-workspace --host 127.0.0.1 --strictPort --port 4173"
+    "workspace:preview": "vite preview apps/sibar-research-workspace --host 127.0.0.1 --strictPort --port 4173",
+    "sibi:dev": "vite sibi --host 127.0.0.1 --strictPort --port 5174",
+    "sibi:build": "vite build sibi"
   },
   "devDependencies": {
     "@types/react": "^19.1.13",

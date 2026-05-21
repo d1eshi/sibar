@@ -127,6 +127,16 @@ release yet.
   now exposes canonical fields directly (`source_id`, `source_kind`, text refs),
   and `MissionPreview.first_sessions` now carries session objects.
 
+### Added - Sibi Ownership Review Wedge
+
+- Added `sibi/`, a Vite/React app for pasted AI-generated diffs, PR text, or
+  agent output that returns a deterministic `OwnershipReview` before merge.
+- Added local heuristics for touched files, additions/deletions, risky areas,
+  missing evidence, ownership questions, suggested tests, minimum read path, and
+  `blocked | limited | ready` merge posture.
+- Added root `sibi:dev` and `sibi:build` scripts plus unit coverage for the
+  deterministic review logic.
+
 ### Added - Workspace Rust Compiler Bridge
 
 - Added a new PedagogoAI bridge module for invoking the Rust
