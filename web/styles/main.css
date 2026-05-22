@@ -1205,54 +1205,14 @@ h1 {
 
 .poster-hero {
   display: grid;
-  grid-template-columns: 172px minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1fr);
   border-bottom: 2px solid var(--poster-rule);
-}
-
-.poster-rail {
-  display: grid;
-  grid-template-rows: 36px auto 36px 1fr auto;
-  gap: 18px;
-  align-content: start;
-  border-right: 2px solid var(--poster-rule);
-  padding: 62px 38px 34px 0;
-}
-
-.poster-rail p {
-  margin: 0;
-  color: #3e3a34;
-  font-family: var(--mono);
-  font-size: 14px;
-  font-weight: 800;
-  line-height: 1.42;
-}
-
-.rail-rule {
-  align-self: center;
-  width: 100%;
-  border-top: 2px solid var(--poster-rule-soft);
-}
-
-.rail-stamp {
-  width: 42px;
-  height: 42px;
-  display: grid;
-  place-items: center;
-  align-self: end;
-  border: 2px solid var(--poster-red);
-  border-radius: 50%;
-  color: var(--poster-red);
-  font-family: var(--mono);
-  font-size: 8px;
-  font-weight: 900;
-  line-height: 1;
-  text-align: center;
-  transform: rotate(-13deg);
+  position: relative;
 }
 
 .poster-main {
   min-width: 0;
-  padding: 22px 0 26px 50px;
+  padding: 22px 0 26px;
 }
 
 .poster-main h1 {
@@ -1365,6 +1325,56 @@ h1 {
   height: 16px;
   border-bottom: 4px solid var(--poster-red);
   transform: rotate(-3deg);
+}
+
+.ownership-note {
+  width: min(670px, 58vw);
+  display: grid;
+  grid-template-columns: 1fr 44px 1fr 44px 1fr;
+  gap: 12px;
+  align-items: center;
+  justify-self: end;
+  margin: -6px 38px 34px 0;
+  color: #5d5a52;
+}
+
+.note-node {
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+  border: 2px solid rgba(46, 45, 41, 0.48);
+  border-radius: 50%;
+  color: #5d5a52;
+  font-family: var(--mono);
+  font-size: clamp(13px, 1.1vw, 18px);
+  font-weight: 800;
+  line-height: 1.2;
+  text-align: center;
+  text-transform: uppercase;
+  box-shadow:
+    2px 0 0 rgba(46, 45, 41, 0.22),
+    -2px 1px 0 rgba(46, 45, 41, 0.12);
+  transform: rotate(-3deg);
+}
+
+.note-node:nth-of-type(2) {
+  transform: rotate(2deg);
+}
+
+.note-node.reduced {
+  border-color: rgba(92, 111, 60, 0.74);
+  color: #4f6534;
+  box-shadow:
+    2px 0 0 rgba(92, 111, 60, 0.28),
+    -2px 1px 0 rgba(92, 111, 60, 0.14);
+}
+
+.note-arrow {
+  color: #5d5a52;
+  font-family: var(--mono);
+  font-size: 38px;
+  line-height: 1;
+  text-align: center;
 }
 
 .poster-artifacts {
@@ -1585,20 +1595,6 @@ h1 {
     grid-template-columns: 1fr;
   }
 
-  .poster-rail {
-    grid-template-columns: 1fr 1fr;
-    grid-template-rows: auto;
-    gap: 14px;
-    border-right: 0;
-    border-bottom: 2px solid var(--poster-rule);
-    padding: 20px 0;
-  }
-
-  .rail-rule,
-  .rail-stamp {
-    display: none;
-  }
-
   .poster-main {
     padding: 24px 0 28px;
   }
@@ -1622,6 +1618,11 @@ h1 {
 
   .artifact-column header {
     min-height: auto;
+  }
+
+  .ownership-note {
+    width: min(100%, 620px);
+    margin: 0 auto 28px;
   }
 }
 
@@ -1649,14 +1650,6 @@ h1 {
 
   .poster-page {
     margin-top: 12px;
-  }
-
-  .poster-rail {
-    grid-template-columns: 1fr;
-  }
-
-  .poster-rail p {
-    font-size: 12px;
   }
 
   .poster-main h1 {
@@ -1692,6 +1685,19 @@ h1 {
   .code-artifact code {
     white-space: inherit;
     overflow-wrap: anywhere;
+  }
+
+  .ownership-note {
+    grid-template-columns: 1fr 26px 1fr 26px 1fr;
+    gap: 6px;
+  }
+
+  .note-node {
+    font-size: 10px;
+  }
+
+  .note-arrow {
+    font-size: 24px;
   }
 
   .hand-note {
