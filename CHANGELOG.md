@@ -25,6 +25,9 @@ release yet.
   sessions, bridge-backed active session evidence/artifacts, focused queue
   limits, secondary Source Map refs, session-scoped readiness, stable
   reproducibility hashes, and a separated frontier-lab UI fixture helper.
+- Added the frontier-lab blog Mission Brief as the primary Tauri React workspace
+  experience, with Home opening to a focused queue before the active Session and
+  the static web workspace leading with the same mission context.
 
 ### Changed - Pedagogy Core Facade
 

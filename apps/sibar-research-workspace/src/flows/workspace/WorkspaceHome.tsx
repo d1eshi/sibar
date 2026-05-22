@@ -20,16 +20,16 @@ export function WorkspaceHome({
   );
 
   return (
-    <section className={styles.workspaceHome} aria-label="Workspace home">
+    <section className={styles.workspaceHome} aria-label="Mission home">
       <header className={styles.homeHeader}>
         <div className={styles.headerCopy}>
-          <p className={styles.kicker}>Workspace home</p>
-          <h1>Continue your technical work</h1>
-          <p>Pick up where you left off or open a workspace to continue learning.</p>
+          <p className={styles.kicker}>Mission home</p>
+          <h1>Continue the frontier-lab mission</h1>
+          <p>Open the source-backed Mission Brief before entering an active Session.</p>
         </div>
         <button type="button" className={styles.newWorkspaceButton} onClick={onNewWorkspace}>
           <span aria-hidden="true">+</span>
-          New workspace
+          New mission
         </button>
       </header>
 
@@ -38,7 +38,7 @@ export function WorkspaceHome({
           <span className={styles.panelIcon} data-icon="clock" aria-hidden="true" />
           <div>
             <h2>Continue</h2>
-            <p>Resume the last selected node or a ready study path.</p>
+            <p>Open the Mission Brief and focused queue for the blog-derived path.</p>
           </div>
         </header>
         {pendingWorkspaces.length === 0 ? (
@@ -50,16 +50,19 @@ export function WorkspaceHome({
                 <div className={styles.cardTopline}>
                   <p className={styles.statusLabel}>
                     <span aria-hidden="true" />
-                    {workspace.status === "active" ? "Active session" : "Ready to resume"}
+                    {workspace.status === "active" ? "Active Mission" : "Ready to review"}
                   </p>
                   <button type="button" onClick={() => onOpenWorkspace(workspace)}>
-                    {workspace.status === "active" ? "Resume" : "Open"} session
+                    {workspace.status === "active" ? "Open" : "View"} Mission Brief
                     <span aria-hidden="true">-&gt;</span>
                   </button>
                 </div>
                 <div className={styles.cardIntro}>
                   <h3>{workspace.title}</h3>
                   <p>{workspace.objective}</p>
+                  {workspace.sourceOriginUrl ? (
+                    <a href={workspace.sourceOriginUrl}>{workspace.sourceOriginUrl}</a>
+                  ) : null}
                 </div>
                 <dl className={styles.continueDetails}>
                   <div>
@@ -75,8 +78,8 @@ export function WorkspaceHome({
                     <dd>{workspace.nextNode}</dd>
                   </div>
                   <div>
-                    <dt>Last activity</dt>
-                    <dd>{workspace.lastActivity}</dd>
+                    <dt>Why</dt>
+                    <dd>{workspace.whyMissionExists}</dd>
                   </div>
                 </dl>
                 <div className={styles.readinessLine}>
@@ -96,8 +99,8 @@ export function WorkspaceHome({
         <header className={styles.panelHeader}>
           <span className={styles.panelIcon} data-icon="folder" aria-hidden="true" />
           <div>
-            <h2>Workspaces</h2>
-            <p>Open a workspace to view your study path and sessions.</p>
+            <h2>Missions</h2>
+            <p>Mission, Track, Session, and Artifact are the primary surfaces.</p>
           </div>
         </header>
         <div className={styles.workspaceList}>
@@ -109,7 +112,7 @@ export function WorkspaceHome({
                 <p>{workspace.objective}</p>
                 <dl className={styles.workspaceDetails}>
                   <div>
-                    <dt>Source boundary</dt>
+                    <dt>Source origin</dt>
                     <dd>{workspace.sourceBoundary}</dd>
                   </div>
                   <div>
@@ -141,7 +144,7 @@ export function WorkspaceHome({
       <footer className={styles.homeFooter}>
         <p>
           <span className={styles.footerStatusIcon} aria-hidden="true" />
-          Local workspace data
+          Local mission data
           <span className={styles.footerDivider} aria-hidden="true" />
           Synced
         </p>

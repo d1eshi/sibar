@@ -3,13 +3,14 @@ import styles from "./App.module.css";
 import { OnboardingFlow } from "./flows/onboarding/OnboardingFlow";
 import { WorkspaceShell } from "./flows/workspace/WorkspaceShell";
 import { WorkspaceHome } from "./flows/workspace/WorkspaceHome";
-import { WorkspaceOverview } from "./flows/workspace/WorkspaceOverview";
+import { MissionOverview } from "./flows/workspace/MissionOverview";
 import { SessionWorkbench } from "./flows/workspace/SessionWorkbench";
 import { StudyPathRail } from "./flows/workspace/StudyPathRail";
 import stylesWorkspace from "./flows/workspace/workspace.module.css";
 import {
   createInitialWorkspaceStateFromFixture,
-  firstWorkspaceSessionFixture,
+  frontierLabMissionUiProjection,
+  frontierLabWorkspaceSessionFixture,
   workspaceHomeProjection,
   projectWorkspaceSession,
 } from "./state/workspaceProjection";
@@ -20,11 +21,11 @@ export default function App() {
   const [flowStep, setFlowStep] = React.useState<AppFlowStep>("home");
   const [workspaceState, dispatchWorkspace] = React.useReducer(
     workspaceSessionReducer,
-    createInitialWorkspaceStateFromFixture(firstWorkspaceSessionFixture),
+    createInitialWorkspaceStateFromFixture(frontierLabWorkspaceSessionFixture),
   );
   const workspaceProjection = projectWorkspaceSession(
     workspaceState,
-    firstWorkspaceSessionFixture,
+    frontierLabWorkspaceSessionFixture,
   );
 
   function openFlowStep(nextStep: AppFlowStep) {
@@ -44,7 +45,8 @@ export default function App() {
         ) : flowStep === "onboarding" ? (
           <OnboardingFlow onOpenWorkspace={() => openFlowStep("overview")} />
         ) : flowStep === "overview" ? (
-          <WorkspaceOverview
+          <MissionOverview
+            mission={frontierLabMissionUiProjection}
             projection={workspaceProjection}
             state={workspaceState}
             dispatch={dispatchWorkspace}
