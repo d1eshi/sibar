@@ -11,6 +11,14 @@ accepted specs and iterations, not by raw commit count.
 Use this section for changes that have landed but are not part of a tagged
 release yet.
 
+### Changed - Capture PR Entry
+
+- Added a provider selector for PR ingestion so the Capture PR screen can switch
+  between GitHub and GitLab examples, detect pasted provider URLs, and keep the
+  provider icon in sync with the entered URL.
+- Reworked the Capture PR form sizing with fluid layout variables and responsive
+  breakpoints instead of a single fixed-width control cap.
+
 ### Docs - Ownership Workbench Product Research
 
 - Added three research memos:

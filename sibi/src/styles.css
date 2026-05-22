@@ -1298,9 +1298,17 @@ button.secondary {
   --capture-accent-soft: #f1efff;
   --capture-accent-border: #d8d0ff;
   --capture-accent-shadow: rgba(76, 51, 143, 0.2);
+  --capture-panel-inline: clamp(36px, 5vw, 72px);
+  --capture-form-max: clamp(34rem, 42vw, 40rem);
+  --capture-form-width: min(100%, var(--capture-form-max));
+  --capture-form-align: flex-start;
+  --capture-panel-column-min: min(clamp(30rem, 48vw, 36rem), 100%);
+  --capture-preview-column-min: min(clamp(22rem, 32vw, 28rem), 100%);
+  --capture-panel-column: minmax(var(--capture-panel-column-min), 3fr);
+  --capture-preview-column: minmax(var(--capture-preview-column-min), 2fr);
   min-height: 100dvh;
   display: grid;
-  grid-template-columns: minmax(560px, 3fr) minmax(390px, 2fr);
+  grid-template-columns: var(--capture-panel-column) var(--capture-preview-column);
   background:
     radial-gradient(circle at 28% 18%, rgba(101, 81, 214, 0.07), transparent 34%),
     #fbfcfc;
@@ -1309,10 +1317,10 @@ button.secondary {
 
 .capturePanel {
   min-height: 100dvh;
-  padding: 30px clamp(36px, 5vw, 72px) 34px;
+  padding: 30px var(--capture-panel-inline) 34px;
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
+  align-items: var(--capture-form-align);
   border: 1px solid #d6dde3;
   border-radius: 0 12px 12px 0;
   background: rgba(255, 255, 255, 0.92);
@@ -1325,7 +1333,8 @@ button.secondary {
 .captureDivider,
 .pasteDiffDropzone,
 .capturePrimary {
-  width: min(100%, 632px);
+  width: var(--capture-form-width);
+  max-width: 100%;
 }
 
 .captureBrand {
@@ -1368,27 +1377,35 @@ button.secondary {
 .captureInputControl {
   min-height: 68px;
   display: grid;
-  grid-template-columns: 36px minmax(0, 1fr) 24px;
+  grid-template-columns:
+    clamp(32px, 7vw, 36px)
+    minmax(clamp(6.5rem, 18%, 8rem), max-content)
+    minmax(0, 1fr)
+    clamp(20px, 5vw, 24px);
   align-items: center;
-  gap: 12px;
-  padding: 0 16px;
+  gap: clamp(10px, 1.8vw, 12px);
+  padding: 0 clamp(12px, 2vw, 16px);
   border: 2px solid var(--capture-accent);
   border-radius: 10px;
   background: #ffffff;
   box-shadow: 0 10px 22px rgba(76, 51, 143, 0.1);
 }
 
-.githubGlyph,
+.providerGlyph,
 .prAvatar {
   display: block;
   border-radius: 999px;
-  background: #06090d;
   position: relative;
 }
 
-.githubGlyph {
+.providerGlyph {
   width: 34px;
   height: 34px;
+}
+
+.githubGlyph,
+.prAvatar {
+  background: #06090d;
 }
 
 .githubGlyph::before,
@@ -1416,6 +1433,54 @@ button.secondary {
   background:
     radial-gradient(circle at 13% 20%, #ffffff 0 32%, transparent 34%),
     radial-gradient(circle at 87% 20%, #ffffff 0 32%, transparent 34%);
+}
+
+.gitlabGlyph {
+  border-radius: 9px;
+  background:
+    linear-gradient(135deg, transparent 0 33%, #fc6d26 34% 66%, transparent 67%),
+    linear-gradient(45deg, #e24329 0 46%, transparent 47%),
+    linear-gradient(-45deg, #fca326 0 46%, transparent 47%);
+  background-color: #ffffff;
+  box-shadow: inset 0 0 0 2px #f0d4c4;
+}
+
+.gitlabGlyph::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 52%;
+  width: 46%;
+  height: 42%;
+  transform: translate(-50%, -50%) rotate(45deg);
+  border-radius: 3px;
+  background: #fc6d26;
+}
+
+.providerSelect {
+  min-width: 0;
+  height: 44px;
+  border: 1px solid #d9dfe6;
+  border-radius: 8px;
+  padding: 0 34px 0 12px;
+  color: #162331;
+  background:
+    linear-gradient(45deg, transparent 50%, #5f6872 50%),
+    linear-gradient(135deg, #5f6872 50%, transparent 50%),
+    #f8fafb;
+  background-position:
+    calc(100% - 16px) 50%,
+    calc(100% - 11px) 50%,
+    0 0;
+  background-size:
+    5px 5px,
+    5px 5px,
+    100% 100%;
+  background-repeat: no-repeat;
+  font-size: 13px;
+  font-weight: 760;
+  appearance: none;
+  cursor: pointer;
 }
 
 .captureInputControl input {
@@ -1941,6 +2006,9 @@ button.secondary {
   }
 
   .captureRoot {
+    --capture-panel-inline: clamp(24px, 6vw, 56px);
+    --capture-form-max: clamp(34rem, 70vw, 44rem);
+    --capture-form-align: center;
     grid-template-columns: 1fr;
   }
 
@@ -1952,7 +2020,6 @@ button.secondary {
 
   .capturePanel {
     padding-bottom: 32px;
-    align-items: stretch;
   }
 
   .routePreview {
@@ -1970,5 +2037,38 @@ button.secondary {
 
   .routeSlideDeck {
     min-height: 390px;
+  }
+}
+
+@media (max-width: 35rem) {
+  .captureRoot {
+    --capture-panel-inline: clamp(16px, 5vw, 24px);
+    --capture-form-width: 100%;
+  }
+
+  .captureInputControl {
+    grid-template-columns:
+      clamp(32px, 10vw, 34px)
+      minmax(0, 1fr)
+      clamp(20px, 8vw, 24px);
+    gap: clamp(8px, 2.5vw, 10px);
+    padding: clamp(10px, 3vw, 12px);
+  }
+
+  .providerSelect {
+    grid-column: 2 / 3;
+    grid-row: 1;
+  }
+
+  .captureInputControl input {
+    grid-column: 1 / 4;
+    grid-row: 2;
+    min-height: clamp(36px, 10vw, 40px);
+  }
+
+  .captureCheck {
+    grid-column: 3;
+    grid-row: 1;
+    justify-self: end;
   }
 }
