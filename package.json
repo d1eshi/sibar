@@ -23,23 +23,29 @@
     "web:dev": "bun --hot scripts/web-dev.mjs",
     "article:workspace": "node --experimental-strip-types src/article-workspace-server.ts",
     "article:vercel:check": "node --test --test-concurrency=1 --experimental-strip-types Tests/article-workspace-vercel.test.ts",
-    "test": "node --test --test-concurrency=1 --experimental-strip-types Tests/**/*.test.ts",
+    "test": "node --test --test-concurrency=1 --experimental-strip-types Tests/**/*.test.ts sibi/Tests/**/*.test.ts",
     "typecheck": "pnpm exec tsc -p tsconfig.json --noEmit",
     "guard:supply-chain": "node --experimental-strip-types src/scripts/guard-supply-chain.ts",
     "workspace:dev": "vite apps/sibar-research-workspace --host 127.0.0.1 --strictPort --port 5173",
     "workspace:build": "vite build apps/sibar-research-workspace",
     "workspace:preview": "vite preview apps/sibar-research-workspace --host 127.0.0.1 --strictPort --port 4173",
-    "sibi:dev": "vite sibi --host 127.0.0.1 --strictPort --port 5174",
-    "sibi:build": "vite build sibi"
+    "sibi:dev": "vite sibi --host 127.0.0.1 --strictPort --port 5174 --configLoader native",
+    "sibi:build": "vite build sibi --configLoader native",
+    "sibi:e2e": "playwright test sibi/Tests/sibi-ownership-workbench.e2e.spec.ts",
+    "sibi:e2e:ui": "playwright test sibi/Tests/sibi-ownership-workbench.e2e.spec.ts --ui",
+    "sibi:test": "node --test --test-concurrency=1 --experimental-strip-types sibi/Tests/**/*.test.ts"
   },
   "devDependencies": {
+    "@playwright/test": "^1.60.0",
+    "@types/node": "^22.15.3",
     "@types/react": "^19.1.13",
     "@types/react-dom": "^19.1.9",
-    "@types/node": "^22.15.3",
-    "vite": "^7.1.0",
-    "typescript": "^5.8.3"
+    "typescript": "^5.8.3",
+    "vite": "^7.1.0"
   },
   "dependencies": {
+    "@pierre/diffs": "^1.2.1",
+    "@pierre/trees": "1.0.0-beta.4",
     "react": "^19.1.0",
     "react-dom": "^19.1.0"
   },
