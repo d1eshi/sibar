@@ -18,6 +18,13 @@ release yet.
   operation taxonomy, builds stable source-slice excerpt evidence inventory
   entries, and emits the existing attempt/readiness loop inputs.
 
+### Changed - Pedagogy Core Facade
+
+- Expanded `src/pedagogy-core/index.ts` to expose the mission
+  attempt/evidence/readiness contracts and closed operation/artifact/evidence
+  taxonomies without re-exporting the adapter-heavy deep ownership runtime
+  entrypoint.
+
 ### Docs - Ownership Workbench Product Research
 
 - Added three research memos:
