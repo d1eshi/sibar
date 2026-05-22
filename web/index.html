@@ -26,9 +26,21 @@ if (location.protocol !== "file:" && location.hostname !== "localhost" && locati
   document.head.appendChild(analyticsScript);
 }
 </script>
-<link rel="stylesheet" href="styles/main.css?v=poster">
+<link rel="stylesheet" href="styles/main.css?v=poster-nav">
 </head>
 <body class="landing variant-poster">
+<header class="poster-navbar" aria-label="Sibi navigation">
+  <nav class="poster-nav-links" aria-label="Primary">
+    <a class="is-active" href="#top">Manifesto</a>
+    <a href="#artifacts">How it works</a>
+    <a href="#artifacts">Proof</a>
+    <a href="#artifacts">Principles</a>
+  </nav>
+  <div class="poster-nav-actions">
+    <a class="poster-login" href="#top">Login</a>
+    <a class="poster-try" href="#artifacts">Try Sibi</a>
+  </div>
+</header>
 <main class="poster-page" id="top">
   <section class="poster-hero" aria-labelledby="hero-title">
     <aside class="poster-rail" aria-label="Sibi manifesto notes">
