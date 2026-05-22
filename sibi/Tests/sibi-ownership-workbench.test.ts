@@ -2,13 +2,13 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { CodeView as VanillaCodeView, parsePatchFiles } from "@pierre/diffs";
-import { PierreCodeView } from "../sibi/src/ownershipWorkbench/components/PierreCodeView.ts";
-import type { BoundaryState } from "../sibi/src/ownershipWorkbench/types.ts";
+import { PierreCodeView } from "../src/ownershipWorkbench/components/PierreCodeView.ts";
+import type { BoundaryState } from "../src/ownershipWorkbench/types.ts";
 
-type OwnershipWorkbenchFixtures = typeof import("../sibi/src/ownershipWorkbench/fixtures.ts");
-type OwnershipWorkbenchHelpers = typeof import("../sibi/src/ownershipWorkbench/helpers.ts");
-type OwnershipReviewSession = typeof import("../sibi/src/ownershipWorkbench/ownershipReviewSession.ts");
-type OwnershipWorkbenchSurfaceMode = typeof import("../sibi/src/ownershipWorkbench/surfaceMode.ts");
+type OwnershipWorkbenchFixtures = typeof import("../src/ownershipWorkbench/fixtures.ts");
+type OwnershipWorkbenchHelpers = typeof import("../src/ownershipWorkbench/helpers.ts");
+type OwnershipReviewSession = typeof import("../src/ownershipWorkbench/ownershipReviewSession.ts");
+type OwnershipWorkbenchSurfaceMode = typeof import("../src/ownershipWorkbench/surfaceMode.ts");
 
 const EXPECTED_DIFF_FILES = ["src/api/session.ts", "src/api/session.test.ts"] as const;
 const DIRECTORY_PATHS = ["src", "src/api", "src/runtime"] as const;
@@ -31,7 +31,7 @@ async function loadFixturesModule(): Promise<OwnershipWorkbenchFixtures> {
   };
 
   try {
-    cachedFixtures = (await import("../sibi/src/ownershipWorkbench/fixtures.ts")) as OwnershipWorkbenchFixtures;
+    cachedFixtures = (await import("../src/ownershipWorkbench/fixtures.ts")) as OwnershipWorkbenchFixtures;
     fixtureImportConsoleErrors = capturedErrors;
     return cachedFixtures;
   } finally {
@@ -44,7 +44,7 @@ async function loadHelpersModule(): Promise<OwnershipWorkbenchHelpers> {
     return cachedHelpers;
   }
 
-  cachedHelpers = (await import("../sibi/src/ownershipWorkbench/helpers.ts")) as OwnershipWorkbenchHelpers;
+  cachedHelpers = (await import("../src/ownershipWorkbench/helpers.ts")) as OwnershipWorkbenchHelpers;
   return cachedHelpers;
 }
 
@@ -53,7 +53,7 @@ async function loadSurfaceModeModule(): Promise<OwnershipWorkbenchSurfaceMode> {
     return cachedSurfaceMode;
   }
 
-  cachedSurfaceMode = (await import("../sibi/src/ownershipWorkbench/surfaceMode.ts")) as OwnershipWorkbenchSurfaceMode;
+  cachedSurfaceMode = (await import("../src/ownershipWorkbench/surfaceMode.ts")) as OwnershipWorkbenchSurfaceMode;
   return cachedSurfaceMode;
 }
 
@@ -62,7 +62,7 @@ async function loadReviewSessionModule(): Promise<OwnershipReviewSession> {
     return cachedReviewSession;
   }
 
-  cachedReviewSession = (await import("../sibi/src/ownershipWorkbench/ownershipReviewSession.ts")) as OwnershipReviewSession;
+  cachedReviewSession = (await import("../src/ownershipWorkbench/ownershipReviewSession.ts")) as OwnershipReviewSession;
   return cachedReviewSession;
 }
 
@@ -361,7 +361,7 @@ test("evidenceForSelection returns evidence overlapping the selected range", asy
 
 test("ReviewGuidePanel defines a first-run review sequence without free chat language", () => {
   const guideSource = readFileSync(
-    new URL("../sibi/src/ownershipWorkbench/components/ReviewGuidePanel.tsx", import.meta.url),
+    new URL("../src/ownershipWorkbench/components/ReviewGuidePanel.tsx", import.meta.url),
     "utf8",
   );
 
@@ -394,7 +394,7 @@ test("ReviewGuidePanel defines a first-run review sequence without free chat lan
 
 test("ReviewGuidePanel gates detailed priority queue behind lab mode", () => {
   const guideSource = readFileSync(
-    new URL("../sibi/src/ownershipWorkbench/components/ReviewGuidePanel.tsx", import.meta.url),
+    new URL("../src/ownershipWorkbench/components/ReviewGuidePanel.tsx", import.meta.url),
     "utf8",
   );
 
@@ -427,7 +427,7 @@ test("ReviewGuidePanel gates detailed priority queue behind lab mode", () => {
 
 test("OwnershipHarnessPanel renders review guide before guided session and gates the local lab", () => {
   const harnessSource = readFileSync(
-    new URL("../sibi/src/ownershipWorkbench/components/OwnershipHarnessPanel.tsx", import.meta.url),
+    new URL("../src/ownershipWorkbench/components/OwnershipHarnessPanel.tsx", import.meta.url),
     "utf8",
   );
 
@@ -484,7 +484,7 @@ test("OwnershipHarnessPanel renders review guide before guided session and gates
 });
 
 test("workbench CSS gives the ownership harness a wide primary desktop column", () => {
-  const styles = readFileSync(new URL("../sibi/src/styles.css", import.meta.url), "utf8");
+  const styles = readFileSync(new URL("../src/styles.css", import.meta.url), "utf8");
 
   assert.match(
     styles,
@@ -519,7 +519,7 @@ test("workbench surface mode is derived from local query params", async () => {
 });
 
 test("App passes a query-derived surface mode into the ownership harness", () => {
-  const appSource = readFileSync(new URL("../sibi/src/App.tsx", import.meta.url), "utf8");
+  const appSource = readFileSync(new URL("../src/App.tsx", import.meta.url), "utf8");
 
   assert.match(
     appSource,
@@ -573,7 +573,7 @@ test("ownership workbench CodeView adapter uses the React entrypoint", () => {
 
 test("CodeDiffPanel renders the CodeView adapter instead of vanilla CodeView", () => {
   const source = readFileSync(
-    new URL("../sibi/src/ownershipWorkbench/components/CodeDiffPanel.tsx", import.meta.url),
+    new URL("../src/ownershipWorkbench/components/CodeDiffPanel.tsx", import.meta.url),
     "utf8",
   );
 
@@ -601,11 +601,11 @@ test("CodeDiffPanel renders the CodeView adapter instead of vanilla CodeView", (
 
 test("OwnershipHarnessPanel wires a local derivation lab contract", () => {
   const harnessSource = readFileSync(
-    new URL("../sibi/src/ownershipWorkbench/components/OwnershipHarnessPanel.tsx", import.meta.url),
+    new URL("../src/ownershipWorkbench/components/OwnershipHarnessPanel.tsx", import.meta.url),
     "utf8",
   );
   const labSource = readFileSync(
-    new URL("../sibi/src/ownershipWorkbench/components/OwnershipLabPanel.tsx", import.meta.url),
+    new URL("../src/ownershipWorkbench/components/OwnershipLabPanel.tsx", import.meta.url),
     "utf8",
   );
 
