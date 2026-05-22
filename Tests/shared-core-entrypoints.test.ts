@@ -25,6 +25,15 @@ function expectNoSurfaceImports(modulePath: CoreModulePath): void {
   assert.doesNotMatch(source, /from\s+["'][^"']*runtime-workspace-(?:context|session)/);
 }
 
+function expectNoSourceMissionPlanningAdapters(modulePath: CoreModulePath): void {
+  const absolutePath = join(REPO_ROOT, modulePath.replace(/^\.\.\//, ""));
+  const source = readFileSync(absolutePath, "utf8");
+
+  assert.doesNotMatch(source, /from\s+["'][^"']*runtime-source-mission-/);
+  assert.doesNotMatch(source, /from\s+["'][^"']*article-workspace/);
+  assert.doesNotMatch(source, /from\s+["'][^"']*pedagogoai\/workspace-intent/);
+}
+
 test("shared core entrypoints exist and are deterministic boundary facades", () => {
   assert.equal(ownershipCore.OWNERSHIP_CORE_BOUNDARY_VERSION, "0.1.0-slice-2");
   assert.equal(ownershipCore.OWNERSHIP_REVIEW_EXTRACTION_STATE.status, "available");
@@ -36,6 +45,8 @@ test("shared core entrypoints exist and are deterministic boundary facades", () 
   assert.equal(typeof pedagogyCore.createAttempt, "function");
   assert.equal(typeof pedagogyCore.attemptToReadiness, "function");
   assert.equal(typeof pedagogyCore.classifyGapTaxonomy, "function");
+  assert.equal(Object.hasOwn(pedagogyCore, "SOURCE_MISSION_TRACE_SCHEMA_VERSION"), false);
+  assert.equal(Object.hasOwn(pedagogyCore, "buildSourceMissionTraceRecord"), false);
   assert.ok(pedagogyCore.RECOGNIZED_OPERATION_KINDS.includes("explain"));
   assert.ok(pedagogyCore.RECOGNIZED_OPERATION_KINDS.includes("trace"));
   assert.ok(pedagogyCore.RECOGNIZED_ARTIFACT_KINDS.includes("paper_excerpt"));
@@ -59,6 +70,7 @@ test("shared core entrypoints exist and are deterministic boundary facades", () 
   expectNoSurfaceImports("../src/ownership-core/index.ts");
   expectNoSurfaceImports("../src/pedagogy-core/index.ts");
   expectNoSurfaceImports("../src/memory-core/index.ts");
+  expectNoSourceMissionPlanningAdapters("../src/pedagogy-core/index.ts");
 });
 
 test("memory core starts empty and append helpers are non-mutating", () => {
