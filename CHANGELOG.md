@@ -33,6 +33,17 @@ release yet.
 - Simplified the default review guide to a compact current-step flow, while
   keeping the full priority queue and trace detail available in lab mode.
 
+### Added - Slice 1 Inventory Runtime
+
+- Moved the Slice 1 contract/runtime base for deterministic `repoInventory(sourceRoot)`
+  to `src/repo-inventory` at the workspace root, with skip rules for
+  `.git`, `node_modules`, build artifacts, and cache directories.
+- Added file metadata for each scanned file (`path`, `extension`, `sizeBytes`,
+  `lineCount`, `role`, `excerpt`) plus deterministic tree rollup fields in the
+  shared contract.
+- Kept the bounded `/__sibi/repo-inventory` endpoint in Sibi so browser code can
+  consume the shared contract from the app-root boundary.
+
 ### Docs - Sibi Ownership Workbench Review Guide
 
 - Marked Slice 0 as PR-ready in the implementation spec, updated Sibi

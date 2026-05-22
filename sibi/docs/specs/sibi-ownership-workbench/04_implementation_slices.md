@@ -71,7 +71,8 @@ the filesystem directly.
 
 Deliverables:
 
-- local server endpoint or script for `repo_inventory`;
+- shared runtime contract under `../src/repo-inventory`, currently consumed by the Sibi
+  local `/__sibi/repo-inventory` endpoint.
 - skip rules for `.git`, `node_modules`, build outputs, caches;
 - file metadata: path, extension, size, lines, role, excerpt;
 - tree projection with rollup counts.

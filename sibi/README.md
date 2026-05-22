@@ -16,10 +16,15 @@ The review logic is now consumed from `src/ownership-core/diff-review.ts` and
 re-exported by `sibi/src/ownershipReview.ts`, so Sibi and `ownership-core` keep
 contract behavior in sync.
 
-This app still does not request OS permissions, inspect user folders, call a
-model, or open repository files. It is Tauri-ready only in the sense that the
-web surface can be packaged later. It also remains independent of `WorkspaceIntent`
-and all PedagogoAI workspace adapters for this slice.
+This app still does not request OS permissions or call a model. Slice 1 adds a
+local, bounded `repo_inventory` path from the shared `../src/repo-inventory`
+contract, with the concrete Sibi path still bounded to the app root
+(`sourceRoot=src` by default), exposed through a Vite endpoint so browser code
+can request metadata and build deterministic inventory status signals.
+
+It is Tauri-ready in that the web surface can be packaged later. It also
+remains independent of `WorkspaceIntent` and all PedagogoAI workspace adapters for
+this slice.
 
 ## Commands
 
