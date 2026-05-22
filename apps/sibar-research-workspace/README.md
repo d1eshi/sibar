@@ -74,18 +74,6 @@ The runtime guard lives in `src/config/publicRuntimeConfig.ts`. Its effective
 storage mode remains `localStorage` until a future implementation adds an
 explicit remote client.
 
-## Legacy Vanilla Workspace
-
-The pre-React vanilla workspace scripts are retained only as a compatibility
-facade for existing legacy tests and architecture references:
-
-```text
-legacy/vanilla-workspace/scripts/
-```
-
-They are not the active Vite runtime entry. The current app enters through
-`src/main.tsx` from `index.html`.
-
 ## Optional Supabase Notes Schema
 
 Static public mode does not need Supabase. For a future authenticated sync path,

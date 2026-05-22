@@ -784,13 +784,12 @@ release yet.
 
 ### Internal - Deep Ownership Workspace Modularization
 
-- Refactored the monolithic `research-workspace.js` into focused modules
-  (`workspace-data`, `workspace-utils`, `workspace-study-plans`,
-  `workspace-contract`, `workspace-session`, `workspace-render`, and
-  `workspace-app`) while keeping the facade API and behavior stable.
-- Moved the retained vanilla workspace facade scripts under
-  `apps/sibar-research-workspace/legacy/vanilla-workspace/scripts/` so they no
-  longer read as the primary React/Vite runtime surface.
+- Earlier modularized the DOM workspace runtime into focused data, utility,
+  contract, session, render, and app modules while keeping the facade API and
+  behavior stable.
+- Removed the retained DOM workspace facade after the React/Vite app became the
+  only Sibar workspace runtime surface, and updated tests/spec references to
+  reject non-React script loading.
 
 ### Docs - Deep Ownership Workspace Rust Execution Specs
 

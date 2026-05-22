@@ -51,5 +51,8 @@ test("PedagogoAI facade reexports existing runtime pieces through stable subdoma
   const workspaceIntent = boundariesForCapability("workspace-intent");
   assert.equal(workspaceIntent.length, 1);
   assert.equal(workspaceIntent[0].entrypoint, "src/pedagogoai/workspace-intent.ts");
-  assert.ok(workspaceIntent[0].adapters.includes("apps/sibar-research-workspace/legacy/vanilla-workspace/scripts/workspace-intent-adapter.js"));
+  assert.ok(workspaceIntent[0].adapters.includes("src/pedagogoai/workspace-compiler-runner.ts"));
+  assert.equal(workspaceIntent[0].adapters.some((adapter) => adapter.includes("legacy")), false);
+  assert.equal(workspaceIntent[0].adapters.some((adapter) => adapter.includes("vanilla")), false);
+  assert.equal(workspaceIntent[0].adapters.some((adapter) => adapter.includes("workspace-intent-adapter")), false);
 });
