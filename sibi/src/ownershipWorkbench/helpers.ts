@@ -289,7 +289,12 @@ export function evaluateAttempt(attempt: string, boundary: OwnershipBoundary): {
   const normalized = attempt.toLowerCase();
   const hasNullBranch = normalized.includes("204") || normalized.includes("null");
   const hasCaller = normalized.includes("call") || normalized.includes("consumer");
-  const hasFailure = normalized.includes("throws") || normalized.includes("failure") || normalized.includes("unauthenticated");
+  const hasFailure =
+    normalized.includes("throws") ||
+    normalized.includes("failure") ||
+    normalized.includes("unauthenticated") ||
+    normalized.includes("privileged") ||
+    normalized.includes("auth branch");
 
   if (hasNullBranch && hasCaller && hasFailure) {
     return {

@@ -44,6 +44,26 @@ release yet.
 - Added a step-by-step ownership session where Sibi asks the current
   file/check question, advances on empty, unknown, or inconclusive attempts, and
   records bounded observations for missing evidence.
+
+### Added - Slice 5 Attempt Readiness
+
+- Added deterministic readiness gating after guided session completion through a
+  new attempt assessment flow that captures `attempt_id`, `self_confidence`,
+  `evidence_fit`, `calibration_score`, and `readiness_gate` for each attempt.
+- Added non-UI state contract (`OwnershipAttemptReadiness`) and gap diagnostics
+  (`attemptEvidenceRefs`, `gapDiagnoses`, `smallestRepair`) in
+  `src/ownershipWorkbench/types.ts` and wired those into `App` + readiness output.
+- Added `evaluateOwnershipAttemptReadiness` in `src/ownershipWorkbench/attemptReadiness.ts` as a
+  small deterministic pure module with attempt evidence matching, timing capture,
+  anti-overconfidence block behavior, and repair guidance tied to evidence anchors.
+- Added user-facing readiness gate UI in `OwnershipHarnessPanel` so users can submit
+  a final boundary attempt, set bounded self-confidence, retry after repair, and
+  inspect evidence and gap diagnostics before moving to ready/owned.
+- Extended readiness coverage with fixture-backed unit assertions for anti-overconfidence,
+  evidence fit/calibration, timing, and readiness-state downgrade behavior, plus Playwright
+  scenarios for initial attempt, failed attempt, repair guidance, and re-attempt.
+- Added Slice 5 acceptance-oriented integration in app/tests for deterministic
+  attempt progression while keeping existing guided flow and non-chat behavior.
 - Added relation-focused questions for supporting tests and inferred callers so
   `session.test.ts` and `consumer.ts` ask the user to connect files instead of
   summarizing them in isolation.

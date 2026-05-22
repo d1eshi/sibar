@@ -10,6 +10,7 @@ type OwnershipWorkbenchHelpers = typeof import("../src/ownershipWorkbench/helper
 type OwnershipReviewSession = typeof import("../src/ownershipWorkbench/ownershipReviewSession.ts");
 type OwnershipWorkbenchSurfaceMode = typeof import("../src/ownershipWorkbench/surfaceMode.ts");
 type OwnershipEvidenceExtraction = typeof import("../src/ownershipWorkbench/evidenceExtraction.ts");
+type OwnershipAttemptReadiness = typeof import("../src/ownershipWorkbench/attemptReadiness.ts");
 type OwnershipBoundaryBuilder = typeof import("../src/ownershipWorkbench/boundaryBuilder.ts");
 type OwnershipTreeReasonFormatting = typeof import("../src/ownershipWorkbench/fileTreeReasonFormatting.ts");
 
@@ -21,6 +22,7 @@ let cachedHelpers: OwnershipWorkbenchHelpers | null = null;
 let cachedReviewSession: OwnershipReviewSession | null = null;
 let cachedSurfaceMode: OwnershipWorkbenchSurfaceMode | null = null;
 let cachedEvidenceExtraction: OwnershipEvidenceExtraction | null = null;
+let cachedAttemptReadiness: OwnershipAttemptReadiness | null = null;
 let cachedBoundaryBuilder: OwnershipBoundaryBuilder | null = null;
 let cachedFileTreeReasonFormatting: OwnershipTreeReasonFormatting | null = null;
 let fixtureImportConsoleErrors: unknown[] = [];
@@ -79,6 +81,15 @@ async function loadEvidenceExtractionModule(): Promise<OwnershipEvidenceExtracti
 
   cachedEvidenceExtraction = (await import("../src/ownershipWorkbench/evidenceExtraction.ts")) as OwnershipEvidenceExtraction;
   return cachedEvidenceExtraction;
+}
+
+async function loadAttemptReadinessModule(): Promise<OwnershipAttemptReadiness> {
+  if (cachedAttemptReadiness != null) {
+    return cachedAttemptReadiness;
+  }
+
+  cachedAttemptReadiness = (await import("../src/ownershipWorkbench/attemptReadiness.ts")) as OwnershipAttemptReadiness;
+  return cachedAttemptReadiness;
 }
 
 async function loadBoundaryBuilderModule(): Promise<OwnershipBoundaryBuilder> {
@@ -306,6 +317,91 @@ test("ownership review session records relation gaps and opens hint ladder after
   assert.equal(second.state.currentIndex, 2);
   assert.equal(second.state.showHintLadder, true);
   assert.equal(second.state.observations[1]?.reason, "could not connect caller/test");
+});
+
+test("attempt readiness gate captures evidence fit, timing, and anti-overconfidence", async () => {
+  const fixtures = await loadFixturesModule();
+  const attemptReadiness = await loadAttemptReadinessModule();
+  const boundary = {
+    ...fixtures.ownershipBoundary,
+    evidence: fixtures.fixtureEvidence.filter((entry) => entry.id === "E-001" || entry.id === "E-002"),
+  };
+  const attemptText =
+    "Null returns and the call must block privileged work when missing.";
+
+  const antiOverConfidentAttempt = attemptReadiness.evaluateOwnershipAttemptReadiness({
+    attemptText,
+    boundary,
+    selfConfidence: 95,
+    attemptIndex: 1,
+    startedAt: 10_000,
+    submittedAt: 10_700,
+  });
+
+  assert.equal(antiOverConfidentAttempt.state, "partial");
+  assert.equal(antiOverConfidentAttempt.readiness_gate, "repair-needed");
+  assert.equal(antiOverConfidentAttempt.evidence_fit, 0.5);
+  assert.equal(antiOverConfidentAttempt.calibration_score, 0.55);
+  assert.equal(antiOverConfidentAttempt.gapDiagnoses.length > 0, true);
+  assert.equal(antiOverConfidentAttempt.gapDiagnoses[0]?.evidenceRefs.length > 0, true);
+  assert.equal(antiOverConfidentAttempt.elapsedMs, 700);
+  assert.equal(typeof antiOverConfidentAttempt.attempt_id, "string");
+
+  const calibratedAttempt = attemptReadiness.evaluateOwnershipAttemptReadiness({
+    attemptText:
+      "The createSession branch can return null; callers must guard with `if (!session)` before any privileged request and unauthenticated flows stop here.",
+    boundary,
+    selfConfidence: 62,
+    attemptIndex: 2,
+    startedAt: 20_000,
+    submittedAt: 20_450,
+  });
+
+  assert.equal(calibratedAttempt.state, "owned");
+  assert.equal(calibratedAttempt.readiness_gate, "ready");
+  assert.equal(calibratedAttempt.attempt_id.startsWith(`attempt-${fixtures.ownershipBoundary.id}-02-`), true);
+});
+
+test("attempt readiness forces partial state when readiness gate fails but attempt is owned", async () => {
+  const fixtures = await loadFixturesModule();
+  const attemptReadiness = await loadAttemptReadinessModule();
+  const boundary = {
+    ...fixtures.ownershipBoundary,
+    evidence: fixtures.fixtureEvidence.filter((entry) => entry.id === "E-001" || entry.id === "E-002"),
+  };
+  const ownershipWithoutReadiness = attemptReadiness.evaluateOwnershipAttemptReadiness({
+    attemptText: "Null returns and the call must block privileged work when missing.",
+    boundary,
+    selfConfidence: 5,
+    attemptIndex: 3,
+    startedAt: 33_000,
+    submittedAt: 33_450,
+  });
+
+  assert.equal(ownershipWithoutReadiness.state, "partial");
+  assert.equal(ownershipWithoutReadiness.readiness_gate, "repair-needed");
+  assert.equal(ownershipWithoutReadiness.gapReason, "Attempt met ownership heuristics but readiness confidence/evidence thresholds are not met.");
+  assert.equal(ownershipWithoutReadiness.gapDiagnoses.length > 0, true);
+  assert.equal(ownershipWithoutReadiness.smallestRepair.includes("Lower confidence"), true);
+});
+
+test("attempt readiness blocks owned state when confidence evidence gap is too high", async () => {
+  const fixtures = await loadFixturesModule();
+  const attemptReadiness = await loadAttemptReadinessModule();
+
+  const weakEvidenceAttempt = attemptReadiness.evaluateOwnershipAttemptReadiness({
+    attemptText: "I don't know.",
+    boundary: fixtures.ownershipBoundary,
+    selfConfidence: 70,
+    attemptIndex: 1,
+    startedAt: 1000,
+    submittedAt: 1100,
+  });
+
+  assert.equal(weakEvidenceAttempt.state, "gap");
+  assert.equal(weakEvidenceAttempt.readiness_gate !== "ready", true);
+  assert.equal(weakEvidenceAttempt.evidence_fit < 0.45, true);
+  assert.equal(weakEvidenceAttempt.gapDiagnoses.length > 0, true);
 });
 
 test("ownership review session completes on a valid final answer", async () => {

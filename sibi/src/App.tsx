@@ -7,6 +7,7 @@ import { OwnershipHarnessPanel } from "./ownershipWorkbench/components/Ownership
 import type { RepoInventoryStatus } from "./ownershipWorkbench/repoInventoryTypes.ts";
 import { loadRepoInventoryStatus } from "./ownershipWorkbench/repoInventoryClient.ts";
 import type {
+  OwnershipAttemptReadiness,
   BoundaryState,
   LineSelection,
   OwnershipSessionState,
@@ -27,6 +28,7 @@ import {
 import {
   getActiveBoundaryState,
   getLineSelectionText,
+  withBoundaryFileState,
   groupedEvidence,
   getRelationNavigationTargets,
 } from "./ownershipWorkbench/helpers";
@@ -40,6 +42,7 @@ import { buildBoundaryCandidates, projectBoundaryFileStates, selectHighestRiskBo
 import { getWorkbenchSurfaceMode } from "./ownershipWorkbench/surfaceMode";
 import type { ViewMode } from "./ownershipWorkbench/types";
 import { loadFileContentStatus, type FileContentStatus } from "./ownershipWorkbench/fileContentClient.ts";
+import { evaluateOwnershipAttemptReadiness } from "./ownershipWorkbench/attemptReadiness";
 
 export default function App() {
   const workbenchSurfaceMode = getWorkbenchSurfaceMode(
@@ -50,6 +53,9 @@ export default function App() {
   const [selection, setSelection] = React.useState<LineSelection | null>(null);
   const [fileStates, setFileStates] = React.useState<Record<string, BoundaryState>>(initialFileStates);
   const [attemptText, setAttemptText] = React.useState("");
+  const [selfConfidence, setSelfConfidence] = React.useState(70);
+  const [readinessHistory, setReadinessHistory] = React.useState<OwnershipAttemptReadiness[]>([]);
+  const [readinessStartedAt, setReadinessStartedAt] = React.useState<number>(() => Date.now());
   const [sessionState, setSessionState] = React.useState<OwnershipSessionState>(
     createOwnershipSessionState,
   );
@@ -114,6 +120,10 @@ export default function App() {
       }),
     [selectedFile],
   );
+  const latestReadiness = React.useMemo(
+    () => readinessHistory[readinessHistory.length - 1] ?? null,
+    [readinessHistory],
+  );
 
   React.useEffect(() => {
     setSelection(null);
@@ -159,16 +169,52 @@ export default function App() {
     };
   }, []);
 
-  function submitAttempt() {
+  function submitGuidedAttempt() {
     advanceSession("submit");
   }
 
   function markUnknown() {
+    if (sessionState.isComplete) return;
     advanceSession("mark_unknown");
+  }
+
+  function submitReadinessAttempt() {
+    submitOwnershipAttempt();
+  }
+
+  function submitOwnershipAttempt() {
+    const normalizedAttempt = attemptText.trim();
+    if (!sessionState.isComplete || normalizedAttempt.length < 2) {
+      return;
+    }
+
+    const attempt = evaluateOwnershipAttemptReadiness({
+      attemptText: normalizedAttempt,
+      boundary: selectedBoundary,
+      selfConfidence,
+      attemptIndex: readinessHistory.length + 1,
+      startedAt: readinessStartedAt,
+      now: () => Date.now(),
+    });
+
+    setReadinessHistory((prev) => [...prev, attempt]);
+    const nextBoundaryState = attempt.readiness_gate === "ready" ? "owned" : attempt.state === "owned" ? "partial" : attempt.state;
+    setFileStates((prev) => withBoundaryFileState(prev, selectedBoundary, nextBoundaryState));
+    setAttemptText("");
+    setReadinessStartedAt(Date.now());
+  }
+
+  function retryOwnershipAttempt() {
+    setAttemptText("");
+    setSelfConfidence(60);
+    setReadinessStartedAt(Date.now());
   }
 
   function advanceSession(action: "submit" | "mark_unknown") {
     const result = advanceOwnershipSession(sessionState, sessionQuestions, attemptText, action);
+    if (!sessionState.isComplete && result.state.isComplete) {
+      setReadinessStartedAt(Date.now());
+    }
     setSessionState(result.state);
     setAttemptText("");
 
@@ -215,11 +261,16 @@ export default function App() {
         surfaceMode={workbenchSurfaceMode}
         labContext={labContext}
         attemptText={attemptText}
+        selfConfidence={selfConfidence}
+        onSelfConfidenceChange={setSelfConfidence}
+        latestReadiness={latestReadiness}
         onAttemptChange={setAttemptText}
-        onSubmitAttempt={submitAttempt}
+        onSubmitGuidedAttempt={submitGuidedAttempt}
+        onSubmitReadinessAttempt={submitReadinessAttempt}
         onMarkUnknown={() => {
           markUnknown();
         }}
+        onRetryAttempt={retryOwnershipAttempt}
       />
 
       <EvidenceDrawerPanel evidenceGroups={evidenceGroups} />

@@ -2,6 +2,7 @@ import type {
   BoundaryState,
   EvidenceRef,
   LineSelection,
+  OwnershipAttemptReadiness,
   OwnershipBoundary,
   OwnershipSessionQuestion,
   OwnershipSessionState,
@@ -33,9 +34,14 @@ interface OwnershipHarnessPanelProps {
   surfaceMode: WorkbenchSurfaceMode;
   labContext: OwnershipLabContext | null;
   attemptText: string;
+  selfConfidence: number;
   onAttemptChange: (next: string) => void;
-  onSubmitAttempt: () => void;
+  onSelfConfidenceChange: (nextConfidence: number) => void;
+  latestReadiness: OwnershipAttemptReadiness | null;
+  onSubmitGuidedAttempt: () => void;
+  onSubmitReadinessAttempt: () => void;
   onMarkUnknown: () => void;
+  onRetryAttempt: () => void;
 }
 
 export function OwnershipHarnessPanel({
@@ -48,12 +54,24 @@ export function OwnershipHarnessPanel({
   surfaceMode,
   labContext,
   attemptText,
+  selfConfidence,
   onAttemptChange,
-  onSubmitAttempt,
+  onSelfConfidenceChange,
+  latestReadiness,
+  onSubmitGuidedAttempt,
+  onSubmitReadinessAttempt,
   onMarkUnknown,
+  onRetryAttempt,
 }: OwnershipHarnessPanelProps): React.ReactElement {
   const isLabView = surfaceMode === "lab" && labContext != null;
   const currentQuestion = sessionState.isComplete ? null : sessionQuestions[sessionState.currentIndex] ?? null;
+  const readinessReady = latestReadiness?.readiness_gate === "ready";
+  const latestElapsedMs = latestReadiness == null ? null : Math.max(1, latestReadiness.elapsedMs);
+
+  const readinessStatusText = latestReadiness == null ? "Not yet attempted." : latestReadiness.readiness_gate;
+  const evidenceFitText = latestReadiness == null ? "—" : `${Math.round(latestReadiness.evidence_fit * 100)}%`;
+  const calibrationText =
+    latestReadiness == null ? "—" : `${Math.round(latestReadiness.calibration_score * 100)}%`;
 
   return (
     <aside className="panel ownershipPanel">
@@ -124,7 +142,7 @@ export function OwnershipHarnessPanel({
               </label>
 
               <div className="primaryActions">
-                <button type="button" onClick={onSubmitAttempt}>
+                <button type="button" onClick={onSubmitGuidedAttempt}>
                   Submit attempt
                 </button>
                 <button type="button" onClick={onMarkUnknown} className="secondary">
@@ -132,6 +150,91 @@ export function OwnershipHarnessPanel({
                 </button>
               </div>
             </>
+          )}
+
+          {!currentQuestion && (
+            <section className="readinessSection" aria-label="Boundary readiness gate">
+              <h3>Boundary readiness assessment</h3>
+              <p>Submit a final bounded attempt with a confidence score to evaluate readiness.</p>
+              <label className="attemptField">
+                <span>Final boundary attempt</span>
+                <textarea
+                  value={attemptText}
+                  onChange={(event) => onAttemptChange(event.target.value)}
+                  placeholder="Describe the exact contract, caller safety behavior, and failure mode."
+                  rows={6}
+                />
+              </label>
+
+              <label className="confidenceField">
+                <span>Self-confidence ({selfConfidence})</span>
+                <input
+                  type="range"
+                  min={0}
+                  max={100}
+                  step={5}
+                  value={selfConfidence}
+                  onChange={(event) => onSelfConfidenceChange(Number.parseInt(event.target.value, 10))}
+                  aria-label="Self confidence"
+                />
+              </label>
+
+              <div className="attemptActions">
+                <button
+                  type="button"
+                  onClick={onSubmitReadinessAttempt}
+                  disabled={attemptText.trim().length === 0}
+                >
+                  Submit attempt
+                </button>
+                <button
+                  type="button"
+                  onClick={onRetryAttempt}
+                  className="secondary"
+                  disabled={latestReadiness == null || readinessReady}
+                >
+                  Retry after repair
+                </button>
+              </div>
+
+              <section className="attemptReadinessSummary" aria-label="Readiness gate output">
+                <h4>Readiness gate: {readinessStatusText}</h4>
+                <div className="readinessMetrics">
+                  <span>Attempt ID: {latestReadiness?.attempt_id ?? "not submitted"}</span>
+                  <span>Evidence fit: {evidenceFitText}</span>
+                  <span>Calibration: {calibrationText}</span>
+                  <span>Elapsed: {latestElapsedMs == null ? "n/a" : `${latestElapsedMs}ms`}</span>
+                </div>
+                {latestReadiness != null && (
+                  <dl className="readinessDetails">
+                    <div>
+                      <dt>State</dt>
+                      <dd>{latestReadiness.state}</dd>
+                    </div>
+                    <div>
+                      <dt>Evidence refs</dt>
+                      <dd>{latestReadiness.attemptEvidenceRefs.map((entry) => entry.id).join(", ") || "none"}</dd>
+                    </div>
+                    <div>
+                      <dt>Smallest repair</dt>
+                      <dd>{latestReadiness.smallestRepair}</dd>
+                    </div>
+                    <div>
+                      <dt>Return condition</dt>
+                      <dd>{latestReadiness.returnCondition}</dd>
+                    </div>
+                  </dl>
+                )}
+                {latestReadiness?.gapDiagnoses?.map((gap) => (
+                  <section className="gapCard" key={`${latestReadiness.attempt_id}-${gap.reason}`}>
+                    <p>{gap.reason}</p>
+                    <p className="gapEvidence">
+                      Evidence anchors: {gap.evidenceRefs.map((entry) => entry.id).join(", ")}
+                    </p>
+                  </section>
+                ))}
+              </section>
+            </section>
           )}
 
           {sessionState.lastFeedback && (
