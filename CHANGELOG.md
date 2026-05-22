@@ -27,6 +27,8 @@ release yet.
   code change -> ownership proof -> debt reduced.
 - Replaced the artifact-card row with a wide Sibi product mockup section for
   the future demo: pasted diff, ownership attempt, and debt-reduction outcome.
+- Added a simple poster-style footer CTA with `Try Sibi free`, `See how it
+  works`, and four ownership principles.
 - Added three Sibi landing prototypes (`html`, `html2`, `html3`) exploring a
   direct diff interaction, an editorial cognitive-debt ledger, and a dark
   ownership ceremony flow.
