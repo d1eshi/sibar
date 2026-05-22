@@ -4,8 +4,8 @@
   display: grid;
   grid-template-columns: clamp(220px, 19vw, 292px) minmax(0, 1fr) clamp(260px, 24vw, 360px);
   overflow: hidden;
-  color: #f4efe4;
-  background: #14130f;
+  color: var(--text-primary);
+  background: var(--surface-page);
 }
 
 .workspaceFrame[data-has-support-slot="false"] {
@@ -25,20 +25,20 @@
   display: grid;
   grid-template-rows: auto 1fr;
   overflow: auto;
-  border-right: 1px solid rgba(244, 239, 228, 0.1);
-  background: #1b1a15;
+  border-right: 1px solid var(--divider);
+  background: var(--surface-panel-warm);
 }
 
 .railHeader {
   padding: 24px 20px 18px;
-  border-bottom: 1px solid rgba(244, 239, 228, 0.1);
+  border-bottom: 1px solid var(--divider);
 }
 
 .railTitle {
   display: flex;
   align-items: center;
   gap: 10px;
-  color: #f4efe4;
+  color: var(--text-primary);
   font-size: 16px;
 }
 
@@ -56,7 +56,7 @@
   top: 4px;
   width: 6px;
   height: 16px;
-  border: 2px solid #d7c681;
+  border: 2px solid var(--olive);
   border-radius: 5px;
 }
 
@@ -70,7 +70,7 @@
 
 .railHeader h2 {
   margin: 28px 0 0;
-  color: #f4efe4;
+  color: var(--text-primary);
   font-size: 18px;
   line-height: 1.2;
 }
@@ -104,14 +104,14 @@
 }
 
 .activeSessionCard h3 {
-  color: #f4efe4;
+  color: var(--text-primary);
   font-size: 17px;
   line-height: 1.25;
 }
 
 .activeSessionCard p:last-child,
 .activeSessionNotes p {
-  color: rgba(244, 239, 228, 0.64);
+  color: var(--text-muted);
   font-size: 13px;
   line-height: 1.4;
 }
@@ -128,10 +128,10 @@
   gap: 10px;
   align-items: start;
   padding: 12px 10px;
-  border: 1px solid rgba(215, 198, 129, 0.26);
+  border: 1px solid var(--divider);
   border-radius: 6px;
-  color: #f4efe4;
-  background: rgba(244, 239, 228, 0.06);
+  color: var(--text-primary);
+  background: var(--surface-panel);
   text-align: left;
 }
 
@@ -140,18 +140,18 @@
   height: 7px;
   margin-top: 6px;
   border-radius: 50%;
-  background: #d7c681;
+  background: var(--olive);
 }
 
 .courseNoteTreeItemActive strong {
-  color: #f4efe4;
+  color: var(--text-primary);
   font-size: 14px;
   line-height: 1.2;
 }
 
 .courseNoteTreeItemActive em {
   grid-column: 2;
-  color: rgba(244, 239, 228, 0.58);
+  color: var(--text-muted);
   font-size: 12px;
   font-style: normal;
   line-height: 1.25;
@@ -175,7 +175,7 @@
 .activeSessionOutline .miniNodeButton em,
 .activeSessionOutline .miniNodeButtonActive em {
   grid-column: 2;
-  color: rgba(244, 239, 228, 0.54);
+  color: var(--text-muted);
   font-size: 12px;
   font-style: normal;
   line-height: 1.25;
@@ -192,7 +192,7 @@
   display: grid;
   gap: 4px;
   padding-top: 8px;
-  border-top: 1px solid rgba(244, 239, 228, 0.1);
+  border-top: 1px solid var(--divider);
 }
 
 .activeSessionNotes li:first-child {
@@ -201,7 +201,7 @@
 }
 
 .activeSessionNotes strong {
-  color: #d7c681;
+  color: var(--olive);
   font-size: 12px;
   text-transform: uppercase;
 }
@@ -211,14 +211,14 @@
   overflow: hidden;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
-  color: #f4efe4;
+  color: var(--text-primary);
   font-size: 13px;
   line-height: 1.35;
 }
 
 .kicker {
   margin: 0;
-  color: #d7c681;
+  color: var(--olive);
   font-size: 12px;
   font-weight: 700;
   letter-spacing: 0;
@@ -339,19 +339,19 @@
   padding: 12px 14px;
   border: 0;
   border-radius: 8px;
-  color: rgba(244, 239, 228, 0.68);
+  color: var(--text-muted);
   background: transparent;
   text-align: left;
 }
 
 .miniNodeButtonActive {
-  color: #f4efe4;
-  background: rgba(244, 239, 228, 0.06);
+  color: var(--text-primary);
+  background: var(--surface);
 }
 
 .miniNodeButton:hover,
 .miniNodeButtonActive:hover {
-  background: rgba(244, 239, 228, 0.08);
+  background: var(--surface-soft);
 }
 
 .miniNodeButton span,
@@ -381,7 +381,7 @@
   min-height: 0;
   overflow: hidden;
   padding: 30px clamp(28px, 5vw, 72px);
-  background: #14130f;
+  background: linear-gradient(90deg, var(--surface-panel) 0%, var(--surface-page) 100%);
 }
 
 .sessionHeader {
@@ -742,7 +742,7 @@
 
 .studyNotesHeader h1 {
   margin: 10px 0 0;
-  color: #f8f1e4;
+  color: var(--surface-ink);
   font-family: var(--font-serif);
   font-size: clamp(42px, 5vw, 76px);
   font-weight: 500;
@@ -752,14 +752,14 @@
 .studyNotesHeader div > p:last-child {
   max-width: 620px;
   margin-top: 8px;
-  color: rgba(244, 239, 228, 0.62);
+  color: var(--text-muted);
   font-size: 15px;
 }
 
 .studyNoteStatsLine {
   align-self: start;
   margin: 0;
-  color: rgba(244, 239, 228, 0.58);
+  color: var(--text-muted);
   font-size: 13px;
   white-space: nowrap;
 }
@@ -770,10 +770,10 @@
   gap: 18px;
   min-height: 0;
   padding: clamp(22px, 4vw, 44px);
-  border: 1px solid rgba(244, 239, 228, 0.2);
+  border: 1px solid var(--divider);
   border-radius: 8px;
-  background: #f9f3e8;
-  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.28);
+  background: var(--surface-panel);
+  box-shadow: var(--shadow-lift);
 }
 
 .studyNoteComposer label {
@@ -782,7 +782,7 @@
 }
 
 .studyNoteComposer label > span {
-  color: #6d6658;
+  color: var(--text-muted);
   font-size: 12px;
   font-weight: 700;
   text-transform: uppercase;
@@ -790,10 +790,10 @@
 
 .studyNoteComposer input,
 .studyNoteComposer textarea {
-  color: #25231d;
-  border-color: #ded2bf;
+  color: var(--text-primary);
+  border-color: var(--divider);
   border-radius: 6px;
-  background: #fffaf0;
+  background: var(--surface-panel-warm);
 }
 
 .studyNoteComposer textarea {
@@ -806,10 +806,10 @@
       to bottom,
       transparent 0,
       transparent 31px,
-      rgba(82, 74, 60, 0.16) 32px
+      color-mix(in srgb, var(--divider-strong) 48%, transparent) 32px
     ),
-    #f9f3e8;
-  color: #25231d;
+    var(--surface-panel);
+  color: var(--text-primary);
   font-family: var(--font-serif);
   font-size: clamp(20px, 2.2vw, 28px);
   resize: vertical;
@@ -819,10 +819,10 @@
 .studyNoteComposer button {
   justify-self: start;
   padding: 11px 15px;
-  border-color: #25231d;
+  border-color: var(--olive);
   border-radius: 999px;
-  color: #f9f3e8;
-  background: #25231d;
+  color: var(--surface-panel);
+  background: var(--olive);
   font-size: 13px;
   font-weight: 700;
 }
@@ -839,13 +839,13 @@
 }
 
 .studyNoteContext span {
-  color: #746b5c;
+  color: var(--text-muted);
   font-size: 12px;
   line-height: 1.25;
 }
 
 .studyNoteContext span:first-child {
-  color: #25231d;
+  color: var(--text-primary);
   font-weight: 700;
 }
 
@@ -880,7 +880,7 @@
 }
 
 .studyNoteActions span {
-  color: #746b5c;
+  color: var(--text-muted);
   font-size: 13px;
 }
 
@@ -894,7 +894,7 @@
 
 .emptyStudyNotes {
   margin: 0;
-  color: rgba(244, 239, 228, 0.58);
+  color: var(--text-muted);
   font-size: 14px;
 }
 
@@ -903,7 +903,7 @@
   display: grid;
   gap: 10px;
   padding: 12px 0 0;
-  border-top: 1px solid rgba(244, 239, 228, 0.18);
+  border-top: 1px solid var(--divider);
   border-right: 0;
   border-bottom: 0;
   border-left: 0;
@@ -924,13 +924,13 @@
 .studyNoteCard time,
 .studyNoteCard footer span {
   margin: 0;
-  color: rgba(244, 239, 228, 0.54);
+  color: var(--text-muted);
   font-size: 12px;
   line-height: 1.25;
 }
 
 .studyNoteCard header p {
-  color: #d7c681;
+  color: var(--olive);
   font-weight: 800;
   text-transform: uppercase;
 }
@@ -938,7 +938,7 @@
 .studyNoteCard > p {
   margin: 0;
   white-space: pre-wrap;
-  color: rgba(244, 239, 228, 0.86);
+  color: var(--text-primary);
   font-size: 14px;
   line-height: 1.45;
 }
@@ -992,7 +992,7 @@
 
   .studyPathRail {
     border-right: 0;
-    border-bottom: 1px solid rgba(244, 239, 228, 0.1);
+    border-bottom: 1px solid var(--divider);
   }
 
   .sessionWorkbench,

@@ -31,9 +31,11 @@ release yet.
   source artifacts/readiness into the right panel.
 - Added a reusable workspace session layout with left rail, main surface, and
   optional support/artifacts slot, then changed the default Platzi course session
-  to render as a dark two-column notebook without the artifact panel.
+  to render as a warm light two-column notebook without the artifact panel.
 - Updated the default session identity to `Curso de Estadística y Probabilidad -
   Platzi` with a central `Clase 8, notas` writing surface.
+- Restored the active study session to the original light/cream workspace palette
+  while keeping the reusable notebook layout.
 
 ### Docs - Ownership Workbench Product Research
 
