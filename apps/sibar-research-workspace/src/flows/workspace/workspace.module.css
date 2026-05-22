@@ -9,6 +9,7 @@
 }
 
 .studyPathRail,
+.studyNotesWorkbench,
 .sessionWorkbench,
 .readinessPanel {
   min-width: 0;
@@ -68,6 +69,106 @@
   color: var(--text-primary);
   font-size: 19px;
   line-height: 1.2;
+}
+
+.activeSessionRailBody {
+  min-height: 0;
+  display: grid;
+  align-content: start;
+  gap: 18px;
+  padding: 22px 20px 28px;
+  overflow: auto;
+}
+
+.activeSessionCard,
+.activeSessionOutline,
+.activeSessionNotes {
+  display: grid;
+  gap: 10px;
+  padding: 16px;
+  border: 1px solid var(--divider);
+  border-radius: 8px;
+  background: var(--surface-panel);
+}
+
+.activeSessionCard h3,
+.activeSessionCard p,
+.activeSessionOutline p,
+.activeSessionNotes p,
+.activeSessionNotes ul {
+  margin: 0;
+}
+
+.activeSessionCard h3 {
+  color: var(--text-primary);
+  font-size: 17px;
+  line-height: 1.25;
+}
+
+.activeSessionCard p:last-child,
+.activeSessionNotes p {
+  color: var(--text-muted);
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.activeSessionOutline .miniNodeList {
+  margin: 0;
+  padding-left: 0;
+}
+
+.activeSessionOutline .miniNodeList::before {
+  display: none;
+}
+
+.activeSessionOutline .miniNodeButton,
+.activeSessionOutline .miniNodeButtonActive {
+  grid-template-columns: 24px minmax(0, 1fr);
+  padding: 10px;
+}
+
+.activeSessionOutline .miniNodeButton em,
+.activeSessionOutline .miniNodeButtonActive em {
+  grid-column: 2;
+  color: var(--text-muted);
+  font-size: 12px;
+  font-style: normal;
+  line-height: 1.25;
+}
+
+.activeSessionNotes ul {
+  display: grid;
+  gap: 8px;
+  padding: 0;
+  list-style: none;
+}
+
+.activeSessionNotes li {
+  display: grid;
+  gap: 4px;
+  padding-top: 8px;
+  border-top: 1px solid var(--divider);
+}
+
+.activeSessionNotes li:first-child {
+  padding-top: 0;
+  border-top: 0;
+}
+
+.activeSessionNotes strong {
+  color: var(--olive);
+  font-size: 12px;
+  text-transform: uppercase;
+}
+
+.activeSessionNotes span {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  color: var(--text-primary);
+  font-size: 13px;
+  line-height: 1.35;
 }
 
 .kicker {
@@ -225,6 +326,14 @@
   display: grid;
   grid-template-rows: auto minmax(0, 1fr);
   gap: 18px;
+  overflow: hidden;
+  padding: 32px clamp(28px, 4vw, 58px) 34px;
+  background: linear-gradient(90deg, var(--surface-panel) 0%, var(--surface-page) 100%);
+}
+
+.studyNotesWorkbench {
+  height: 100dvh;
+  min-height: 0;
   overflow: hidden;
   padding: 32px clamp(28px, 4vw, 58px) 34px;
   background: linear-gradient(90deg, var(--surface-panel) 0%, var(--surface-page) 100%);
@@ -456,6 +565,59 @@
   background: var(--surface-page);
 }
 
+.artifactPanel {
+  min-height: 0;
+  display: grid;
+  gap: 16px;
+}
+
+.artifactHeader {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: start;
+}
+
+.artifactHeader h3,
+.artifactHeader p {
+  margin: 0;
+}
+
+.artifactHeader h3 {
+  margin-top: 6px;
+  color: var(--text-primary);
+  font-size: 18px;
+  line-height: 1.25;
+}
+
+.artifactHeader p:last-child {
+  margin-top: 6px;
+  color: var(--text-muted);
+  font-size: 13px;
+  line-height: 1.35;
+}
+
+.artifactDocument {
+  max-height: 30dvh;
+  overflow: auto;
+  padding: 16px;
+  border: 1px solid var(--divider);
+  border-radius: 8px;
+  background: var(--surface-panel);
+  color: var(--text-primary);
+  font-family: var(--font-serif);
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.artifactDocument p {
+  margin: 0 0 12px;
+}
+
+.artifactDocument p:last-child {
+  margin-bottom: 0;
+}
+
 .guidePanel {
   display: grid;
   align-content: start;
@@ -517,10 +679,11 @@
 }
 
 .studyNotesPanel {
+  height: 100%;
+  min-height: 0;
   display: grid;
-  gap: 16px;
-  padding-bottom: 18px;
-  border-bottom: 1px solid var(--divider);
+  grid-template-rows: auto auto minmax(0, 1fr);
+  gap: 20px;
 }
 
 .studyNotesHeader {
@@ -531,10 +694,12 @@
 }
 
 .studyNotesHeader h3 {
-  margin: 6px 0 0;
+  margin: 8px 0 0;
   color: var(--text-primary);
-  font-size: 20px;
-  line-height: 1.2;
+  font-family: var(--font-serif);
+  font-size: clamp(34px, 3.1vw, 52px);
+  font-weight: 500;
+  line-height: 1;
 }
 
 .studyNoteStats {
@@ -551,7 +716,7 @@
   padding: 8px 10px;
   border: 1px solid var(--divider);
   border-radius: 8px;
-  background: var(--surface-panel);
+  background: var(--surface-panel-warm);
   text-align: center;
 }
 
@@ -572,7 +737,11 @@
 
 .studyNoteComposer {
   display: grid;
-  gap: 12px;
+  gap: 14px;
+  padding: 18px;
+  border: 1px solid var(--divider);
+  border-radius: 8px;
+  background: var(--surface-panel);
 }
 
 .studyNoteComposer label {
@@ -594,8 +763,9 @@
 }
 
 .studyNoteComposer textarea {
-  min-height: 150px;
-  line-height: 1.45;
+  min-height: 280px;
+  resize: vertical;
+  line-height: 1.5;
 }
 
 .studyNoteComposer button {
@@ -637,6 +807,8 @@
 .studyNoteList {
   display: grid;
   gap: 10px;
+  min-height: 0;
+  overflow: auto;
 }
 
 .emptyStudyNotes {
@@ -722,6 +894,7 @@
   }
 
   .studyPathRail,
+  .studyNotesWorkbench,
   .sessionWorkbench,
   .readinessPanel {
     height: auto;
@@ -733,7 +906,8 @@
     border-bottom: 1px solid var(--divider);
   }
 
-  .sessionWorkbench {
+  .sessionWorkbench,
+  .studyNotesWorkbench {
     padding: 34px 22px;
     overflow: visible;
   }

@@ -1,4 +1,5 @@
 import type { WorkspaceSessionState } from "./workspaceReducer";
+import { defaultStudyCourseTitle } from "./workspaceStudySession";
 
 export type WorkspaceMaterialMode =
   | "paper"
@@ -340,7 +341,7 @@ export function createInitialWorkspaceStateFromFixture(
     selectedMiniNodeId: firstMini?.id ?? "",
     selectedSourceId: fallbackSourceId,
     isReadinessPanelVisible: true,
-    studyCourseTitle: "Platzi course",
+    studyCourseTitle: defaultStudyCourseTitle,
     studyNoteDraft: "",
     studyNotes: [],
     ...overrides,

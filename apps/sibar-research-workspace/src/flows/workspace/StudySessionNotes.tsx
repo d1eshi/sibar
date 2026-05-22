@@ -1,11 +1,13 @@
 import type * as React from "react";
 import styles from "./workspace.module.css";
 import type { WorkspaceStudyNote } from "../../state/workspaceReducer";
+import type { WorkspaceStudyNoteMetrics } from "../../state/workspaceStudyMetrics";
 
 interface StudySessionNotesProps {
   courseTitle: string;
   noteDraft: string;
   notes: readonly WorkspaceStudyNote[];
+  metrics: WorkspaceStudyNoteMetrics;
   currentSessionTitle: string;
   currentSourceTitle: string;
   onCourseTitleChange: (courseTitle: string) => void;
@@ -13,35 +15,17 @@ interface StudySessionNotesProps {
   onAddNote: () => void;
 }
 
-function getLocalDateKey(date: Date): string {
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
-
-  return `${year}-${month}-${day}`;
-}
-
 export function StudySessionNotes({
   courseTitle,
   noteDraft,
   notes,
+  metrics,
   currentSessionTitle,
   currentSourceTitle,
   onCourseTitleChange,
   onNoteDraftChange,
   onAddNote,
 }: StudySessionNotesProps) {
-  const now = Date.now();
-  const todayKey = getLocalDateKey(new Date(now));
-  const notesToday = notes.filter((note) => {
-    return note.createdAtDateKey === todayKey;
-  }).length;
-  const notesThisWeek = notes.filter((note) => {
-    const ageMs = now - note.createdAtEpochMs;
-
-    return ageMs >= 0 && ageMs < 7 * 24 * 60 * 60 * 1000;
-  }).length;
-
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     onAddNote();
@@ -57,11 +41,11 @@ export function StudySessionNotes({
         <dl className={styles.studyNoteStats}>
           <div>
             <dt>Today</dt>
-            <dd>{notesToday}</dd>
+            <dd>{metrics.notesToday}</dd>
           </div>
           <div>
             <dt>Week</dt>
-            <dd>{notesThisWeek}</dd>
+            <dd>{metrics.notesThisWeek}</dd>
           </div>
         </dl>
       </header>
