@@ -5,6 +5,7 @@ import type { WorkspaceStudyNoteMetrics } from "../../state/workspaceStudyMetric
 
 interface StudySessionNotesProps {
   courseTitle: string;
+  noteTitle: string;
   noteDraft: string;
   notes: readonly WorkspaceStudyNote[];
   metrics: WorkspaceStudyNoteMetrics;
@@ -17,6 +18,7 @@ interface StudySessionNotesProps {
 
 export function StudySessionNotes({
   courseTitle,
+  noteTitle,
   noteDraft,
   notes,
   metrics,
@@ -35,55 +37,54 @@ export function StudySessionNotes({
     <section className={styles.studyNotesPanel} aria-label="Study session notes">
       <header className={styles.studyNotesHeader}>
         <div>
-          <p className={styles.kicker}>Study session</p>
-          <h3>Notes</h3>
+          <p className={styles.kicker}>{courseTitle}</p>
+          <h1>{noteTitle}</h1>
+          <p>{currentSessionTitle}</p>
         </div>
-        <dl className={styles.studyNoteStats}>
-          <div>
-            <dt>Today</dt>
-            <dd>{metrics.notesToday}</dd>
-          </div>
-          <div>
-            <dt>Week</dt>
-            <dd>{metrics.notesThisWeek}</dd>
-          </div>
-        </dl>
+        <p className={styles.studyNoteStatsLine}>
+          {metrics.notesToday} hoy / {metrics.notesThisWeek} esta semana
+        </p>
       </header>
 
       <form className={styles.studyNoteComposer} onSubmit={handleSubmit}>
-        <label>
-          <span>Course</span>
-          <input
-            type="text"
-            value={courseTitle}
-            placeholder="Platzi course"
-            onChange={(event) => onCourseTitleChange(event.currentTarget.value)}
-          />
-        </label>
+        <div className={styles.studyNoteMetaRow}>
+          <label>
+            <span>Curso</span>
+            <input
+              type="text"
+              value={courseTitle}
+              placeholder="Curso de Platzi"
+              onChange={(event) => onCourseTitleChange(event.currentTarget.value)}
+            />
+          </label>
 
-        <div className={styles.studyNoteContext}>
-          <span>{currentSessionTitle}</span>
-          <span>{currentSourceTitle}</span>
+          <div className={styles.studyNoteContext}>
+            <span>{currentSourceTitle}</span>
+            <span>Guardado localmente en esta sesion</span>
+          </div>
         </div>
 
-        <label>
-          <span>New entry</span>
+        <label className={styles.studyNoteBodyField}>
+          <span>Nota</span>
           <textarea
-            rows={7}
+            rows={16}
             value={noteDraft}
-            placeholder="Concept, example, question..."
+            placeholder="Escribi tus notas de la clase..."
             onChange={(event) => onNoteDraftChange(event.currentTarget.value)}
           />
         </label>
 
-        <button type="submit" disabled={noteDraft.trim().length === 0}>
-          Save entry
-        </button>
+        <div className={styles.studyNoteActions}>
+          <button type="submit" disabled={noteDraft.trim().length === 0}>
+            Guardar nota
+          </button>
+          <span>{notes.length} entradas guardadas</span>
+        </div>
       </form>
 
       <div className={styles.studyNoteList} aria-label="Saved study entries">
         {notes.length === 0 ? (
-          <p className={styles.emptyStudyNotes}>No study notes in this session.</p>
+          <p className={styles.emptyStudyNotes}>No hay notas guardadas en esta clase.</p>
         ) : (
           notes.map((note) => (
             <article key={note.id} className={styles.studyNoteCard}>

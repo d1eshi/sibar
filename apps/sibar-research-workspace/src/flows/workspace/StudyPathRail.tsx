@@ -13,6 +13,7 @@ interface StudyPathRailProps {
   dispatch: React.Dispatch<WorkspaceSessionAction>;
   courseTitle: string;
   notes: readonly WorkspaceStudyNote[];
+  currentNoteTitle: string;
 }
 
 export function StudyPathRail({
@@ -21,8 +22,9 @@ export function StudyPathRail({
   dispatch,
   courseTitle,
   notes,
+  currentNoteTitle,
 }: StudyPathRailProps) {
-  const recentNotes = notes.slice(0, 4);
+  const latestNote = notes[0];
 
   return (
     <aside className={styles.studyPathRail} aria-label="Active study session rail">
@@ -35,20 +37,16 @@ export function StudyPathRail({
       </header>
 
       <div className={styles.activeSessionRailBody}>
-        <section className={styles.activeSessionCard}>
-          <p className={styles.kicker}>Current session</p>
-          <h3>{projection.selectedNode.sessionTitle}</h3>
-          <p>{projection.selectedNode.scope}</p>
-        </section>
-
-        <section className={styles.activeSessionCard}>
-          <p className={styles.kicker}>Source</p>
-          <h3>{projection.selectedSource.title}</h3>
-          <p>{projection.selectedSource.snippet}</p>
-        </section>
+        <nav className={styles.courseNoteTree} aria-label="Course notebook">
+          <button type="button" className={styles.courseNoteTreeItemActive}>
+            <span aria-hidden="true" />
+            <strong>{currentNoteTitle}</strong>
+            <em>{projection.selectedNode.sessionTitle}</em>
+          </button>
+        </nav>
 
         <section className={styles.activeSessionOutline}>
-          <p className={styles.kicker}>Note outline</p>
+          <p className={styles.kicker}>Clase</p>
           <ol className={styles.miniNodeList}>
             {projection.selectedNode.miniNodes.map((miniNode, miniIndex) => (
               <li key={miniNode.id}>
@@ -77,18 +75,11 @@ export function StudyPathRail({
         </section>
 
         <section className={styles.activeSessionNotes}>
-          <p className={styles.kicker}>Recent notes</p>
-          {recentNotes.length === 0 ? (
-            <p>No entries yet for this study session.</p>
+          <p className={styles.kicker}>Ultima nota</p>
+          {latestNote ? (
+            <p>{latestNote.body}</p>
           ) : (
-            <ul>
-              {recentNotes.map((note) => (
-                <li key={note.id}>
-                  <strong>{note.iterationLabel}</strong>
-                  <span>{note.body}</span>
-                </li>
-              ))}
-            </ul>
+            <p>Todavia no hay entradas guardadas para esta clase.</p>
           )}
         </section>
       </div>

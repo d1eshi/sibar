@@ -29,6 +29,11 @@ release yet.
   compact note outline, and recent notes instead of the previous full study path.
 - Moved the study note composer into the central workspace surface and separated
   source artifacts/readiness into the right panel.
+- Added a reusable workspace session layout with left rail, main surface, and
+  optional support/artifacts slot, then changed the default Platzi course session
+  to render as a dark two-column notebook without the artifact panel.
+- Updated the default session identity to `Curso de Estadística y Probabilidad -
+  Platzi` with a central `Clase 8, notas` writing surface.
 
 ### Docs - Ownership Workbench Product Research
 

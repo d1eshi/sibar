@@ -87,12 +87,12 @@ export type WorkspaceHomeProjection = {
 export const workspaceHomeProjection: WorkspaceHomeProjection = {
   workspaces: [
     {
-      id: "embeddings-probe",
-      title: "Embeddings",
-      objective: "Consolidate nearest-neighbor behavior and failure cases.",
-      sourceBoundary: "Paper excerpt + local notebook",
-      progress: "1 of 5 nodes",
-      nextNode: "Boundary checks",
+      id: "estadistica-platzi",
+      title: defaultStudyCourseTitle,
+      objective: "Tomar notas de la clase y consolidar conceptos del curso.",
+      sourceBoundary: "Apuntes de clase",
+      progress: "Clase 8",
+      nextNode: "Clase 8, notas",
       readinessHint: "Solid understanding. Continue to the next node.",
       readinessPercent: 78,
       readinessLevel: "Good",
@@ -135,34 +135,22 @@ export const workspaceHomeProjection: WorkspaceHomeProjection = {
 };
 
 export const firstWorkspaceSessionFixture: WorkspaceSessionFixture = {
-  title: "Focused workspace: embeddings",
+  title: defaultStudyCourseTitle,
   sessionHint:
-    "Inspect one compact material slice, draft a grounded artifact, and confirm readiness.",
+    "Tomar notas de la clase actual y guardar entradas locales de estudio.",
   nodes: [
     {
-      id: "goal-embeddings",
-      name: "Embedding basics",
-      scope: "How do embeddings turn meaning into vectors and where do they fail?",
-      sessionTitle: "Session 01 - read the first source slice",
-      status: "complete",
+      id: "clase-8",
+      name: "Clase 8",
+      scope: "Notas de Estadistica y Probabilidad para la clase actual.",
+      sessionTitle: "Clase 8",
+      status: "ready",
       miniNodes: [
         {
-          id: "mn-tokenization",
-          name: "Token boundaries",
-          question: "What happens to meaning when text is split into tokens?",
-          sourceId: "source-overview",
-        },
-        {
-          id: "mn-vector-space",
-          name: "Vector space intuition",
-          question: "How do vectors preserve similarity in retrieval?",
-          sourceId: "source-overview",
-        },
-        {
-          id: "mn-implementation",
-          name: "Toy implementation",
-          question: "What small artifact proves retrieval quality?",
-          sourceId: "source-repo",
+          id: "mn-apuntes",
+          name: "Notas",
+          question: "Escribir los conceptos, formulas y dudas de esta clase.",
+          sourceId: "source-class-note",
         },
       ],
     },
@@ -235,16 +223,15 @@ export const firstWorkspaceSessionFixture: WorkspaceSessionFixture = {
   ],
   sources: [
     {
-      id: "source-overview",
-      type: "paper",
-      title: "Embedding overview paper excerpt",
-      metadata: "Wu et al. - arXiv:2309.12345 - 2023",
+      id: "source-class-note",
+      type: "note",
+      title: "Clase 8, notas",
+      metadata: defaultStudyCourseTitle,
       snippet:
-        "Short queries and out-of-domain language often break semantic generalization...",
+        "Cuaderno de apuntes para conceptos, formulas, ejemplos y dudas de la clase.",
       body: [
-        "The useful claim for this node is not that embeddings understand meaning globally. The narrower claim is that they preserve enough local similarity for a bounded retrieval task.",
-        "Short queries and out-of-domain phrasing are the first stress tests. If the vector neighborhood changes when the wording changes slightly, the retrieval layer needs additional evidence before it can be trusted.",
-        "For this session, treat the paper as source material: identify the claim, the boundary condition, and the evidence required before turning it into an implementation artifact.",
+        "Usa esta pagina para capturar los conceptos principales de la clase, ejemplos resueltos, formulas importantes y preguntas pendientes.",
+        "Las fuentes y artefactos de investigacion siguen disponibles como un panel opcional para otros tipos de workspace.",
       ],
     },
     {

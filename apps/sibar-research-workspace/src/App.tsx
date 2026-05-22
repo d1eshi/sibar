@@ -4,9 +4,9 @@ import { OnboardingFlow } from "./flows/onboarding/OnboardingFlow";
 import { WorkspaceShell } from "./flows/workspace/WorkspaceShell";
 import { WorkspaceHome } from "./flows/workspace/WorkspaceHome";
 import { WorkspaceOverview } from "./flows/workspace/WorkspaceOverview";
-import { StudySessionArtifacts } from "./flows/workspace/StudySessionArtifacts";
 import { StudyPathRail } from "./flows/workspace/StudyPathRail";
 import { StudySessionNotes } from "./flows/workspace/StudySessionNotes";
+import { WorkspaceSessionLayout } from "./flows/workspace/WorkspaceSessionLayout";
 import stylesWorkspace from "./flows/workspace/workspace.module.css";
 import {
   createInitialWorkspaceStateFromFixture,
@@ -44,11 +44,12 @@ export default function App() {
     workspaceState,
     firstWorkspaceSessionFixture,
   );
+  const currentStudyNoteTitle = workspaceProjection.selectedSource.title;
   const studyNoteMetrics = projectWorkspaceStudyNoteMetrics(workspaceState.studyNotes);
 
   React.useEffect(() => {
     writeStoredStudyNotesState({
-      version: 1,
+      version: 2,
       courseTitle: workspaceState.studyCourseTitle,
       notes: [...workspaceState.studyNotes],
     });
@@ -96,45 +97,38 @@ export default function App() {
             onOpenSelectedNode={() => openFlowStep("session")}
           />
         ) : (
-          <section
-            className={stylesWorkspace.workspaceFrame}
-            data-component="workspace-session"
-          >
-            <StudyPathRail
-              projection={workspaceProjection}
-              state={workspaceState}
-              dispatch={dispatchWorkspace}
-              courseTitle={workspaceState.studyCourseTitle}
-              notes={workspaceState.studyNotes}
-            />
-            <section className={stylesWorkspace.studyNotesWorkbench}>
-              <StudySessionNotes
+          <WorkspaceSessionLayout
+            leftRail={
+              <StudyPathRail
+                projection={workspaceProjection}
+                state={workspaceState}
+                dispatch={dispatchWorkspace}
                 courseTitle={workspaceState.studyCourseTitle}
-                noteDraft={workspaceState.studyNoteDraft}
                 notes={workspaceState.studyNotes}
-                metrics={studyNoteMetrics}
-                currentSessionTitle={workspaceProjection.selectedNode.sessionTitle}
-                currentSourceTitle={workspaceProjection.selectedSource.title}
-                onCourseTitleChange={(courseTitle) =>
-                  dispatchWorkspace({ type: "set_study_course_title", courseTitle })
-                }
-                onNoteDraftChange={(noteDraft) =>
-                  dispatchWorkspace({ type: "set_study_note_draft", noteDraft })
-                }
-                onAddNote={saveStudyNote}
+                currentNoteTitle={currentStudyNoteTitle}
               />
-            </section>
-            <StudySessionArtifacts
-              projection={workspaceProjection}
-              isReadinessPanelVisible={workspaceState.isReadinessPanelVisible}
-              onSelectSource={(sourceId) =>
-                dispatchWorkspace({ type: "select_source", sourceId })
-              }
-              onToggleReadiness={() =>
-                dispatchWorkspace({ type: "toggle_readiness_panel" })
-              }
-            />
-          </section>
+            }
+            mainSurface={
+              <section className={stylesWorkspace.studyNotesWorkbench}>
+                <StudySessionNotes
+                  courseTitle={workspaceState.studyCourseTitle}
+                  noteTitle={currentStudyNoteTitle}
+                  noteDraft={workspaceState.studyNoteDraft}
+                  notes={workspaceState.studyNotes}
+                  metrics={studyNoteMetrics}
+                  currentSessionTitle={workspaceProjection.selectedNode.sessionTitle}
+                  currentSourceTitle={workspaceProjection.selectedSource.title}
+                  onCourseTitleChange={(courseTitle) =>
+                    dispatchWorkspace({ type: "set_study_course_title", courseTitle })
+                  }
+                  onNoteDraftChange={(noteDraft) =>
+                    dispatchWorkspace({ type: "set_study_note_draft", noteDraft })
+                  }
+                  onAddNote={saveStudyNote}
+                />
+              </section>
+            }
+          />
         )}
       </WorkspaceShell>
     </main>
