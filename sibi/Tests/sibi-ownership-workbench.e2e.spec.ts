@@ -88,6 +88,31 @@ test("relation navigation preview appears in code panel and updates by selected 
   await expect(relationSection).toContainText("src/api/session.test.ts");
 });
 
+test("relation evidence extraction is visible and updates with explicit gap reasons", async ({ page }) => {
+  await page.goto("/?view=lab");
+
+  const extractionSection = page.getByLabel("Relation evidence extraction");
+  await expect(extractionSection).toBeVisible();
+  await expect(extractionSection).toContainText("Observed:");
+  await expect(extractionSection).toContainText("Active file imports");
+  await expect(extractionSection).toContainText("Runtime candidates");
+  await expect(extractionSection).toContainText("src/api/session.test.ts");
+  await expect(extractionSection).toContainText("src/runtime/consumer.ts");
+
+  await page.getByRole("button", { name: "Submit attempt" }).click();
+  await expect(page.locator(".codePanel h1")).toContainText("src/api/session.test.ts");
+  await expect(extractionSection).toContainText("Candidate callers:");
+  await expect(extractionSection).not.toContainText("missing runtime contract");
+  await expect(extractionSection).toContainText("Candidate tests:");
+  await expect(extractionSection).toContainText("src/api/session.ts");
+  await expect(extractionSection).toContainText("src/runtime/consumer.ts");
+
+  await page.getByRole("button", { name: "Submit attempt" }).click();
+  await expect(page.locator(".codePanel h1")).toContainText("src/runtime/consumer.ts");
+  await expect(extractionSection).not.toContainText("missing runtime contract");
+  await expect(extractionSection).not.toContainText("Relation gaps");
+});
+
 test("line/range selection updates selection summary when code lines expose selectors", async ({ page }) => {
   await page.goto("/");
 

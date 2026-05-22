@@ -9,6 +9,7 @@ type OwnershipWorkbenchFixtures = typeof import("../src/ownershipWorkbench/fixtu
 type OwnershipWorkbenchHelpers = typeof import("../src/ownershipWorkbench/helpers.ts");
 type OwnershipReviewSession = typeof import("../src/ownershipWorkbench/ownershipReviewSession.ts");
 type OwnershipWorkbenchSurfaceMode = typeof import("../src/ownershipWorkbench/surfaceMode.ts");
+type OwnershipEvidenceExtraction = typeof import("../src/ownershipWorkbench/evidenceExtraction.ts");
 
 const EXPECTED_DIFF_FILES = ["src/api/session.ts", "src/api/session.test.ts"] as const;
 const DIRECTORY_PATHS = ["src", "src/api", "src/runtime"] as const;
@@ -17,6 +18,7 @@ let cachedFixtures: OwnershipWorkbenchFixtures | null = null;
 let cachedHelpers: OwnershipWorkbenchHelpers | null = null;
 let cachedReviewSession: OwnershipReviewSession | null = null;
 let cachedSurfaceMode: OwnershipWorkbenchSurfaceMode | null = null;
+let cachedEvidenceExtraction: OwnershipEvidenceExtraction | null = null;
 let fixtureImportConsoleErrors: unknown[] = [];
 
 async function loadFixturesModule(): Promise<OwnershipWorkbenchFixtures> {
@@ -64,6 +66,15 @@ async function loadReviewSessionModule(): Promise<OwnershipReviewSession> {
 
   cachedReviewSession = (await import("../src/ownershipWorkbench/ownershipReviewSession.ts")) as OwnershipReviewSession;
   return cachedReviewSession;
+}
+
+async function loadEvidenceExtractionModule(): Promise<OwnershipEvidenceExtraction> {
+  if (cachedEvidenceExtraction != null) {
+    return cachedEvidenceExtraction;
+  }
+
+  cachedEvidenceExtraction = (await import("../src/ownershipWorkbench/evidenceExtraction.ts")) as OwnershipEvidenceExtraction;
+  return cachedEvidenceExtraction;
 }
 
 test("fixture file tree paths only include leaf file paths", async () => {
@@ -387,6 +398,233 @@ test("relation navigation falls back to explicit missing relation", async () => 
   assert.equal(links[0].path, "missing relation");
 });
 
+test("extractCodeEvidence detects observed imports, exports, and symbols from session fixture", async () => {
+  const fixtures = await loadFixturesModule();
+  const extractor = await loadEvidenceExtractionModule();
+
+  const evidence = extractor.extractCodeEvidence({
+    selectedFile: "src/api/session.ts",
+    fileFixtures: fixtures.fileFixtures,
+    evidenceRefs: fixtures.fixtureEvidence,
+    reviewQueue: fixtures.ownershipReviewQueue,
+  });
+
+  const importText = evidence.imports.map((entry) => entry.text.trim());
+  const exportText = evidence.exports.map((entry) => entry.text.trim());
+  const symbolText = evidence.symbols.map((entry) => entry.text.trim());
+
+  assert.equal(importText.includes('import type { LoginPayload } from "./types";'), true);
+  assert.equal(exportText.some((line) => line.includes("export async function createSession")), true);
+  assert.equal(symbolText.some((line) => line.includes("createSession")), true);
+  assert.equal(evidence.imports.length >= 1, true);
+  assert.equal(evidence.exports.length >= 1, true);
+  assert.equal(evidence.symbols.length >= 1, true);
+});
+
+test("extractCodeEvidence detects nearby test and caller candidates from queue/evidence", async () => {
+  const fixtures = await loadFixturesModule();
+  const extractor = await loadEvidenceExtractionModule();
+
+  const evidence = extractor.extractCodeEvidence({
+    selectedFile: "src/api/session.ts",
+    fileFixtures: fixtures.fileFixtures,
+    evidenceRefs: fixtures.fixtureEvidence,
+    reviewQueue: fixtures.ownershipReviewQueue,
+  });
+
+  const kinds = evidence.relationCandidates.map((candidate) => candidate.kind).sort();
+
+  assert.equal(kinds.includes("test"), true, "session.ts should detect nearby test candidates");
+  assert.equal(kinds.includes("caller"), true, "session.ts should detect caller candidates");
+  assert.equal(
+    evidence.relationCandidates.every((candidate) => candidate.sourceIds.length > 0),
+    true,
+    "relation candidates should include source IDs",
+  );
+});
+
+test("extractCodeEvidence preserves conflict candidates when deduping relation paths", async () => {
+  const extractor = await loadEvidenceExtractionModule();
+  const evidence = extractor.extractCodeEvidence({
+    selectedFile: "src/api/session.ts",
+    fileFixtures: {
+      "src/api/session.ts": `export function createSession() {
+  return null;
+}`,
+    },
+    evidenceRefs: [
+      {
+        id: "R-observed",
+        title: "Observed caller",
+        detail: "Direct caller evidence.",
+        location: "src/runtime/consumer.ts:10",
+        confidence: "observed",
+      },
+      {
+        id: "R-conflict",
+        title: "Conflicting caller",
+        detail: "Contradictory caller evidence.",
+        location: "src/runtime/consumer.ts:22",
+        confidence: "conflict",
+      },
+    ],
+    reviewQueue: [],
+  });
+
+  const candidate = evidence.relationCandidates.find(
+    (entry) => entry.kind === "caller" && entry.path === "src/runtime/consumer.ts",
+  );
+
+  assert.equal(candidate?.evidenceKind, "conflict", "conflict evidence should survive relation candidate dedupe");
+  assert.deepEqual(
+    candidate?.sourceIds.sort(),
+    ["R-conflict", "R-observed"].sort(),
+    "deduped conflict candidate should keep both evidence sources",
+  );
+});
+
+test("extractCodeEvidence emits missing relation gaps when runtime/caller support is absent", async () => {
+  const extractor = await loadEvidenceExtractionModule();
+  const evidence = extractor.extractCodeEvidence({
+    selectedFile: "src/standalone/runtime.ts",
+    fileFixtures: {
+      "src/standalone/runtime.ts": `export function loadRuntimeState() {
+  return { value: true };
+}`,
+    },
+    evidenceRefs: [],
+    reviewQueue: [],
+  });
+
+  assert.equal(
+    evidence.relationGaps.some((gap) => gap.type === "missing runtime contract"),
+    true,
+    "runtime-supporting file without evidence should surface an explicit runtime gap",
+  );
+  assert.equal(
+    evidence.relationGaps.some((gap) => gap.sourceIds.length > 0),
+    true,
+    "relation gaps should expose source IDs to support downgrade behavior",
+  );
+});
+
+test("extractCodeEvidence adds an explicit missing-caller fallback candidate", async () => {
+  const extractor = await loadEvidenceExtractionModule();
+  const evidence = extractor.extractCodeEvidence({
+    selectedFile: "src/services/runtime.ts",
+    fileFixtures: {
+      "src/services/runtime.ts": `export function parseRuntimeBoundary() {
+  return { valid: false };
+}`,
+    },
+    evidenceRefs: [],
+    reviewQueue: [],
+  });
+
+  const missingCallerGap = evidence.relationGaps.find((gap) => gap.type === "missing caller");
+  const missingCallerCandidate = evidence.relationCandidates.find(
+    (candidate) => candidate.kind === "caller" && candidate.path === "missing-caller",
+  );
+
+  assert.equal(missingCallerGap != null, true, "caller gap should surface without direct caller evidence");
+  assert.equal(missingCallerGap?.id, "src/services/runtime.ts:gap:missing-caller", "caller gap id should use a stable slug");
+  assert.equal(
+    missingCallerGap?.candidateReason,
+    "Expected caller relation is not confirmed for src/services/runtime.ts.",
+    "caller gap reason should avoid duplicate missing wording",
+  );
+  assert.equal(missingCallerCandidate != null, true, "missing caller should be represented as fallback candidate");
+  assert.equal(missingCallerCandidate?.source, "fallback", "missing-caller fallback should be sourced as fallback");
+  assert.equal(missingCallerCandidate?.evidenceKind, "unverified", "missing-caller fallback should be unverified");
+  assert.equal(
+    missingCallerCandidate?.sourceIds.includes(missingCallerGap?.id ?? ""),
+    true,
+    "missing-caller fallback should reference the originating missing-caller gap",
+  );
+  assert.equal(missingCallerCandidate?.sourceIds.includes("src/services/runtime.ts"), true, "fallback should include file context");
+});
+
+test("extractCodeEvidence downgrades unsupported missing claims when only weak hints exist", async () => {
+  const extractor = await loadEvidenceExtractionModule();
+  const evidence = extractor.extractCodeEvidence({
+    selectedFile: "src/services/runtime.ts",
+    fileFixtures: {
+      "src/services/runtime.ts": `export function parseRuntimeBoundary() {
+  return { valid: false };
+}`,
+    },
+    evidenceRefs: [
+      {
+        id: "R-001",
+        title: "Boundary notes",
+        detail: "This note is not direct evidence and only sketches ownership context.",
+        location: "docs/notes/runtime.md:1-3",
+        confidence: "unverified",
+      },
+    ],
+    reviewQueue: [],
+  });
+
+  assert.equal(evidence.relationGaps.some((gap) => gap.type === "missing caller"), true, "caller gap should surface without direct caller evidence");
+  assert.equal(evidence.relationGaps.some((gap) => gap.type === "missing test path"), true, "test-path gap should surface without direct test evidence");
+  assert.equal(evidence.relationGaps.some((gap) => gap.type === "missing runtime contract"), true, "runtime gap should surface without runtime evidence");
+  assert.equal(
+    evidence.relationGaps.every((gap) => gap.downgrade != null),
+    true,
+    "all missing-gap entries should be downgraded for weak/indirect support",
+  );
+  assert.equal(
+    evidence.relationGaps.every((gap) => gap.downgrade?.to === "unverified"),
+    true,
+    "downgrade should move weak signals to question-grade confidence",
+  );
+});
+
+test("extractCodeEvidence infers runtime-contract gaps from runtime boundary text before downgrading", async () => {
+  const extractor = await loadEvidenceExtractionModule();
+  const evidence = extractor.extractCodeEvidence({
+    selectedFile: "src/services/sessionBoundary.ts",
+    fileFixtures: {
+      "src/services/sessionBoundary.ts": `export async function fetchSessionBoundary() {
+  return fetch("/api/session");
+}`,
+    },
+    evidenceRefs: [],
+    reviewQueue: [],
+  });
+
+  const runtimeGap = evidence.relationGaps.find((gap) => gap.type === "missing runtime contract");
+
+  assert.equal(runtimeGap?.id, "src/services/sessionBoundary.ts:gap:missing-runtime-contract");
+  assert.equal(runtimeGap?.evidenceKind, "unverified");
+  assert.equal(runtimeGap?.confidence, "unverified");
+  assert.equal(runtimeGap?.downgrade?.from, "inferred");
+  assert.equal(runtimeGap?.downgrade?.to, "unverified");
+});
+
+test("extractCodeEvidence does not require runtime contract for test files by default", async () => {
+  const extractor = await loadEvidenceExtractionModule();
+  const evidence = extractor.extractCodeEvidence({
+    selectedFile: "src/services/session.test.ts",
+    fileFixtures: {
+      "src/services/session.test.ts": `import { parseSession } from "./session";
+
+test("returns null session", () => {
+  expect(parseSession()).toBeNull();
+});
+`,
+    },
+    evidenceRefs: [],
+    reviewQueue: [],
+  });
+
+  assert.equal(
+    evidence.relationGaps.some((gap) => gap.type === "missing runtime contract"),
+    false,
+    "test files should not trigger missing runtime by default",
+  );
+});
+
 test("ReviewGuidePanel defines a first-run review sequence without free chat language", () => {
   const guideSource = readFileSync(
     new URL("../src/ownershipWorkbench/components/ReviewGuidePanel.tsx", import.meta.url),
@@ -624,6 +862,26 @@ test("CodeDiffPanel renders the CodeView adapter instead of vanilla CodeView", (
     source,
     /<PierreCodeView(?:[\s>]|<)/,
     "CodeDiffPanel should render the ownership workbench CodeView adapter",
+  );
+  assert.match(
+    source,
+    /relationEvidence\.relationCandidates\.map\(\(candidate\) => \(/,
+    "CodeDiffPanel should render extracted relationCandidates to the evidence UI",
+  );
+  assert.match(
+    source,
+    /candidate\.path/,
+    "CodeDiffPanel relation candidate rendering should include candidate.path",
+  );
+  assert.match(
+    source,
+    /candidate\.label|candidate\.source/,
+    "CodeDiffPanel relation candidate rendering should include candidate label and source",
+  );
+  assert.match(
+    source,
+    /\(\{candidate\.source\}\) \{candidate\.label\}/,
+    "CodeDiffPanel relation candidate rendering should include candidate label and source together",
   );
 });
 
