@@ -9,12 +9,25 @@ import type {
 
 export const AGENT_FLOW_MANIFEST_VERSION = "10.0.0";
 
+export const AGENT_FLOW_VOICE_CONTROL_ID = "agent-flow-control-voice";
+export const AGENT_FLOW_JARVIS_CONTROL_ID = "agent-flow-control-jarvis";
+
+export const AGENT_FLOW_EXPERIMENTAL_VOICE_ACTION_ID = "probe_voice_channel";
+export const AGENT_FLOW_EXPERIMENTAL_JARVIS_ACTION_ID = "probe_jarvis_channel";
+
 export const AGENT_FLOW_VALID_ACTIONS = [
   "submit_guided_attempt",
   "mark_unknown",
 ] as const;
 
 export const AGENT_FLOW_READONLY_ACTION = "read_manifest";
+
+export type ControlOwner = "agent" | "human" | "voice" | "jarvis" | "system";
+export type ControlSafetyMode = "strict" | "bounded" | "experimental";
+export type AgentFlowControlPolicy = {
+  postV01Enabled?: boolean;
+  experimentalControlOptIn?: ReadonlyArray<string>;
+};
 
 export type AllowedActor = "agent" | "human";
 
@@ -60,10 +73,14 @@ export type ActionDescriptor = {
 
 export type ControlSurfaceEntry = {
   controlId: string;
+  owner: ControlOwner;
   path: string;
   mode: "user" | "agent" | "agent_readonly";
   allowedPayloads: string[];
-  safetyMode: "strict" | "bounded" | "experimental";
+  safetyMode: ControlSafetyMode;
+  safePreconditions: string[];
+  requiresPostV01: boolean;
+  requiresExplicitOptIn: boolean;
 };
 
 export type ManifestRestriction = {
@@ -104,6 +121,7 @@ export type ValidateAgentActionInput = {
   request: AgentActionRequest;
   expectedScope?: string;
   now?: () => number;
+  controlPolicy?: AgentFlowControlPolicy;
 };
 
 export type AgentActionAllowed = {
@@ -134,7 +152,9 @@ export type AgentActionRejectionCode =
   | "action_not_listed"
   | "actor_not_authorized"
   | "control_not_listed"
+  | "action_control_mismatch"
   | "control_mode_restricted"
+  | "control_policy_restricted"
   | "payload_not_listed"
   | "private_action_blocked"
   | "precondition_missing"
@@ -411,6 +431,84 @@ function buildAllowedActions(input: {
         },
       },
     },
+    {
+      id: AGENT_FLOW_EXPERIMENTAL_VOICE_ACTION_ID,
+      actor: "agent",
+      controlId: AGENT_FLOW_VOICE_CONTROL_ID,
+      preconditions: [
+        {
+          key: "scope",
+          op: "eq",
+          value: input.scope,
+        },
+        {
+          key: "state",
+          op: "in",
+          value: ["gap", "partial", "questionable", "attempted", "owned", "blocked", "unvisited"],
+        },
+      ],
+      requiredEvidenceKinds: [],
+      requiredArtifacts: [],
+      allowedInputs: ["voice-channel-query"],
+      outputs: ["experimental_control_probe"],
+      postconditions: ["no_state_mutation"],
+      safeFallback: "none",
+      playwrightLinkage: {
+        playwrightTraceId: "sibi-ownership-workbench.slice11",
+        actionScenarioId: "agent-action.probe-voice-channel",
+        assertions: {
+          minimum: ["Voice control visibility is declared"],
+          required: ["Experimental control output is read-only"],
+        },
+        recovery: {
+          fallbackScenarioId: "agent-action.probe-voice-channel.recovery",
+          fallbackAction: "read_manifest",
+          recoveryAssertions: [
+            "Use manifest read action as non-destructive recovery",
+            "Do not mutate readiness or ownership facts",
+          ],
+        },
+      },
+    },
+    {
+      id: AGENT_FLOW_EXPERIMENTAL_JARVIS_ACTION_ID,
+      actor: "agent",
+      controlId: AGENT_FLOW_JARVIS_CONTROL_ID,
+      preconditions: [
+        {
+          key: "scope",
+          op: "eq",
+          value: input.scope,
+        },
+        {
+          key: "state",
+          op: "in",
+          value: ["gap", "partial", "questionable", "attempted", "owned", "blocked", "unvisited"],
+        },
+      ],
+      requiredEvidenceKinds: [],
+      requiredArtifacts: [],
+      allowedInputs: ["jarvis-channel-query"],
+      outputs: ["experimental_control_probe"],
+      postconditions: ["no_state_mutation"],
+      safeFallback: "none",
+      playwrightLinkage: {
+        playwrightTraceId: "sibi-ownership-workbench.slice11",
+        actionScenarioId: "agent-action.probe-jarvis-channel",
+        assertions: {
+          minimum: ["Jarvis control visibility is declared"],
+          required: ["Experimental control output is read-only"],
+        },
+        recovery: {
+          fallbackScenarioId: "agent-action.probe-jarvis-channel.recovery",
+          fallbackAction: "read_manifest",
+          recoveryAssertions: [
+            "Use manifest read action as non-destructive recovery",
+            "Do not mutate readiness or ownership facts",
+          ],
+        },
+      },
+    },
   ];
 }
 
@@ -418,24 +516,58 @@ function buildControlSurface(): ControlSurfaceEntry[] {
   return [
     {
       controlId: "agent-flow-control-submit-guided-attempt",
+      owner: "agent",
       path: "ownership-harness.submit-guided-attempt",
       mode: "agent",
       allowedPayloads: ["guided-attempt-attempt-text"],
       safetyMode: "strict",
+      safePreconditions: ["Agent action is the active actor", "Action payload is validated"],
+      requiresPostV01: false,
+      requiresExplicitOptIn: false,
     },
     {
       controlId: "agent-flow-control-mark-unknown",
+      owner: "human",
       path: "ownership-harness.mark-unknown",
       mode: "user",
       allowedPayloads: ["mark-unknown-action"],
       safetyMode: "bounded",
+      safePreconditions: ["Human actor for manual fallback", "Question remains open"],
+      requiresPostV01: false,
+      requiresExplicitOptIn: false,
     },
     {
       controlId: "agent-flow-control-read-manifest",
+      owner: "agent",
       path: "ownership-harness.read-manifest",
       mode: "agent_readonly",
       allowedPayloads: ["inspect-manifest"],
       safetyMode: "bounded",
+      safePreconditions: ["Manifest read is idempotent", "No state mutation required"],
+      requiresPostV01: false,
+      requiresExplicitOptIn: false,
+    },
+    {
+      controlId: AGENT_FLOW_VOICE_CONTROL_ID,
+      owner: "voice",
+      path: "ownership-harness.voice-channel",
+      mode: "agent",
+      allowedPayloads: ["voice-channel-query"],
+      safetyMode: "experimental",
+      safePreconditions: ["Bind to post-v0.1 policy", "Explicit opt-in required"],
+      requiresPostV01: true,
+      requiresExplicitOptIn: true,
+    },
+    {
+      controlId: AGENT_FLOW_JARVIS_CONTROL_ID,
+      owner: "jarvis",
+      path: "ownership-harness.jarvis-channel",
+      mode: "agent",
+      allowedPayloads: ["jarvis-channel-query"],
+      safetyMode: "experimental",
+      safePreconditions: ["Bind to post-v0.1 policy", "Explicit opt-in required"],
+      requiresPostV01: true,
+      requiresExplicitOptIn: true,
     },
   ];
 }
@@ -500,6 +632,33 @@ function findAction(manifest: AgentFlowManifest, actionId: string): ActionDescri
 
 function findControl(manifest: AgentFlowManifest, controlId: string): ControlSurfaceEntry | undefined {
   return manifest.controlSurface.find((entry) => entry.controlId === controlId);
+}
+
+function hasExplicitOptIn(control: ControlSurfaceEntry, policy?: AgentFlowControlPolicy): boolean {
+  if (!control.requiresExplicitOptIn) {
+    return true;
+  }
+
+  return (policy?.experimentalControlOptIn ?? []).includes(control.controlId);
+}
+
+function isControlAuthorized(control: ControlSurfaceEntry, policy?: AgentFlowControlPolicy): boolean {
+  if (control.requiresPostV01 && !policy?.postV01Enabled) {
+    return false;
+  }
+
+  if (control.safetyMode !== "experimental") {
+    return true;
+  }
+
+  return hasExplicitOptIn(control, policy);
+}
+
+export function isControlSurfaceAuthorizedForPolicy(
+  control: ControlSurfaceEntry,
+  policy?: AgentFlowControlPolicy,
+): boolean {
+  return isControlAuthorized(control, policy);
 }
 
 function evalPrecondition(context: AgentActionRuntime, condition: ActionManifestPrecondition): boolean {
@@ -810,6 +969,35 @@ export function validateAgentAction(input: ValidateAgentActionInput): AgentActio
       reason: `Control ${request.controlId} is not listed in the manifest control surface.`,
       expectedActionHint: action.id,
       fallbackAction: action.safeFallback === "none" ? "mark_unknown" : action.safeFallback,
+      fallbackScenarioId: action.playwrightLinkage.recovery.fallbackScenarioId,
+    });
+  }
+
+  if (action.controlId !== request.controlId) {
+    return buildRejected(input, now, {
+      actionId: request.actionId,
+      controlId: request.controlId,
+      actor: request.actor,
+      payload: request.payload,
+      reasonCode: "action_control_mismatch",
+      reason:
+        `Action ${request.actionId} is declared for control ${action.controlId}, but request used ${request.controlId}.`,
+      expectedActionHint: action.id,
+      fallbackAction: action.safeFallback,
+      fallbackScenarioId: action.playwrightLinkage.recovery.fallbackScenarioId,
+    });
+  }
+
+  if (!isControlAuthorized(control, input.controlPolicy)) {
+    return buildRejected(input, now, {
+      actionId: request.actionId,
+      controlId: request.controlId,
+      actor: request.actor,
+      payload: request.payload,
+      reasonCode: "control_policy_restricted",
+      reason: `Control ${request.controlId} is disabled by policy for the current runtime configuration.`,
+      expectedActionHint: action.id,
+      fallbackAction: action.safeFallback,
       fallbackScenarioId: action.playwrightLinkage.recovery.fallbackScenarioId,
     });
   }

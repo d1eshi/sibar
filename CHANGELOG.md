@@ -167,6 +167,21 @@ release yet.
   conditions (unlisted/private/payload stale manifest), and Playwright coverage in
   lab mode for manifest visibility plus allowed/rejected validation diagnostics.
 
+### Added - Slice 11 Control Surface Authorization
+
+- Extended `src/ownershipWorkbench/agentFlowManifest.ts` with an auditable
+  control-surface registry that includes control owner, mode, allowed payloads,
+  safe preconditions, and explicit experimental policy flags.
+- Added explicit policy gating in action validation for `voice` and `Jarvis`:
+  default deny, requiring `post-v0.1` and explicit control opt-in.
+- Added experimental actions for control channel probes with deterministic
+  policy-restricted validation paths plus recovery metadata.
+- Updated lab manifest rendering in `OwnershipHarnessPanel.tsx` to expose control
+  claims and authorization policy status (including `policy=post-v0.1+opt-in`).
+- Added unit coverage for control registry details, experimental-default-deny
+  behavior, and explicit opt-in allow rules in
+  `Tests/sibi-ownership-workbench.test.ts`.
+
 ### Added - Slice 1 Inventory Runtime
 
 - Moved the Slice 1 contract/runtime base for deterministic `repoInventory(sourceRoot)`

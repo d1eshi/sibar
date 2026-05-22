@@ -386,6 +386,21 @@ test("lab mode renders agent-flow manifest and diagnostics", async ({ page }) =>
   await expect(page.getByLabel("Agent action validation")).toContainText("agent_action_allowed");
   await expect(page.getByLabel("Agent action validation")).toContainText("agent_action_rejected");
   await expect(page.getByLabel("Agent action validation")).toContainText("private_action_blocked");
+  const manifestSection = page.getByLabel("Agent-flow manifest");
+  const registrySection = manifestSection.getByLabel("Control authorization registry");
+  const controlClaims = registrySection.getByRole("listitem");
+  const voiceClaim = controlClaims.filter({ hasText: "agent-flow-control-voice" });
+  const jarvisClaim = controlClaims.filter({ hasText: "agent-flow-control-jarvis" });
+
+  await expect(voiceClaim).toHaveCount(1);
+  await expect(jarvisClaim).toHaveCount(1);
+  await expect(voiceClaim.filter({ hasText: "safePreconditions: Bind to post-v0.1 policy, Explicit opt-in required" })).toHaveCount(1);
+  await expect(jarvisClaim.filter({ hasText: "safePreconditions: Bind to post-v0.1 policy, Explicit opt-in required" })).toHaveCount(1);
+  await expect(voiceClaim.filter({ hasText: "postV01=true" })).toHaveCount(1);
+  await expect(jarvisClaim.filter({ hasText: "postV01=true" })).toHaveCount(1);
+  await expect(voiceClaim.filter({ hasText: "optInRequired=true" })).toHaveCount(1);
+  await expect(jarvisClaim.filter({ hasText: "optInRequired=true" })).toHaveCount(1);
+  await expect(controlClaims.filter({ hasText: "policy=post-v0.1+opt-in" })).toHaveCount(2);
 });
 
 test("agent-flow diagnostics are hidden in default view", async ({ page }) => {
