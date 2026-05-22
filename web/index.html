@@ -66,59 +66,110 @@ if (location.protocol !== "file:" && location.hostname !== "localhost" && locati
   </section>
 
   <section class="poster-artifacts" id="artifacts" aria-labelledby="artifacts-title">
-    <h2 id="artifacts-title">OWNERSHIP IS A PRACTICE</h2>
-    <div class="artifact-grid">
-      <article class="artifact-column">
-        <header>
-          <h3>1. Prove it</h3>
-          <p>You attempt an explanation of the boundary.</p>
+    <h2 id="artifacts-title">SIBI OWNERSHIP REVIEW DEMO</h2>
+    <div class="demo-mockup" aria-label="Sibi ownership review product mockup">
+      <section class="demo-panel diff-panel-demo" aria-label="Paste diff">
+        <header class="demo-panel-head">
+          <div><span class="demo-icon">⌘</span><strong>Paste diff</strong></div>
+          <button type="button" aria-label="Close diff panel">×</button>
         </header>
-        <div class="artifact-card code-artifact" aria-label="Code diff artifact">
-          <pre><code>diff -- src/runtime/evaluateAttempt.ts
-@@ -48,6 +48,11 @@ export function evaluateAttempt(state) {
+        <div class="demo-panel-body">
+          <div class="file-line">
+            <strong>src/runtime/compileWorkspaceIntent.ts</strong>
+            <span><b>+423</b> <em>-61</em></span>
+          </div>
+          <pre class="demo-code"><code>@@ -128,7 +128,13 @@ export function compileWorkspaceIntent(
+128   const plan = buildPlan(input);
+129   const context = loadContext(plan);
+130   const result = execute(plan, context);
 
-48   const result = run(input);
-49   const score = scoreResult(result);
-50 + validateOwnershipBoundary(result);
-51 + recordEvidence(result);
-52 + updateRuntimeState(result);
-53   return { score, result };</code></pre>
+-     if (!result.ok) {
+-       return failure(result.error);
+-     }
+-     return success(result.value);
++     const evaluation = evaluateAttempt(result, context);
++     if (!evaluation.passed) {
++       recordFailure(evaluation);
++       return failure(evaluation.error);
++     }
++     return success(evaluation.value);
+131 }</code></pre>
+          <footer class="diff-footer">
+            <span>Files changed <b>7</b></span>
+            <span>Lines <b>+423</b> <em>-61</em></span>
+            <button type="button">Re-run review</button>
+          </footer>
         </div>
-      </article>
+      </section>
 
-      <div class="artifact-arrow" aria-hidden="true">-></div>
-
-      <article class="artifact-column">
-        <header>
-          <h3>2. Gap diagnosed</h3>
-          <p>Sibi shows what you missed, with evidence.</p>
+      <section class="demo-panel attempt-panel-demo" aria-label="Explain what breaks">
+        <header class="demo-panel-head">
+          <div><span class="demo-icon">◎</span><strong>Explain what breaks</strong></div>
+          <span>Boundary: Attempt Evaluation</span>
         </header>
-        <div class="artifact-card diagnosis-artifact" aria-label="Gap diagnosis artifact">
-          <h4>GAP DIAGNOSIS</h4>
-          <ul>
-            <li>Confused validation with evaluation</li>
-            <li>No downstream consumer identified</li>
-            <li>Deletion risk not explained</li>
-            <li>Missing failure mode</li>
-          </ul>
-          <p class="evidence-line">Evidence available in 3 files</p>
+        <div class="demo-panel-body">
+          <div class="sibi-asks">
+            <strong>Sibi asks</strong>
+            <ol>
+              <li>What is being evaluated?</li>
+              <li>What evidence proves it?</li>
+              <li>What would break if this layer was removed?</li>
+            </ol>
+          </div>
+          <label class="attempt-box-demo">
+            <span>Your attempt</span>
+            <textarea spellcheck="false">This layer evaluates the attempt result against the context. It gathers rules and checks from the context and runs validations. If we removed it, invalid results could be accepted and downstream metrics would be wrong.
+
+Evidence: evaluateAttempt(), recordFailure(), and the new evaluation type.</textarea>
+          </label>
+          <div class="attempt-actions">
+            <button type="button">Submit attempt</button>
+            <a href="#top">Ask for hint</a>
+          </div>
+          <div class="attempt-progress">
+            <span>2 attempts today</span>
+            <i><b></b></i>
+            <span>Good progress</span>
+          </div>
         </div>
-      </article>
+      </section>
 
-      <div class="artifact-arrow" aria-hidden="true">-></div>
-
-      <article class="artifact-column">
-        <header>
-          <h3>3. Repair the boundary</h3>
-          <p>Smallest next step to close the gap.</p>
+      <section class="demo-panel debt-panel-demo" aria-label="Debt reduced">
+        <header class="demo-panel-head">
+          <div><span class="demo-icon">↗</span><strong>Debt reduced</strong></div>
         </header>
-        <div class="artifact-card repair-artifact" aria-label="Next repair artifact">
-          <h4>NEXT SMALLEST REPAIR</h4>
-          <p>Explain the difference between:</p>
-          <blockquote>"checking if an answer is good"<br>vs<br>"proving the user owns a system boundary".</blockquote>
-          <a class="repair-button" href="#top">Retry attempt <span aria-hidden="true">-></span></a>
+        <div class="demo-panel-body">
+          <article class="debt-metric increase">
+            <div>
+              <strong>Cognitive debt</strong>
+              <p>This change increased debt.</p>
+              <span>+18%</span>
+              <em>High increase</em>
+            </div>
+            <svg viewBox="0 0 260 90" aria-hidden="true">
+              <polyline points="12,58 48,42 75,56 104,54 136,42 170,20 205,36 232,24 252,10"></polyline>
+              <circle cx="252" cy="10" r="7"></circle>
+            </svg>
+          </article>
+          <article class="debt-metric recovered">
+            <div>
+              <strong>Ownership recovered</strong>
+              <p>After your attempt</p>
+              <span>-14%</span>
+              <em>Debt reduced</em>
+            </div>
+            <svg viewBox="0 0 260 90" aria-hidden="true">
+              <polyline points="12,25 50,28 76,12 108,25 142,50 176,54 210,66 252,78"></polyline>
+              <circle cx="252" cy="78" r="7"></circle>
+            </svg>
+          </article>
+          <div class="recovered-callout">
+            <strong>Ownership recovered</strong>
+            <p>You demonstrated understanding of this boundary.</p>
+          </div>
+          <a class="read-path-button" href="#top">View updated read path <span aria-hidden="true">-></span></a>
         </div>
-      </article>
+      </section>
     </div>
   </section>
 </main>
