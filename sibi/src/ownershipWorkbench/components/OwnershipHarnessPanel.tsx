@@ -15,6 +15,7 @@ import * as React from "react";
 import { OwnershipLabPanel } from "./OwnershipLabPanel";
 import { ReviewGuidePanel } from "./ReviewGuidePanel";
 import { RepoInventoryStatusPanel } from "./RepoInventoryStatusPanel";
+import type { TransferAttemptRecord } from "../transferVerification.ts";
 
 interface OwnershipLabContext {
   selectedFile: string;
@@ -42,6 +43,13 @@ interface OwnershipHarnessPanelProps {
   onSubmitReadinessAttempt: () => void;
   onMarkUnknown: () => void;
   onRetryAttempt: () => void;
+  transferQuestion: string;
+  transferAnswerText: string;
+  onTransferAnswerChange: (next: string) => void;
+  onSubmitTransferAttempt: () => void;
+  onSkipTransfer: () => void;
+  latestTransferAttempt: TransferAttemptRecord | null;
+  showTransferProbe: boolean;
 }
 
 export function OwnershipHarnessPanel({
@@ -62,11 +70,23 @@ export function OwnershipHarnessPanel({
   onSubmitReadinessAttempt,
   onMarkUnknown,
   onRetryAttempt,
+  transferQuestion,
+  transferAnswerText,
+  onTransferAnswerChange,
+  onSubmitTransferAttempt,
+  onSkipTransfer,
+  latestTransferAttempt,
+  showTransferProbe,
 }: OwnershipHarnessPanelProps): React.ReactElement {
   const isLabView = surfaceMode === "lab" && labContext != null;
   const currentQuestion = sessionState.isComplete ? null : sessionQuestions[sessionState.currentIndex] ?? null;
   const readinessReady = latestReadiness?.readiness_gate === "ready";
   const latestElapsedMs = latestReadiness == null ? null : Math.max(1, latestReadiness.elapsedMs);
+  const transferState = latestReadiness?.transfer ?? null;
+  const transferOutcomeText = transferState?.transferOutcome ?? "not yet attempted";
+  const transferContinuityText =
+    transferState == null ? "—" : `${Math.round(transferState.readinessContinuity * 100)}%`;
+  const transferDebtText = transferState == null ? "—" : `${Math.round(transferState.debtSignal * 100)}%`;
 
   const readinessStatusText = latestReadiness == null ? "Not yet attempted." : latestReadiness.readiness_gate;
   const evidenceFitText = latestReadiness == null ? "—" : `${Math.round(latestReadiness.evidence_fit * 100)}%`;
@@ -224,6 +244,59 @@ export function OwnershipHarnessPanel({
                       <dd>{latestReadiness.returnCondition}</dd>
                     </div>
                   </dl>
+                )}
+                {showTransferProbe && (
+                  <section className="transferSection" aria-label="Transfer probe">
+                    <h4>Transfer probe required</h4>
+                    <p>{transferQuestion}</p>
+                    <label className="attemptField">
+                      <span>Transfer answer</span>
+                      <textarea
+                        value={transferAnswerText}
+                        onChange={(event) => onTransferAnswerChange(event.target.value)}
+                        placeholder="Translate the boundary invariant to the related file."
+                        rows={5}
+                      />
+                    </label>
+                    <div className="attemptActions">
+                      <button
+                        type="button"
+                        onClick={onSubmitTransferAttempt}
+                        disabled={transferAnswerText.trim().length === 0}
+                      >
+                        Submit transfer answer
+                      </button>
+                      <button type="button" onClick={onSkipTransfer} className="secondary">
+                        Skip transfer
+                      </button>
+                    </div>
+                    <div className="readinessMetrics">
+                      <span>Transfer outcome: {transferOutcomeText}</span>
+                      <span>Continuity: {transferContinuityText}</span>
+                      <span>Debt signal: {transferDebtText}</span>
+                      {transferState?.transferRecurrenceTags?.length ? (
+                        <span>Recurrence: {transferState.transferRecurrenceTags.join(", ")}</span>
+                      ) : null}
+                    </div>
+                    {(transferState?.transferFollowUpTasks?.length ?? 0) > 0 ? (
+                      <div className="gapCard">
+                        <p>Recovery tasks</p>
+                        <ul>
+                          {(transferState?.transferFollowUpTasks ?? []).map((task) => (
+                            <li key={task}>{task}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    ) : null}
+                    {transferState?.transferEscalationCandidate ? (
+                      <p className="gapEvidence">Escalation candidate: transfer failed repeatedly.</p>
+                    ) : null}
+                    {latestTransferAttempt ? (
+                      <p className="gapEvidence">
+                        Last transfer answer: {latestTransferAttempt.attemptTextPreview}
+                      </p>
+                    ) : null}
+                  </section>
                 )}
                 {latestReadiness?.gapDiagnoses?.map((gap) => (
                   <section className="gapCard" key={`${latestReadiness.attempt_id}-${gap.reason}`}>

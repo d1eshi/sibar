@@ -188,6 +188,12 @@ Deliverables:
 - repeated transfer failure causes escalation candidate and recovery task list;
 - transfer outcomes represented in readiness exports.
 
+Implementation note for this slice:
+
+- `transfer.required` is true when the selected boundary has more than one file in-scope, and the related
+  boundary is selected deterministically from `boundary.files` + `reviewQueue`, preferring `runtime` adjacency
+  over test coverage when both exist.
+
 Acceptance:
 
 - a boundary cannot be considered stable without one transfer probe when required;

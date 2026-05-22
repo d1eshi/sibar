@@ -13,6 +13,7 @@ type OwnershipEvidenceExtraction = typeof import("../src/ownershipWorkbench/evid
 type OwnershipAttemptReadiness = typeof import("../src/ownershipWorkbench/attemptReadiness.ts");
 type OwnershipBoundaryBuilder = typeof import("../src/ownershipWorkbench/boundaryBuilder.ts");
 type OwnershipTreeReasonFormatting = typeof import("../src/ownershipWorkbench/fileTreeReasonFormatting.ts");
+type OwnershipTransferVerification = typeof import("../src/ownershipWorkbench/transferVerification.ts");
 
 const EXPECTED_DIFF_FILES = ["src/api/session.ts", "src/api/session.test.ts"] as const;
 const DIRECTORY_PATHS = ["src", "src/api", "src/runtime"] as const;
@@ -25,6 +26,7 @@ let cachedEvidenceExtraction: OwnershipEvidenceExtraction | null = null;
 let cachedAttemptReadiness: OwnershipAttemptReadiness | null = null;
 let cachedBoundaryBuilder: OwnershipBoundaryBuilder | null = null;
 let cachedFileTreeReasonFormatting: OwnershipTreeReasonFormatting | null = null;
+let cachedTransferVerification: OwnershipTransferVerification | null = null;
 let fixtureImportConsoleErrors: unknown[] = [];
 
 async function loadFixturesModule(): Promise<OwnershipWorkbenchFixtures> {
@@ -108,6 +110,15 @@ async function loadFileTreeReasonFormattingModule(): Promise<OwnershipTreeReason
 
   cachedFileTreeReasonFormatting = (await import("../src/ownershipWorkbench/fileTreeReasonFormatting.ts")) as OwnershipTreeReasonFormatting;
   return cachedFileTreeReasonFormatting;
+}
+
+async function loadTransferVerificationModule(): Promise<OwnershipTransferVerification> {
+  if (cachedTransferVerification != null) {
+    return cachedTransferVerification;
+  }
+
+  cachedTransferVerification = (await import("../src/ownershipWorkbench/transferVerification.ts")) as OwnershipTransferVerification;
+  return cachedTransferVerification;
 }
 
 test("fixture file tree paths only include leaf file paths", async () => {
@@ -425,6 +436,211 @@ test("ownership review session completes on a valid final answer", async () => {
   assert.equal(result.state.currentIndex, questions.length - 1);
   assert.equal(result.state.observations.length, 0);
   assert.match(result.feedback, /session complete/i);
+});
+
+test("transfer probe chooses a deterministic nearby boundary and captures required transfer contract fields", async () => {
+  const fixtures = await loadFixturesModule();
+  const transferVerification = await loadTransferVerificationModule();
+  const probe = transferVerification.makeTransferProbe(
+    fixtures.ownershipBoundary,
+    fixtures.ownershipReviewQueue,
+  );
+
+  assert.equal(probe.required, true);
+  assert.equal(probe.sourceBoundaryFile, fixtures.ownershipBoundary.filePath);
+  assert.equal(probe.relatedBoundaryFile, "src/runtime/consumer.ts");
+  assert.equal(probe.sourceBoundaryTitle, fixtures.ownershipBoundary.title);
+  assert.equal(probe.relatedBoundaryTitle, "Caller contract for unauthenticated runtime paths");
+  assert.equal(probe.required, true);
+  assert.match(probe.id, /^probe-boundary-01-/);
+  assert.match(
+    probe.question,
+    /Transfer this boundary contract from session to consumer\./,
+  );
+});
+
+test("transfer attempt contract classifies pass/fail/skip with recurrence and follow-up tasks", async () => {
+  const fixtures = await loadFixturesModule();
+  const attemptReadiness = await loadAttemptReadinessModule();
+  const transferVerification = await loadTransferVerificationModule();
+
+  const boundary = {
+    ...fixtures.ownershipBoundary,
+    evidence: fixtures.fixtureEvidence,
+  };
+  const passText =
+    "In consumer, transfer the caller guard from session by checking `if (!session)` before privileged paths; this keeps the null contract equivalent across both boundary locations.";
+  const failText = "I am not sure why this is related.";
+  const readyAttempt = attemptReadiness.evaluateOwnershipAttemptReadiness({
+    attemptText: passText,
+    boundary,
+    selfConfidence: 62,
+    attemptIndex: 1,
+    startedAt: 10_000,
+    submittedAt: 10_500,
+  });
+
+  const probe = transferVerification.makeTransferProbe(boundary, fixtures.ownershipReviewQueue);
+  assert.equal(readyAttempt.readiness_gate, "ready");
+
+  const passAttempt = transferVerification.evaluateTransferAttempt({
+    attemptText: passText,
+    attemptIndex: 1,
+    probe,
+    transferHistory: [],
+    startedAt: 11_000,
+    now: () => 11_250,
+  });
+  const failAttempt = transferVerification.evaluateTransferAttempt({
+    attemptText: failText,
+    attemptIndex: 2,
+    probe,
+    transferHistory: [passAttempt],
+    startedAt: 11_500,
+    now: () => 11_900,
+  });
+  const skipAttempt = transferVerification.makeTransferSkip({
+    attemptText: "",
+    attemptIndex: 3,
+    probe,
+    transferHistory: [passAttempt, failAttempt],
+    startedAt: 12_000,
+    now: () => 12_350,
+  });
+
+  assert.equal(passAttempt.outcome, "transfer_pass");
+  assert.equal(passAttempt.questionId, "transfer_to_related_file");
+  assert.equal(failAttempt.outcome, "transfer_fail");
+  assert.equal(failAttempt.questionId, "transfer_to_related_file");
+  assert.equal(skipAttempt.outcome, "transfer_skip");
+  assert.equal(skipAttempt.questionId, "transfer_unknown");
+  assert.match(passAttempt.attemptTextPreview, /consumer/);
+  assert.match(failAttempt.attemptTextPreview, /not sure why/);
+  assert.equal(skipAttempt.attemptTextPreview, "skipped");
+
+  assert.equal(failAttempt.escalationCandidate, false, "single failure should not escalate automatically");
+  assert.ok(failAttempt.followUpTasks.includes("Name one concrete invariant that must hold in the related boundary file."));
+
+  const repeatedFail = transferVerification.evaluateTransferAttempt({
+    attemptText: "Another weak and unclear answer.",
+    attemptIndex: 4,
+    probe,
+    transferHistory: [passAttempt, failAttempt],
+    startedAt: 12_600,
+    now: () => 12_900,
+  });
+  assert.equal(repeatedFail.outcome, "transfer_fail");
+  assert.equal(repeatedFail.escalationCandidate, true);
+  assert.equal(repeatedFail.recurrenceTags.includes("transfer-recurrence-2"), true);
+});
+
+test("transfer readiness integration updates continuity and debt by transfer outcome", async () => {
+  const fixtures = await loadFixturesModule();
+  const attemptReadiness = await loadAttemptReadinessModule();
+  const transferVerification = await loadTransferVerificationModule();
+
+  const boundary = {
+    ...fixtures.ownershipBoundary,
+    evidence: fixtures.fixtureEvidence,
+  };
+  const readyAttempt = attemptReadiness.evaluateOwnershipAttemptReadiness({
+    attemptText:
+      "The createSession branch can return null; callers must guard with `if (!session)` before any privileged request.",
+    boundary,
+    selfConfidence: 62,
+    attemptIndex: 1,
+    startedAt: 22_000,
+    submittedAt: 22_450,
+  });
+  const probe = transferVerification.makeTransferProbe(boundary, fixtures.ownershipReviewQueue);
+  const baseline = transferVerification.integrateTransferReadinessState({
+    boundary,
+    reviewQueue: fixtures.ownershipReviewQueue,
+    readiness: readyAttempt,
+    transferHistory: [],
+  });
+
+  assert.equal(baseline.transfer.required, true);
+  assert.equal(baseline.transfer.transferAttemptCount, 0);
+  assert.equal(baseline.transfer.transferOutcome, null);
+  assert.equal(baseline.transfer.transferRecurrenceTags.length, 0);
+  assert.equal(Math.round(baseline.transfer.readinessContinuity * 100), 52);
+  assert.equal(Math.round(baseline.transfer.debtSignal * 100), 48);
+  assert.equal(baseline.transfer.transferred, false);
+
+  const passingAttempt = transferVerification.evaluateTransferAttempt({
+    attemptText: "In consumer, transfer the same `if (!session)` guard from session.ts to keep the contract identical.",
+    attemptIndex: 1,
+    probe,
+    transferHistory: [],
+    startedAt: 22_600,
+    now: () => 22_880,
+  });
+  const passed = transferVerification.integrateTransferReadinessState({
+    boundary,
+    reviewQueue: fixtures.ownershipReviewQueue,
+    readiness: readyAttempt,
+    transferHistory: [passingAttempt],
+  });
+
+  assert.equal(passed.transfer.transferOutcome, "transfer_pass");
+  assert.equal(passed.transfer.transferred, true);
+  assert.equal(Math.round(passed.transfer.readinessContinuity * 100), 87);
+  assert.equal(Math.round(passed.transfer.debtSignal * 100), 13);
+
+  const firstFail = transferVerification.evaluateTransferAttempt({
+    attemptText: "I do not have enough context for the caller.",
+    attemptIndex: 1,
+    probe,
+    transferHistory: [],
+    startedAt: 23_000,
+    now: () => 23_200,
+  });
+  const secondFail = transferVerification.evaluateTransferAttempt({
+    attemptText: "Still not transferable.",
+    attemptIndex: 2,
+    probe,
+    transferHistory: [firstFail],
+    startedAt: 23_300,
+    now: () => 23_600,
+  });
+  const failed = transferVerification.integrateTransferReadinessState({
+    boundary,
+    reviewQueue: fixtures.ownershipReviewQueue,
+    readiness: readyAttempt,
+    transferHistory: [firstFail, secondFail],
+  });
+
+  assert.equal(failed.transfer.transferOutcome, "transfer_fail");
+  assert.equal(failed.transfer.transferEscalationCandidate, true);
+  assert.equal(failed.transfer.transferRecurrenceTags.includes("transfer-recurrence-2"), true);
+  assert.equal(Math.round(failed.transfer.readinessContinuity * 100), 47);
+  assert.equal(Math.round(failed.transfer.debtSignal * 100), 53);
+});
+
+test("App gates state transitions when readiness is ready but transfer has not passed", async () => {
+  const appSource = readFileSync(new URL("../src/App.tsx", import.meta.url), "utf8");
+
+  assert.match(
+    appSource,
+    /const isTransferSatisfied =\s*!isTransferRequired \|\| projectedAttempt\.transfer\.transferOutcome === "transfer_pass";/,
+    "App should gate ownership stability on transfer pass when transfer is required",
+  );
+  assert.match(
+    appSource,
+    /nextBoundaryState =\s*projectedAttempt\.readiness_gate === "ready" && isTransferSatisfied\s*\?\s*"owned"\s*:\s*projectedAttempt\.readiness_gate === "ready"\s*\?\s*"partial"/,
+    "App should downgrade ready state to partial until transfer passes",
+  );
+  assert.match(
+    appSource,
+    /onSubmitTransferAttempt=\{submitTransferAttempt\}/,
+    "App should pass transfer submit handler into the harness panel",
+  );
+  assert.match(
+    appSource,
+    /onSkipTransfer=\{submitTransferSkip\}/,
+    "App should pass transfer skip handler into the harness panel",
+  );
 });
 
 test("ownership review session completes with a final observation on weak last answer", async () => {
