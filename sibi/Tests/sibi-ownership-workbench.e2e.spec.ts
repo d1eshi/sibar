@@ -15,6 +15,23 @@ test("default workbench starts a guided ownership session without lab traces", a
   expect(codeBox?.width).toBeGreaterThan(500);
 });
 
+test("default workbench exposes highest-risk boundary section in the compact review panel", async ({ page }) => {
+  await page.goto("/");
+
+  await expect(page.getByRole("heading", { level: 3, name: "Highest-risk boundary" })).toBeVisible();
+  await expect(page.getByText("Responsibility claim:")).toBeVisible();
+  await expect(page.getByText(/Open questions/)).toBeVisible();
+  await expect(page.getByText(/Risk score/)).toBeVisible();
+});
+
+test("file-tree projection shows deterministic non-owned reasons", async ({ page }) => {
+  await page.goto("/");
+
+  await expect(page.locator(".fileTreePanel")).toContainText("gap: missing caller");
+  await expect(page.locator(".fileTreePanel")).toContainText("questionable");
+  await expect(page.locator(".fileTreePanel")).toContainText("gap: missing deletion path");
+});
+
 test("empty submit advances to the relation question and records no-answer gap", async ({ page }) => {
   await page.goto("/");
 

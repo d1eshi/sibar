@@ -22,6 +22,7 @@ import {
   ownershipBoundary,
   ownershipReviewQueue,
   fileTreePaths,
+  fileDiffsByPath,
 } from "./ownershipWorkbench/fixtures";
 import {
   getActiveBoundaryState,
@@ -35,6 +36,7 @@ import {
   makeOwnershipSessionQuestions,
 } from "./ownershipWorkbench/ownershipReviewSession";
 import { extractCodeEvidence } from "./ownershipWorkbench/evidenceExtraction.ts";
+import { buildBoundaryCandidates, projectBoundaryFileStates, selectHighestRiskBoundary } from "./ownershipWorkbench/boundaryBuilder";
 import { getWorkbenchSurfaceMode } from "./ownershipWorkbench/surfaceMode";
 import type { ViewMode } from "./ownershipWorkbench/types";
 import { loadFileContentStatus, type FileContentStatus } from "./ownershipWorkbench/fileContentClient.ts";
@@ -61,7 +63,32 @@ export default function App() {
   );
   const codeViewFileItem = codeViewFileItemsByPath[selectedFile];
   const codeViewDiffItem = codeViewDiffItemsByPath[selectedFile];
-  const boundaryState = getActiveBoundaryState(fileStates, ownershipBoundary);
+  const boundaryCandidates = React.useMemo(
+    () =>
+      buildBoundaryCandidates({
+        baseBoundary: ownershipBoundary,
+        fileFixtures,
+        evidenceRefs: fixtureEvidence,
+        reviewQueue: ownershipReviewQueue,
+        fileDiffsByPath,
+      }),
+    [],
+  );
+  const selectedBoundary = React.useMemo(
+    () => selectHighestRiskBoundary(boundaryCandidates),
+    [boundaryCandidates],
+  );
+  const { fileStates: projectedFileStates, fileStateReasons } = React.useMemo(
+    () =>
+      projectBoundaryFileStates({
+        boundary: selectedBoundary,
+        baseFileStates: fileStates,
+        fileDiffsByPath,
+        reviewQueue: ownershipReviewQueue,
+      }),
+    [selectedBoundary, fileStates],
+  );
+  const boundaryState = getActiveBoundaryState(projectedFileStates, selectedBoundary);
   const selectionSummaryText = getLineSelectionText(selection);
   const labContext =
     workbenchSurfaceMode === "lab"
@@ -158,7 +185,8 @@ export default function App() {
       <FileTreePanel
         fileTreePaths={fileTreePaths}
         fileTreeNodeByPath={fileTreeNodeByPath}
-        fileStates={fileStates}
+        fileStates={projectedFileStates}
+        fileStateReasons={fileStateReasons}
         selectedPath={selectedFile}
         onSelectFile={setSelectedFile}
       />
@@ -178,7 +206,7 @@ export default function App() {
       />
 
       <OwnershipHarnessPanel
-        boundary={ownershipBoundary}
+        boundary={selectedBoundary}
         inventoryStatus={inventoryStatus}
         boundaryState={boundaryState}
         reviewQueue={ownershipReviewQueue}

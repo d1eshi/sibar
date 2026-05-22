@@ -79,8 +79,24 @@ export type WorkbenchLineMetadata = {
   detail: string;
 };
 
+export type OwnershipBoundaryRiskProfile = {
+  score: number;
+  relationWeight: number;
+  missingCallerPenalty: number;
+  missingDeletionPenalty: number;
+  blockedPenalty: number;
+  questionablePenalty: number;
+};
+
 export type OwnershipBoundary = {
   id: string;
+  files: string[];
+  responsibility_claim: string;
+  evidence: EvidenceRef[];
+  open_questions: string[];
+  risk: OwnershipBoundaryRiskProfile;
+  confidence: EvidenceConfidence;
+  state_reason_hints?: Record<string, string>;
   title: string;
   filePath: string;
   startLine: number;

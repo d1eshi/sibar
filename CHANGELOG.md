@@ -106,6 +106,26 @@ release yet.
   `aria-label="Relation evidence extraction"` with evidence-kind labels and explicit gap
   reasons.
 
+### Added - Slice 4 Ownership Boundary Builder and Risk Scoring
+
+- Added `OwnershipBoundary` contract fields required for boundary scoring and
+  selection (`files`, `responsibility_claim`, `evidence`, `open_questions`,
+  `risk`, `confidence`) and retained compatibility with existing runtime fields.
+- Added deterministic boundary construction and highest-risk selection in
+  `src/ownershipWorkbench/boundaryBuilder.ts`, with relation-aware risk weighting
+  and capped scoring.
+- Added deterministic file-tree projection for selected boundary flow with
+  explicit reasoned labels for non-owned states:
+  `gap: missing caller`, `gap: missing deletion path`,
+  `blocked: prerequisite`, and `questionable`.
+- Updated harness state flow in `src/App.tsx` to consume the highest-risk boundary
+  candidate and pass reasoned projections into the file tree.
+- Added compact user-facing UI for the selected highest-risk boundary inside
+  `ReviewGuidePanel` and `src/styles.css` (`boundaryRiskGrid` with compact
+  risk summary),
+  plus dedicated unit + Playwright coverage for boundary contracts, selection,
+  and non-owned reason labels.
+
 ### Internal - Sibi Ownership Workbench Review Guide
 
 - Added deterministic workbench coverage for review guide rendering order,

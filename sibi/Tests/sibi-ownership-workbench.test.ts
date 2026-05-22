@@ -3,13 +3,15 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { CodeView as VanillaCodeView, parsePatchFiles } from "@pierre/diffs";
 import { PierreCodeView } from "../src/ownershipWorkbench/components/PierreCodeView.ts";
-import type { BoundaryState } from "../src/ownershipWorkbench/types.ts";
+import type { BoundaryState, OwnershipBoundary } from "../src/ownershipWorkbench/types.ts";
 
 type OwnershipWorkbenchFixtures = typeof import("../src/ownershipWorkbench/fixtures.ts");
 type OwnershipWorkbenchHelpers = typeof import("../src/ownershipWorkbench/helpers.ts");
 type OwnershipReviewSession = typeof import("../src/ownershipWorkbench/ownershipReviewSession.ts");
 type OwnershipWorkbenchSurfaceMode = typeof import("../src/ownershipWorkbench/surfaceMode.ts");
 type OwnershipEvidenceExtraction = typeof import("../src/ownershipWorkbench/evidenceExtraction.ts");
+type OwnershipBoundaryBuilder = typeof import("../src/ownershipWorkbench/boundaryBuilder.ts");
+type OwnershipTreeReasonFormatting = typeof import("../src/ownershipWorkbench/fileTreeReasonFormatting.ts");
 
 const EXPECTED_DIFF_FILES = ["src/api/session.ts", "src/api/session.test.ts"] as const;
 const DIRECTORY_PATHS = ["src", "src/api", "src/runtime"] as const;
@@ -19,6 +21,8 @@ let cachedHelpers: OwnershipWorkbenchHelpers | null = null;
 let cachedReviewSession: OwnershipReviewSession | null = null;
 let cachedSurfaceMode: OwnershipWorkbenchSurfaceMode | null = null;
 let cachedEvidenceExtraction: OwnershipEvidenceExtraction | null = null;
+let cachedBoundaryBuilder: OwnershipBoundaryBuilder | null = null;
+let cachedFileTreeReasonFormatting: OwnershipTreeReasonFormatting | null = null;
 let fixtureImportConsoleErrors: unknown[] = [];
 
 async function loadFixturesModule(): Promise<OwnershipWorkbenchFixtures> {
@@ -75,6 +79,24 @@ async function loadEvidenceExtractionModule(): Promise<OwnershipEvidenceExtracti
 
   cachedEvidenceExtraction = (await import("../src/ownershipWorkbench/evidenceExtraction.ts")) as OwnershipEvidenceExtraction;
   return cachedEvidenceExtraction;
+}
+
+async function loadBoundaryBuilderModule(): Promise<OwnershipBoundaryBuilder> {
+  if (cachedBoundaryBuilder != null) {
+    return cachedBoundaryBuilder;
+  }
+
+  cachedBoundaryBuilder = (await import("../src/ownershipWorkbench/boundaryBuilder.ts")) as OwnershipBoundaryBuilder;
+  return cachedBoundaryBuilder;
+}
+
+async function loadFileTreeReasonFormattingModule(): Promise<OwnershipTreeReasonFormatting> {
+  if (cachedFileTreeReasonFormatting != null) {
+    return cachedFileTreeReasonFormatting;
+  }
+
+  cachedFileTreeReasonFormatting = (await import("../src/ownershipWorkbench/fileTreeReasonFormatting.ts")) as OwnershipTreeReasonFormatting;
+  return cachedFileTreeReasonFormatting;
 }
 
 test("fixture file tree paths only include leaf file paths", async () => {
@@ -625,6 +647,219 @@ test("returns null session", () => {
   );
 });
 
+test("buildBoundaryCandidates emits Slice 4 boundary contract fields with evidence and questions", async () => {
+  const fixtures = await loadFixturesModule();
+  const builder = await loadBoundaryBuilderModule();
+
+  const candidates = builder.buildBoundaryCandidates({
+    baseBoundary: fixtures.ownershipBoundary,
+    fileFixtures: fixtures.fileFixtures,
+    evidenceRefs: fixtures.fixtureEvidence,
+    reviewQueue: fixtures.ownershipReviewQueue,
+    fileDiffsByPath: fixtures.fileDiffsByPath,
+  });
+
+  assert.equal(candidates.length, 1, "fixture should produce one deterministic boundary candidate");
+  const candidate = candidates[0];
+  assert.ok(candidate, "candidate should exist");
+  assert.equal(candidate.files.includes("src/api/session.ts"), true, "boundary files must include primary boundary file");
+  assert.equal(candidate.files.includes("src/api/session.test.ts"), true, "boundary files must include related test");
+  assert.equal(candidate.files.includes("src/runtime/consumer.ts"), true, "boundary files must include related caller");
+  assert.equal(typeof candidate.responsibility_claim, "string", "responsibility claim must be explicit");
+  assert.ok(candidate.responsibility_claim.length > 8, "responsibility claim should not be empty");
+  assert.equal(candidate.evidence.length > 0, true, "boundary evidence should be evidence-backed");
+  assert.equal(candidate.open_questions.length > 0, true, "boundary should expose open questions");
+  assert.equal(candidate.risk.score >= 0 && candidate.risk.score <= 100, true, "risk score should be normalized");
+  assert.equal(
+    candidate.risk.relationWeight > 0,
+    true,
+    "risk should include deterministic relation-weight contribution",
+  );
+  assert.ok(["observed", "inferred", "unverified", "conflict"].includes(candidate.confidence), "confidence should be valid enum");
+  assert.equal(
+    candidate.files.every((path) => ["src/api/session.ts", "src/api/session.test.ts", "src/runtime/consumer.ts"].includes(path)),
+    true,
+    "fixture scope should remain selected relation files, not arbitrary repo paths",
+  );
+  assert.equal(
+    candidate.open_questions.length > 0,
+    true,
+    "open question list should remain non-empty",
+  );
+  assert.equal(
+    candidate.responsibility_claim.toLowerCase().includes("whole repo"),
+    false,
+    "responsibility claim should remain scoped to fixture relation files",
+  );
+  assert.equal(
+    (candidate.state_reason_hints?.[fixtures.ownershipBoundary.filePath] ?? "").startsWith("questionable:"),
+    true,
+    "whole-scope selection should be marked as questionable",
+  );
+});
+
+test("selectHighestRiskBoundary picks the boundary with the highest risk score deterministically", async () => {
+  const builder = await loadBoundaryBuilderModule();
+  const candidates: OwnershipBoundary[] = [
+    {
+      id: "low",
+      files: ["src/api/session.ts"],
+      responsibility_claim: "Low risk boundary",
+      evidence: [],
+      open_questions: ["question a"],
+      risk: {
+        score: 12,
+        relationWeight: 3,
+        missingCallerPenalty: 0,
+        missingDeletionPenalty: 0,
+        blockedPenalty: 0,
+        questionablePenalty: 0,
+      },
+      confidence: "observed",
+      filePath: "src/api/session.ts",
+      startLine: 1,
+      endLine: 4,
+      state_reason_hints: {},
+      title: "low",
+      whyMatters: "test",
+      prompt: ["p"],
+      returnCondition: "ok",
+    },
+    {
+      id: "high",
+      files: ["src/api/session.ts"],
+      responsibility_claim: "High risk boundary",
+      evidence: [],
+      open_questions: ["question b"],
+      risk: {
+        score: 88,
+        relationWeight: 9,
+        missingCallerPenalty: 0,
+        missingDeletionPenalty: 0,
+        blockedPenalty: 0,
+        questionablePenalty: 0,
+      },
+      confidence: "observed",
+      filePath: "src/api/session.ts",
+      startLine: 1,
+      endLine: 4,
+      state_reason_hints: {},
+      title: "high",
+      whyMatters: "test",
+      prompt: ["p"],
+      returnCondition: "ok",
+    },
+  ];
+
+  const selected = builder.selectHighestRiskBoundary(candidates);
+  assert.equal(selected.id, "high");
+});
+
+test("projectBoundaryFileStates emits explicit non-owned reason labels", async () => {
+  const fixtures = await loadFixturesModule();
+  const builder = await loadBoundaryBuilderModule();
+
+  const baseCandidate = builder.selectHighestRiskBoundary(
+    builder.buildBoundaryCandidates({
+      baseBoundary: fixtures.ownershipBoundary,
+      fileFixtures: fixtures.fileFixtures,
+      evidenceRefs: fixtures.fixtureEvidence,
+      reviewQueue: fixtures.ownershipReviewQueue,
+      fileDiffsByPath: fixtures.fileDiffsByPath,
+    }),
+  );
+  const candidate = {
+    ...baseCandidate,
+    state_reason_hints: {
+      ...baseCandidate.state_reason_hints,
+      [baseCandidate.filePath]: "questionable: fixture-local warning should not override missing-caller projection",
+      "src/api/session.test.ts": "gap: missing deletion path - legacy fixture warning",
+      "src/runtime/consumer.ts": "questionable: caller prerequisite is inferred from queue gaps",
+    },
+  };
+
+  const synthetic = {
+    ...fixtures.initialFileStates,
+    "src/api/session.test.ts": "attempted" as const,
+    "src/runtime/consumer.ts": "attempted" as const,
+  };
+  const projectionDiffs = { ...fixtures.fileDiffsByPath };
+  delete projectionDiffs["src/api/session.test.ts"];
+
+  const projected = builder.projectBoundaryFileStates({
+    boundary: candidate,
+    baseFileStates: synthetic,
+    fileDiffsByPath: {
+      ...projectionDiffs,
+      "src/runtime/consumer.ts": {},
+    },
+    reviewQueue: fixtures.ownershipReviewQueue,
+  });
+
+  assert.equal(Object.entries(projected.fileStates).length >= 0, true);
+  const expectedPaths = [candidate.filePath, "src/api/session.test.ts", "src/runtime/consumer.ts"];
+
+  for (const filePath of expectedPaths) {
+    const reason = projected.fileStateReasons[filePath];
+    const state = projected.fileStates[filePath];
+    if (state !== "owned") {
+      assert.ok(reason.length > 0, `reason should be present for non-owned state ${filePath}`);
+      assert.match(
+        reason,
+        /^(gap: missing caller|gap: missing deletion path|blocked: prerequisite|questionable)/,
+        "reason should use one of the reasoned projection labels",
+      );
+    }
+  }
+
+  assert.match(
+    projected.fileStateReasons["src/api/session.ts"] ?? "",
+    /^gap: missing caller - fixture-local warning should not override missing-caller projection$/,
+    "structured missing-caller reason should preserve prefix and append hint.",
+  );
+  assert.match(
+    projected.fileStateReasons["src/api/session.test.ts"] ?? "",
+    /^gap: missing deletion path - legacy fixture warning$/,
+    "structured missing-deletion reason should preserve prefix and append hint.",
+  );
+  assert.match(
+    projected.fileStateReasons["src/runtime/consumer.ts"] ?? "",
+    /^blocked: prerequisite - caller prerequisite is inferred from queue gaps$/,
+    "structured blocked reason should preserve prefix and append hint.",
+  );
+});
+
+test("file-tree snippet preserves required reason prefixes", async () => {
+  const formatter = await loadFileTreeReasonFormattingModule();
+
+  assert.equal(
+    formatter.makeReasonSnippet("gap: missing deletion path - legacy fixture warning and extra context for a larger-than-preview reason"),
+    "gap: missing deletion path",
+  );
+  assert.equal(
+    formatter.makeReasonSnippet(
+      "gap: missing caller - fixture-local hint about missing upstream references for the active boundary",
+    ),
+    "gap: missing caller",
+  );
+  assert.equal(
+    formatter.makeReasonSnippet(
+      "blocked: prerequisite - caller prerequisite is inferred from queue gaps and should stay compact in this panel",
+    ),
+    "blocked: prerequisite",
+  );
+  assert.equal(
+    formatter.makeReasonSnippet(
+      "questionable: no evidence-backed reasoned claim for this file in this boundary and this keeps a long suffix.",
+    ),
+    "questionable",
+  );
+  assert.equal(
+    formatter.makeReasonSnippet("This reason is long enough to need truncation in the compact view."),
+    "This reason is long eno...",
+  );
+});
+
 test("ReviewGuidePanel defines a first-run review sequence without free chat language", () => {
   const guideSource = readFileSync(
     new URL("../src/ownershipWorkbench/components/ReviewGuidePanel.tsx", import.meta.url),
@@ -801,6 +1036,26 @@ test("App passes a query-derived surface mode into the ownership harness", () =>
     appSource,
     /surfaceMode=\{workbenchSurfaceMode\}/,
     "App should pass the derived mode into OwnershipHarnessPanel",
+  );
+  assert.match(
+    appSource,
+    /buildBoundaryCandidates\([\s\S]*ownershipBoundary/,
+    "App should build boundary candidates from fixture contract inputs",
+  );
+  assert.match(
+    appSource,
+    /selectHighestRiskBoundary\(boundaryCandidates\)/,
+    "App should select the deterministic highest-risk boundary for the flow",
+  );
+  assert.match(
+    appSource,
+    /projectBoundaryFileStates\(/,
+    "App should project boundary file states before rendering the file tree",
+  );
+  assert.match(
+    appSource,
+    /fileStateReasons=\{fileStateReasons\}/,
+    "App should provide reasoned non-owned file states to file-tree rendering",
   );
   assert.match(
     appSource,
