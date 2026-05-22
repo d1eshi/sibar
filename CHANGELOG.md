@@ -11,6 +11,10 @@ accepted specs and iterations, not by raw commit count.
 Use this section for changes that have landed but are not part of a tagged
 release yet.
 
+### Docs - AutoResearch Cognitive Debt Workbench
+
+- Added `docs/research/2026-05-22-cognitive-debt-autoresearch-ownership-workbench.md` as a research memo for AutoResearch framing, translating cognitive debt/ cognitive load/ ownership manifesto into concrete, testable contracts, reproducible evidence definitions, UI reproducibility rules, and pending ownership decisions.
+
 ### Docs - Cognitive Debt Ownership Research
 
 - Added a sourced research memo for Sibi/Sibar cognitive debt, cognitive load,
