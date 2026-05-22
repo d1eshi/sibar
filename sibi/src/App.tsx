@@ -207,9 +207,21 @@ function CapturePrScreen({ onAnalyze }: CapturePrScreenProps): React.ReactElemen
               <h3>Leave with a reviewable ownership artifact.</h3>
               <p>Your answers become a compact route: what you own, what only supports the claim, and what remains unresolved.</p>
               <div className="slidePreview artifactMini" aria-hidden="true">
-                <span><strong>Owns</strong><small>ready to carry forward</small></span>
-                <span><strong>Supports</strong><small>evidence, not ownership</small></span>
-                <span><strong>Gap</strong><small>return condition</small></span>
+                <span className="artifactState owned">
+                  <i />
+                  <strong>Owns</strong>
+                  <small>ready to carry forward</small>
+                </span>
+                <span className="artifactState support">
+                  <i />
+                  <strong>Supports</strong>
+                  <small>evidence, not ownership</small>
+                </span>
+                <span className="artifactState gap">
+                  <i />
+                  <strong>Gap</strong>
+                  <small>return condition</small>
+                </span>
               </div>
               <div className="slideMeter" aria-hidden="true"><span /></div>
             </article>
