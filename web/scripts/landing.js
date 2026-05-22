@@ -20,7 +20,9 @@ async function submitEarlyAccess(event) {
   }
 }
 
-earlyAccessForm.addEventListener("submit", submitEarlyAccess);
+if (earlyAccessForm && earlyAccessEmail && earlyAccessXHandle && earlyAccessStatus) {
+  earlyAccessForm.addEventListener("submit", submitEarlyAccess);
+}
 
 if (rotatingSource && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
   const terms = rotatingSource.dataset.terms.split(",").map((term) => term.trim()).filter(Boolean);
