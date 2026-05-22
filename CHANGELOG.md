@@ -17,6 +17,21 @@ release yet.
   ownership verification, metrics, Playwright/agent-flow implications,
   Workspace escalation thresholds, and voice interaction guardrails.
 
+### Docs - Ownership Workbench Spec Expansion
+
+- Expanded `sibi/docs/specs/sibi-ownership-workbench/04_implementation_slices.md` into
+  a roadmap that keeps Slice 0/1 as current baseline and adds new product-ready
+  slices for relation-gap evidence, calibration/readiness, transfer verification,
+  workspace escalation, cognitive debt/load metrics, and daily learning readout.
+- Added `sibi/docs/specs/sibi-ownership-workbench/05_agent_flow_manifest.md` to define
+  explicit agent action permissions, manifest constraints, and Playwright-aligned
+  execution policy.
+- Added `sibi/docs/specs/sibi-ownership-workbench/06_cognitive_debt_metrics.md` to
+  define metric formulas, debt/readout derivation, and recurring-gap transfer
+  signals with reproducible scope.
+- Updated `sibi/docs/specs/sibi-ownership-workbench/README.md` to link the new spec
+  contracts and re-frame build sequencing.
+
 ### Changed - Sibi Ownership Workbench Review Guide
 
 - Made the Ownership Harness the primary desktop workspace with a wider
