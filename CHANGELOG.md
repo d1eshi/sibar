@@ -54,9 +54,13 @@ release yet.
   supply-chain guard baseline for `@playwright/test`.
 - Switched Sibi Vite scripts to the native config loader and a JS config so
   local sandbox runs avoid Vite temp writes under `node_modules/.vite-temp`.
-- Scoped the Sibi Vite Rollup warning handler to filter only the known
-  `@pierre/*` React bundle `"use client"` module directive noise while leaving
-  unrelated build warnings visible.
+- Moved Sibi-owned JS/TS tests from root `Tests/` into `sibi/Tests/`, and
+  updated `pnpm test`, `pnpm sibi:test`, and Playwright paths so Sibi tests run
+  from the app directory.
+- Replaced the flexible Sibi Vite Rollup warning suppression with an explicit
+  allowlist for `@pierre/*/dist/react/*` module-level `"use client"` warnings; a
+  build-backed contract test now captures the observed directive-warning sources
+  and fails on any new/unexpected files while keeping chunk-size warnings visible.
 - Added deterministic workbench coverage for query-param lab activation and
   hiding `OwnershipLabPanel` from the default harness view.
 - Added deterministic workbench coverage that gates the detailed priority queue
@@ -175,7 +179,7 @@ release yet.
 - Added ownership review exports to `src/ownership-core/index.ts` and updated
   `OWNERSHIP_REVIEW_EXTRACTION_STATE.status` to `available`, with `ownedBySlice`
   set to `slice-4`.
-- Added `Tests/ownership-core.test.ts` and updated `Tests/sibi-ownership-review.test.ts`
+- Added `Tests/ownership-core.test.ts` and updated `sibi/Tests/sibi-ownership-review.test.ts`
   for direct core coverage plus core/Sibi review parity on representative diffs.
 
 ### Added - Slice 0 Ownership Workbench Shell
@@ -204,7 +208,7 @@ release yet.
 
 ### Added - Slice 0 Workbench Adapter Regression Coverage
 
-- Added `Tests/sibi-ownership-workbench.test.ts` to prevent regressions in the
+- Added `sibi/Tests/sibi-ownership-workbench.test.ts` to prevent regressions in the
   Ownership Workbench adapter layer, including file-tree leaf-path validation,
   strict `fixtureDiff` parsing via `parsePatchFiles`, and `codeViewDiffItemsByPath`
   coverage for expected fixture files.

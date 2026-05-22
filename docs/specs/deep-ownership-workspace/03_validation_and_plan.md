@@ -191,7 +191,7 @@ pnpm test -- Tests/pedagogoai-workspace-intent.test.ts
 Relevant targets when shared core boundaries change:
 
 ```text
-pnpm test -- Tests/sibi-ownership-review.test.ts
+pnpm test -- sibi/Tests/sibi-ownership-review.test.ts
 pnpm test -- Tests/pedagogoai-architecture.test.ts
 pnpm eval:pedagogy-core-coverage
 ```

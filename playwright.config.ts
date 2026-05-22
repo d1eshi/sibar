@@ -1,7 +1,7 @@
 import { defineConfig, devices } from "@playwright/test";
 
 export default defineConfig({
-  testDir: "Tests",
+  testDir: "sibi/Tests",
   testMatch: "sibi-ownership-workbench.e2e.spec.ts",
   outputDir: "/private/tmp/sibi-playwright-results",
   fullyParallel: false,
