@@ -150,6 +150,23 @@ release yet.
 - Added coverage for metric/readout derivation in unit tests and verified daily
   readout updates and transfer summary rendering in Playwright lab mode.
 
+### Added - Slice 10 Agent-Flow and Playwright Manifest
+
+- Added pure module `src/ownershipWorkbench/agentFlowManifest.ts` with
+  deterministic manifest build and runtime action validation:
+  `AGENT_FLOW_MANIFEST_VERSION`, `AgentFlowManifest`, `ActionDescriptor`,
+  runtime scope derivation, deterministic `manifestId`, `agent_action_allowed`,
+  and `agent_action_rejected` decision outputs.
+- Added runtime-only policy gates in validation:
+  stale scope/version checks, private-action blocking, action/control listing checks,
+  actor-mode checks, payload checks, preconditions/evidence/artifact requirements.
+- Integrated lab-only manifest runtime rendering and validation diagnostics into
+  `src/App.tsx` and `src/ownershipWorkbench/components/OwnershipHarnessPanel.tsx`,
+  keeping default UI unchanged.
+- Added deterministic unit coverage for happy-path acceptance and blocked-path
+  conditions (unlisted/private/payload stale manifest), and Playwright coverage in
+  lab mode for manifest visibility plus allowed/rejected validation diagnostics.
+
 ### Added - Slice 1 Inventory Runtime
 
 - Moved the Slice 1 contract/runtime base for deterministic `repoInventory(sourceRoot)`

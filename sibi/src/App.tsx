@@ -12,6 +12,7 @@ import type {
   LineSelection,
   OwnershipSessionState,
   OwnershipReviewArtifact,
+  ReadinessGate,
 } from "./ownershipWorkbench/types";
 import {
   codeViewDiffItemsByPath,
@@ -74,6 +75,15 @@ import {
   buildOwnershipMemoryExportBundle,
   createOwnershipMemoryState,
 } from "./ownershipWorkbench/ownershipMemory.ts";
+import {
+  AGENT_FLOW_VALID_ACTIONS,
+  AGENT_FLOW_READONLY_ACTION,
+  buildAgentFlowManifest,
+  buildAgentFlowRuntime,
+  validateAgentAction,
+  type AgentActionValidationResult,
+  type AgentFlowManifest,
+} from "./ownershipWorkbench/agentFlowManifest.ts";
 
 export default function App() {
   const workbenchSurfaceMode = getWorkbenchSurfaceMode(
@@ -203,6 +213,7 @@ export default function App() {
     () => readinessHistoryWithTransfer.at(-1) ?? null,
     [readinessHistoryWithTransfer],
   );
+  const readiness: ReadinessGate | "not_attempted" = latestReadiness?.readiness_gate ?? "not_attempted";
   const escalationDecision = React.useMemo<WorkspaceEscalationDecision>(() => {
     return evaluateWorkspaceEscalation({
       boundary: selectedBoundary,
@@ -255,6 +266,54 @@ export default function App() {
         codeEvidence: [boundaryRelationEvidence],
       }),
     [ownershipMemoryExport, selectedBoundary, boundaryRelationEvidence],
+  );
+  const agentFlowManifest = React.useMemo<AgentFlowManifest>(() => {
+    return buildAgentFlowManifest({
+      boundary: selectedBoundary,
+      boundaryState,
+      readiness,
+      selectedFile,
+      sessionState,
+      evidenceRefs: fixtureEvidence,
+    });
+  }, [selectedBoundary, boundaryState, readiness, selectedFile, sessionState]);
+  const agentFlowRuntime = React.useMemo(() => {
+    return buildAgentFlowRuntime({
+      boundary: selectedBoundary,
+      boundaryState,
+      readiness,
+      selectedFile,
+      evidenceRefs: fixtureEvidence,
+      sessionState,
+    });
+  }, [selectedBoundary, boundaryState, readiness, selectedFile, sessionState]);
+  const labAgentFlowHappyPath = React.useMemo<AgentActionValidationResult>(
+    () =>
+      validateAgentAction({
+        manifest: agentFlowManifest,
+        runtime: agentFlowRuntime,
+        request: {
+          actionId: AGENT_FLOW_READONLY_ACTION,
+          actor: "agent",
+          controlId: "agent-flow-control-read-manifest",
+          payload: "inspect-manifest",
+        },
+      }),
+    [agentFlowManifest, agentFlowRuntime],
+  );
+  const labAgentFlowBlockedPath = React.useMemo<AgentActionValidationResult>(
+    () =>
+      validateAgentAction({
+        manifest: agentFlowManifest,
+        runtime: agentFlowRuntime,
+        request: {
+          actionId: "set_readiness_fact",
+          actor: "agent",
+          controlId: "agent-flow-control-submit-guided-attempt",
+          payload: "set-ready-flag",
+        },
+      }),
+    [agentFlowManifest, agentFlowRuntime],
   );
 
   const latestTransferAttempt = transferHistoryForCurrentProbe.at(-1) ?? null;
@@ -550,6 +609,9 @@ export default function App() {
         cognitiveDebtMetric={cognitiveDebtMetric}
         cognitiveLoadMetric={cognitiveLoadMetric}
         cognitiveDailyReadout={cognitiveDailyReadout}
+        agentFlowManifest={workbenchSurfaceMode === "lab" ? agentFlowManifest : null}
+        agentFlowHappyValidation={workbenchSurfaceMode === "lab" ? labAgentFlowHappyPath : null}
+        agentFlowBlockedValidation={workbenchSurfaceMode === "lab" ? labAgentFlowBlockedPath : null}
       />
 
       <EvidenceDrawerPanel evidenceGroups={evidenceGroups} />

@@ -17,6 +17,7 @@ type OwnershipTreeReasonFormatting = typeof import("../src/ownershipWorkbench/fi
 type OwnershipTransferVerification = typeof import("../src/ownershipWorkbench/transferVerification.ts");
 type OwnershipMemory = typeof import("../src/ownershipWorkbench/ownershipMemory.ts");
 type OwnershipCognitiveMetrics = typeof import("../src/ownershipWorkbench/cognitiveMetrics.ts");
+type OwnershipAgentFlowManifest = typeof import("../src/ownershipWorkbench/agentFlowManifest.ts");
 
 const EXPECTED_DIFF_FILES = ["src/api/session.ts", "src/api/session.test.ts"] as const;
 const DIRECTORY_PATHS = ["src", "src/api", "src/runtime"] as const;
@@ -33,6 +34,7 @@ let cachedFileTreeReasonFormatting: OwnershipTreeReasonFormatting | null = null;
 let cachedTransferVerification: OwnershipTransferVerification | null = null;
 let cachedOwnershipMemory: OwnershipMemory | null = null;
 let cachedCognitiveMetrics: OwnershipCognitiveMetrics | null = null;
+let cachedAgentFlowManifest: OwnershipAgentFlowManifest | null = null;
 let fixtureImportConsoleErrors: unknown[] = [];
 
 async function loadFixturesModule(): Promise<OwnershipWorkbenchFixtures> {
@@ -152,6 +154,15 @@ async function loadCognitiveMetricsModule(): Promise<OwnershipCognitiveMetrics> 
 
   cachedCognitiveMetrics = (await import("../src/ownershipWorkbench/cognitiveMetrics.ts")) as OwnershipCognitiveMetrics;
   return cachedCognitiveMetrics;
+}
+
+async function loadAgentFlowManifestModule(): Promise<OwnershipAgentFlowManifest> {
+  if (cachedAgentFlowManifest != null) {
+    return cachedAgentFlowManifest;
+  }
+
+  cachedAgentFlowManifest = (await import("../src/ownershipWorkbench/agentFlowManifest.ts")) as OwnershipAgentFlowManifest;
+  return cachedAgentFlowManifest;
 }
 
 test("fixture file tree paths only include leaf file paths", async () => {
@@ -1289,6 +1300,22 @@ test("App metric builders use boundary-scoped relation evidence", () => {
   assert.equal(appSource.includes("codeEvidence: [relationEvidence]"), false);
 });
 
+test("App includes selected file in agent-flow runtime memo dependencies", () => {
+  const appSource = readFileSync(new URL("../src/App.tsx", import.meta.url), "utf8");
+  const appLines = appSource.split("\n");
+  const memoStart = appLines.findIndex((line) =>
+    line.includes("const agentFlowRuntime = React.useMemo"));
+  assert.ok(memoStart >= 0, "App should memoize agentFlowRuntime");
+
+  const memoChunk = appLines.slice(memoStart, memoStart + 20).join("\n");
+  const depMatch = memoChunk.match(/\},\s*\[([^\]]*)\]\s*\)\s*;/);
+  assert.ok(depMatch != null, "agentFlowRuntime should define a dependency array");
+  assert.ok(
+    depMatch[1].includes("selectedFile"),
+    "agentFlowRuntime dependency array should include selectedFile",
+  );
+});
+
 test("workspace escalation detects relation-gap recurrence and repeated low calibration", async () => {
   const fixtures = await loadFixturesModule();
   const escalation = await loadWorkspaceEscalationModule();
@@ -2411,4 +2438,400 @@ test("OwnershipHarnessPanel wires a local derivation lab contract", () => {
     /boundary\.returnCondition/,
     "OwnershipLabPanel should not reveal the return condition before an attempt",
   );
+});
+
+test("agent-flow manifest exposes deterministic allowed actions and control surface", async () => {
+  const fixtures = await loadFixturesModule();
+  const agentFlow = await loadAgentFlowManifestModule();
+  const reviewSession = await loadReviewSessionModule();
+  const sessionState = reviewSession.createOwnershipSessionState();
+
+  const manifest = agentFlow.buildAgentFlowManifest({
+    boundary: fixtures.ownershipBoundary,
+    boundaryState: "gap",
+    readiness: "not_attempted",
+    selectedFile: fixtures.ownershipBoundary.filePath,
+    sessionState,
+    evidenceRefs: fixtures.fixtureEvidence,
+  });
+  const actionIds = manifest.allowedActions.map((action) => action.id);
+  const controlIds = manifest.controlSurface.map((control) => control.controlId);
+
+  assert.equal(manifest.version, agentFlow.AGENT_FLOW_MANIFEST_VERSION);
+  assert.equal(manifest.scope.includes(`boundary=${fixtures.ownershipBoundary.id}`), true);
+  assert.deepEqual(manifest.restrictions[0]?.kind, "no_auto_readiness");
+  assert.ok(actionIds.includes("submit_guided_attempt"));
+  assert.ok(actionIds.includes("mark_unknown"));
+  assert.ok(actionIds.includes("read_manifest"));
+  assert.ok(controlIds.includes("agent-flow-control-submit-guided-attempt"));
+  assert.ok(controlIds.includes("agent-flow-control-mark-unknown"));
+  assert.ok(controlIds.includes("agent-flow-control-read-manifest"));
+});
+
+test("agent-flow manifest generation is deterministic without explicit now", async () => {
+  const fixtures = await loadFixturesModule();
+  const agentFlow = await loadAgentFlowManifestModule();
+  const reviewSession = await loadReviewSessionModule();
+  const sessionState = reviewSession.createOwnershipSessionState();
+
+  const manifestA = agentFlow.buildAgentFlowManifest({
+    boundary: fixtures.ownershipBoundary,
+    boundaryState: "gap",
+    readiness: "not_attempted",
+    selectedFile: fixtures.ownershipBoundary.filePath,
+    sessionState,
+    evidenceRefs: fixtures.fixtureEvidence,
+  });
+  const manifestB = agentFlow.buildAgentFlowManifest({
+    boundary: fixtures.ownershipBoundary,
+    boundaryState: "gap",
+    readiness: "not_attempted",
+    selectedFile: fixtures.ownershipBoundary.filePath,
+    sessionState,
+    evidenceRefs: fixtures.fixtureEvidence,
+  });
+
+  assert.equal(manifestA.manifestId, manifestB.manifestId);
+  assert.equal(manifestA.generatedAt, manifestB.generatedAt);
+});
+
+test("agent-flow validation accepts a valid agent action and rejects blocked actions", async () => {
+  const fixtures = await loadFixturesModule();
+  const agentFlow = await loadAgentFlowManifestModule();
+  const reviewSession = await loadReviewSessionModule();
+  const sessionState = reviewSession.createOwnershipSessionState();
+  const assertListedRecoveryAction = (
+    result: unknown,
+    allowedActionIds: ReadonlySet<string>,
+  ): void => {
+    if (result != null && typeof result === "object" && "recoveryAction" in result) {
+      const rejection = result as {
+        kind: string;
+        recoveryAction?: { actionId: string; rationale: string; fallbackScenarioId: string };
+      };
+      if (rejection.recoveryAction == null) {
+        return;
+      }
+
+      const validRecoveryAction = allowedActionIds.has(rejection.recoveryAction?.actionId);
+      assert.equal(validRecoveryAction, true, "Recovery action should be listed in manifest allowed actions");
+      assert.notEqual(rejection.recoveryAction.actionId, "ask");
+      assert.notEqual(rejection.recoveryAction.actionId, "request_human_review");
+    }
+  };
+
+  const manifest = agentFlow.buildAgentFlowManifest({
+    boundary: fixtures.ownershipBoundary,
+    boundaryState: "gap",
+    readiness: "not_attempted",
+    selectedFile: fixtures.ownershipBoundary.filePath,
+    sessionState,
+    evidenceRefs: fixtures.fixtureEvidence,
+  });
+  const runtime = agentFlow.buildAgentFlowRuntime({
+    boundary: fixtures.ownershipBoundary,
+    boundaryState: "gap",
+    readiness: "not_attempted",
+    selectedFile: fixtures.ownershipBoundary.filePath,
+    evidenceRefs: fixtures.fixtureEvidence,
+    sessionState,
+  });
+
+  const happy = agentFlow.validateAgentAction({
+    manifest,
+    runtime,
+    request: {
+      actionId: "submit_guided_attempt",
+      actor: "agent",
+      controlId: "agent-flow-control-submit-guided-attempt",
+      payload: "guided-attempt-attempt-text",
+    },
+  });
+  assert.equal(happy.kind, "agent_action_allowed");
+  const happyRepeat = agentFlow.validateAgentAction({
+    manifest,
+    runtime,
+    request: {
+      actionId: "submit_guided_attempt",
+      actor: "agent",
+      controlId: "agent-flow-control-submit-guided-attempt",
+      payload: "guided-attempt-attempt-text",
+    },
+  });
+  assert.equal(happyRepeat.kind, "agent_action_allowed");
+  assert.equal(happy.decisionId, happyRepeat.decisionId);
+  assert.equal(happy.actionId, "submit_guided_attempt");
+  assert.equal(happy.scenario.playwrightTraceId, "sibi-ownership-workbench.slice10");
+  assert.equal(happy.fallback.strategy, "ask");
+
+  const payloadMismatch = agentFlow.validateAgentAction({
+    manifest,
+    runtime,
+    request: {
+      actionId: "submit_guided_attempt",
+      actor: "agent",
+      controlId: "agent-flow-control-submit-guided-attempt",
+      payload: "wrong-payload",
+    },
+  });
+  assert.equal(payloadMismatch.kind, "agent_action_rejected");
+  assert.equal(payloadMismatch.reasonCode, "payload_not_listed");
+  assert.match(payloadMismatch.reason, /Payload/);
+  const payloadMismatchRepeat = agentFlow.validateAgentAction({
+    manifest,
+    runtime,
+    request: {
+      actionId: "submit_guided_attempt",
+      actor: "agent",
+      controlId: "agent-flow-control-submit-guided-attempt",
+      payload: "wrong-payload",
+    },
+  });
+  assert.equal(payloadMismatchRepeat.kind, "agent_action_rejected");
+  assert.equal(payloadMismatchRepeat.decisionId, payloadMismatch.decisionId);
+  assert.equal(payloadMismatchRepeat.reasonCode, "payload_not_listed");
+  assertListedRecoveryAction(payloadMismatch, new Set(manifest.allowedActions.map((action) => action.id)));
+
+  const blockedPrivate = agentFlow.validateAgentAction({
+    manifest,
+    runtime,
+    request: {
+      actionId: "set_readiness_fact",
+      actor: "agent",
+      controlId: "agent-flow-control-submit-guided-attempt",
+      payload: "set-ready-flag",
+    },
+  });
+  assert.equal(blockedPrivate.kind, "agent_action_rejected");
+  assert.equal(blockedPrivate.reasonCode, "private_action_blocked");
+  assert.match(blockedPrivate.reason, /blocked by no_private_action/);
+  const blockedPrivateRepeat = agentFlow.validateAgentAction({
+    manifest,
+    runtime,
+    request: {
+      actionId: "set_readiness_fact",
+      actor: "agent",
+      controlId: "agent-flow-control-submit-guided-attempt",
+      payload: "set-ready-flag",
+    },
+  });
+  assert.equal(blockedPrivateRepeat.kind, "agent_action_rejected");
+  assert.equal(blockedPrivateRepeat.decisionId, blockedPrivate.decisionId);
+  assert.equal(blockedPrivateRepeat.reasonCode, "private_action_blocked");
+  assertListedRecoveryAction(blockedPrivate, new Set(manifest.allowedActions.map((action) => action.id)));
+
+  const actionNotListed = agentFlow.validateAgentAction({
+    manifest,
+    runtime,
+    request: {
+      actionId: "ghost_action",
+      actor: "agent",
+      controlId: "agent-flow-control-submit-guided-attempt",
+      payload: "guided-attempt-attempt-text",
+    },
+  });
+  assert.equal(actionNotListed.kind, "agent_action_rejected");
+  assert.equal(actionNotListed.reasonCode, "action_not_listed");
+  const actionNotListedRepeat = agentFlow.validateAgentAction({
+    manifest,
+    runtime,
+    request: {
+      actionId: "ghost_action",
+      actor: "agent",
+      controlId: "agent-flow-control-submit-guided-attempt",
+      payload: "guided-attempt-attempt-text",
+    },
+  });
+  assert.equal(actionNotListedRepeat.kind, "agent_action_rejected");
+  assert.equal(actionNotListedRepeat.decisionId, actionNotListed.decisionId);
+  assert.equal(actionNotListedRepeat.reasonCode, "action_not_listed");
+  assertListedRecoveryAction(actionNotListed, new Set(manifest.allowedActions.map((action) => action.id)));
+
+  const actorMismatch = agentFlow.validateAgentAction({
+    manifest,
+    runtime,
+    request: {
+      actionId: "submit_guided_attempt",
+      actor: "human",
+      controlId: "agent-flow-control-submit-guided-attempt",
+      payload: "guided-attempt-attempt-text",
+    },
+  });
+  assert.equal(actorMismatch.kind, "agent_action_rejected");
+  assert.equal(actorMismatch.reasonCode, "actor_not_authorized");
+  assertListedRecoveryAction(actorMismatch, new Set(manifest.allowedActions.map((action) => action.id)));
+
+  const restrictedControl = agentFlow.validateAgentAction({
+    manifest,
+    runtime,
+    request: {
+      actionId: "submit_guided_attempt",
+      actor: "agent",
+      controlId: "agent-flow-control-mark-unknown",
+      payload: "guided-attempt-attempt-text",
+    },
+  });
+  assert.equal(restrictedControl.kind, "agent_action_rejected");
+  assert.equal(restrictedControl.reasonCode, "control_mode_restricted");
+  assertListedRecoveryAction(restrictedControl, new Set(manifest.allowedActions.map((action) => action.id)));
+
+  const noEvidenceRuntime = agentFlow.buildAgentFlowRuntime({
+    boundary: fixtures.ownershipBoundary,
+    boundaryState: "gap",
+    readiness: "not_attempted",
+    selectedFile: fixtures.ownershipBoundary.filePath,
+    evidenceRefs: [],
+    sessionState,
+  });
+  const manifestWithoutEvidence = agentFlow.buildAgentFlowManifest({
+    boundary: fixtures.ownershipBoundary,
+    boundaryState: "gap",
+    readiness: "not_attempted",
+    selectedFile: fixtures.ownershipBoundary.filePath,
+    sessionState,
+    evidenceRefs: [],
+  });
+  const preconditionMissing = agentFlow.validateAgentAction({
+    manifest: manifestWithoutEvidence,
+    runtime: noEvidenceRuntime,
+    request: {
+      actionId: "submit_guided_attempt",
+      actor: "agent",
+      controlId: "agent-flow-control-submit-guided-attempt",
+      payload: "guided-attempt-attempt-text",
+    },
+  });
+  assert.equal(preconditionMissing.kind, "agent_action_rejected");
+  assert.equal(preconditionMissing.reasonCode, "precondition_missing");
+  assertListedRecoveryAction(preconditionMissing, new Set(manifestWithoutEvidence.allowedActions.map((action) => action.id)));
+});
+
+test("agent-flow readable action remains allowed in owned/ready and blocked path remains rejected", async () => {
+  const fixtures = await loadFixturesModule();
+  const agentFlow = await loadAgentFlowManifestModule();
+  const reviewSession = await loadReviewSessionModule();
+  const ownedSessionState = {
+    ...reviewSession.createOwnershipSessionState(),
+    isComplete: true,
+  };
+  const runtime = agentFlow.buildAgentFlowRuntime({
+    boundary: fixtures.ownershipBoundary,
+    boundaryState: "owned",
+    readiness: "ready",
+    selectedFile: fixtures.ownershipBoundary.filePath,
+    evidenceRefs: fixtures.fixtureEvidence,
+    sessionState: ownedSessionState,
+  });
+  const manifest = agentFlow.buildAgentFlowManifest({
+    boundary: fixtures.ownershipBoundary,
+    boundaryState: "owned",
+    readiness: "ready",
+    selectedFile: fixtures.ownershipBoundary.filePath,
+    sessionState: ownedSessionState,
+    evidenceRefs: fixtures.fixtureEvidence,
+  });
+
+  const readAction = agentFlow.validateAgentAction({
+    manifest,
+    runtime,
+    request: {
+      actionId: "read_manifest",
+      actor: "agent",
+      controlId: "agent-flow-control-read-manifest",
+      payload: "inspect-manifest",
+    },
+  });
+  assert.equal(readAction.kind, "agent_action_allowed");
+
+  const blockedInOwned = agentFlow.validateAgentAction({
+    manifest,
+    runtime,
+    request: {
+      actionId: "set_readiness_fact",
+      actor: "agent",
+      controlId: "agent-flow-control-submit-guided-attempt",
+      payload: "set-ready-flag",
+    },
+  });
+  assert.equal(blockedInOwned.kind, "agent_action_rejected");
+  assert.equal(blockedInOwned.reasonCode, "private_action_blocked");
+  assert.ok(blockedInOwned.recoveryAction != null);
+  assert.equal(blockedInOwned.recoveryAction?.actionId, "read_manifest");
+  const readManifestAction = manifest.allowedActions.find(
+    (action) => action.id === blockedInOwned.recoveryAction?.actionId,
+  );
+  assert.ok(readManifestAction != null);
+  const readManifestRecovery = agentFlow.validateAgentAction({
+    manifest,
+    runtime,
+    request: {
+      actionId: readManifestAction!.id,
+      actor: "agent",
+      controlId: readManifestAction!.controlId,
+      payload: readManifestAction!.allowedInputs[0]!,
+    },
+  });
+  assert.equal(readManifestRecovery.kind, "agent_action_allowed");
+  assert.equal(readManifestRecovery.actionId, blockedInOwned.recoveryAction?.actionId);
+});
+
+test("agent-flow validation rejects stale manifest inputs", async () => {
+  const fixtures = await loadFixturesModule();
+  const agentFlow = await loadAgentFlowManifestModule();
+  const reviewSession = await loadReviewSessionModule();
+  const sessionState = reviewSession.createOwnershipSessionState();
+
+  const manifest = agentFlow.buildAgentFlowManifest({
+    boundary: fixtures.ownershipBoundary,
+    boundaryState: "gap",
+    readiness: "not_attempted",
+    selectedFile: fixtures.ownershipBoundary.filePath,
+    sessionState,
+    evidenceRefs: fixtures.fixtureEvidence,
+  });
+  const runtime = agentFlow.buildAgentFlowRuntime({
+    boundary: fixtures.ownershipBoundary,
+    boundaryState: "gap",
+    readiness: "not_attempted",
+    selectedFile: fixtures.ownershipBoundary.filePath,
+    evidenceRefs: fixtures.fixtureEvidence,
+    sessionState,
+  });
+
+  const staleScope = {
+    ...manifest,
+    scope: "scope=stale-boundary;file=src/api/session.ts;state=gap;readiness=not_attempted;openQuestions=0;evidence=",
+  };
+
+  const staleScopeResult = agentFlow.validateAgentAction({
+    manifest: staleScope,
+    runtime,
+    request: {
+      actionId: "submit_guided_attempt",
+      actor: "agent",
+      controlId: "agent-flow-control-submit-guided-attempt",
+      payload: "guided-attempt-attempt-text",
+    },
+  });
+
+  assert.equal(staleScopeResult.kind, "agent_action_rejected");
+  assert.equal(staleScopeResult.reasonCode, "manifest_stale");
+
+  const staleVersion = {
+    ...manifest,
+    version: "9.9.9",
+  };
+  const staleVersionResult = agentFlow.validateAgentAction({
+    manifest: staleVersion,
+    runtime,
+    request: {
+      actionId: "submit_guided_attempt",
+      actor: "agent",
+      controlId: "agent-flow-control-submit-guided-attempt",
+      payload: "guided-attempt-attempt-text",
+    },
+  });
+
+  assert.equal(staleVersionResult.kind, "agent_action_rejected");
+  assert.equal(staleVersionResult.reasonCode, "manifest_stale");
 });
