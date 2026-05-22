@@ -34,7 +34,24 @@ test("shared core entrypoints exist and are deterministic boundary facades", () 
   assert.equal(typeof pedagogyCore.evaluateFullLoop, "function");
   assert.equal(typeof pedagogyCore.createReadinessClaim, "function");
   assert.equal(typeof pedagogyCore.createAttempt, "function");
+  assert.equal(typeof pedagogyCore.attemptToReadiness, "function");
   assert.equal(typeof pedagogyCore.classifyGapTaxonomy, "function");
+  assert.ok(pedagogyCore.RECOGNIZED_OPERATION_KINDS.includes("explain"));
+  assert.ok(pedagogyCore.RECOGNIZED_OPERATION_KINDS.includes("trace"));
+  assert.ok(pedagogyCore.RECOGNIZED_ARTIFACT_KINDS.includes("paper_excerpt"));
+  assert.ok(pedagogyCore.RECOGNIZED_ARTIFACT_KINDS.includes("test_oracle"));
+  assert.ok(pedagogyCore.RECOGNIZED_EVIDENCE_ROLES.includes("source_truth"));
+  assert.ok(pedagogyCore.RECOGNIZED_EVIDENCE_ROLES.includes("counterexample"));
+
+  const attempt = pedagogyCore.createAttempt({
+    operation_id: "operation-1",
+    answer_text: "I can explain this from the cited source slice.",
+    selected_evidence: ["evidence-1"],
+    declared_confidence: "medium",
+    declared_unknowns: ["implementation detail"],
+  });
+  assert.equal(attempt.operation_id, "operation-1");
+  assert.deepEqual(attempt.selected_evidence, ["evidence-1"]);
 
   assert.equal(memoryCore.MEMORY_CORE_VERSION, "0.1.0");
   assert.equal(memoryCore.MEMORY_CORE_STORE_VERSION, "memory-core@0.1.0");
