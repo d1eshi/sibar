@@ -26,6 +26,7 @@ import {
   getActiveBoundaryState,
   getLineSelectionText,
   groupedEvidence,
+  getRelationNavigationTargets,
 } from "./ownershipWorkbench/helpers";
 import {
   advanceOwnershipSession,
@@ -34,6 +35,7 @@ import {
 } from "./ownershipWorkbench/ownershipReviewSession";
 import { getWorkbenchSurfaceMode } from "./ownershipWorkbench/surfaceMode";
 import type { ViewMode } from "./ownershipWorkbench/types";
+import { loadFileContentStatus, type FileContentStatus } from "./ownershipWorkbench/fileContentClient.ts";
 
 export default function App() {
   const workbenchSurfaceMode = getWorkbenchSurfaceMode(
@@ -48,6 +50,7 @@ export default function App() {
     createOwnershipSessionState,
   );
   const [inventoryStatus, setInventoryStatus] = React.useState<RepoInventoryStatus>({ kind: "loading" });
+  const [fileContentStatus, setFileContentStatus] = React.useState<FileContentStatus>({ kind: "loading" });
 
   const evidenceGroups = React.useMemo(() => groupedEvidence(fixtureEvidence), []);
   const sessionQuestions = React.useMemo(
@@ -68,6 +71,10 @@ export default function App() {
           evidenceRefs: fixtureEvidence,
         }
       : null;
+  const relationNavigation = React.useMemo(
+    () => getRelationNavigationTargets(selectedFile, ownershipReviewQueue, fixtureEvidence),
+    [selectedFile],
+  );
 
   React.useEffect(() => {
     setSelection(null);
@@ -79,6 +86,24 @@ export default function App() {
       setSelectedFile(currentQuestion.filePath);
     }
   }, [selectedFile, sessionQuestions, sessionState.currentIndex]);
+
+  React.useEffect(() => {
+    const controller = new AbortController();
+
+    void (async () => {
+      const nextStatus = await loadFileContentStatus(selectedFile, {
+        signal: controller.signal,
+        sourceRoot: "src",
+      });
+      if (!controller.signal.aborted) {
+        setFileContentStatus(nextStatus);
+      }
+    })();
+
+    return () => {
+      controller.abort();
+    };
+  }, [selectedFile]);
 
   React.useEffect(() => {
     const controller = new AbortController();
@@ -131,8 +156,10 @@ export default function App() {
         mode={viewMode}
         selection={selection}
         selectionSummaryText={selectionSummaryText}
+        fileContentStatus={fileContentStatus}
         codeViewFileItem={codeViewFileItem}
         codeViewDiffItem={codeViewDiffItem}
+        relationNavigation={relationNavigation}
         setMode={(nextMode) => setViewMode(nextMode)}
         onSelectionChange={setSelection}
       />

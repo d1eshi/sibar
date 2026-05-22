@@ -1,6 +1,6 @@
 import { defineConfig } from "vite";
 import { appendFileSync } from "node:fs";
-import { realpath } from "node:fs/promises";
+import { readFile, realpath, stat } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -57,7 +57,115 @@ async function resolveInventorySourceRoot(sourceRoot) {
   };
 }
 
-export { resolveInventorySourceRoot };
+function normalizeContentPath(value) {
+  const trimmed = String(value ?? "").trim();
+  if (trimmed === "") return "";
+
+  if (path.isAbsolute(trimmed)) return "";
+  if (/(^|[\\/])\.\.(?:[\\/]|$)/.test(trimmed)) return "";
+  if (trimmed.includes("\0")) return "";
+
+  const normalized = path.normalize(trimmed).replaceAll("\\", "/");
+  return normalized.replace(/^\.\//, "").replace(/\/+$/, "");
+}
+
+async function resolveFileContentTarget({ sourceRoot, rawPath }) {
+  const normalizedSourceRoot = normalizeFileContentSourceRoot(sourceRoot ?? "src");
+  if (!normalizedSourceRoot) {
+    return {
+      kind: "invalid-source-root",
+      normalizedSourceRoot: "src",
+      message: "sourceRoot must stay inside the Sibi app root",
+    };
+  }
+
+  const sourceRootResolution = await resolveInventorySourceRoot(normalizedSourceRoot);
+  const normalizedPath = normalizeContentPath(rawPath);
+
+  if (!sourceRootResolution.isInsideAppRoot) {
+    return {
+      kind: "invalid-source-root",
+      normalizedSourceRoot,
+      message: "sourceRoot must stay inside the Sibi app root",
+    };
+  }
+
+  if (!normalizedPath) {
+    return {
+      kind: "invalid-path",
+      normalizedSourceRoot,
+      message: "path must be a relative file path inside the selected sourceRoot",
+    };
+  }
+
+  const sourceRootPrefix = `${normalizedSourceRoot}/`;
+  const normalizedRelativePath = normalizedPath.startsWith(sourceRootPrefix)
+    ? normalizedPath.slice(sourceRootPrefix.length)
+    : normalizedPath;
+
+  if (!normalizedRelativePath || normalizedRelativePath === normalizedSourceRoot) {
+    return {
+      kind: "invalid-path",
+      normalizedSourceRoot,
+      message: "path must be a regular file inside the selected sourceRoot",
+    };
+  }
+
+  const absoluteSourceRoot = path.resolve(SIBI_APP_ROOT, normalizedSourceRoot);
+  const sourceRootItem = path.resolve(absoluteSourceRoot, normalizedRelativePath);
+
+  try {
+    const [sourceRootRealPath, targetRealPath, targetStats] = await Promise.all([
+      realpath(absoluteSourceRoot),
+      realpath(sourceRootItem),
+      stat(sourceRootItem),
+    ]);
+
+    if (!targetStats.isFile()) {
+      return {
+        kind: "invalid-target",
+        normalizedSourceRoot,
+        message: "path must target a regular file",
+      };
+    }
+
+    if (!isInsideRealPath(sourceRootRealPath, targetRealPath)) {
+      return {
+        kind: "invalid-target",
+        normalizedSourceRoot,
+        message: "path must stay inside the selected sourceRoot",
+      };
+    }
+
+    return {
+      kind: "ready",
+      normalizedSourceRoot,
+      normalizedPath,
+      sourceRootRealPath,
+      targetRealPath,
+    };
+  } catch (error) {
+    if (error instanceof Error && error.code === "ENOENT") {
+      return {
+        kind: "missing",
+        normalizedSourceRoot,
+        message: "file not found",
+      };
+    }
+
+    if (error instanceof Error && error.code === "ELOOP") {
+      return {
+        kind: "invalid-target",
+        normalizedSourceRoot,
+        message: "path resolution failed",
+      };
+    }
+
+    throw error;
+  }
+}
+
+export { resolveInventorySourceRoot, resolveFileContentTarget };
 
 export function getPierreReactDistFileId(warning) {
   const message = String(warning?.message ?? "");
@@ -90,6 +198,25 @@ function normalizeSourceRootLabel(sourceRoot) {
   const trimmed = String(sourceRoot ?? "").trim();
   const normalized = trimmed === "" ? "src" : path.normalize(trimmed).replaceAll("\\", "/");
   return normalized.replace(/\/+/g, "/").replace(/^\.\//, "").replace(/\/+$/, "");
+}
+
+function normalizeFileContentSourceRoot(sourceRoot) {
+  const trimmed = String(sourceRoot ?? "").trim();
+  if (trimmed === "") return "";
+  if (path.isAbsolute(trimmed)) return "";
+  if (trimmed.includes("\0")) return "";
+  if (trimmed === ".") return "";
+  if (trimmed === ".." || /(^|[\\/])\.\.(?:[\\/]|$)/.test(trimmed)) return "";
+
+  const normalized = path
+    .normalize(trimmed)
+    .replaceAll("\\", "/")
+    .replace(/\/+/g, "/")
+    .replace(/^\.\//, "")
+    .replace(/\/+$/, "");
+
+  if (normalized === "" || normalized === ".") return "";
+  return normalized;
 }
 
 export default defineConfig({
@@ -136,6 +263,61 @@ export default defineConfig({
             response.statusCode = 500;
             response.setHeader("content-type", "application/json");
             response.end(JSON.stringify({ error: error instanceof Error ? error.message : String(error) }));
+          }
+        });
+      },
+    },
+    {
+      name: "sibi-file-content-endpoint",
+      configureServer(server) {
+        server.middlewares.use("/__sibi/file-content", async (request, response) => {
+          try {
+            const requestUrl = new URL(request.url ?? "", "http://sibi.local");
+            const rawSourceRoot = requestUrl.searchParams.get("sourceRoot") ?? "src";
+            const rawPath = requestUrl.searchParams.get("path");
+            const target = await resolveFileContentTarget({
+              sourceRoot: rawSourceRoot,
+              rawPath,
+            });
+
+            if (target.kind === "invalid-source-root" || target.kind === "invalid-path") {
+              response.statusCode = 400;
+              response.setHeader("content-type", "application/json");
+              response.end(JSON.stringify({ error: target.message }));
+              return;
+            }
+
+            if (target.kind === "invalid-target") {
+              response.statusCode = 400;
+              response.setHeader("content-type", "application/json");
+              response.end(JSON.stringify({ error: target.message }));
+              return;
+            }
+
+            if (target.kind === "missing") {
+              response.statusCode = 404;
+              response.setHeader("content-type", "application/json");
+              response.end(JSON.stringify({ error: "file not found" }));
+              return;
+            }
+
+            const contents = await readFile(target.targetRealPath, "utf8");
+            const payload = {
+              sourceRoot: target.normalizedSourceRoot,
+              path: target.normalizedPath,
+              contents,
+              lineCount: contents.split("\n").length,
+              sizeBytes: Buffer.byteLength(contents, "utf8"),
+            };
+
+            response.statusCode = 200;
+            response.setHeader("content-type", "application/json");
+            response.end(JSON.stringify(payload));
+          } catch (error) {
+            console.error("sibi file-content endpoint failed", error);
+            response.statusCode = 500;
+            response.setHeader("content-type", "application/json");
+            response.end(JSON.stringify({ error: "unexpected file-content error" }));
           }
         });
       },

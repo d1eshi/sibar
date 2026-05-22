@@ -5,6 +5,7 @@ import type {
   EvidenceRef,
   LineSelection,
   OwnershipBoundary,
+  ReviewQueueItem,
   TreeNode,
 } from "./types";
 
@@ -191,6 +192,84 @@ export function groupedEvidence(entries: EvidenceRef[]): EvidenceByConfidence {
       conflict: [],
     } as EvidenceByConfidence,
   );
+}
+
+export type RelationNavigationKind = "possible test" | "possible caller" | "possible doc evidence" | "possible evidence" | "missing relation";
+
+export type RelationNavigationTarget = {
+  kind: RelationNavigationKind;
+  path: string;
+  label: string;
+  source: "queue" | "evidence" | "fallback";
+};
+
+function isTestTarget(filePath: string): boolean {
+  return /\.test\./.test(filePath) || /session\.test\.ts$/.test(filePath) || /\/__tests?\//.test(filePath);
+}
+
+function isDocTarget(filePath: string): boolean {
+  return /^docs?\//.test(filePath) || /\.md$/.test(filePath);
+}
+
+function classifyRelationKind(filePath: string): "possible test" | "possible caller" | "possible doc evidence" | "possible evidence" {
+  if (isDocTarget(filePath)) return "possible doc evidence";
+  if (isTestTarget(filePath)) return "possible test";
+  return "possible caller";
+}
+
+function extractEvidencePath(location: string): string {
+  const separator = location.lastIndexOf(":");
+  return separator <= 0 ? location.trim() : location.slice(0, separator).trim();
+}
+
+function safeLabel(value: string | undefined): string {
+  if (!value) return "Untitled relation";
+  const trimmed = value.trim();
+  return trimmed.length > 0 ? trimmed : "Untitled relation";
+}
+
+export function getRelationNavigationTargets(
+  selectedFile: string,
+  reviewQueue: ReviewQueueItem[],
+  evidenceRefs: EvidenceRef[],
+): RelationNavigationTarget[] {
+  const relations = new Map<string, RelationNavigationTarget>();
+
+  for (const queueItem of reviewQueue) {
+    const targetPath = queueItem.filePath;
+    if (targetPath === selectedFile) continue;
+    relations.set(targetPath, {
+      kind: classifyRelationKind(targetPath),
+      path: targetPath,
+      label: safeLabel(queueItem.orderReason || queueItem.boundaryTitle),
+      source: "queue",
+    });
+  }
+
+  for (const evidence of evidenceRefs) {
+    const targetPath = extractEvidencePath(evidence.location);
+    if (!targetPath || targetPath === selectedFile) continue;
+    if (relations.has(targetPath)) continue;
+    relations.set(targetPath, {
+      kind: classifyRelationKind(targetPath),
+      path: targetPath,
+      label: safeLabel(evidence.title),
+      source: "evidence",
+    });
+  }
+
+  if (relations.size === 0) {
+    return [
+      {
+        kind: "missing relation",
+        path: "missing relation",
+        label: "No relation evidence found for this file.",
+        source: "fallback",
+      },
+    ];
+  }
+
+  return [...relations.values()];
 }
 
 export function evaluateAttempt(attempt: string, boundary: OwnershipBoundary): {
