@@ -2463,9 +2463,26 @@ test("agent-flow manifest exposes deterministic allowed actions and control surf
   assert.ok(actionIds.includes("submit_guided_attempt"));
   assert.ok(actionIds.includes("mark_unknown"));
   assert.ok(actionIds.includes("read_manifest"));
+  assert.ok(actionIds.includes(agentFlow.AGENT_FLOW_EXPERIMENTAL_VOICE_ACTION_ID));
+  assert.ok(actionIds.includes(agentFlow.AGENT_FLOW_EXPERIMENTAL_JARVIS_ACTION_ID));
+  assert.ok(controlIds.includes(agentFlow.AGENT_FLOW_VOICE_CONTROL_ID));
+  assert.ok(controlIds.includes(agentFlow.AGENT_FLOW_JARVIS_CONTROL_ID));
   assert.ok(controlIds.includes("agent-flow-control-submit-guided-attempt"));
   assert.ok(controlIds.includes("agent-flow-control-mark-unknown"));
   assert.ok(controlIds.includes("agent-flow-control-read-manifest"));
+
+  const voiceControl = manifest.controlSurface.find((control) => control.controlId === agentFlow.AGENT_FLOW_VOICE_CONTROL_ID);
+  const jarvisControl = manifest.controlSurface.find((control) => control.controlId === agentFlow.AGENT_FLOW_JARVIS_CONTROL_ID);
+  assert.ok(voiceControl != null);
+  assert.ok(jarvisControl != null);
+  assert.equal(voiceControl.safetyMode, "experimental");
+  assert.equal(jarvisControl.safetyMode, "experimental");
+  assert.equal(voiceControl.requiresPostV01, true);
+  assert.equal(jarvisControl.requiresPostV01, true);
+  assert.equal(voiceControl.requiresExplicitOptIn, true);
+  assert.equal(jarvisControl.requiresExplicitOptIn, true);
+  assert.equal(agentFlow.isControlSurfaceAuthorizedForPolicy(voiceControl), false);
+  assert.equal(agentFlow.isControlSurfaceAuthorizedForPolicy(jarvisControl), false);
 });
 
 test("agent-flow manifest generation is deterministic without explicit now", async () => {
@@ -2493,6 +2510,95 @@ test("agent-flow manifest generation is deterministic without explicit now", asy
 
   assert.equal(manifestA.manifestId, manifestB.manifestId);
   assert.equal(manifestA.generatedAt, manifestB.generatedAt);
+});
+
+test("agent-flow experimental controls require post-v0.1 and explicit opt-in", async () => {
+  const fixtures = await loadFixturesModule();
+  const agentFlow = await loadAgentFlowManifestModule();
+  const reviewSession = await loadReviewSessionModule();
+  const sessionState = reviewSession.createOwnershipSessionState();
+
+  const manifest = agentFlow.buildAgentFlowManifest({
+    boundary: fixtures.ownershipBoundary,
+    boundaryState: "gap",
+    readiness: "not_attempted",
+    selectedFile: fixtures.ownershipBoundary.filePath,
+    sessionState,
+    evidenceRefs: fixtures.fixtureEvidence,
+  });
+  const runtime = agentFlow.buildAgentFlowRuntime({
+    boundary: fixtures.ownershipBoundary,
+    boundaryState: "gap",
+    readiness: "not_attempted",
+    selectedFile: fixtures.ownershipBoundary.filePath,
+    evidenceRefs: fixtures.fixtureEvidence,
+    sessionState,
+  });
+
+  const blockedByDefault = agentFlow.validateAgentAction({
+    manifest,
+    runtime,
+    request: {
+      actionId: agentFlow.AGENT_FLOW_EXPERIMENTAL_VOICE_ACTION_ID,
+      actor: "agent",
+      controlId: agentFlow.AGENT_FLOW_VOICE_CONTROL_ID,
+      payload: "voice-channel-query",
+    },
+  });
+  assert.equal(blockedByDefault.kind, "agent_action_rejected");
+  assert.equal(blockedByDefault.reasonCode, "control_policy_restricted");
+
+  const blockedWithoutPostV01 = agentFlow.validateAgentAction({
+    manifest,
+    runtime,
+    request: {
+      actionId: agentFlow.AGENT_FLOW_EXPERIMENTAL_JARVIS_ACTION_ID,
+      actor: "agent",
+      controlId: agentFlow.AGENT_FLOW_JARVIS_CONTROL_ID,
+      payload: "jarvis-channel-query",
+    },
+    controlPolicy: {
+      postV01Enabled: false,
+      experimentalControlOptIn: [agentFlow.AGENT_FLOW_VOICE_CONTROL_ID],
+    },
+  });
+  assert.equal(blockedWithoutPostV01.kind, "agent_action_rejected");
+  assert.equal(blockedWithoutPostV01.reasonCode, "control_policy_restricted");
+
+  const blockedWithoutOptIn = agentFlow.validateAgentAction({
+    manifest,
+    runtime,
+    request: {
+      actionId: agentFlow.AGENT_FLOW_EXPERIMENTAL_VOICE_ACTION_ID,
+      actor: "agent",
+      controlId: agentFlow.AGENT_FLOW_VOICE_CONTROL_ID,
+      payload: "voice-channel-query",
+    },
+    controlPolicy: {
+      postV01Enabled: true,
+      experimentalControlOptIn: [],
+    },
+  });
+  assert.equal(blockedWithoutOptIn.kind, "agent_action_rejected");
+  assert.equal(blockedWithoutOptIn.reasonCode, "control_policy_restricted");
+
+  const allowedWithPolicy = agentFlow.validateAgentAction({
+    manifest,
+    runtime,
+    request: {
+      actionId: agentFlow.AGENT_FLOW_EXPERIMENTAL_VOICE_ACTION_ID,
+      actor: "agent",
+      controlId: agentFlow.AGENT_FLOW_VOICE_CONTROL_ID,
+      payload: "voice-channel-query",
+    },
+    controlPolicy: {
+      postV01Enabled: true,
+      experimentalControlOptIn: [agentFlow.AGENT_FLOW_VOICE_CONTROL_ID],
+    },
+  });
+  assert.equal(allowedWithPolicy.kind, "agent_action_allowed");
+  assert.equal(allowedWithPolicy.actionId, agentFlow.AGENT_FLOW_EXPERIMENTAL_VOICE_ACTION_ID);
+  assert.equal(allowedWithPolicy.scenario.playwrightTraceId, "sibi-ownership-workbench.slice11");
 });
 
 test("agent-flow validation accepts a valid agent action and rejects blocked actions", async () => {
@@ -2665,15 +2771,58 @@ test("agent-flow validation accepts a valid agent action and rejects blocked act
     manifest,
     runtime,
     request: {
+      actionId: "mark_unknown",
+      actor: "agent",
+      controlId: "agent-flow-control-mark-unknown",
+      payload: "mark-unknown-action",
+    },
+  });
+  assert.equal(restrictedControl.kind, "agent_action_rejected");
+  assert.equal(restrictedControl.reasonCode, "control_mode_restricted");
+  assertListedRecoveryAction(restrictedControl, new Set(manifest.allowedActions.map((action) => action.id)));
+
+  const actionControlMismatch = agentFlow.validateAgentAction({
+    manifest,
+    runtime,
+    request: {
       actionId: "submit_guided_attempt",
       actor: "agent",
       controlId: "agent-flow-control-mark-unknown",
       payload: "guided-attempt-attempt-text",
     },
   });
-  assert.equal(restrictedControl.kind, "agent_action_rejected");
-  assert.equal(restrictedControl.reasonCode, "control_mode_restricted");
-  assertListedRecoveryAction(restrictedControl, new Set(manifest.allowedActions.map((action) => action.id)));
+  assert.equal(actionControlMismatch.kind, "agent_action_rejected");
+  assert.equal(actionControlMismatch.reasonCode, "action_control_mismatch");
+  assert.match(
+    actionControlMismatch.reason,
+    /Action submit_guided_attempt is declared for control agent-flow-control-submit-guided-attempt/,
+  );
+  const actionControlMismatchRepeat = agentFlow.validateAgentAction({
+    manifest,
+    runtime,
+    request: {
+      actionId: "submit_guided_attempt",
+      actor: "agent",
+      controlId: "agent-flow-control-mark-unknown",
+      payload: "guided-attempt-attempt-text",
+    },
+  });
+  assert.equal(actionControlMismatchRepeat.kind, "agent_action_rejected");
+  assert.equal(actionControlMismatchRepeat.decisionId, actionControlMismatch.decisionId);
+  assert.equal(actionControlMismatchRepeat.reasonCode, "action_control_mismatch");
+
+  const missingControl = agentFlow.validateAgentAction({
+    manifest,
+    runtime,
+    request: {
+      actionId: "submit_guided_attempt",
+      actor: "agent",
+      controlId: "agent-flow-control-absent",
+      payload: "guided-attempt-attempt-text",
+    },
+  });
+  assert.equal(missingControl.kind, "agent_action_rejected");
+  assert.equal(missingControl.reasonCode, "control_not_listed");
 
   const noEvidenceRuntime = agentFlow.buildAgentFlowRuntime({
     boundary: fixtures.ownershipBoundary,

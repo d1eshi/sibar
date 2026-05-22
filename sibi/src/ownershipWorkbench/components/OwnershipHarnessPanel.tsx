@@ -150,8 +150,12 @@ export function OwnershipHarnessPanel({
   const manifestControls = agentFlowManifest == null
     ? null
     : {
-        allowedActions: agentFlowManifest.allowedActions.map((action) => `${action.id} (${action.actor})`),
-        controlSurface: agentFlowManifest.controlSurface.map((control) => `${control.controlId} (${control.mode})`),
+        allowedActions: agentFlowManifest.allowedActions.map((action) => ({
+          id: action.id,
+          actor: action.actor,
+          controlId: action.controlId,
+        })),
+        controlSurface: agentFlowManifest.controlSurface,
         scope: agentFlowManifest.scope,
         manifestId: agentFlowManifest.manifestId,
         version: agentFlowManifest.version,
@@ -193,11 +197,38 @@ export function OwnershipHarnessPanel({
             <div className="readinessMetrics">
               <span>Scope: {manifestControls.scope}</span>
             </div>
-            <p>Allowed actions: {manifestControls.allowedActions.join(", ")}</p>
-            <p>Control surface: {manifestControls.controlSurface.join(", ")}</p>
+            <p>Allowed actions detail:</p>
+            <ul>
+              {manifestControls.allowedActions.map((action) => (
+                <li key={action.id}>
+                  {action.id} actor={action.actor} control={action.controlId}
+                </li>
+              ))}
+            </ul>
+            <section aria-label="Control authorization registry">
+              <p>Control surface:</p>
+              <ul>
+                {manifestControls.controlSurface.map((control) => (
+                  <li key={control.controlId}>
+                    {control.controlId}
+                    {" "}
+                    owner={control.owner}
+                    mode={control.mode}
+                    safety={control.safetyMode}
+                    policy=
+                    {control.safetyMode === "experimental" ? "post-v0.1+opt-in" : "default-enabled"}
+                    postV01={String(control.requiresPostV01)}
+                    optInRequired={String(control.requiresExplicitOptIn)}
+                    payloads={control.allowedPayloads.join(",")}
+                    <br />
+                    safePreconditions: {control.safePreconditions.join(", ")}
+                  </li>
+                ))}
+              </ul>
+            </section>
             <details>
               <summary>Manifest shape</summary>
-              <pre>{JSON.stringify(manifestControls, null, 2)}</pre>
+              <pre>{JSON.stringify(agentFlowManifest, null, 2)}</pre>
             </details>
           </section>
         ) : null}

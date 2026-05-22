@@ -369,19 +369,31 @@ Implementation policy for this slice:
 
 Goal: define explicit and auditable control boundaries for manual, automated, and experimental interactions.
 
+Status: implemented.
+
 Deliverables:
 
 - control-surface registry:
   - control id, owner, mode, allowed payloads, safe preconditions;
-- explicit policy for experimental channels:
-  - default deny for `voice` and `Jarvis`;
-  - requires `post-v0.1` + explicit policy opt-in.
+- explicit policy flags for experimental channels;
+- manifest/UI visibility of control claims and policy status in lab mode.
+
+Implementation policy for this slice:
+
+- control surface now includes owner, mode, allowed payloads, safe preconditions,
+  and explicit policy flags per control entry.
+- `voice` and `Jarvis` controls are declared with `safetyMode: experimental`
+  and are rejected unless both `post-v0.1` is enabled and the control id is
+  opt-in listed.
 
 Acceptance:
 
 - no action executes outside declared control surface;
 - control claims are testable by Playwright IDs and agent manifest;
-- post-v0.1 experimental channels remain disabled by default.
+- post-v0.1 experimental channels remain disabled by default;
+- `post-v0.1` + explicit control opt-in is required for `voice` and `Jarvis` actions.
+
+- lab view includes control claims with safety mode and opt-in status text.
 
 ## Slice 12 - Gemini Evidence Extractor
 
@@ -404,7 +416,7 @@ Acceptance:
 ## Open Questions
 
 - What minimum transfer depth (single related boundary vs two adjacent artifacts) is required before a boundary moves to `transfer_ready`?
-- Should voice/Jarvis be compile-time disabled or runtime-flagged when `post-v0.1` is enabled?
+- Slice 11 implemented explicit control-policy handling for `voice`/`Jarvis`; no extra runtime/compile-time question remains in this scope.
 
 ## Build Recommendation
 

@@ -97,10 +97,14 @@ For this slice, actions are:
 ```ts
 type ControlSurfaceEntry = {
   controlId: string;
+  owner: "agent" | "human" | "voice" | "jarvis" | "system";
   path: string;
   mode: "user" | "agent" | "agent_readonly";
   allowedPayloads: string[];
   safetyMode: "strict" | "bounded" | "experimental";
+  safePreconditions: string[];
+  requiresPostV01: boolean;
+  requiresExplicitOptIn: boolean;
 };
 ```
 
@@ -156,6 +160,12 @@ For every allowed action:
 
 - at least one passing Playwright assertion must match the action contract;
 - one failing assertion in the same scenario must map to the recovery action.
+
+Experimental controls:
+
+- `voice` and `Jarvis` channel controls must be declared in `controlSurface`
+  and remain disabled unless `post-v0.1` is active and control ID appears in
+  explicit policy opt-in.
 
 ## Runtime Behavior
 
