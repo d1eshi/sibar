@@ -77,6 +77,15 @@ export type SourceSignal = {
   user_relevance: SourceSignalUserRelevance;
 };
 
+export type SourceSlice = {
+  slice_id: string;
+  source_id: string;
+  label: string;
+  excerpt_ref: string;
+  excerpt: string;
+  source_signal_ids: string[];
+};
+
 export type ProposedTrackStatus = "recommended" | "optional" | "deferred";
 
 export type ProposedTrack = {
@@ -124,4 +133,24 @@ export type SourceMissionValidationResult<T> = {
   ok: boolean;
   issues: SourceMissionValidationIssue[];
   value: T | null;
+};
+
+export type SessionSeed = {
+  session_id: string;
+  track_id: string;
+  source_signal_ids: string[];
+  source_slice_refs: string[];
+  operation: import("./runtime-deep-ownership-evidence-types.ts").UserOperationKind;
+  required_artifacts: string[];
+  required_evidence: string[];
+  success_criteria: string[];
+  prerequisite_note?: string;
+  status: ProposedSessionStatus;
+};
+
+export type PedagogyInput = {
+  session_seed: SessionSeed;
+  user_attempt: import("./runtime-deep-ownership-loop-types.ts").UserAttempt | null;
+  cited_evidence: string[];
+  existing_memory?: import("./runtime-pedagogy-loop/types.ts").DeepOwnershipMemory;
 };
