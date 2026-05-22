@@ -1,5 +1,10 @@
 import { defineConfig } from "vite";
 import { appendFileSync } from "node:fs";
+import { realpath } from "node:fs/promises";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+import { repoInventory } from "../src/repo-inventory/repo-inventory.js";
 
 const PIERRE_REACT_DIST_FILE_PATTERN =
   /@pierre[/\\](?<packageName>[^/\\]+)[/\\]dist[/\\]react[/\\](?<filePath>[^"'\\\s]+?\.js)\b/;
@@ -24,6 +29,35 @@ export const ALLOWED_PIERRE_USE_CLIENT_REACT_FILES = Object.freeze([
 ]);
 
 const ALLOWED_PIERRE_USE_CLIENT_REACT_FILES_SET = new Set(ALLOWED_PIERRE_USE_CLIENT_REACT_FILES);
+const SIBI_APP_ROOT = path.dirname(fileURLToPath(import.meta.url));
+const SIBI_APP_ROOT_REAL = realpath(SIBI_APP_ROOT);
+
+function isInsideRealPath(rootPath, candidatePath) {
+  const relativePath = path.relative(rootPath, candidatePath);
+  return relativePath === "" || (!relativePath.startsWith("..") && !path.isAbsolute(relativePath));
+}
+
+async function resolveInventorySourceRoot(sourceRoot) {
+  const normalizedSourceRoot = normalizeSourceRootLabel(sourceRoot);
+  const absoluteSourceRoot = path.resolve(SIBI_APP_ROOT, normalizedSourceRoot);
+  if (!isInsideRealPath(SIBI_APP_ROOT, absoluteSourceRoot)) {
+    return {
+      normalizedSourceRoot,
+      absoluteSourceRoot,
+      isInsideAppRoot: false,
+    };
+  }
+
+  const [appRootRealPath, sourceRootRealPath] = await Promise.all([SIBI_APP_ROOT_REAL, realpath(absoluteSourceRoot)]);
+
+  return {
+    normalizedSourceRoot,
+    absoluteSourceRoot,
+    isInsideAppRoot: isInsideRealPath(appRootRealPath, sourceRootRealPath),
+  };
+}
+
+export { resolveInventorySourceRoot };
 
 export function getPierreReactDistFileId(warning) {
   const message = String(warning?.message ?? "");
@@ -52,8 +86,61 @@ export function isPierreModuleLevelDirectiveWarning(warning) {
   );
 }
 
+function normalizeSourceRootLabel(sourceRoot) {
+  const trimmed = String(sourceRoot ?? "").trim();
+  const normalized = trimmed === "" ? "src" : path.normalize(trimmed).replaceAll("\\", "/");
+  return normalized.replace(/\/+/g, "/").replace(/^\.\//, "").replace(/\/+$/, "");
+}
+
 export default defineConfig({
   cacheDir: ".vite-cache",
+  plugins: [
+    {
+      name: "sibi-repo-inventory-endpoint",
+      configureServer(server) {
+        server.middlewares.use("/__sibi/repo-inventory", async (request, response) => {
+          try {
+            const requestUrl = new URL(request.url ?? "", "http://sibi.local");
+            const rawSourceRoot = requestUrl.searchParams.get("sourceRoot") ?? "src";
+            const sourceRootResolution = await resolveInventorySourceRoot(rawSourceRoot);
+
+            if (!sourceRootResolution.isInsideAppRoot) {
+              response.statusCode = 400;
+              response.setHeader("content-type", "application/json");
+              response.end(JSON.stringify({ error: "sourceRoot must stay inside the Sibi app root" }));
+              return;
+            }
+
+            const inventory = await repoInventory(sourceRootResolution.absoluteSourceRoot, {
+              sourceRootLabel: sourceRootResolution.normalizedSourceRoot,
+            });
+
+            response.statusCode = 200;
+            response.setHeader("content-type", "application/json");
+            response.end(JSON.stringify(inventory));
+          } catch (error) {
+            if (error instanceof Error && (error.message.includes("sourceRoot") || error.code === "ENOENT")) {
+              response.statusCode = 400;
+              response.setHeader("content-type", "application/json");
+              response.end(
+                JSON.stringify({
+                  error:
+                    error instanceof Error && error.message.includes("must stay inside the Sibi app root")
+                      ? error.message
+                      : `sourceRoot validation failed: ${error.message}`,
+                }),
+              );
+              return;
+            }
+
+            response.statusCode = 500;
+            response.setHeader("content-type", "application/json");
+            response.end(JSON.stringify({ error: error instanceof Error ? error.message : String(error) }));
+          }
+        });
+      },
+    },
+  ],
   build: {
     rollupOptions: {
       onwarn(warning, defaultHandler) {
