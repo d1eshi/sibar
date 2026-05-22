@@ -16,6 +16,61 @@ export type EvidenceRef = {
   confidence: EvidenceConfidence;
 };
 
+export type RelationEvidenceSource = "queue" | "evidence" | "fixture" | "fallback";
+
+export type RelationEvidenceCategory = "test" | "caller" | "doc" | "runtime-contract";
+
+export type RelationEvidenceKind = EvidenceConfidence;
+
+export type RelationEvidenceDowngrade = {
+  from: RelationEvidenceKind;
+  to: RelationEvidenceKind;
+  reason: string;
+};
+
+export type RelationGapReason = "missing caller" | "missing test path" | "missing runtime contract";
+
+export type RelationGap = {
+  id: string;
+  type: RelationGapReason;
+  sourceIds: string[];
+  evidenceKind: RelationEvidenceKind;
+  confidence: RelationEvidenceKind;
+  downgrade?: RelationEvidenceDowngrade;
+  candidateReason: string;
+};
+
+export type RelationLineKind = "import" | "export" | "symbol";
+
+export type RelationTextEvidence = {
+  id: string;
+  kind: RelationLineKind;
+  line: number;
+  text: string;
+  evidenceKind: RelationEvidenceKind;
+};
+
+export type RelationEvidenceCandidate = {
+  id: string;
+  kind: RelationEvidenceCategory;
+  path: string;
+  label: string;
+  evidenceKind: RelationEvidenceKind;
+  source: RelationEvidenceSource;
+  sourceIds: string[];
+  downgrade?: RelationEvidenceDowngrade;
+};
+
+export type CodeEvidence = {
+  selectedFile: string;
+  imports: RelationTextEvidence[];
+  exports: RelationTextEvidence[];
+  symbols: RelationTextEvidence[];
+  relationCandidates: RelationEvidenceCandidate[];
+  relationGaps: RelationGap[];
+  evidenceKindCounts: Record<RelationEvidenceKind, number>;
+};
+
 export type WorkbenchLineKind = "ownership-boundary" | "evidence";
 
 export type WorkbenchLineMetadata = {

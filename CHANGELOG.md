@@ -96,6 +96,16 @@ release yet.
   and fixture evidence, plus unit + Playwright coverage for selection and preview
   behavior.
 
+### Added - Slice 3 Relation Evidence Extraction
+
+- Added a deterministic, fixture-backed `extractCodeEvidence` contract in
+  `src/ownershipWorkbench/evidenceExtraction.ts` to emit observed imports/exports/
+  symbol text, nearby test/caller candidates, and relation gaps for missing evidence.
+- Added `CodeEvidence`/relation metadata types to `src/ownershipWorkbench/types.ts`
+  and wired relation evidence extraction into the code panel so it renders under
+  `aria-label="Relation evidence extraction"` with evidence-kind labels and explicit gap
+  reasons.
+
 ### Internal - Sibi Ownership Workbench Review Guide
 
 - Added deterministic workbench coverage for review guide rendering order,

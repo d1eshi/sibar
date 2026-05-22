@@ -14,6 +14,7 @@ import type {
 import {
   codeViewDiffItemsByPath,
   codeViewFileItemsByPath,
+  fileFixtures,
   fixtureEvidence,
   fileTreeNodeByPath,
   initialFile,
@@ -33,6 +34,7 @@ import {
   createOwnershipSessionState,
   makeOwnershipSessionQuestions,
 } from "./ownershipWorkbench/ownershipReviewSession";
+import { extractCodeEvidence } from "./ownershipWorkbench/evidenceExtraction.ts";
 import { getWorkbenchSurfaceMode } from "./ownershipWorkbench/surfaceMode";
 import type { ViewMode } from "./ownershipWorkbench/types";
 import { loadFileContentStatus, type FileContentStatus } from "./ownershipWorkbench/fileContentClient.ts";
@@ -73,6 +75,16 @@ export default function App() {
       : null;
   const relationNavigation = React.useMemo(
     () => getRelationNavigationTargets(selectedFile, ownershipReviewQueue, fixtureEvidence),
+    [selectedFile],
+  );
+  const relationEvidence = React.useMemo(
+    () =>
+      extractCodeEvidence({
+        selectedFile,
+        fileFixtures,
+        evidenceRefs: fixtureEvidence,
+        reviewQueue: ownershipReviewQueue,
+      }),
     [selectedFile],
   );
 
@@ -160,6 +172,7 @@ export default function App() {
         codeViewFileItem={codeViewFileItem}
         codeViewDiffItem={codeViewDiffItem}
         relationNavigation={relationNavigation}
+        relationEvidence={relationEvidence}
         setMode={(nextMode) => setViewMode(nextMode)}
         onSelectionChange={setSelection}
       />

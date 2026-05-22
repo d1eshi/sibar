@@ -9,7 +9,7 @@ import type {
 import * as React from "react";
 import { noCodeLinePlaceHolder } from "../fixtures";
 import type { FileContentStatus } from "../fileContentClient.ts";
-import type { LineSelection, ViewMode } from "../types";
+import type { CodeEvidence, LineSelection, ViewMode } from "../types";
 import type { RelationNavigationTarget } from "../helpers";
 import type { WorkbenchLineMetadata } from "../types";
 import { PierreCodeView } from "./PierreCodeView";
@@ -23,6 +23,7 @@ interface CodeDiffPanelProps {
   codeViewFileItem?: CodeViewFileItem<WorkbenchLineMetadata>;
   codeViewDiffItem?: CodeViewDiffItem<WorkbenchLineMetadata>;
   relationNavigation: RelationNavigationTarget[];
+  relationEvidence: CodeEvidence;
   setMode: (mode: ViewMode) => void;
   onSelectionChange: (selection: LineSelection | null) => void;
 }
@@ -82,6 +83,7 @@ export function CodeDiffPanel({
   codeViewFileItem,
   codeViewDiffItem,
   relationNavigation,
+  relationEvidence,
   setMode,
   onSelectionChange,
 }: CodeDiffPanelProps): React.ReactElement {
@@ -100,6 +102,15 @@ export function CodeDiffPanel({
         : "Checking live content availability...";
 
   const relationItems = relationNavigation.length > 0 ? relationNavigation : [];
+  const evidenceItems = relationEvidence.evidenceKindCounts;
+  const relationGapTexts = relationEvidence.relationGaps.map(
+    (gap) =>
+      `${gap.type} (${gap.evidenceKind}): ${gap.candidateReason} ` +
+      `${gap.downgrade ? `downgraded: ${gap.downgrade.from}→${gap.downgrade.to}. ${gap.downgrade.reason}` : "direct signal."}`,
+  );
+  const candidateTest = relationEvidence.relationCandidates.filter((candidate) => candidate.kind === "test");
+  const candidateCallers = relationEvidence.relationCandidates.filter((candidate) => candidate.kind === "caller");
+  const candidateRuntime = relationEvidence.relationCandidates.filter((candidate) => candidate.kind === "runtime-contract");
 
   function onSelectedLinesChange(next: CodeViewLineSelection | null): void {
     if (!activeItem || !next || next.id !== activeItem.id) {
@@ -166,6 +177,72 @@ export function CodeDiffPanel({
             </li>
           ))}
         </ul>
+      </section>
+
+      <section className="relationEvidenceExtraction" aria-label="Relation evidence extraction">
+        <p className="relationHeader">Relation evidence extraction</p>
+        <p className="selectionSummary">
+          Observed: {evidenceItems.observed} | Inferred: {evidenceItems.inferred} | Unverified: {evidenceItems.unverified} | Conflict: {evidenceItems.conflict}
+        </p>
+        <div className="relationDetails">
+          <p>Active file imports: {relationEvidence.imports.length}</p>
+          <p>Active file exports: {relationEvidence.exports.length}</p>
+          <p>Active file symbols: {relationEvidence.symbols.length}</p>
+          <p>Candidate tests: {candidateTest.length}</p>
+          <p>Candidate callers: {candidateCallers.length}</p>
+          <p>Runtime candidates: {candidateRuntime.length}</p>
+        </div>
+
+        <ul className="relationList">
+          {relationEvidence.relationCandidates.map((candidate) => (
+            <li key={`${relationEvidence.selectedFile}:candidate:${candidate.kind}:${candidate.path}`} className="relationListItem">
+              <span className={`relationPill ${candidate.evidenceKind}`}>{candidate.kind}</span>
+              <span className={`relationPill ${candidate.evidenceKind}`}>{candidate.evidenceKind}</span>
+              <span className="relationPath">{candidate.path}</span>
+              <span className="relationMeta">
+                ({candidate.source}) {candidate.label}
+              </span>
+            </li>
+          ))}
+
+          {relationEvidence.imports.map((entry) => (
+            <li key={entry.id} className="relationListItem">
+              <span className={`relationPill ${entry.evidenceKind}`}>{entry.evidenceKind}</span>
+              <span className="relationPath">
+                import:{entry.line}: {entry.text}
+              </span>
+            </li>
+          ))}
+          {relationEvidence.exports.map((entry) => (
+            <li key={entry.id} className="relationListItem">
+              <span className={`relationPill ${entry.evidenceKind}`}>{entry.evidenceKind}</span>
+              <span className="relationPath">
+                export:{entry.line}: {entry.text}
+              </span>
+            </li>
+          ))}
+          {relationEvidence.symbols.map((entry) => (
+            <li key={entry.id} className="relationListItem">
+              <span className={`relationPill ${entry.evidenceKind}`}>{entry.evidenceKind}</span>
+              <span className="relationPath">
+                symbol:{entry.line}: {entry.text}
+              </span>
+            </li>
+          ))}
+        </ul>
+
+        {relationEvidence.relationGaps.length > 0 && (
+          <div className="relationGaps">
+            <h3>Relation gaps</h3>
+            <ul className="relationList">
+              {relationGapTexts.map((gapText, index) => (
+                <li key={`${relationEvidence.selectedFile}-gap-${index}`}>
+                  <span className="relationGap">{gapText}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
       </section>
 
       {selection?.startLine != null && selection?.endLine != null && selectedLines?.range && (
