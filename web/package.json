@@ -4,5 +4,8 @@
   "type": "module",
   "engines": {
     "node": ">=22.0.0"
+  },
+  "scripts": {
+    "check:responsive": "node scripts/check-responsive.mjs"
   }
 }
