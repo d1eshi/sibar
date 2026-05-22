@@ -3,8 +3,8 @@ import {
   RECOGNIZED_OPERATION_KINDS,
   type ConceptSlice,
   type ThinkingArtifact,
-} from "./runtime-deep-ownership-evidence-types.ts";
-import type { ReadinessClaim, ValidationIssue } from "./runtime-deep-ownership-loop-types.ts";
+} from "./pedagogy/core/evidence-types.ts";
+import type { ReadinessClaim, ValidationIssue } from "./pedagogy/core/loop-types.ts";
 import { issue, warning } from "./runtime-deep-ownership-validation-evidence.ts";
 
 /**

@@ -6,7 +6,7 @@ import type {
   UserAttempt,
   UserOperation,
 } from "../../engine/runtime-deep-ownership.ts";
-import { createAttempt, evaluateAttempt } from "../../engine/runtime-attempt-evaluation.ts";
+import { createAttempt, evaluateAttempt } from "../../engine/pedagogy/core/attempt-evaluation.ts";
 
 export function makeEvidenceRef(overrides?: Partial<EvidenceRef>): EvidenceRef {
   return {

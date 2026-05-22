@@ -2,7 +2,7 @@ import type {
   EvidenceRef,
   EvidenceRole,
   UserOperation,
-} from "./runtime-deep-ownership-evidence-types.ts";
+} from "./pedagogy/core/evidence-types.ts";
 
 export type ResearchBridgeMissingSide =
   | "research"

@@ -1,7 +1,7 @@
 import test, { describe } from "node:test";
 import assert from "node:assert/strict";
 
-import { createAttempt, evaluateAttempt } from "../../engine/runtime-attempt-evaluation.ts";
+import { createAttempt, evaluateAttempt } from "../../engine/pedagogy/core/attempt-evaluation.ts";
 import { makeArtifact, makeEvidenceInventory, makeEvidenceRef, makeOperation } from "./fixtures.ts";
 
 describe("VAL-PED-004: Evidence Check Evaluation", () => {

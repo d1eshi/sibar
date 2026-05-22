@@ -1,6 +1,6 @@
 import { basename, isAbsolute, relative, resolve } from "node:path";
 
-import type { EvidenceRef } from "./runtime-deep-ownership-evidence-types.ts";
+import type { EvidenceRef } from "./pedagogy/core/evidence-types.ts";
 import type {
   MutationAllowedAction,
   OpenInEditorCitationPayload,

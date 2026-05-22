@@ -6,7 +6,7 @@ import {
   buildPrerequisiteRoute,
   createReadinessClaim,
   createRepairAction,
-} from "../../engine/runtime-pedagogy-loop.ts";
+} from "../../engine/pedagogy/core/loop.ts";
 import type { OwnershipGap, OwnershipGapKind } from "../../engine/runtime-deep-ownership.ts";
 import { makeConceptSlice, makeEvidenceRef, makeOperation } from "./fixtures.ts";
 

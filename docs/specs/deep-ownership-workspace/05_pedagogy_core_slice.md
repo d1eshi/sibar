@@ -4,34 +4,35 @@
 
 Pedagogy-related source currently splits across these areas:
 
-1. `src/pedagogy-core/index.ts` is the intended shared boundary, but today it
-   only re-exports `runtime-pedagogy-loop` and `runtime-attempt-evaluation`.
-2. `src/runtime-attempt-evaluation*` captures user attempts, checks cited
+1. `engine/pedagogy-core/index.ts` is the intended shared boundary, but today it
+   only re-exports `engine/pedagogy/core/loop` and `engine/pedagogy/core/attempt-evaluation`.
+2. `engine/pedagogy/core/attempt-evaluation*` captures user attempts, checks cited
    evidence, classifies gaps, and is already operation/evidence scoped.
-3. `src/runtime-pedagogy-loop*` owns gap creation, repair actions,
+3. `engine/pedagogy/core/loop*` owns gap creation, repair actions,
    prerequisite routes, reevaluation prompts, readiness claims, misconception
    memory, and the full attempt-to-readiness loop.
-4. `src/runtime-deep-ownership-*-types.ts` owns the pure contracts for evidence,
+4. `engine/pedagogy/core/evidence-types.ts` and
+   `engine/pedagogy/core/loop-types.ts` own the pure contracts for evidence,
    operations, attempts, gaps, repairs, readiness, and loop state.
-5. `src/pedagogy/*` owns the older layer/signal/question pipeline used by
+5. `engine/pedagogy/*` owns the older layer/signal/question pipeline used by
    runtime commands, store types, and `pedagogoai` exports.
-6. `src/pedagogoai/*` is a product/runtime facade: tracks, readiness, gap
+6. `engine/pedagogoai/*` is a product/runtime facade: tracks, readiness, gap
    repair, recall, source-to-roadmap, and workspace-intent projection.
 7. `engine/workspace/source-mission/*`, `engine/article-workspace*`, and
-   `src/pedagogoai/workspace-intent*` are source/workspace planning adapters,
+   `engine/pedagogoai/workspace-intent*` are source/workspace planning adapters,
    not pedagogy core.
 
 ## Real Incongruences
 
 1. `pedagogy-core` is named as the core but does not yet export the older
-   `src/pedagogy/*` layer/question policy that still drives
+   `engine/pedagogy/*` layer/question policy that still drives
    `runtime-questions`, `runtime-support`, `store`, and the coverage eval.
-2. `src/pedagogy/*` is called "Sibi Pedagogy Layer Module" but mixes generic
+2. `engine/pedagogy/*` is called "Sibi Pedagogy Layer Module" but mixes generic
    layer detection with runtime-facing `DeclaredWorkIntent`,
    `OwnershipQuestion`, and session summary contracts.
-3. `runtime-pedagogy-loop` is a runtime-named module, but its internals are the
-   actual deterministic core for attempts, evidence, gaps, repairs, readiness,
-   routes, and misconception memory.
+3. The attempt evaluation and loop internals now live under
+   `engine/pedagogy/core/`, but `pedagogoai` facades still create additional
+   public paths around the same concepts.
 4. `pedagogoai/readiness-mastery.ts` and `pedagogoai/gap-repair.ts` re-export
    core loop pieces directly, creating a second public path around the same
    concepts.
@@ -43,17 +44,17 @@ Pedagogy-related source currently splits across these areas:
 
 ## Decision
 
-`src/pedagogy-core/` should become the single reusable core boundary. It should
+`engine/pedagogy-core/` should become the single reusable core boundary. It should
 own the mission session attempt/evidence/readiness loop, exposed first by
 re-exporting or wrapping existing deterministic modules:
 
-1. attempt capture/evaluation from `src/runtime-attempt-evaluation*`,
-2. loop orchestration from `src/runtime-pedagogy-loop*`,
+1. attempt capture/evaluation from `engine/pedagogy/core/attempt-evaluation*`,
+2. loop orchestration from `engine/pedagogy/core/loop*`,
 3. pure deep-ownership evidence/loop/intelligence types needed by those
    modules.
 
-`src/pedagogy/*` remains legacy layer/question policy initially. It may be
-re-exported for compatibility or adapted behind `src/pedagogy-core/`, but it is
+`engine/pedagogy/*` remains legacy layer/question policy initially. It may be
+re-exported for compatibility or adapted behind `engine/pedagogy-core/`, but it is
 not the primary mission session semantics until its runtime-shaped
 `DeclaredWorkIntent`, `OwnershipQuestion`, and session summary types are split
 from the layer/question policy.
@@ -64,12 +65,11 @@ It should leave outside core:
    and model runners,
 2. Mission/Track/Session UI projection and source-intent compilation,
 3. `pedagogoai` track facades and Rust/compiler adapters,
-4. persistence details such as `src/store.ts`, `src/runtime-state.ts`, and
+4. persistence details such as `engine/store.ts`, `engine/runtime-state.ts`, and
    workspace session commands.
 
-Legacy entrypoints (`src/runtime-pedagogy-loop.ts`,
-`src/runtime-attempt-evaluation.ts`, `src/pedagogy/index.ts`) should remain
-compatibility shims until imports and tests move.
+Legacy entrypoints, if reintroduced for compatibility, should remain thin
+re-exports until imports and tests move.
 
 ## Minimum Blog-To-Session Contract
 
@@ -220,23 +220,23 @@ mission UI.
    `UserOperation`, `ThinkingArtifact`, `EvidenceInventoryEntry`, and
    `PedagogyInput`. Include tests for signal-vs-slice normalization and stable
    evidence ids.
-2. Facade cleanup: make `src/pedagogy-core/index.ts` export the mission
-   attempt/evidence/readiness surface from `runtime-attempt-evaluation`,
-   `runtime-pedagogy-loop`, and pure deep-ownership contracts without moving
+2. Facade cleanup: make `engine/pedagogy-core/index.ts` export the mission
+   attempt/evidence/readiness surface from `engine/pedagogy/core/attempt-evaluation`,
+   `engine/pedagogy/core/loop`, and pure deep-ownership contracts without moving
    files.
 3. Contract split: extract or adapter-wrap runtime-shaped `DeclaredWorkIntent`,
-   `OwnershipQuestion`, and session summary types out of `src/pedagogy/*` or
+   `OwnershipQuestion`, and session summary types out of `engine/pedagogy/*` or
    keep them as legacy layer/question policy until runtime-shaped types are
    separated.
 4. Import migration: move internal imports in runtime and `pedagogoai` facades
-   from `runtime-pedagogy-loop` and `runtime-attempt-evaluation` to
-   `src/pedagogy-core`; migrate `src/pedagogy/*` imports only where the legacy
+   from `engine/pedagogy/core/loop` and `engine/pedagogy/core/attempt-evaluation` to
+   `engine/pedagogy-core`; migrate `engine/pedagogy/*` imports only where the legacy
    adapter contract is explicit.
 5. Validation gate: add tests/evals that a generic article fixture and the
    frontier-lab fixture both produce sessions through the same contract with no
    URL-specific core branch.
 6. Shim retirement: after imports are stable, move pure files under
-   `src/pedagogy-core/` and leave legacy entrypoints as thin re-exports.
+   `engine/pedagogy-core/` and leave legacy entrypoints as thin re-exports.
 
 Do not schedule UI work before the bridge can produce an executable
 `evaluateAttempt` -> `attemptToReadiness` path from a reviewed
@@ -251,36 +251,36 @@ Do not schedule UI work before the bridge can produce an executable
 5. `docs/specs/deep-ownership-workspace/03_validation_and_plan.md`
 6. `docs/specs/deep-ownership-workspace/04_shared_core_boundaries.md`
 7. `sibi/docs/specs/sibi-ownership-workbench/03_runtime_evidence_contract.md`
-8. `src/pedagogy-core/index.ts`
-9. `src/pedagogy/index.ts`
-10. `src/pedagogy/pipeline.ts`
-11. `src/runtime-pedagogy-loop.ts`
-12. `src/runtime-pedagogy-loop/types.ts`
-13. `src/runtime-pedagogy-loop/pipeline.ts`
-14. `src/runtime-attempt-evaluation.ts`
-15. `src/runtime-deep-ownership.ts`
+8. `engine/pedagogy-core/index.ts`
+9. `engine/pedagogy/index.ts`
+10. `engine/pedagogy/pipeline.ts`
+11. `engine/pedagogy/core/loop.ts`
+12. `engine/pedagogy/core/loop/types.ts`
+13. `engine/pedagogy/core/loop/pipeline.ts`
+14. `engine/pedagogy/core/attempt-evaluation.ts`
+15. `engine/runtime-deep-ownership.ts`
 16. `engine/workspace/source-mission/contracts.ts`
 17. `engine/workspace/source-mission/validate.ts`
-18. `src/runtime-workspace-session-contracts.ts`
+18. `engine/runtime-workspace-session-contracts.ts`
 19. `engine/article-workspace.ts`
 20. `engine/article-workspace-server.ts`
-21. `src/pedagogoai/contracts.ts`
-22. `src/pedagogoai/source-to-roadmap-session.ts`
-23. `src/pedagogoai/tracks/deep-ownership.ts`
-24. `src/pedagogoai/workspace-intent.ts`
-25. `src/pedagogoai/workspace-intent-types.ts`
-26. `src/pedagogoai/workspace-intent-runtime.js`
-27. `src/pedagogoai/workspace-intent/contracts.ts`
-28. `src/pedagogoai/workspace-intent/validate.ts`
-29. `src/pedagogoai/workspace-intent/fixtures.ts`
-30. `src/pedagogoai/readiness-mastery.ts`
-31. `src/pedagogoai/gap-repair.ts`
-32. `src/store.ts`
-33. `src/runtime-support.ts`
-34. `src/runtime-questions.ts`
-35. `src/evals/pedagogy-core-coverage.ts`
-36. `src/evals/pedagogy-coverage.ts`
-37. `src/evals/shared-core-boundaries.ts`
+21. `engine/pedagogoai/contracts.ts`
+22. `engine/pedagogoai/source-to-roadmap-session.ts`
+23. `engine/pedagogoai/tracks/deep-ownership.ts`
+24. `engine/pedagogoai/workspace-intent.ts`
+25. `engine/pedagogoai/workspace-intent-types.ts`
+26. `engine/pedagogoai/workspace-intent-runtime.js`
+27. `engine/pedagogoai/workspace-intent/contracts.ts`
+28. `engine/pedagogoai/workspace-intent/validate.ts`
+29. `engine/pedagogoai/workspace-intent/fixtures.ts`
+30. `engine/pedagogoai/readiness-mastery.ts`
+31. `engine/pedagogoai/gap-repair.ts`
+32. `engine/store.ts`
+33. `engine/runtime-support.ts`
+34. `engine/runtime-questions.ts`
+35. `engine/evals/pedagogy-core-coverage.ts`
+36. `engine/evals/pedagogy-coverage.ts`
+37. `engine/evals/shared-core-boundaries.ts`
 
 ## File Changed
 

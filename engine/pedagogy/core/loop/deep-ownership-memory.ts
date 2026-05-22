@@ -1,4 +1,4 @@
-import type { ConceptSlice, OwnershipGap, RepairAction } from "../runtime-deep-ownership.ts";
+import type { ConceptSlice, OwnershipGap, RepairAction } from "../loop-types.ts";
 import type {
   DeepOwnershipMemory,
   MemoryAnswerEntry,

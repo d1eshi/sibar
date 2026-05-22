@@ -5,9 +5,9 @@
  * validation, boundary safety, and snapshot projection remain maintainable.
  */
 
-export * from "./runtime-deep-ownership-evidence-types.ts";
+export * from "./pedagogy/core/evidence-types.ts";
 export * from "./runtime-deep-ownership-intelligence-types.ts";
-export * from "./runtime-deep-ownership-loop-types.ts";
+export * from "./pedagogy/core/loop-types.ts";
 
 export {
   validateEvidenceRef,

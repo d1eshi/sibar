@@ -5,12 +5,12 @@ export type {
   PrerequisiteRoute,
   RepairAction,
   UserAttempt,
-} from "../runtime-pedagogy-loop.ts";
+} from "../pedagogy/core/loop.ts";
 export type {
   CreateAttemptInput,
   EvaluateAttemptInput,
   EvaluateAttemptOutput,
-} from "../runtime-attempt-evaluation.ts";
+} from "../pedagogy/core/attempt-evaluation.ts";
 
 export {
   buildPrerequisiteRoute,
@@ -19,7 +19,7 @@ export {
   evaluateFullLoop,
   generateReevaluation,
   trackMisconception,
-} from "../runtime-pedagogy-loop.ts";
+} from "../pedagogy/core/loop.ts";
 export {
   detectLearningGapFromAnswer,
   persistGapDetectionResult,
@@ -29,4 +29,4 @@ export {
   classifyGapTaxonomy,
   createAttempt,
   evaluateAttempt,
-} from "../runtime-attempt-evaluation.ts";
+} from "../pedagogy/core/attempt-evaluation.ts";

@@ -4,8 +4,8 @@ import type {
   UserAttempt,
   UserOperation,
   ConceptSlice,
-} from "../runtime-deep-ownership.ts";
-import type { EvaluateAttemptOutput } from "../runtime-attempt-evaluation.ts";
+} from "../loop-types.ts";
+import type { EvaluateAttemptOutput } from "../attempt-evaluation.ts";
 import type { LoopResult, MemoryAnswerEntry, MisconceptionMemory } from "./types.ts";
 import { evaluateFullLoop } from "./pipeline.ts";
 import { validateEvidenceIdentity } from "./evidence-identity.ts";
@@ -19,7 +19,7 @@ export function attemptToReadiness(input: {
   conceptSlice: ConceptSlice;
   evidenceInventory: EvidenceInventoryEntry[];
   existingMisconceptions?: MisconceptionMemory[];
-  existingGaps?: import("../runtime-deep-ownership.ts").OwnershipGap[];
+  existingGaps?: import("../loop-types.ts").OwnershipGap[];
   existingAnswerHistory?: MemoryAnswerEntry[];
 }): LoopResult & { evidenceStable: boolean; evidenceIssues: string[] } {
   const result = evaluateFullLoop({

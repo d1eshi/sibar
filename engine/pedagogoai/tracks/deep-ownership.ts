@@ -16,4 +16,4 @@ export * from "../../runtime-deep-ownership-command-safety.ts";
 export * from "../../runtime-deep-ownership-intelligence.ts";
 export * from "../../runtime-deep-ownership-mutation-editor.ts";
 export * from "../../runtime-deep-ownership-snapshot.ts";
-export * from "../../runtime-pedagogy-loop.ts";
+export * from "../../pedagogy/core/loop.ts";

@@ -1,8 +1,8 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { evaluateAttempt } from "../engine/runtime-attempt-evaluation.ts";
-import { attemptToReadiness } from "../engine/runtime-pedagogy-loop.ts";
+import { evaluateAttempt } from "../engine/pedagogy/core/attempt-evaluation.ts";
+import { attemptToReadiness } from "../engine/pedagogy/core/loop.ts";
 import { buildMissionSessionBridge } from "../engine/workspace/source-mission/bridge.ts";
 import type {
   MissionPreview,

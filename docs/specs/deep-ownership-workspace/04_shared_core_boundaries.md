@@ -88,16 +88,16 @@ It owns:
 
 Current code already contains most of this logic:
 
-1. `src/pedagogy/*`
-2. `src/runtime-attempt-evaluation/*`
-3. `src/runtime-pedagogy-loop/*`
+1. `engine/pedagogy/*`
+2. `engine/pedagogy/core/attempt-evaluation/*`
+3. `engine/pedagogy/core/loop/*`
 4. pure deep-ownership contracts in
-   `src/runtime-deep-ownership-evidence-types.ts`,
-   `src/runtime-deep-ownership-loop-types.ts`,
-   `src/runtime-deep-ownership-boundary.ts`, and
-   `src/runtime-deep-ownership-intelligence.ts`
+   `engine/pedagogy/core/evidence-types.ts`,
+   `engine/pedagogy/core/loop-types.ts`,
+   `engine/runtime-deep-ownership-boundary.ts`, and
+   `engine/runtime-deep-ownership-intelligence.ts`
 
-The first implementation should create `src/pedagogy-core/` as an API boundary
+The first implementation should create `engine/pedagogy-core/` as an API boundary
 over existing logic. It should not introduce new versions of gap kinds,
 readiness claims, evidence refs, or repair actions.
 
@@ -168,12 +168,12 @@ Adapter-owned:
 
 Known adapter-heavy modules:
 
-1. `src/runtime-workspace-context.ts`
-2. `src/runtime-workspace-session*.ts`
-3. `src/runtime-state.ts`
-4. `src/store.ts`
-5. `src/runtime-deep-ownership-study-artifacts.ts`
-6. `src/pedagogoai/workspace-compiler-runner.ts`
+1. `engine/runtime-workspace-context.ts`
+2. `engine/runtime-workspace-session*.ts`
+3. `engine/runtime-state.ts`
+4. `engine/store.ts`
+5. `engine/runtime-deep-ownership-study-artifacts.ts`
+6. `engine/pedagogoai/workspace-compiler-runner.ts`
 7. `apps/sibar-research-workspace/scripts/workspace-intent-adapter.js`
 
 These modules may consume core, but they must not define the shared core
@@ -233,7 +233,7 @@ output must preserve these gates:
 Create core entrypoints as wrappers or re-exports:
 
 1. `src/ownership-core/index.ts`
-2. `src/pedagogy-core/index.ts`
+2. `engine/pedagogy-core/index.ts`
 
 Do not move logic yet. Do not delete legacy runtime entrypoints.
 
@@ -263,7 +263,7 @@ pnpm run sibi:build
 
 ### Slice 3: Pedagogy Core Facade
 
-Promote existing deterministic pedagogy modules behind `src/pedagogy-core/`.
+Promote existing deterministic pedagogy modules behind `engine/pedagogy-core/`.
 Prefer aliases and re-exports before moving files.
 
 Verification:
@@ -307,13 +307,13 @@ pnpm test -- Tests/source-mission-contracts.test.ts
 Do not prune these until the corresponding core entrypoint, shim, and tests are
 stable:
 
-1. `src/runtime-deep-ownership.ts`
-2. `src/runtime-pedagogy-loop.ts`
-3. `src/runtime-attempt-evaluation.ts`
-4. `src/runtime-memory.ts`
-5. `src/runtime-state.ts`
-6. `src/store.ts`
-7. `src/pedagogoai/index.ts`
+1. `engine/runtime-deep-ownership.ts`
+2. `engine/pedagogy/core/loop.ts`
+3. `engine/pedagogy/core/attempt-evaluation.ts`
+4. `engine/runtime-memory.ts`
+5. `engine/runtime-state.ts`
+6. `engine/store.ts`
+7. `engine/pedagogoai/index.ts`
 8. `apps/sibar-research-workspace/scripts/workspace-intent-adapter.js`
 
 The first goal is to make ownership, pedagogy, and memory boundaries explicit.

@@ -4,14 +4,14 @@
 
 export const PEDAGOGY_CORE_BOUNDARY_VERSION = "0.1.0";
 
-export * from "../runtime-pedagogy-loop.ts";
-export * from "../runtime-attempt-evaluation.ts";
+export * from "../pedagogy/core/loop.ts";
+export * from "../pedagogy/core/attempt-evaluation.ts";
 
 export {
   RECOGNIZED_ARTIFACT_KINDS,
   RECOGNIZED_EVIDENCE_ROLES,
   RECOGNIZED_OPERATION_KINDS,
-} from "../runtime-deep-ownership-evidence-types.ts";
+} from "../pedagogy/core/evidence-types.ts";
 
 export type {
   ArtifactBoundary,
@@ -29,7 +29,7 @@ export type {
   UnknownZone,
   UserOperation,
   UserOperationKind,
-} from "../runtime-deep-ownership-evidence-types.ts";
+} from "../pedagogy/core/evidence-types.ts";
 
 export type {
   DeepOwnershipFixture,
@@ -49,4 +49,4 @@ export type {
   ValidationResult,
   WeakGoalRoute,
   WorkspaceSnapshot,
-} from "../runtime-deep-ownership-loop-types.ts";
+} from "../pedagogy/core/loop-types.ts";

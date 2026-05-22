@@ -7,7 +7,7 @@ import type {
   TaskType,
 } from "./pedagogy/index.ts";
 import type { RuntimeCodeSelection } from "./code-selection.ts";
-import type { DeepOwnershipLoop } from "./runtime-deep-ownership-loop-types.ts";
+import type { DeepOwnershipLoop } from "./pedagogy/core/loop-types.ts";
 
 export type RuntimeCommand =
   | "create_artifact_session"

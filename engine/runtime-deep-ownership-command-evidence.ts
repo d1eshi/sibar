@@ -1,7 +1,7 @@
 import { createHash, randomUUID } from "node:crypto";
 
 import { checkBoundaryEscape } from "./runtime-deep-ownership-boundary.ts";
-import type { ArtifactBoundary } from "./runtime-deep-ownership-evidence-types.ts";
+import type { ArtifactBoundary } from "./pedagogy/core/evidence-types.ts";
 import type {
   ReadOnlyCommandEvidenceRecord,
   ReadOnlyCommandMutationAssessment,

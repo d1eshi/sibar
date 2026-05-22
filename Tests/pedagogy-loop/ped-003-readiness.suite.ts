@@ -1,7 +1,7 @@
 import test, { describe } from "node:test";
 import assert from "node:assert/strict";
 
-import { createReadinessClaim } from "../../engine/runtime-pedagogy-loop.ts";
+import { createReadinessClaim } from "../../engine/pedagogy/core/loop.ts";
 import { makeConceptSlice, makeOperation } from "./fixtures.ts";
 
 describe("VAL-PED-003: Readiness is scoped", () => {

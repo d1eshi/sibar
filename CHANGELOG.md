@@ -56,6 +56,9 @@ release yet.
   attempt/evidence/readiness contracts and closed operation/artifact/evidence
   taxonomies without re-exporting the adapter-heavy deep ownership runtime
   entrypoint.
+- Moved attempt evaluation, pedagogy loop, and pure evidence/loop contract files
+  under `engine/pedagogy/core/` while keeping `engine/pedagogy-core/index.ts`
+  as the public facade.
 
 ### Docs - Ownership Workbench Product Research
 

@@ -4,7 +4,7 @@ import type {
   ThinkingArtifact,
   UserAttempt,
   UserOperation,
-} from "../runtime-deep-ownership.ts";
+} from "../loop-types.ts";
 
 const DOMAIN_TERMS_PATTERN = /\b(module|function|class|interface|type|pattern|flow|state|data|config|boundary|scope|evidence|gap|readiness|repair|memory|slice|artifact|operation|concept|pedagogy|claim|check|taxonomy|severity|confidence|quality|detection|branch|field|map|trace|runtime|answer)\b/i;
 

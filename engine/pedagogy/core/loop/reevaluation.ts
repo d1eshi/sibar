@@ -4,7 +4,7 @@ import type {
   OwnershipGap,
   ConceptSlice,
   ThinkingArtifact,
-} from "../runtime-deep-ownership.ts";
+} from "../loop-types.ts";
 import type { ReevaluationPrompt } from "./types.ts";
 import { now, uniqueId } from "./shared.ts";
 
