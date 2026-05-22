@@ -21,6 +21,8 @@ release yet.
 - Reworked the public index into a two-section editorial manifesto poster:
   hero plus ownership artifacts, matching the paper/rules/red-annotation
   direction for Sibi cognitive debt.
+- Added the poster-style top navigation with manifesto links, login, and a
+  black `Try Sibi` call to action.
 - Added three Sibi landing prototypes (`html`, `html2`, `html3`) exploring a
   direct diff interaction, an editorial cognitive-debt ledger, and a dark
   ownership ceremony flow.
