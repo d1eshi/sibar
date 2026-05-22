@@ -1,8 +1,22 @@
 import { expect, test, type Page } from "@playwright/test";
 
-test("default workbench starts a guided ownership session without lab traces", async ({ page }) => {
+test("capture screen shows PR ingestion route and enters the guided workbench", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto("/");
+
+  await expect(page.getByRole("heading", { name: "Capture PR" })).toBeVisible();
+  await expect(page.getByLabel("Pull request URL")).toHaveValue("https://github.com/d1eshi/sibar/pull/18");
+  await expect(page.getByRole("heading", { name: "Ownership route" })).toBeVisible();
+
+  await page.getByRole("button", { name: "Analyze ownership" }).click();
+
+  await expect(page).toHaveURL(/workbench=1/);
+  await expect(page.getByLabel("Guided ownership review session")).toBeVisible();
+});
+
+test("default workbench starts a guided ownership session without lab traces", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/?workbench=1");
 
   await expect(page.getByLabel("Guided ownership review session")).toBeVisible();
   await expect(page.getByLabel("Repo inventory status")).toBeVisible();
@@ -16,7 +30,7 @@ test("default workbench starts a guided ownership session without lab traces", a
 });
 
 test("default workbench exposes highest-risk boundary section in the compact review panel", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/?workbench=1");
 
   await expect(page.getByRole("heading", { level: 3, name: "Highest-risk boundary" })).toBeVisible();
   await expect(page.getByText("Responsibility claim:")).toBeVisible();
@@ -25,7 +39,7 @@ test("default workbench exposes highest-risk boundary section in the compact rev
 });
 
 test("file-tree projection shows deterministic non-owned reasons", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/?workbench=1");
 
   await expect(page.locator(".fileTreePanel")).toContainText("gap: missing caller");
   await expect(page.locator(".fileTreePanel")).toContainText("questionable");
@@ -33,7 +47,7 @@ test("file-tree projection shows deterministic non-owned reasons", async ({ page
 });
 
 test("empty submit advances to the relation question and records no-answer gap", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/?workbench=1");
 
   await page.getByRole("button", { name: "Submit attempt" }).click();
 
@@ -42,7 +56,7 @@ test("empty submit advances to the relation question and records no-answer gap",
 });
 
 test("valid submit advances to the relation question without recording a gap", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/?workbench=1");
 
   await page
     .getByLabel("Tu respuesta")
@@ -55,7 +69,7 @@ test("valid submit advances to the relation question without recording a gap", a
 });
 
 test("mark unknown advances to the next check", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/?workbench=1");
 
   await page.getByRole("button", { name: "Mark unknown" }).click();
 
@@ -64,7 +78,7 @@ test("mark unknown advances to the next check", async ({ page }) => {
 });
 
 test("inconclusive relation answer advances and records a caller/test gap", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/?workbench=1");
 
   await page.getByRole("button", { name: "Submit attempt" }).click();
   await page.getByLabel("Tu respuesta").fill("The test exists but I cannot connect it yet.");
@@ -173,7 +187,7 @@ test("lab mode renders cognitive daily readout and updates from attempts", async
 });
 
 test("line/range selection updates selection summary when code lines expose selectors", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/?workbench=1");
 
   const codeLines = page.locator(".codeViewport button");
   const firstLineButton = codeLines.first();
@@ -209,7 +223,7 @@ async function completeReviewSession(page: Page): Promise<void> {
 }
 
 test("readiness attempt can be submitted after guided questions with anti-overconfidence block", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/?workbench=1");
 
   await completeReviewSession(page);
   await page
@@ -227,7 +241,7 @@ test("readiness attempt can be submitted after guided questions with anti-overco
 });
 
 test("repair path exposes fix guidance and allows re-attempt", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/?workbench=1");
 
   await completeReviewSession(page);
   await page
@@ -273,7 +287,7 @@ test("repair path exposes fix guidance and allows re-attempt", async ({ page }) 
 });
 
 test("transfer skip keeps boundary non-owned and exposes explicit follow-up tasks", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/?workbench=1");
 
   await completeReviewSession(page);
   await page
@@ -293,7 +307,7 @@ test("transfer skip keeps boundary non-owned and exposes explicit follow-up task
 });
 
 test("repeated transfer failures expose a deterministic workspace handoff candidate and user authorization", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/?workbench=1");
 
   await completeReviewSession(page);
   await page
@@ -404,7 +418,7 @@ test("lab mode renders agent-flow manifest and diagnostics", async ({ page }) =>
 });
 
 test("agent-flow diagnostics are hidden in default view", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/?workbench=1");
 
   await expect(page.getByLabel("Agent-flow manifest")).toHaveCount(0);
   await expect(page.getByLabel("Agent action validation")).toHaveCount(0);
@@ -420,6 +434,6 @@ test("lab mode renders Gemini evidence extraction panel and hides it in default 
   await expect(geminiSection).toContainText("Overall disposition:");
   await expect(geminiSection).toContainText("Verified:");
 
-  await page.goto("/");
+  await page.goto("/?workbench=1");
   await expect(page.getByLabel("Gemini evidence extraction")).toHaveCount(0);
 });
