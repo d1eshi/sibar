@@ -36,6 +36,10 @@ release yet.
   and required user reasons produce the active Mission Brief, derived Home
   projection, and session fixture while unsupported URLs stay blocked with
   diagnostics.
+- Added a pure source-mission trace contract that summarizes frontier-lab intake,
+  mission projection, focused queue status, source/evidence counts, diagnostics,
+  and reproducibility hashes without exposing raw source maps in primary trace
+  output.
 
 ### Changed - Pedagogy Core Facade
 
