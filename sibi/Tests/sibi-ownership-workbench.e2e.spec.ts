@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
 
 test("default workbench starts a guided ownership session without lab traces", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
@@ -142,4 +142,70 @@ test("line/range selection updates selection summary when code lines expose sele
 
   await firstLineButton.click();
   await expect(page.getByText(/Current selection detail: /)).toBeVisible();
+});
+
+async function completeReviewSession(page: Page): Promise<void> {
+  await page.getByRole("button", { name: "Submit attempt" }).click();
+  await expect(page.getByLabel("Current Sibi question")).toContainText("session.test.ts");
+
+  await page
+    .getByLabel("Tu respuesta")
+    .fill(
+      "The 204 branch now returns null and callers must treat this as an active-session miss.",
+    );
+  await page.getByRole("button", { name: "Submit attempt" }).click();
+  await expect(page.getByLabel("Current Sibi question")).toContainText("runtime/consumer.ts");
+
+  await page
+    .getByLabel("Tu respuesta")
+    .fill("session.test proves null returns now, while no session stays unauthenticated.");
+  await page.getByRole("button", { name: "Submit attempt" }).click();
+  await expect(page.getByRole("heading", { name: "Session complete", level: 2 })).toBeVisible();
+  await expect(page.getByText("Readiness gate: Not yet attempted.")).toBeVisible();
+}
+
+test("readiness attempt can be submitted after guided questions with anti-overconfidence block", async ({ page }) => {
+  await page.goto("/");
+
+  await completeReviewSession(page);
+  await page
+    .getByLabel("Final boundary attempt")
+    .fill(
+      "Null returns and the call must block privileged work when missing.",
+    );
+  await page.getByLabel("Self confidence").fill("95");
+  await page.getByRole("button", { name: "Submit attempt" }).click();
+
+  await expect(page.getByText("Readiness gate: repair-needed")).toBeVisible();
+  await expect(page.getByText("Evidence fit:")).toBeVisible();
+  await expect(page.getByText(/Evidence anchors:/)).toBeVisible();
+  await expect(page.getByText("Smallest repair")).toBeVisible();
+});
+
+test("repair path exposes fix guidance and allows re-attempt", async ({ page }) => {
+  await page.goto("/");
+
+  await completeReviewSession(page);
+  await page
+    .getByLabel("Final boundary attempt")
+    .fill(
+      "Null returns and the call must block privileged work when missing.",
+    );
+  await page.getByLabel("Self confidence").fill("95");
+  await page.getByRole("button", { name: "Submit attempt" }).click();
+  await expect(page.getByRole("button", { name: "Retry after repair" })).toBeEnabled();
+
+  await page.getByRole("button", { name: "Retry after repair" }).click();
+  await page
+    .getByLabel("Final boundary attempt")
+    .fill(
+      "The createSession branch returns null from 204; callers must guard with `if (!session)` before any privileged request so unauthenticated path stays safe.",
+    );
+  await page.getByLabel("Self confidence").fill("60");
+  await page.getByRole("button", { name: "Submit attempt" }).click();
+
+  await expect(page.getByText("Readiness gate: ready")).toBeVisible();
+  const readinessOutput = page.getByLabel("Readiness gate output");
+  await expect(readinessOutput).toContainText(/State\s*owned/);
+  await expect(page.getByText("Attempt ID: attempt-")).toBeVisible();
 });

@@ -8,6 +8,8 @@ export type ViewMode = "code" | "diff";
 
 export type WorkbenchSurfaceMode = "default" | "lab";
 
+export type ReadinessGate = "ready" | "repair-needed" | "blocked";
+
 export type EvidenceRef = {
   id: string;
   title: string;
@@ -124,6 +126,30 @@ export type OwnershipSessionObservation = {
   filePath: string;
   reason: OwnershipSessionGapReason;
   note: string;
+};
+
+export type OwnershipAttemptGap = {
+  reason: string;
+  evidenceRefs: EvidenceRef[];
+  smallestRepair: string;
+};
+
+export type OwnershipAttemptReadiness = {
+  attempt_id: string;
+  self_confidence: number;
+  evidence_fit: number;
+  calibration_score: number;
+  readiness_gate: ReadinessGate;
+  state: BoundaryState;
+  summary: string;
+  gapReason?: string;
+  gapDiagnoses: OwnershipAttemptGap[];
+  smallestRepair: string;
+  returnCondition: string;
+  attemptEvidenceRefs: EvidenceRef[];
+  startedAt: number;
+  submittedAt: number;
+  elapsedMs: number;
 };
 
 export type OwnershipSessionQuestion = {
