@@ -137,6 +137,19 @@ release yet.
   and manual/daily compaction policy, and added unit/e2e coverage for append-only
   behavior, evidence-preserving exports, and memory UI replay.
 
+### Added - Slice 9 Cognitive Debt and Cognitive Load Metrics
+
+- Added a pure derivation module at `sibi/src/ownershipWorkbench/cognitiveMetrics.ts`
+  for deterministic `cognitive_debt_metric`, `cognitive_load_metric`, and
+  daily readout derivation from persisted memory state.
+- Integrated metric derivation into `sibi/src/App.tsx` and propagated a lab-facing
+  ownership signal panel into `sibi/src/ownershipWorkbench/components/OwnershipHarnessPanel.tsx`.
+- Added deterministic metric/readout formulas and source-input traceability policy in
+  `sibi/docs/specs/sibi-ownership-workbench/04_implementation_slices.md` and
+  `sibi/docs/specs/sibi-ownership-workbench/06_cognitive_debt_metrics.md`.
+- Added coverage for metric/readout derivation in unit tests and verified daily
+  readout updates and transfer summary rendering in Playwright lab mode.
+
 ### Added - Slice 1 Inventory Runtime
 
 - Moved the Slice 1 contract/runtime base for deterministic `repoInventory(sourceRoot)`

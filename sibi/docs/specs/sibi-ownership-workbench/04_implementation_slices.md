@@ -277,6 +277,8 @@ Acceptance:
 
 Goal: surface practical ownership signals and avoid pseudo-mastery claims.
 
+Status: implemented in Slice 9 runtime+UI pass.
+
 Deliverables:
 
 - `cognitive_debt_metric` definition:
@@ -295,11 +297,28 @@ Deliverables:
   - load hotspots,
   - top 3 follow-up actions.
 
+Policy for deterministic runtime derivation:
+
+- `cognitive_debt_metric` derives only from persisted boundary-scoped signals in `OwnershipMemoryExportBundle` (readiness attempts, transfer attempts, guided observations) plus relation candidates from `extractCodeEvidence` where available.
+- `boundary_gap_density = clamp01(relationGapSignals / max(1, candidateRelationItems.length))`, where `relationGapSignals` is derived from readiness non-ready gaps, relation-aware guided observations, and persisted relation recurrence gaps.
+- `readiness_debt = clamp01(1 - average(local_readiness_signal))`, `local_readiness_signal = mean(1 for ready, 0.56 for repair-needed, 0.2 for blocked)`.
+- `calibration_gap = clamp01(mean(abs(self_confidence - evidence_fit)))` over readiness attempts.
+- `attempt_variance` is a bounded mix of confidence/fidelity/elapsed normalized variance for the same boundary.
+- `cognitive_load_metric` computes `boundary_fanout` from relation candidates, `dependency_depth` from relation/runtime/test context + transfer outcomes, and `repair_retry_count = transfer_fail_count + readiness_attempt_count - 1`.
+- readout and metric objects always include source inputs (`attemptIds`, `evidenceRefIds`, and transfer IDs when present).
+- daily readout is recomputed from boundary memory state and rendered in lab mode only, with explicit follow-up actions as readable route guidance (never presented as mastery).
+
 Acceptance:
 
 - every metric has deterministic derivation from recorded attempts/evidence;
 - no metric is shown as mastery proof by itself;
 - daily readout updates predictably from persisted state and can be rendered in lab mode.
+
+Implementation check for this slice:
+
+- memory-driven inputs and derivations are in `src/ownershipWorkbench/cognitiveMetrics.ts`.
+- metrics and readout are integrated into `src/App.tsx` and shown by `OwnershipHarnessPanel` in lab view.
+- unit and Playwright coverage include derivation shape and update checks from attempt/transfer progression.
 
 ## Slice 10 - Agent-Flow and Playwright Manifest
 

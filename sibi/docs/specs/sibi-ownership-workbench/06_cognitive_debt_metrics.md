@@ -21,75 +21,113 @@ gaps, and transfer behavior, and how those measurements feed daily readout.
 type CognitiveDebtMetric = {
   artifactScope: string;
   boundaryId: string;
-  relationGapDensity: number;      // 0..1
-  readinessDebt: number;           // 0..1
-  calibrationGap: number;          // 0..1
-  attemptVariance: number;         // >=0
+  boundary_gap_density: number;       // 0..1
+  readiness_debt: number;            // 0..1
+  calibration_gap: number;            // 0..1
+  attempt_variance: number;           // 0..1
+  source_inputs: {
+    attemptIds: string[];
+    evidenceRefIds: string[];
+    transferAttemptIds?: string[];
+  };
   lastComputedAt: string;
 };
 ```
 
 #### Relation gap density
 
-`relationGapDensity = confirmed_relation_gaps / candidate_relation_items`
+`boundary_gap_density = clamp01(confirmed_relation_gaps / max(1, candidate_relation_items))`
+
+Inputs are boundary-scoped signals from the memory export:
+
+- confirmed relation signals:
+  - guided observation reason `could not connect caller/test`,
+  - non-ready readiness gap reasons that mention relation/test/caller,
+  - persisted recurring gaps that start with `relation-gap:`.
+- candidate relation items come from boundary files + review queue files + local code-evidence relation candidates.
 
 #### Readiness debt
 
-`readinessDebt = 1 - local_readiness_signal`
+`readiness_debt = clamp01(1 - local_readiness_signal)`
 
 `local_readiness_signal` is not a truth claim or user mastery metric. It is only a
 boundary/session-local ownership-progress signal (for product routing only).
 
+`local_readiness_signal = mean(signal)` where each readiness attempt emits:
+
+- `1` when `readiness_gate == "ready"`
+- `0.56` when `readiness_gate == "repair-needed"`
+- `0.2` when `readiness_gate == "blocked"`
+
 #### Calibration gap
 
 `calibrationGap = abs(self_confidence - evidence_confidence)`
+
+`calibration_gap = clamp01(mean( calibration_gap_i for all readiness attempts ))`
+where `calibration_gap_i = abs(self_confidence_i - evidence_fit_i)`.
 
 #### Attempt variance
 
 Measured attempt drift over attempts for the same boundary (timing + correction
 steps + confidence shifts), bounded to avoid unbounded growth.
 
+Implementation uses a weighted bounded standard-deviation mix of:
+
+- confidence drift,
+- evidence-fit drift,
+- elapsed-time drift.
+
 ### `cognitive_load_metric`
 
 ```ts
 type CognitiveLoadMetric = {
   boundaryId: string;
-  fanoutCount: number;
-  dependencyDepth: number;
-  repairRetryCount: number;
-  churnWeight: number;
+  boundary_fanout: number;
+  dependency_depth: number;
+  repair_retry_count: number;
+  source_inputs: {
+    attemptIds: string[];
+    evidenceRefIds: string[];
+    transferAttemptIds?: string[];
+  };
+  churn_weight: number;
   lastComputedAt: string;
 };
 ```
 
 #### Fanout
 
-Number of observed relations from and to the boundary (calls, callers, tests,
-docs).
+`boundary_fanout` = count of observed relation candidates (boundary files, review queue files, and code-evidence candidates).
 
 #### Dependency depth
 
-Derived from relation chain length inside the bounded context.
+`dependency_depth` is deterministic from bounded context signals:
+
+- presence of caller/test files,
+- runtime-context presence,
+- non-boundary relation candidates,
+- transfer failure/retry history.
 
 #### Churn weight
 
-Combined normalized weight from repair retries and open question cycles.
+Combined normalized weight from repair retries and open question cycles and unresolved recurring gaps.
 
 ## Daily Learning Readout
 
 ```ts
 type DailyReadout = {
   date: string;
-  completed_boundaries: string[];
   outstanding_gaps: string[];
+  ready_count: number;
   transfer_summary: Array<{
     boundaryId: string;
     result: "pass" | "fail" | "skipped";
     reason?: string;
   }>;
-  top_debt_boundaries: Array<{ boundaryId: string; score: number }>;
-  top_load_boundaries: Array<{ boundaryId: string; score: number }>;
-  recommended_actions: string[];
+  load_hotspots: string[];
+  top_3_follow_up_actions: string[];
+  cognitive_debt_metric: CognitiveDebtMetric;
+  cognitive_load_metric: CognitiveLoadMetric;
 };
 ```
 
@@ -103,7 +141,7 @@ Readout rules:
 
 ## Mapping to Product Decisions
 
-- A boundary with high `relationGapDensity` and `calibrationGap` should be locked
+- A boundary with high `boundary_gap_density` and `calibration_gap` should be locked
   to remediation flow before advancing.
 - A boundary with repeated transfer failure should route to Workspace escalation
   review and mark a prerequisite stack.

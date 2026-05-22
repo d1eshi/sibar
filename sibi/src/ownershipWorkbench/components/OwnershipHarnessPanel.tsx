@@ -19,6 +19,11 @@ import { RepoInventoryStatusPanel } from "./RepoInventoryStatusPanel";
 import type { TransferAttemptRecord } from "../transferVerification.ts";
 import type { WorkspaceEscalationDecision } from "../workspaceEscalation.ts";
 import type { OwnershipMemoryExportBundle } from "../ownershipMemory.ts";
+import type {
+  CognitiveDebtMetric,
+  CognitiveLoadMetric,
+  DailyCognitiveReadout,
+} from "../cognitiveMetrics.ts";
 
 interface OwnershipLabContext {
   selectedFile: string;
@@ -57,6 +62,9 @@ interface OwnershipHarnessPanelProps {
   authorizedHandoffArtifact: OwnershipReviewArtifact | null;
   onAuthorizeHandoff: () => void;
   ownershipMemoryExport: OwnershipMemoryExportBundle;
+  cognitiveDebtMetric: CognitiveDebtMetric;
+  cognitiveLoadMetric: CognitiveLoadMetric;
+  cognitiveDailyReadout: DailyCognitiveReadout;
 }
 
 export function OwnershipHarnessPanel({
@@ -88,6 +96,9 @@ export function OwnershipHarnessPanel({
   authorizedHandoffArtifact,
   onAuthorizeHandoff,
   ownershipMemoryExport,
+  cognitiveDebtMetric,
+  cognitiveLoadMetric,
+  cognitiveDailyReadout,
 }: OwnershipHarnessPanelProps): React.ReactElement {
   const isLabView = surfaceMode === "lab" && labContext != null;
   const currentQuestion = sessionState.isComplete ? null : sessionQuestions[sessionState.currentIndex] ?? null;
@@ -138,7 +149,7 @@ export function OwnershipHarnessPanel({
       <div className="ownershipPanelBody">
         <RepoInventoryStatusPanel status={inventoryStatus} />
 
-        {isLabView && (
+      {isLabView && (
           <section className="ownershipSection labModeNotice">
             <p className="panelSub">Debug view</p>
             <h2>Local trace lab</h2>
@@ -148,6 +159,93 @@ export function OwnershipHarnessPanel({
             </p>
           </section>
         )}
+
+        {isLabView ? (
+          <section className="ownershipSection" aria-label="Cognitive daily readout">
+            <p className="panelSub">Daily readout</p>
+            <h2>Ownership signals</h2>
+            <div className="readinessMetrics">
+              <span>Boundary: {cognitiveDailyReadout.cognitive_debt_metric.boundaryId}</span>
+              <span>Date: {cognitiveDailyReadout.date}</span>
+              <span>Ready count: {cognitiveDailyReadout.ready_count}</span>
+              <span>Outstanding gaps: {cognitiveDailyReadout.outstanding_gaps.length}</span>
+            </div>
+
+            <div className="gapCard">
+              <p>Cognitive debt metric (route signal, not mastery proof)</p>
+              <div className="readinessMetrics">
+                <span>boundary_gap_density: {cognitiveDebtMetric.boundary_gap_density.toFixed(2)}</span>
+                <span>readiness_debt: {cognitiveDebtMetric.readiness_debt.toFixed(2)}</span>
+                <span>calibration_gap: {cognitiveDebtMetric.calibration_gap.toFixed(2)}</span>
+                <span>attempt_variance: {cognitiveDebtMetric.attempt_variance.toFixed(2)}</span>
+              </div>
+              <p>
+                Inputs: attempts={cognitiveDebtMetric.source_inputs.attemptIds.length} evidence_refs={
+                  cognitiveDebtMetric.source_inputs.evidenceRefIds.length
+                }
+                {cognitiveDebtMetric.source_inputs.transferAttemptIds != null
+                  ? ` transfers=${cognitiveDebtMetric.source_inputs.transferAttemptIds.length}`
+                  : ""}
+              </p>
+            </div>
+
+            <div className="gapCard">
+              <p>Cognitive load metric</p>
+              <div className="readinessMetrics">
+                <span>boundary_fanout: {cognitiveLoadMetric.boundary_fanout}</span>
+                <span>dependency_depth: {cognitiveLoadMetric.dependency_depth}</span>
+                <span>repair_retry_count: {cognitiveLoadMetric.repair_retry_count}</span>
+              </div>
+              <p>Inputs: attempts={cognitiveLoadMetric.source_inputs.attemptIds.length} evidence_refs={cognitiveLoadMetric.source_inputs.evidenceRefIds.length}</p>
+            </div>
+
+            <div className="gapCard">
+              <p>Transfer summary</p>
+              {cognitiveDailyReadout.transfer_summary.length === 0 ? (
+                <p className="gapEvidence">No transfer attempt recorded yet.</p>
+              ) : (
+                <ul>
+                  {cognitiveDailyReadout.transfer_summary.map((entry) => (
+                    <li key={`${entry.boundaryId}-${entry.attemptId ?? "skipped"}-${entry.result}`}>
+                      {entry.boundaryId}: {entry.result}
+                      {entry.attemptId != null ? ` (${entry.attemptId})` : ""}
+                      {entry.reason ? ` — ${entry.reason}` : ""}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+
+            <div className="gapCard">
+              <p>Load hotspots</p>
+              {cognitiveDailyReadout.load_hotspots.length === 0 ? (
+                <p className="gapEvidence">No hotspots recorded yet.</p>
+              ) : (
+                <ul>
+                  {cognitiveDailyReadout.load_hotspots.map((entry) => (
+                    <li key={entry}>{entry}</li>
+                  ))}
+                </ul>
+              )}
+            </div>
+
+            <div className="gapCard">
+              <p>Top 3 follow-up actions</p>
+              {cognitiveDailyReadout.top_3_follow_up_actions.length === 0 ? (
+                <p className="gapEvidence">No deterministic follow-up action needed from current signals.</p>
+              ) : (
+                <ol>
+                  {cognitiveDailyReadout.top_3_follow_up_actions.map((action) => (
+                    <li key={action}>{action}</li>
+                  ))}
+                </ol>
+              )}
+              {cognitiveDailyReadout.outstanding_gaps.length > 0 ? (
+                <p className="gapEvidence">Outstanding gaps: {cognitiveDailyReadout.outstanding_gaps.join(" | ")}</p>
+              ) : null}
+            </div>
+          </section>
+        ) : null}
 
         <ReviewGuidePanel
           boundary={boundary}

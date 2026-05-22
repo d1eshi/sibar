@@ -16,6 +16,7 @@ type OwnershipBoundaryBuilder = typeof import("../src/ownershipWorkbench/boundar
 type OwnershipTreeReasonFormatting = typeof import("../src/ownershipWorkbench/fileTreeReasonFormatting.ts");
 type OwnershipTransferVerification = typeof import("../src/ownershipWorkbench/transferVerification.ts");
 type OwnershipMemory = typeof import("../src/ownershipWorkbench/ownershipMemory.ts");
+type OwnershipCognitiveMetrics = typeof import("../src/ownershipWorkbench/cognitiveMetrics.ts");
 
 const EXPECTED_DIFF_FILES = ["src/api/session.ts", "src/api/session.test.ts"] as const;
 const DIRECTORY_PATHS = ["src", "src/api", "src/runtime"] as const;
@@ -31,6 +32,7 @@ let cachedBoundaryBuilder: OwnershipBoundaryBuilder | null = null;
 let cachedFileTreeReasonFormatting: OwnershipTreeReasonFormatting | null = null;
 let cachedTransferVerification: OwnershipTransferVerification | null = null;
 let cachedOwnershipMemory: OwnershipMemory | null = null;
+let cachedCognitiveMetrics: OwnershipCognitiveMetrics | null = null;
 let fixtureImportConsoleErrors: unknown[] = [];
 
 async function loadFixturesModule(): Promise<OwnershipWorkbenchFixtures> {
@@ -141,6 +143,15 @@ async function loadOwnershipMemoryModule(): Promise<OwnershipMemory> {
 
   cachedOwnershipMemory = (await import("../src/ownershipWorkbench/ownershipMemory.ts")) as OwnershipMemory;
   return cachedOwnershipMemory;
+}
+
+async function loadCognitiveMetricsModule(): Promise<OwnershipCognitiveMetrics> {
+  if (cachedCognitiveMetrics != null) {
+    return cachedCognitiveMetrics;
+  }
+
+  cachedCognitiveMetrics = (await import("../src/ownershipWorkbench/cognitiveMetrics.ts")) as OwnershipCognitiveMetrics;
+  return cachedCognitiveMetrics;
 }
 
 test("fixture file tree paths only include leaf file paths", async () => {
@@ -956,6 +967,326 @@ test("ownership memory daily compaction is deterministic and preserves evidence 
   assert.equal(exported.compaction.daily_cutoff_at, "2026-05-21T00:00:00.000Z");
   assert.equal(exported.boundary_history.length, 2);
   assert.equal(exported.boundary_history.every((entry) => entry.evidence_refs.length > 0), true);
+});
+
+test("cognitive debt metric derives deterministic route signals from attempt + memory traces", async () => {
+  const fixtures = await loadFixturesModule();
+  const metrics = await loadCognitiveMetricsModule();
+  const memory = await loadOwnershipMemoryModule();
+
+  const boundary = { ...fixtures.ownershipBoundary, evidence: fixtures.fixtureEvidence };
+  const baselineAttempt = {
+    attempt_id: "attempt-boundary-01-01",
+    self_confidence: 0.9,
+    evidence_fit: 0.2,
+    calibration_score: 0.35,
+    readiness_gate: "repair-needed" as const,
+    state: "partial",
+    summary: "Relation was not connected yet.",
+    gapReason: "Could not connect caller/test relation for this attempt.",
+    gapDiagnoses: [],
+    smallestRepair: "Add one concrete caller invariant",
+    returnCondition: "Retry with a bounded invariant and explicit guard.",
+    attemptEvidenceRefs: fixtures.fixtureEvidence.slice(0, 2),
+    startedAt: 1_700_000_000_200,
+    submittedAt: 1_700_000_000_300,
+    elapsedMs: 100,
+  };
+  const followUpAttempt = {
+    attempt_id: "attempt-boundary-01-02",
+    self_confidence: 0.7,
+    evidence_fit: 0.2,
+    calibration_score: 0.35,
+    readiness_gate: "ready" as const,
+    state: "partial",
+    summary: "Caller contract is now restated with one guard phrase.",
+    gapReason: undefined,
+    gapDiagnoses: [],
+    smallestRepair: "Keep follow-up local",
+    returnCondition: "No change required.",
+    attemptEvidenceRefs: fixtures.fixtureEvidence.slice(0, 2),
+    startedAt: 1_700_000_000_400,
+    submittedAt: 1_700_000_000_600,
+    elapsedMs: 120,
+  };
+  const failedTransferAttempt = {
+    transferId: "transfer-boundary-01-01",
+    probeId: "probe-boundary-01-boundary-01",
+    attemptIndex: 1,
+    attemptTextPreview: "I tried to translate this invariant but could not reuse it.",
+    startedAt: 1_700_000_000_650,
+    submittedAt: 1_700_000_000_700,
+    outcome: "transfer_fail" as const,
+    questionId: "transfer_to_related_file" as const,
+    recurrenceTags: ["transfer-attempt", "transfer-recurrence-1", "transfer-retry"],
+    followUpTasks: ["Name one concrete invariant in the related boundary."],
+    escalationCandidate: false,
+  };
+
+  const withObservation = memory.appendGuidedObservation({
+    memory: memory.createOwnershipMemoryState(),
+    boundary,
+    observation: {
+      id: "observation-301",
+      filePath: boundary.filePath,
+      reason: "could not connect caller/test" as const,
+      note: "Caller/test relation still not confirmed by evidence.",
+    },
+    occurredAt: 1_700_000_000_100,
+  });
+  const withAttemptOne = memory.appendReadinessAttempt({
+    memory: withObservation,
+    boundary,
+    readiness: baselineAttempt,
+  });
+  const withAttemptTwo = memory.appendReadinessAttempt({
+    memory: withAttemptOne,
+    boundary,
+    readiness: followUpAttempt,
+  });
+  const withTransfer = memory.appendTransferAttempt({
+    memory: withAttemptTwo,
+    boundary,
+    transfer: failedTransferAttempt,
+  });
+
+  const bundle = memory.buildOwnershipMemoryExportBundle({
+    memory: withTransfer,
+    mode: "manual",
+    boundaryId: boundary.id,
+    exportedAt: 1_700_000_000_800,
+  });
+  const syntheticCodeEvidence = [
+    {
+      selectedFile: boundary.filePath,
+      imports: [],
+      exports: [],
+      symbols: [],
+      relationCandidates: fixtures.fixtureEvidence.map((entry) => ({
+        id: `candidate-${entry.id}`,
+        kind: "caller",
+        path: "src/runtime/consumer.ts",
+        label: "caller",
+        evidenceKind: "observed",
+        source: "evidence",
+        sourceIds: [entry.id],
+      })),
+      relationGaps: [],
+      evidenceKindCounts: { observed: 1, inferred: 0, unverified: 0, conflict: 0 },
+    },
+  ];
+
+  const debtMetric = metrics.buildCognitiveDebtMetric({
+    boundary,
+    memoryExport: bundle,
+    reviewQueue: fixtures.ownershipReviewQueue,
+    codeEvidence: syntheticCodeEvidence,
+  });
+  const loadMetric = metrics.buildCognitiveLoadMetric({
+    boundary,
+    memoryExport: bundle,
+    reviewQueue: fixtures.ownershipReviewQueue,
+    codeEvidence: syntheticCodeEvidence,
+  });
+
+  const readout = metrics.buildDailyCognitiveReadout({
+    boundary,
+    memoryExport: bundle,
+    reviewQueue: fixtures.ownershipReviewQueue,
+    codeEvidence: syntheticCodeEvidence,
+  });
+
+  assert.equal(bundle.event_count, 4);
+  assert.equal(bundle.boundary_history.length, 4);
+  assert.equal(debtMetric.boundaryId, boundary.id);
+  assert.equal(debtMetric.boundary_gap_density >= 0, true);
+  assert.equal(debtMetric.boundary_gap_density <= 1, true);
+  assert.equal(debtMetric.readiness_debt > 0, true);
+  assert.equal(debtMetric.calibration_gap > 0, true);
+  assert.equal(debtMetric.attempt_variance > 0, true);
+  assert.equal(debtMetric.source_inputs.attemptIds.length, 2);
+  assert.equal(debtMetric.source_inputs.evidenceRefIds.includes("E-001"), true);
+
+  assert.equal(loadMetric.boundaryId, boundary.id);
+  assert.equal(loadMetric.repair_retry_count, 2);
+  assert.equal(loadMetric.boundary_fanout > 0, true);
+  assert.equal(readout.ready_count, 1);
+  assert.equal(readout.transfer_summary.length, 1);
+  assert.equal(readout.transfer_summary[0]?.result, "fail");
+  assert.equal(readout.outstanding_gaps.length >= 1, true);
+  assert.equal(readout.top_3_follow_up_actions.length <= 3, true);
+  assert.equal(readout.top_3_follow_up_actions.length > 0, true);
+  assert.equal(
+    readout.top_3_follow_up_actions.some((entry) => entry.includes("Retry transfer using one invariant")),
+    true,
+  );
+});
+
+test("cognitive metric source inputs include readiness, guided, transfer, recurring, and history evidence refs", async () => {
+  const fixtures = await loadFixturesModule();
+  const metrics = await loadCognitiveMetricsModule();
+  const memory = await loadOwnershipMemoryModule();
+
+  const boundary = { ...fixtures.ownershipBoundary, evidence: fixtures.fixtureEvidence };
+  const readinessWithReadinessGap = {
+    attempt_id: "attempt-boundary-02-01",
+    self_confidence: 0.9,
+    evidence_fit: 0.2,
+    calibration_score: 0.2,
+    readiness_gate: "repair-needed" as const,
+    state: "partial",
+    summary: "The caller contract is still ambiguous after one pass.",
+    gapReason: "Could not connect caller/test for this attempt.",
+    gapDiagnoses: [],
+    smallestRepair: "Add one explicit caller invariant.",
+    returnCondition: "Retry with a bounded invariant statement.",
+    attemptEvidenceRefs: fixtures.fixtureEvidence.slice(0, 1),
+    startedAt: 1_700_000_002_000,
+    submittedAt: 1_700_000_002_100,
+    elapsedMs: 100,
+  };
+  const readinessSecond = {
+    ...readinessWithReadinessGap,
+    attempt_id: "attempt-boundary-02-02",
+    self_confidence: 0.91,
+    evidence_fit: 0.21,
+    gapReason: "Could not connect caller/test for this attempt.",
+    attemptEvidenceRefs: fixtures.fixtureEvidence.slice(1, 2),
+    startedAt: 1_700_000_002_200,
+    submittedAt: 1_700_000_002_400,
+  };
+  const failedTransferAttempt = {
+    transferId: "transfer-boundary-02-01",
+    probeId: "probe-boundary-02-boundary-02",
+    attemptIndex: 1,
+    attemptTextPreview: "I changed the invariant but it still does not map.",
+    startedAt: 1_700_000_002_450,
+    submittedAt: 1_700_000_002_500,
+    outcome: "transfer_fail" as const,
+    questionId: "transfer_to_related_file" as const,
+    recurrenceTags: ["transfer-attempt"],
+    followUpTasks: ["Name one concrete invariant in the related boundary."],
+    escalationCandidate: false,
+  };
+
+  const withGuided = memory.appendGuidedObservation({
+    memory: memory.createOwnershipMemoryState(),
+    boundary,
+    observation: {
+      id: "observation-401",
+      filePath: boundary.filePath,
+      reason: "could not connect caller/test" as const,
+      note: "Need caller/test trace before this can be considered owned.",
+    },
+    occurredAt: 1_700_000_001_950,
+  });
+  const withReadiness = memory.appendReadinessAttempt({
+    memory: withGuided,
+    boundary,
+    readiness: readinessWithReadinessGap,
+  });
+  const withReadinessTwo = memory.appendReadinessAttempt({
+    memory: withReadiness,
+    boundary,
+    readiness: readinessSecond,
+  });
+  const withTransfer = memory.appendTransferAttempt({
+    memory: withReadinessTwo,
+    boundary,
+    transfer: failedTransferAttempt,
+  });
+  const bundle = memory.buildOwnershipMemoryExportBundle({
+    memory: withTransfer,
+    mode: "manual",
+    boundaryId: boundary.id,
+    exportedAt: 1_700_000_002_900,
+  });
+
+  const debtMetric = metrics.buildCognitiveDebtMetric({
+    boundary,
+    memoryExport: bundle,
+    reviewQueue: fixtures.ownershipReviewQueue,
+    codeEvidence: [],
+  });
+  const loadMetric = metrics.buildCognitiveLoadMetric({
+    boundary,
+    memoryExport: bundle,
+    reviewQueue: fixtures.ownershipReviewQueue,
+    codeEvidence: [],
+  });
+  const uniqueValues = <T,>(values: T[]): T[] => [...new Set(values)];
+
+  const readinessEvidenceRefs = uniqueValues(
+    bundle.events
+      .filter((entry): entry is typeof entry & {
+        event_type: "readiness_attempt";
+        payload: { readiness: { attemptEvidenceRefs: { id: string }[] } };
+      } => entry.event_type === "readiness_attempt")
+      .flatMap((entry) => entry.payload.readiness.attemptEvidenceRefs.map((entry) => entry.id)),
+  );
+  const recurringEvidenceRefs = uniqueValues(
+    bundle.recurring_gaps.flatMap((gap) => gap.evidence_refs.map((evidenceRef) => evidenceRef.id)),
+  );
+  const historyEvidenceRefs = uniqueValues(
+    bundle.boundary_history.flatMap((entry) => entry.evidence_refs.map((evidenceRef) => evidenceRef.id)),
+  );
+  const transferEvidenceRefIds = ["transfer-boundary-02-01"];
+  const guidedEvidenceRefIds = ["memory-observation-401"];
+  const expectedEvidenceRefs = uniqueValues([
+    ...readinessEvidenceRefs,
+    ...recurringEvidenceRefs,
+    ...historyEvidenceRefs,
+    ...transferEvidenceRefIds,
+    ...guidedEvidenceRefIds,
+  ]);
+
+  assert.equal(debtMetric.source_inputs.evidenceRefIds.length, uniqueValues(debtMetric.source_inputs.evidenceRefIds).length);
+  assert.equal(loadMetric.source_inputs.evidenceRefIds.length, uniqueValues(loadMetric.source_inputs.evidenceRefIds).length);
+  for (const expectedEvidenceRef of expectedEvidenceRefs) {
+    assert.equal(debtMetric.source_inputs.evidenceRefIds.includes(expectedEvidenceRef), true);
+    assert.equal(loadMetric.source_inputs.evidenceRefIds.includes(expectedEvidenceRef), true);
+  }
+});
+
+test("computeBoundaryGapDensity returns zero when no relation signals or candidates exist", async () => {
+  const metrics = await loadCognitiveMetricsModule();
+  const memory = await loadOwnershipMemoryModule();
+  const fixtures = await loadFixturesModule();
+  const boundary = {
+    ...fixtures.ownershipBoundary,
+    files: [fixtures.ownershipBoundary.filePath],
+  };
+  const bundle = memory.buildOwnershipMemoryExportBundle({
+    memory: memory.createOwnershipMemoryState(),
+    mode: "manual",
+    boundaryId: boundary.id,
+    exportedAt: 1_700_000_003_000,
+  });
+
+  const debtMetric = metrics.buildCognitiveDebtMetric({
+    boundary,
+    memoryExport: bundle,
+    reviewQueue: [],
+    codeEvidence: [],
+  });
+
+  assert.equal(debtMetric.boundary_gap_density, 0);
+});
+
+test("App metric builders use boundary-scoped relation evidence", () => {
+  const appSource = readFileSync(new URL("../src/App.tsx", import.meta.url), "utf8");
+
+  const debtCall = /buildCognitiveDebtMetric\(\{\s*[\s\S]*?codeEvidence:\s*\[boundaryRelationEvidence\]/;
+  const loadCall = /buildCognitiveLoadMetric\(\{\s*[\s\S]*?codeEvidence:\s*\[boundaryRelationEvidence\]/;
+  const readoutCall = /buildDailyCognitiveReadout\(\{\s*[\s\S]*?codeEvidence:\s*\[boundaryRelationEvidence\]/;
+  const hasBoundaryEvidenceVar = appSource.includes("const boundaryRelationEvidence = React.useMemo(");
+
+  assert.ok(debtCall.test(appSource));
+  assert.ok(loadCall.test(appSource));
+  assert.ok(readoutCall.test(appSource));
+  assert.ok(hasBoundaryEvidenceVar);
+  assert.ok(appSource.includes("selectedFile: selectedBoundary.filePath"));
+  assert.equal(appSource.includes("codeEvidence: [relationEvidence]"), false);
 });
 
 test("workspace escalation detects relation-gap recurrence and repeated low calibration", async () => {
