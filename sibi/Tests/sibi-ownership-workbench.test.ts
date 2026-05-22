@@ -11,6 +11,7 @@ type OwnershipReviewSession = typeof import("../src/ownershipWorkbench/ownership
 type OwnershipWorkbenchSurfaceMode = typeof import("../src/ownershipWorkbench/surfaceMode.ts");
 type OwnershipEvidenceExtraction = typeof import("../src/ownershipWorkbench/evidenceExtraction.ts");
 type OwnershipAttemptReadiness = typeof import("../src/ownershipWorkbench/attemptReadiness.ts");
+type OwnershipWorkspaceEscalation = typeof import("../src/ownershipWorkbench/workspaceEscalation.ts");
 type OwnershipBoundaryBuilder = typeof import("../src/ownershipWorkbench/boundaryBuilder.ts");
 type OwnershipTreeReasonFormatting = typeof import("../src/ownershipWorkbench/fileTreeReasonFormatting.ts");
 type OwnershipTransferVerification = typeof import("../src/ownershipWorkbench/transferVerification.ts");
@@ -24,6 +25,7 @@ let cachedReviewSession: OwnershipReviewSession | null = null;
 let cachedSurfaceMode: OwnershipWorkbenchSurfaceMode | null = null;
 let cachedEvidenceExtraction: OwnershipEvidenceExtraction | null = null;
 let cachedAttemptReadiness: OwnershipAttemptReadiness | null = null;
+let cachedWorkspaceEscalation: OwnershipWorkspaceEscalation | null = null;
 let cachedBoundaryBuilder: OwnershipBoundaryBuilder | null = null;
 let cachedFileTreeReasonFormatting: OwnershipTreeReasonFormatting | null = null;
 let cachedTransferVerification: OwnershipTransferVerification | null = null;
@@ -92,6 +94,15 @@ async function loadAttemptReadinessModule(): Promise<OwnershipAttemptReadiness> 
 
   cachedAttemptReadiness = (await import("../src/ownershipWorkbench/attemptReadiness.ts")) as OwnershipAttemptReadiness;
   return cachedAttemptReadiness;
+}
+
+async function loadWorkspaceEscalationModule(): Promise<OwnershipWorkspaceEscalation> {
+  if (cachedWorkspaceEscalation != null) {
+    return cachedWorkspaceEscalation;
+  }
+
+  cachedWorkspaceEscalation = (await import("../src/ownershipWorkbench/workspaceEscalation.ts")) as OwnershipWorkspaceEscalation;
+  return cachedWorkspaceEscalation;
 }
 
 async function loadBoundaryBuilderModule(): Promise<OwnershipBoundaryBuilder> {
@@ -534,6 +545,58 @@ test("transfer attempt contract classifies pass/fail/skip with recurrence and fo
   assert.equal(repeatedFail.recurrenceTags.includes("transfer-recurrence-2"), true);
 });
 
+test("workspace escalation raises transfer-failure-after-repair on repeated transfer failures", async () => {
+  const fixtures = await loadFixturesModule();
+  const attemptReadiness = await loadAttemptReadinessModule();
+  const escalation = await loadWorkspaceEscalationModule();
+  const reviewSession = await loadReviewSessionModule();
+  const transferVerification = await loadTransferVerificationModule();
+
+  const boundary = { ...fixtures.ownershipBoundary, evidence: fixtures.fixtureEvidence };
+  const readyAttempt = attemptReadiness.evaluateOwnershipAttemptReadiness({
+    attemptText:
+      "The createSession branch now returns null, and `if (!session)` checks must keep the contract before privileged operations.",
+    boundary,
+    selfConfidence: 62,
+    attemptIndex: 1,
+    startedAt: 30_000,
+    submittedAt: 30_800,
+  });
+  const probe = transferVerification.makeTransferProbe(boundary, fixtures.ownershipReviewQueue);
+
+  const failOne = transferVerification.evaluateTransferAttempt({
+    attemptText: "I am not sure why this is the same behavior.",
+    attemptIndex: 1,
+    probe,
+    transferHistory: [],
+    startedAt: 31_000,
+    now: () => 31_420,
+  });
+  const failTwo = transferVerification.evaluateTransferAttempt({
+    attemptText: "I cannot re-prove the related invariant.",
+    attemptIndex: 2,
+    probe,
+    transferHistory: [failOne],
+    startedAt: 31_500,
+    now: () => 31_900,
+  });
+  const decision = escalation.evaluateWorkspaceEscalation({
+    boundary,
+    sessionState: reviewSession.createOwnershipSessionState(),
+    readinessHistory: [readyAttempt],
+    transferHistory: [failOne, failTwo],
+    reviewQueue: fixtures.ownershipReviewQueue,
+    evidenceRefs: fixtures.fixtureEvidence,
+  });
+
+  assert.equal(decision.isCandidate, true);
+  assert.equal(
+    decision.triggers.some((trigger) => trigger.reason === "transfer-failure-after-repair"),
+    true,
+    "repeated transfer failure should emit transfer failure escalation",
+  );
+});
+
 test("transfer readiness integration updates continuity and debt by transfer outcome", async () => {
   const fixtures = await loadFixturesModule();
   const attemptReadiness = await loadAttemptReadinessModule();
@@ -616,6 +679,236 @@ test("transfer readiness integration updates continuity and debt by transfer out
   assert.equal(failed.transfer.transferRecurrenceTags.includes("transfer-recurrence-2"), true);
   assert.equal(Math.round(failed.transfer.readinessContinuity * 100), 47);
   assert.equal(Math.round(failed.transfer.debtSignal * 100), 53);
+});
+
+test("workspace escalation detects relation-gap recurrence and repeated low calibration", async () => {
+  const fixtures = await loadFixturesModule();
+  const escalation = await loadWorkspaceEscalationModule();
+
+  const boundary = { ...fixtures.ownershipBoundary, evidence: fixtures.fixtureEvidence };
+  const firstReadiness = {
+    attempt_id: "attempt-boundary-01-01-lowcal",
+    self_confidence: 22,
+    evidence_fit: 0.2,
+    calibration_score: 0.12,
+    readiness_gate: "repair-needed" as const,
+    state: "partial",
+    summary: "Missing required calibration signal and evidence binding.",
+    gapDiagnoses: [],
+    smallestRepair: "Add explicit invariant evidence for transfer and caller behavior.",
+    returnCondition: "Retry with bounded invariant statements.",
+    attemptEvidenceRefs: fixtures.fixtureEvidence.slice(0, 2),
+    startedAt: 1_000,
+    submittedAt: 1_200,
+    elapsedMs: 200,
+  };
+  const secondReadiness = {
+    attempt_id: "attempt-boundary-01-02-lowcal",
+    self_confidence: 24,
+    evidence_fit: 0.19,
+    calibration_score: 0.2,
+    readiness_gate: "repair-needed" as const,
+    state: "partial",
+    summary: "Missing required calibration signal and evidence binding.",
+    gapDiagnoses: [],
+    smallestRepair: "Add explicit invariant evidence for transfer and caller behavior.",
+    returnCondition: "Retry with bounded invariant statements.",
+    attemptEvidenceRefs: fixtures.fixtureEvidence.slice(0, 2),
+    startedAt: 1_300,
+    submittedAt: 1_500,
+    elapsedMs: 210,
+  };
+  const recurring = escalation.evaluateWorkspaceEscalation({
+    boundary,
+    sessionState: {
+      currentIndex: 3,
+      isComplete: true,
+      weakAttemptStreak: 0,
+      observations: [
+        {
+          id: "obs-01",
+          filePath: boundary.filePath,
+          reason: "could not connect caller/test",
+          note: "caller/test relation still missing after initial attempt.",
+        },
+        {
+          id: "obs-02",
+          filePath: boundary.filePath,
+          reason: "could not connect caller/test",
+          note: "caller/test relation still missing after recovery.",
+        },
+      ],
+      lastFeedback: null,
+      showHintLadder: false,
+    },
+    readinessHistory: [firstReadiness, secondReadiness],
+    transferHistory: [],
+    reviewQueue: fixtures.ownershipReviewQueue,
+    evidenceRefs: fixtures.fixtureEvidence,
+  });
+
+  assert.equal(recurring.isCandidate, true);
+  assert.equal(
+    recurring.triggers.some((trigger) => trigger.reason === "relation-gap-recurrence"),
+    true,
+  );
+  assert.equal(
+    recurring.triggers.some((trigger) => trigger.reason === "repeated-low-calibration"),
+    true,
+  );
+});
+
+test("workspace escalation detects dependency churn from repeated non-progress attempts", async () => {
+  const fixtures = await loadFixturesModule();
+  const escalation = await loadWorkspaceEscalationModule();
+
+  const boundary = fixtures.ownershipBoundary;
+  const stagnantAttempts = [
+    {
+      attempt_id: "attempt-boundary-01-01-stagnant",
+      self_confidence: 20,
+      evidence_fit: 0.22,
+      calibration_score: 0.22,
+      readiness_gate: "repair-needed" as const,
+      state: "partial",
+      summary: "Same non-ready attempt without evidence expansion.",
+      gapDiagnoses: [],
+      gapReason: "No change.",
+      smallestRepair: "Make the same boundary proof more specific.",
+      returnCondition: "Retry with equivalent evidence.",
+      attemptEvidenceRefs: fixtures.fixtureEvidence,
+      startedAt: 4_000,
+      submittedAt: 4_100,
+      elapsedMs: 100,
+    },
+    {
+      attempt_id: "attempt-boundary-01-02-stagnant",
+      self_confidence: 20,
+      evidence_fit: 0.22,
+      calibration_score: 0.22,
+      readiness_gate: "repair-needed" as const,
+      state: "partial",
+      summary: "Same non-ready attempt without evidence expansion.",
+      gapDiagnoses: [],
+      gapReason: "No change.",
+      smallestRepair: "Make the same boundary proof more specific.",
+      returnCondition: "Retry with equivalent evidence.",
+      attemptEvidenceRefs: fixtures.fixtureEvidence,
+      startedAt: 4_200,
+      submittedAt: 4_300,
+      elapsedMs: 100,
+    },
+  ];
+  const decision = escalation.evaluateWorkspaceEscalation({
+    boundary,
+    sessionState: {
+      currentIndex: 3,
+      isComplete: true,
+      weakAttemptStreak: 0,
+      observations: [],
+      lastFeedback: null,
+      showHintLadder: false,
+    },
+    readinessHistory: stagnantAttempts,
+    transferHistory: [],
+    reviewQueue: fixtures.ownershipReviewQueue,
+    evidenceRefs: fixtures.fixtureEvidence,
+  });
+
+  assert.equal(
+    decision.triggers.some((trigger) => trigger.reason === "dependency-churn"),
+    true,
+    "repeated non-progress attempts should trigger dependency churn",
+  );
+});
+
+test("workspace escalation artifact includes minimal handoff context and blocking IDs", async () => {
+  const fixtures = await loadFixturesModule();
+  const escalation = await loadWorkspaceEscalationModule();
+
+  const boundary = fixtures.ownershipBoundary;
+  const readinessHistory = [
+    {
+      attempt_id: "attempt-boundary-01-01-001",
+      self_confidence: 12,
+      evidence_fit: 0.16,
+      calibration_score: 0.1,
+      readiness_gate: "repair-needed" as const,
+      state: "partial",
+      summary: "No concrete proof path was established.",
+      gapReason: "insufficient proof",
+      gapDiagnoses: [],
+      smallestRepair: "Provide proof of caller contract mapping.",
+      returnCondition: "Retry after one concrete invariant proof.",
+      attemptEvidenceRefs: fixtures.fixtureEvidence.slice(0, 2),
+      startedAt: 100,
+      submittedAt: 110,
+      elapsedMs: 10,
+    },
+    {
+      attempt_id: "attempt-boundary-01-02-002",
+      self_confidence: 12,
+      evidence_fit: 0.16,
+      calibration_score: 0.1,
+      readiness_gate: "repair-needed" as const,
+      state: "partial",
+      summary: "No concrete proof path was established.",
+      gapReason: "insufficient proof",
+      gapDiagnoses: [],
+      smallestRepair: "Provide proof of caller contract mapping.",
+      returnCondition: "Retry after one concrete invariant proof.",
+      attemptEvidenceRefs: fixtures.fixtureEvidence.slice(0, 2),
+      startedAt: 120,
+      submittedAt: 130,
+      elapsedMs: 10,
+    },
+  ];
+  const decision = escalation.evaluateWorkspaceEscalation({
+    boundary,
+    sessionState: {
+      currentIndex: 3,
+      isComplete: true,
+      weakAttemptStreak: 0,
+      observations: [],
+      lastFeedback: null,
+      showHintLadder: false,
+    },
+    readinessHistory,
+    transferHistory: [],
+    reviewQueue: fixtures.ownershipReviewQueue,
+    evidenceRefs: fixtures.fixtureEvidence,
+  });
+  const artifact = escalation.buildOwnershipReviewArtifact({
+    boundary,
+    sessionState: {
+      currentIndex: 3,
+      isComplete: true,
+      weakAttemptStreak: 0,
+      observations: [],
+      lastFeedback: null,
+      showHintLadder: false,
+    },
+    readinessHistory,
+    transferHistory: [],
+    reviewQueue: fixtures.ownershipReviewQueue,
+    evidenceRefs: fixtures.fixtureEvidence,
+    sourceKind: "diff",
+    decision,
+    goalContext: boundary.title,
+    now: () => 1_700_000_000_000,
+    diffTextRef: readinessHistory[1].attempt_id,
+  });
+
+  assert.equal(typeof artifact.artifact_id, "string");
+  assert.equal(artifact.source_kind, "diff");
+  assert.equal(artifact.reason, decision.primaryReason ?? "manual");
+  assert.equal(artifact.evidence_refs.length > 0, true);
+  assert.equal(artifact.blocking_ids.length >= 1, true);
+  assert.equal(artifact.read_path.includes(boundary.filePath), true);
+  assert.equal(artifact.areas_touched.length > 0, true);
+  assert.equal(artifact.required_evidence.length > 0, true);
+  assert.equal(artifact.blocked_reasons.length >= 1, true);
+  assert.equal(artifact.created_at, new Date(1_700_000_000_000).toISOString());
 });
 
 test("App gates state transitions when readiness is ready but transfer has not passed", async () => {

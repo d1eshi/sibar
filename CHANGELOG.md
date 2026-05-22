@@ -103,6 +103,26 @@ release yet.
   outcomes, escalation behavior on repeated failure, and continuity/debt scoring,
   plus Playwright coverage for fail -> pass and skip transfer paths.
 
+### Added - Slice 7 Workspace Escalation
+
+- Added a deterministic `WorkspaceEscalationDecision` pure path in
+  `src/ownershipWorkbench/workspaceEscalation.ts` to evaluate escalation
+  triggers for:
+  relation-gap recurrence, repeated low calibration, transfer failure despite
+  repeated attempts, prerequisite-chain dependency, and dependency churn.
+- Extended `OwnershipReviewArtifact` contract in
+  `src/ownershipWorkbench/types.ts` and wired neutral handoff artifact generation in
+  `buildOwnershipReviewArtifact` with evidence summary, blocking IDs, source kind, and
+  minimum read-path context.
+- Added user-authorized workspace handoff flow in `OwnershipHarnessPanel` and
+  `App` state: escalation is visible but not automatic, with an explicit
+  "Authorize workspace handoff" action and rendered artifact/lab trace after
+  authorization.
+- Added unit tests for escalation trigger coverage (repeated transfer fail, relation
+  recurrence, low calibration) and artifact shaping, plus a Playwright e2e path that
+  executes repeated transfer failures, validates candidate visibility, and verifies
+  handoff authorization and trace rendering.
+
 ### Added - Slice 1 Inventory Runtime
 
 - Moved the Slice 1 contract/runtime base for deterministic `repoInventory(sourceRoot)`

@@ -11,6 +11,7 @@ import type {
   BoundaryState,
   LineSelection,
   OwnershipSessionState,
+  OwnershipReviewArtifact,
 } from "./ownershipWorkbench/types";
 import {
   codeViewDiffItemsByPath,
@@ -50,6 +51,11 @@ import {
   makeTransferSkip,
   type TransferAttemptRecord,
 } from "./ownershipWorkbench/transferVerification.ts";
+import {
+  buildOwnershipReviewArtifact,
+  evaluateWorkspaceEscalation,
+  type WorkspaceEscalationDecision,
+} from "./ownershipWorkbench/workspaceEscalation.ts";
 
 export default function App() {
   const workbenchSurfaceMode = getWorkbenchSurfaceMode(
@@ -66,6 +72,9 @@ export default function App() {
   const [readinessStartedAt, setReadinessStartedAt] = React.useState<number>(() => Date.now());
   const [transferHistoryByBoundary, setTransferHistoryByBoundary] = React.useState<
     Record<string, TransferAttemptRecord[]>
+  >({});
+  const [authorizedEscalationArtifacts, setAuthorizedEscalationArtifacts] = React.useState<
+    Record<string, OwnershipReviewArtifact | null>
   >({});
   const [sessionState, setSessionState] = React.useState<OwnershipSessionState>(
     createOwnershipSessionState,
@@ -135,32 +144,51 @@ export default function App() {
       }),
     [selectedFile],
   );
-  const latestReadiness = React.useMemo(
-    () => readinessHistory[readinessHistory.length - 1] ?? null,
-    [readinessHistory],
-  );
   const transferHistory = React.useMemo(
     () => transferHistoryByBoundary[selectedBoundary.id] ?? [],
     [selectedBoundary.id, transferHistoryByBoundary],
   );
-  const latestReadinessWithTransfer = React.useMemo(() => {
-    if (latestReadiness == null) {
-      return null;
-    }
-
-    return integrateTransferReadinessState({
-      boundary: selectedBoundary,
-      reviewQueue: ownershipReviewQueue,
-      readiness: latestReadiness,
-      transferHistory: transferHistory.filter((attempt) => attempt.probeId === transferProbe.id),
-    });
-  }, [latestReadiness, selectedBoundary, transferHistory, transferProbe.id]);
-  const transferHistoryForCurrentProbe = transferHistory.filter(
-    (attempt) => attempt.probeId === transferProbe.id,
+  const transferHistoryForCurrentProbe = transferHistory.filter((attempt) => attempt.probeId === transferProbe.id);
+  const readinessHistoryWithTransfer = React.useMemo(
+    () =>
+      readinessHistory.map((entry) =>
+        integrateTransferReadinessState({
+          boundary: selectedBoundary,
+          reviewQueue: ownershipReviewQueue,
+          readiness: entry,
+          transferHistory: transferHistoryForCurrentProbe,
+        }),
+      ),
+    [readinessHistory, selectedBoundary, transferHistoryForCurrentProbe],
   );
-  const latestTransferAttempt =
-    transferHistoryForCurrentProbe.length === 0 ? null : transferHistoryForCurrentProbe.at(-1) ?? null;
+  const latestReadinessWithTransfer = React.useMemo(
+    () => readinessHistoryWithTransfer.at(-1) ?? null,
+    [readinessHistoryWithTransfer],
+  );
+
+  const readinessHistoryForCurrentAttempt = React.useMemo(
+    () => readinessHistoryWithTransfer.filter((entry) => entry.transfer.probeId === transferProbe.id),
+    [readinessHistoryWithTransfer, transferProbe.id],
+  );
+  const latestReadiness = React.useMemo(
+    () => readinessHistoryWithTransfer.at(-1) ?? null,
+    [readinessHistoryWithTransfer],
+  );
+  const escalationDecision = React.useMemo<WorkspaceEscalationDecision>(() => {
+    return evaluateWorkspaceEscalation({
+      boundary: selectedBoundary,
+      sessionState,
+      readinessHistory: readinessHistoryForCurrentAttempt,
+      transferHistory: transferHistoryForCurrentProbe,
+      reviewQueue: ownershipReviewQueue,
+      evidenceRefs: fixtureEvidence,
+    });
+  }, [selectedBoundary, sessionState, readinessHistoryForCurrentAttempt, transferHistoryForCurrentProbe]);
+  const authorizedHandoffArtifact =
+    authorizedEscalationArtifacts[selectedBoundary.id] ?? null;
   const isTransferRequired = latestReadinessWithTransfer?.transfer.required ?? transferProbe.required;
+
+  const latestTransferAttempt = transferHistoryForCurrentProbe.at(-1) ?? null;
 
   React.useEffect(() => {
     setSelection(null);
@@ -217,6 +245,31 @@ export default function App() {
 
   function submitReadinessAttempt() {
     submitOwnershipAttempt();
+  }
+
+  function authorizeWorkspaceHandoff() {
+    if (!escalationDecision.isCandidate || latestReadinessWithTransfer == null) {
+      return;
+    }
+
+    const artifact = buildOwnershipReviewArtifact({
+      boundary: selectedBoundary,
+      sessionState,
+      readinessHistory: readinessHistoryForCurrentAttempt,
+      transferHistory: transferHistoryForCurrentProbe,
+      reviewQueue: ownershipReviewQueue,
+      evidenceRefs: fixtureEvidence,
+      sourceKind: "diff",
+      decision: escalationDecision,
+      goalContext: selectedBoundary.title,
+      diffTextRef: latestReadinessWithTransfer.attempt_id,
+      now: () => readinessStartedAt,
+    });
+
+    setAuthorizedEscalationArtifacts((prev) => ({
+      ...prev,
+      [selectedBoundary.id]: artifact,
+    }));
   }
 
   function submitOwnershipAttempt() {
@@ -392,6 +445,9 @@ export default function App() {
         onSkipTransfer={submitTransferSkip}
         latestTransferAttempt={latestTransferAttempt}
         showTransferProbe={isTransferRequired && latestReadiness?.readiness_gate === "ready"}
+        escalationDecision={escalationDecision}
+        authorizedHandoffArtifact={authorizedHandoffArtifact}
+        onAuthorizeHandoff={authorizeWorkspaceHandoff}
       />
 
       <EvidenceDrawerPanel evidenceGroups={evidenceGroups} />

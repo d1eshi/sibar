@@ -1063,6 +1063,43 @@ button.secondary {
   color: #607477;
 }
 
+.handoffSection {
+  border: 1px solid #d7e3e6;
+  border-radius: 8px;
+  background: #f5fbfb;
+  padding: 8px 10px;
+  display: grid;
+  gap: 8px;
+}
+
+.handoffSection h4 {
+  margin: 0;
+  color: #223837;
+  font-size: 13px;
+}
+
+.handoffReasonText,
+.handoffBlocking {
+  margin: 0;
+  font-size: 12px;
+  color: #2d4344;
+  line-height: 1.35;
+}
+
+.handoffSection ul {
+  margin: 0;
+  padding-left: 20px;
+  display: grid;
+  gap: 5px;
+}
+
+.handoffSection li {
+  margin: 0;
+  color: #203635;
+  font-size: 12px;
+  line-height: 1.35;
+}
+
 .transferSection {
   display: grid;
   gap: 8px;

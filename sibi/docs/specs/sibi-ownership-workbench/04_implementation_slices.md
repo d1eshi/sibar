@@ -214,6 +214,14 @@ Deliverables:
 - escalation contract with reason, evidence_refs, and blocking IDs;
 - user-authorized handoff UI and lab trace.
 
+Slice 7 deterministic thresholds for this iteration:
+
+- relation-gap recurrence: at least 2 session observations with reason `could not connect caller/test`.
+- repeated low calibration: last 2 readiness attempts with `readiness_gate != "ready"` and `calibration_score < 0.55`.
+- transfer failure despite repair: 2 consecutive transfer fails where the latest two attempts are failures and the latest attempt is marked with escalation candidate.
+- prerequisite-chain dependency: unfulfilled dependency/caller `reviewQueue` entries remain and at least 2 non-ready readiness attempts occurred.
+- dependency churn: at least 2 non-ready readiness attempts with no readiness state progress and unchanged `state`.
+
 Acceptance:
 
 - escalation is explicit and visible;

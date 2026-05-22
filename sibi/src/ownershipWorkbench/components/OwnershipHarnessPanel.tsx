@@ -3,6 +3,7 @@ import type {
   EvidenceRef,
   LineSelection,
   OwnershipAttemptReadiness,
+  OwnershipReviewArtifact,
   OwnershipBoundary,
   OwnershipSessionQuestion,
   OwnershipSessionState,
@@ -16,6 +17,7 @@ import { OwnershipLabPanel } from "./OwnershipLabPanel";
 import { ReviewGuidePanel } from "./ReviewGuidePanel";
 import { RepoInventoryStatusPanel } from "./RepoInventoryStatusPanel";
 import type { TransferAttemptRecord } from "../transferVerification.ts";
+import type { WorkspaceEscalationDecision } from "../workspaceEscalation.ts";
 
 interface OwnershipLabContext {
   selectedFile: string;
@@ -50,6 +52,9 @@ interface OwnershipHarnessPanelProps {
   onSkipTransfer: () => void;
   latestTransferAttempt: TransferAttemptRecord | null;
   showTransferProbe: boolean;
+  escalationDecision: WorkspaceEscalationDecision;
+  authorizedHandoffArtifact: OwnershipReviewArtifact | null;
+  onAuthorizeHandoff: () => void;
 }
 
 export function OwnershipHarnessPanel({
@@ -77,6 +82,9 @@ export function OwnershipHarnessPanel({
   onSkipTransfer,
   latestTransferAttempt,
   showTransferProbe,
+  escalationDecision,
+  authorizedHandoffArtifact,
+  onAuthorizeHandoff,
 }: OwnershipHarnessPanelProps): React.ReactElement {
   const isLabView = surfaceMode === "lab" && labContext != null;
   const currentQuestion = sessionState.isComplete ? null : sessionQuestions[sessionState.currentIndex] ?? null;
@@ -92,6 +100,8 @@ export function OwnershipHarnessPanel({
   const evidenceFitText = latestReadiness == null ? "—" : `${Math.round(latestReadiness.evidence_fit * 100)}%`;
   const calibrationText =
     latestReadiness == null ? "—" : `${Math.round(latestReadiness.calibration_score * 100)}%`;
+  const hasHandoffCandidate = escalationDecision.isCandidate;
+  const handoffSummaryEvidenceRefs = escalationDecision.evidence_refs.slice(0, 6);
 
   return (
     <aside className="panel ownershipPanel">
@@ -291,13 +301,96 @@ export function OwnershipHarnessPanel({
                     {transferState?.transferEscalationCandidate ? (
                       <p className="gapEvidence">Escalation candidate: transfer failed repeatedly.</p>
                     ) : null}
-                    {latestTransferAttempt ? (
+                {latestTransferAttempt ? (
                       <p className="gapEvidence">
                         Last transfer answer: {latestTransferAttempt.attemptTextPreview}
                       </p>
                     ) : null}
                   </section>
                 )}
+                {hasHandoffCandidate ? (
+                  <section className="handoffSection" aria-label="Workspace handoff candidate">
+                    <h4>Workspace handoff candidate</h4>
+                    <p className="handoffReasonText">{escalationDecision.reasonText}</p>
+                    {escalationDecision.primaryReason != null ? (
+                      <p>Primary reason: {escalationDecision.primaryReason}</p>
+                    ) : null}
+                    {escalationDecision.blocking_ids.length > 0 ? (
+                      <p className="handoffBlocking">Blocking IDs: {escalationDecision.blocking_ids.join(", ")}</p>
+                    ) : null}
+                    {handoffSummaryEvidenceRefs.length > 0 ? (
+                      <div className="gapCard">
+                        <p>Evidence summary</p>
+                        <ul>
+                          {handoffSummaryEvidenceRefs.map((entry) => (
+                            <li key={entry.id}>
+                              <strong>{entry.title}</strong> — {entry.id}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    ) : null}
+                    <div className="attemptActions">
+                      <button
+                        type="button"
+                        onClick={onAuthorizeHandoff}
+                        disabled={authorizedHandoffArtifact != null}
+                      >
+                        {authorizedHandoffArtifact == null ? "Authorize workspace handoff" : "Workspace handoff authorized"}
+                      </button>
+                    </div>
+                  </section>
+                ) : null}
+                {authorizedHandoffArtifact != null ? (
+                  <section className="handoffSection" aria-label="Workspace handoff artifact">
+                    <h4>Workspace handoff artifact</h4>
+                    <p className="handoffReasonText">{authorizedHandoffArtifact.review}</p>
+                    <div className="readinessMetrics">
+                      <span>ID: {authorizedHandoffArtifact.artifact_id}</span>
+                      <span>Source: {authorizedHandoffArtifact.source_kind}</span>
+                      <span>Created: {authorizedHandoffArtifact.created_at}</span>
+                    </div>
+                    <div className="gapCard">
+                      <p>Read path</p>
+                      <ul>
+                        {authorizedHandoffArtifact.read_path.map((entry) => (
+                          <li key={`${authorizedHandoffArtifact.artifact_id}-${entry}`}>{entry}</li>
+                        ))}
+                      </ul>
+                    </div>
+                    {authorizedHandoffArtifact.required_evidence.length > 0 ? (
+                      <div className="gapCard">
+                        <p>Required evidence</p>
+                        <ul>
+                          {authorizedHandoffArtifact.required_evidence.slice(0, 6).map((entry) => (
+                            <li key={entry.id}>
+                              <strong>{entry.title}</strong> — {entry.id}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    ) : null}
+                    {authorizedHandoffArtifact.blocking_ids.length > 0 ? (
+                      <div className="gapCard">
+                        <p>Blocking IDs</p>
+                        <p>{authorizedHandoffArtifact.blocking_ids.join(", ")}</p>
+                      </div>
+                    ) : null}
+                    {authorizedHandoffArtifact.blocked_reasons.length > 0 ? (
+                      <div className="gapCard">
+                        <p>Blocked reasons</p>
+                        <ul>
+                          {authorizedHandoffArtifact.blocked_reasons.slice(0, 6).map((entry) => (
+                            <li key={`${authorizedHandoffArtifact.artifact_id}-block-${entry}`}>{entry}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    ) : null}
+                    {authorizedHandoffArtifact.suggested_workspace_seed == null ? null : (
+                      <p>Suggested workspace seed: {authorizedHandoffArtifact.suggested_workspace_seed}</p>
+                    )}
+                  </section>
+                ) : null}
                 {latestReadiness?.gapDiagnoses?.map((gap) => (
                   <section className="gapCard" key={`${latestReadiness.attempt_id}-${gap.reason}`}>
                     <p>{gap.reason}</p>
