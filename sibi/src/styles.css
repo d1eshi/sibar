@@ -1292,11 +1292,17 @@ button.secondary {
 }
 
 .captureRoot {
+  --capture-accent: #6551d6;
+  --capture-accent-strong: #4b338f;
+  --capture-accent-ink: #2d2454;
+  --capture-accent-soft: #f1efff;
+  --capture-accent-border: #d8d0ff;
+  --capture-accent-shadow: rgba(76, 51, 143, 0.2);
   min-height: 100dvh;
   display: grid;
   grid-template-columns: minmax(560px, 3fr) minmax(390px, 2fr);
   background:
-    radial-gradient(circle at 28% 18%, rgba(0, 142, 103, 0.05), transparent 34%),
+    radial-gradient(circle at 28% 18%, rgba(101, 81, 214, 0.07), transparent 34%),
     #fbfcfc;
   color: #071827;
 }
@@ -1356,10 +1362,10 @@ button.secondary {
   align-items: center;
   gap: 12px;
   padding: 0 16px;
-  border: 2px solid #008e67;
+  border: 2px solid var(--capture-accent);
   border-radius: 10px;
   background: #ffffff;
-  box-shadow: 0 10px 22px rgba(0, 99, 75, 0.08);
+  box-shadow: 0 10px 22px rgba(76, 51, 143, 0.1);
 }
 
 .githubGlyph,
@@ -1413,7 +1419,7 @@ button.secondary {
 }
 
 .captureCheck {
-  color: #008e67;
+  color: var(--capture-accent);
   font-size: 28px;
   line-height: 1;
 }
@@ -1478,8 +1484,8 @@ button.secondary {
   border: 0;
   border-radius: 8px;
   color: #ffffff;
-  background: linear-gradient(135deg, #008f69, #008966 58%, #007b5c);
-  box-shadow: 0 18px 36px rgba(0, 117, 86, 0.22);
+  background: linear-gradient(135deg, #7259e4, #5d45c4 56%, #422c83);
+  box-shadow: 0 18px 36px rgba(76, 51, 143, 0.25);
   font-size: 23px;
   font-weight: 850;
   cursor: pointer;
@@ -1538,13 +1544,13 @@ button.secondary {
 }
 
 .routeStatus.ready {
-  border: 1px solid #c9e6d8;
-  color: #00865f;
-  background: #edf8f3;
+  border: 1px solid var(--capture-accent-border);
+  color: var(--capture-accent-strong);
+  background: var(--capture-accent-soft);
 }
 
 .routeStatus.ready::before {
-  background: #009b68;
+  background: var(--capture-accent);
 }
 
 .routeStatus.gap {
@@ -1605,10 +1611,10 @@ button.secondary {
 .slideStep {
   width: fit-content;
   padding: 7px 10px;
-  border: 1px solid #c9e6d8;
+  border: 1px solid var(--capture-accent-border);
   border-radius: 999px;
-  color: #007d5e;
-  background: #edf8f3;
+  color: var(--capture-accent-strong);
+  background: var(--capture-accent-soft);
   font-size: 12px;
   font-weight: 850;
   text-transform: uppercase;
@@ -1674,7 +1680,7 @@ button.secondary {
 .diffMini span {
   height: 12px;
   border-radius: 999px;
-  background: linear-gradient(90deg, #42b77f, #009d71);
+  background: linear-gradient(90deg, #9c8cf0, #6551d6);
 }
 
 .diffMini span:first-child {
@@ -1694,20 +1700,20 @@ button.secondary {
   width: 28px;
   height: 28px;
   border-radius: 7px;
-  box-shadow: 0 8px 18px rgba(0, 112, 82, 0.22);
+  box-shadow: 0 8px 18px var(--capture-accent-shadow);
 }
 
 .graphMini .node.green {
   left: 58px;
   top: 35px;
-  background: linear-gradient(135deg, #5dc99d, #209f78);
+  background: linear-gradient(135deg, #a897ff, #6551d6);
 }
 
 .graphMini .node.green.lower {
   left: 66px;
   top: auto;
   bottom: 34px;
-  background: linear-gradient(135deg, #80ceb2, #4aa384);
+  background: linear-gradient(135deg, #c1b7ff, #7a68df);
 }
 
 .graphMini .node.amber {
@@ -1721,7 +1727,7 @@ button.secondary {
   right: 62px;
   top: auto;
   bottom: 34px;
-  background: linear-gradient(135deg, #28b386, #007d66);
+  background: linear-gradient(135deg, #8c79e9, #4b338f);
 }
 
 .graphMini::before,
@@ -1756,11 +1762,11 @@ button.secondary {
   min-height: 34px;
   display: flex;
   align-items: center;
-  border: 1px solid #c9e6d8;
+  border: 1px solid var(--capture-accent-border);
   border-radius: 8px;
   padding: 0 12px;
-  color: #00865f;
-  background: #edf8f3;
+  color: var(--capture-accent-strong);
+  background: var(--capture-accent-soft);
   font-size: 13px;
   font-weight: 850;
 }
@@ -1807,7 +1813,7 @@ button.secondary {
   width: 24px;
   height: 24px;
   border-radius: 999px;
-  border: 2px solid #008e67;
+  border: 2px solid var(--capture-accent);
   opacity: 0;
   animation: routeDotCycle 16s infinite;
 }
@@ -1850,8 +1856,8 @@ button.secondary {
   height: 38px;
   border-radius: 999px;
   color: #ffffff;
-  background: radial-gradient(circle at 30% 25%, #21ad83, #007c60 72%);
-  box-shadow: 0 10px 22px rgba(0, 128, 96, 0.22);
+  background: radial-gradient(circle at 30% 25%, #8b78ee, #4b338f 72%);
+  box-shadow: 0 10px 22px var(--capture-accent-shadow);
   font-size: 18px;
   font-weight: 880;
 }
