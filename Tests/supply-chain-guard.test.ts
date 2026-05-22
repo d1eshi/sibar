@@ -262,12 +262,19 @@ test("full guard run returns no violations", () => {
 // ---------------------------------------------------------------------------
 
 test("BASELINE_DEV_DEPENDENCIES contains expected packages", () => {
+  assert.ok(BASELINE_DEV_DEPENDENCIES.has("@playwright/test"));
   assert.ok(BASELINE_DEV_DEPENDENCIES.has("@types/node"));
+  assert.ok(BASELINE_DEV_DEPENDENCIES.has("@types/react"));
+  assert.ok(BASELINE_DEV_DEPENDENCIES.has("@types/react-dom"));
   assert.ok(BASELINE_DEV_DEPENDENCIES.has("typescript"));
+  assert.ok(BASELINE_DEV_DEPENDENCIES.has("vite"));
 });
 
-test("BASELINE_DEPENDENCIES is empty for this project", () => {
-  assert.equal(BASELINE_DEPENDENCIES.size, 0);
+test("BASELINE_DEPENDENCIES contains expected packages", () => {
+  assert.ok(BASELINE_DEPENDENCIES.has("@pierre/diffs"));
+  assert.ok(BASELINE_DEPENDENCIES.has("@pierre/trees"));
+  assert.ok(BASELINE_DEPENDENCIES.has("react"));
+  assert.ok(BASELINE_DEPENDENCIES.has("react-dom"));
 });
 
 test("FORBIDDEN_PATTERNS covers all required categories", () => {
@@ -285,12 +292,19 @@ test("FORBIDDEN_PATTERNS covers all required categories", () => {
 });
 
 test("BASELINE_DEV_DEPENDENCIES contains expected packages", () => {
+  assert.ok(BASELINE_DEV_DEPENDENCIES.has("@playwright/test"));
   assert.ok(BASELINE_DEV_DEPENDENCIES.has("@types/node"));
+  assert.ok(BASELINE_DEV_DEPENDENCIES.has("@types/react"));
+  assert.ok(BASELINE_DEV_DEPENDENCIES.has("@types/react-dom"));
   assert.ok(BASELINE_DEV_DEPENDENCIES.has("typescript"));
+  assert.ok(BASELINE_DEV_DEPENDENCIES.has("vite"));
 });
 
-test("BASELINE_DEPENDENCIES is empty for this project", () => {
-  assert.equal(BASELINE_DEPENDENCIES.size, 0);
+test("BASELINE_DEPENDENCIES contains expected packages", () => {
+  assert.ok(BASELINE_DEPENDENCIES.has("@pierre/diffs"));
+  assert.ok(BASELINE_DEPENDENCIES.has("@pierre/trees"));
+  assert.ok(BASELINE_DEPENDENCIES.has("react"));
+  assert.ok(BASELINE_DEPENDENCIES.has("react-dom"));
 });
 
 // ---------------------------------------------------------------------------

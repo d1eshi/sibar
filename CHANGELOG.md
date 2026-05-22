@@ -11,6 +11,67 @@ accepted specs and iterations, not by raw commit count.
 Use this section for changes that have landed but are not part of a tagged
 release yet.
 
+### Changed - Sibi Ownership Workbench Review Guide
+
+- Made the Ownership Harness the primary desktop workspace with a wider
+  responsive right column, stronger header treatment, and a more prominent
+  guided ownership session/input area while keeping code and diff visible as
+  evidence context.
+- Changed the ownership harness first-run experience to open with a guided
+  review sequence and prioritized file/boundary queue before the ownership
+  prompt.
+- Added a step-by-step ownership session where Sibi asks the current
+  file/check question, advances on empty, unknown, or inconclusive attempts, and
+  records bounded observations for missing evidence.
+- Added relation-focused questions for supporting tests and inferred callers so
+  `session.test.ts` and `consumer.ts` ask the user to connect files instead of
+  summarizing them in isolation.
+- Added a minimal hint ladder that appears after repeated weak attempts while
+  keeping the default right panel compact.
+- Moved the local derivation lab out of the default user-facing right panel and
+  behind explicit local/debug query params: `?view=lab` or `?lab=1`.
+- Simplified the default review guide to a compact current-step flow, while
+  keeping the full priority queue and trace detail available in lab mode.
+
+### Docs - Sibi Ownership Workbench Review Guide
+
+- Marked Slice 0 as PR-ready in the implementation spec, updated Sibi
+  verification commands to `pnpm -s sibi:test`, `pnpm -s sibi:build`, and
+  `pnpm -s sibi:e2e`, and documented that root `typecheck` is not a Slice 0
+  gate while it has pre-existing non-Sibi errors.
+- Added the Slice 1 handoff contract for `repo_inventory(sourceRoot) ->
+  deterministic JSON`, including skip rules, file metadata, tree projection,
+  and the invariant that the browser never reads the filesystem directly.
+- Defined the first-run review sequence in the ownership wedge and boundary
+  docs, including touched status, priority, order reason, next step, and the
+  prompt as a later stage.
+- Documented that the derivation lab is a local trace/debug view, not part of
+  the default ownership UI.
+- Clarified that the default ownership UI shows the current queue step and next
+  action, while full queue details live behind `?view=lab` or `?lab=1`.
+
+### Internal - Sibi Ownership Workbench Review Guide
+
+- Added deterministic workbench coverage for review guide rendering order,
+  prioritized queue fixtures, and avoiding open-chat framing.
+- Added deterministic coverage for the guided ownership session state machine
+  and Playwright coverage for default review flow, gap observations, hint
+  ladder behavior, and lab-mode traces.
+- Added Playwright E2E scripts/config for the Sibi workbench and updated the
+  supply-chain guard baseline for `@playwright/test`.
+- Switched Sibi Vite scripts to the native config loader and a JS config so
+  local sandbox runs avoid Vite temp writes under `node_modules/.vite-temp`.
+- Moved Sibi-owned JS/TS tests from root `Tests/` into `sibi/Tests/`, and
+  updated `pnpm test`, `pnpm sibi:test`, and Playwright paths so Sibi tests run
+  from the app directory.
+- Replaced the flexible Sibi Vite Rollup warning suppression with an explicit
+  allowlist for `@pierre/*/dist/react/*` module-level `"use client"` warnings; a
+  build-backed contract test now captures the observed directive-warning sources
+  and fails on any new/unexpected files while keeping chunk-size warnings visible.
+- Added deterministic workbench coverage for query-param lab activation and
+  hiding `OwnershipLabPanel` from the default harness view.
+- Added deterministic workbench coverage that gates the detailed priority queue
+  behind lab mode.
 ### Docs - Attempt Readiness Prototype Pruning
 
 - Removed obsolete attempt-readiness prototype artifacts and generated visual
@@ -29,6 +90,40 @@ release yet.
 - Updated open decisions and implementation plan to make the frontier lab
   source fixture the first MVP path and keep Sibi-repo ownership as internal
   regression context.
+
+### Changed - Sibi Ownership Workbench Lab
+
+- Added a selection-aware ownership lab inside the harness panel so code/diff
+  highlights surface range, boundary state, trace, signal, schema, and relevant
+  evidence context without turning the harness into an explain-first flow.
+- Reframed the ownership lab as a local derivation inspector, making the
+  user-facing state, state source, and attempt-gate derivation explicit instead
+  of rendering a second public-facing state badge.
+- Fixed evidence grouping so the bottom evidence drawer renders observed,
+  inferred, unverified, and conflict fixture evidence instead of empty groups.
+
+### Fixed - Sibi Ownership Workbench Lab
+
+- Kept the file tree, ownership harness, and lab on the same active boundary
+  state source so initial `gap` and submitted `gap`/`partial`/`owned`/
+  `questionable` results render consistently.
+
+### Docs - Sibi Ownership Harness
+
+- Clarified the Sibi manifesto around cognitive debt recovery: AI-assisted work
+  can compile and pass tests while human ownership remains blocked.
+- Added the `Prove ownership` interaction rule, replacing explain-first flows
+  with attempt-first diagnosis, smallest repair, re-attempt, and scoped
+  readiness updates.
+- Defined ownership boundaries as the primary unit instead of files, with
+  cognitive file-tree states such as `owned`, `partial`, `gap`, `blocked`, and
+  `questionable`.
+- Documented the evidence extraction layer as the alternative to building a
+  custom AST: cheap deterministic signals, LLM evidence extraction, strict
+  contracts, verification, and confidence scoring.
+- Added `sibi/docs/specs/sibi-ownership-workbench/` as the implementation-ready
+  spec pack for the repo tree, code/diff view, ownership harness panel,
+  evidence extraction contract, and staged build slices.
 
 ### Added - Slice Final Sibi Ownership-Review Wedge
 
@@ -95,8 +190,54 @@ release yet.
 - Added ownership review exports to `src/ownership-core/index.ts` and updated
   `OWNERSHIP_REVIEW_EXTRACTION_STATE.status` to `available`, with `ownedBySlice`
   set to `slice-4`.
-- Added `Tests/ownership-core.test.ts` and updated `Tests/sibi-ownership-review.test.ts`
+- Added `Tests/ownership-core.test.ts` and updated `sibi/Tests/sibi-ownership-review.test.ts`
   for direct core coverage plus core/Sibi review parity on representative diffs.
+
+### Added - Slice 0 Ownership Workbench Shell
+
+- Replaced the prior paste-and-summary UI in `sibi/src/App.tsx` with a fixture-backed
+  static Ownership Workbench shell.
+- Added a three-panel app layout (ownership-aware file tree, code/diff panel, and
+  ownership harness) plus a dedicated evidence drawer.
+- Implemented line-numbered code and diff views with evidence and current boundary
+  highlighting, stable line selection, and one static boundary prompt cycle.
+- Added an attempt-first ownership harness flow: current boundary, evidence list,
+  ownership prompt, attempt textarea, `Submit attempt` / `Ask for hint` /
+  `Mark unknown`, diagnosis, smallest repair, and return condition outputs.
+- Kept behavior static and fixture-backed (no filesystem scanning, no model calls,
+  no explain-first UX path).
+
+### Changed - Slice 0 Workbench Adapters
+
+- Swapped Slice 0 file tree and code/diff panels to public package backends:
+  `@pierre/trees` + `@pierre/trees/react` and `@pierre/diffs`.
+- Added library-shaped fixture adapters (`CodeViewFileItem`, `CodeViewDiffItem`,
+  `fileTreePaths`, and node path metadata) so static fixtures feed renderer inputs
+  without custom render logic.
+- Kept fixtures as Slice 0 demo inputs only and documented that they are not the
+  architecture/source-of-truth contract for future ownership/evidence/runtime layers.
+
+### Added - Slice 0 Workbench Adapter Regression Coverage
+
+- Added `sibi/Tests/sibi-ownership-workbench.test.ts` to prevent regressions in the
+  Ownership Workbench adapter layer, including file-tree leaf-path validation,
+  strict `fixtureDiff` parsing via `parsePatchFiles`, and `codeViewDiffItemsByPath`
+  coverage for expected fixture files.
+
+### Fixed - Slice 0 Workbench Runtime Stability
+
+- Fixed a localhost runtime blank screen by passing only file paths into
+  `@pierre/trees/react` while preserving directory nodes in `fileTreeNodeByPath`
+  for metadata and decoration lookup.
+- Fixed the Ownership Workbench code/diff renderer to use the React
+  `@pierre/diffs/react` `CodeView` entrypoint instead of rendering the vanilla
+  `CodeView` constructor as JSX under React 19.
+- Repaired malformed fixture diff content in `ownershipWorkbench/fixtures.ts` to match
+  `@pierre/diffs` unified diff parsing and added guarded fixture parse error
+  handling that keeps the app running with file mode in case parsing fails.
+- Kept build-time chunk warning behavior unchanged for now (`vite` large chunk
+  warning still appears from syntax-highlighting/runtime bundle size; not part of
+  this fix scope).
 
 ### Docs - Tauri Workspace UI Specs
 

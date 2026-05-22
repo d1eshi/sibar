@@ -59,7 +59,7 @@ Initial scope:
 Current source of truth to promote first:
 
 1. `sibi/src/ownershipReview.ts`
-2. `Tests/sibi-ownership-review.test.ts`
+2. `sibi/Tests/sibi-ownership-review.test.ts`
 
 The first extraction should move this deterministic review logic into
 `src/ownership-core/` and leave `sibi/src/ownershipReview.ts` as a shim. Do not
@@ -257,7 +257,7 @@ Coordinate this slice with any active agent touching `sibi/`.
 Verification:
 
 ```text
-pnpm test -- Tests/sibi-ownership-review.test.ts
+pnpm test -- sibi/Tests/sibi-ownership-review.test.ts
 pnpm run sibi:build
 ```
 
