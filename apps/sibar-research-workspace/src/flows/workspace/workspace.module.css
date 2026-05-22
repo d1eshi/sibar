@@ -449,33 +449,39 @@
   min-height: 0;
   display: grid;
   align-content: start;
-  gap: 20px;
+  gap: 18px;
   padding: 38px 28px;
   overflow: auto;
   border-left: 1px solid var(--divider);
   background: var(--surface-page);
 }
 
-.readinessPanel h3,
-.readinessPanel p,
-.readinessPanel ul,
+.guidePanel {
+  display: grid;
+  align-content: start;
+  gap: 20px;
+}
+
+.guidePanel h3,
+.guidePanel p,
+.guidePanel ul,
 .panelToggle,
 .panelShow {
   margin: 0;
 }
 
-.readinessPanel h3 {
+.guidePanel h3 {
   color: var(--text-primary);
   font-size: 18px;
   line-height: 1.25;
 }
 
-.readinessPanel p {
+.guidePanel p {
   color: var(--text-muted);
   line-height: 1.45;
 }
 
-.readinessPanel ul {
+.guidePanel ul {
   display: grid;
   gap: 16px;
   padding: 24px;
@@ -485,14 +491,14 @@
   list-style: none;
 }
 
-.readinessPanel li {
+.guidePanel li {
   position: relative;
   padding-left: 24px;
   color: var(--text-primary);
   line-height: 1.4;
 }
 
-.readinessPanel li::before {
+.guidePanel li::before {
   content: "";
   position: absolute;
   left: 0;
@@ -508,6 +514,191 @@
   justify-self: start;
   padding: 10px 14px;
   color: var(--text-secondary);
+}
+
+.studyNotesPanel {
+  display: grid;
+  gap: 16px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--divider);
+}
+
+.studyNotesHeader {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 14px;
+  align-items: start;
+}
+
+.studyNotesHeader h3 {
+  margin: 6px 0 0;
+  color: var(--text-primary);
+  font-size: 20px;
+  line-height: 1.2;
+}
+
+.studyNoteStats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(54px, auto));
+  gap: 6px;
+  margin: 0;
+}
+
+.studyNoteStats div {
+  display: grid;
+  gap: 2px;
+  min-width: 54px;
+  padding: 8px 10px;
+  border: 1px solid var(--divider);
+  border-radius: 8px;
+  background: var(--surface-panel);
+  text-align: center;
+}
+
+.studyNoteStats dt {
+  color: var(--text-muted);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.studyNoteStats dd {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: 18px;
+  font-weight: 750;
+  line-height: 1;
+}
+
+.studyNoteComposer {
+  display: grid;
+  gap: 12px;
+}
+
+.studyNoteComposer label {
+  display: grid;
+  gap: 6px;
+}
+
+.studyNoteComposer label > span {
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.studyNoteComposer input,
+.studyNoteComposer textarea {
+  border-radius: 8px;
+  background: var(--surface-panel);
+}
+
+.studyNoteComposer textarea {
+  min-height: 150px;
+  line-height: 1.45;
+}
+
+.studyNoteComposer button {
+  justify-self: start;
+  padding: 10px 14px;
+  border-color: var(--olive);
+  border-radius: 999px;
+  color: var(--surface-panel);
+  background: var(--olive);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.studyNoteComposer button:disabled {
+  cursor: not-allowed;
+  opacity: 0.48;
+}
+
+.studyNoteContext {
+  display: grid;
+  gap: 6px;
+  padding: 10px 12px;
+  border: 1px solid var(--divider);
+  border-radius: 8px;
+  background: var(--surface-panel-warm);
+}
+
+.studyNoteContext span {
+  color: var(--text-muted);
+  font-size: 12px;
+  line-height: 1.25;
+}
+
+.studyNoteContext span:first-child {
+  color: var(--text-primary);
+  font-weight: 700;
+}
+
+.studyNoteList {
+  display: grid;
+  gap: 10px;
+}
+
+.emptyStudyNotes {
+  margin: 0;
+  padding: 16px;
+  border: 1px dashed var(--divider-strong);
+  border-radius: 8px;
+  color: var(--text-muted);
+  background: var(--surface-panel);
+  font-size: 14px;
+}
+
+.studyNoteCard {
+  display: grid;
+  gap: 10px;
+  padding: 14px;
+  border: 1px solid var(--divider);
+  border-radius: 8px;
+  background: var(--surface-panel);
+}
+
+.studyNoteCard header,
+.studyNoteCard footer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.studyNoteCard header p,
+.studyNoteCard time,
+.studyNoteCard footer span {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 12px;
+  line-height: 1.25;
+}
+
+.studyNoteCard header p {
+  color: var(--olive);
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.studyNoteCard > p {
+  margin: 0;
+  white-space: pre-wrap;
+  color: var(--text-primary);
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.studyNoteCard footer {
+  justify-content: flex-start;
+}
+
+.studyNoteCard footer span {
+  padding: 4px 7px;
+  border: 1px solid var(--divider);
+  border-radius: 999px;
+  background: var(--surface-soft);
 }
 
 @media (max-width: 1080px) {

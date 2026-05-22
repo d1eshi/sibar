@@ -11,6 +11,12 @@ accepted specs and iterations, not by raw commit count.
 Use this section for changes that have landed but are not part of a tagged
 release yet.
 
+### Added - Sibar Study Session Notes
+
+- Added a compact locally persisted study-session notes panel to the research
+  workspace for capturing Platzi course entries with date, iteration label,
+  note body, and current session/source context.
+
 ### Docs - Ownership Workbench Product Research
 
 - Added three research memos:

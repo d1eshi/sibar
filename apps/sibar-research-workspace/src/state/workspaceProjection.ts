@@ -340,6 +340,9 @@ export function createInitialWorkspaceStateFromFixture(
     selectedMiniNodeId: firstMini?.id ?? "",
     selectedSourceId: fallbackSourceId,
     isReadinessPanelVisible: true,
+    studyCourseTitle: "Platzi course",
+    studyNoteDraft: "",
+    studyNotes: [],
     ...overrides,
   };
 }
