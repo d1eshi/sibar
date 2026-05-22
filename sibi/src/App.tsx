@@ -84,6 +84,12 @@ import {
   type AgentActionValidationResult,
   type AgentFlowManifest,
 } from "./ownershipWorkbench/agentFlowManifest.ts";
+import {
+  buildGeminiEvidenceLabReport,
+  evaluateGeminiEvidenceReport,
+  getGeminiEvidenceProviderAdapter,
+  type GeminiEvidenceExtractionResult,
+} from "./ownershipWorkbench/geminiEvidenceExtractor.ts";
 
 export default function App() {
   const workbenchSurfaceMode = getWorkbenchSurfaceMode(
@@ -267,6 +273,7 @@ export default function App() {
       }),
     [ownershipMemoryExport, selectedBoundary, boundaryRelationEvidence],
   );
+  const labGeminiProvider = getGeminiEvidenceProviderAdapter("gemini-first");
   const agentFlowManifest = React.useMemo<AgentFlowManifest>(() => {
     return buildAgentFlowManifest({
       boundary: selectedBoundary,
@@ -315,6 +322,22 @@ export default function App() {
       }),
     [agentFlowManifest, agentFlowRuntime],
   );
+  const geminiEvidenceLabReport = React.useMemo(() => {
+    return buildGeminiEvidenceLabReport({
+      selectedFile,
+    });
+  }, [selectedFile]);
+  const labGeminiExtraction: GeminiEvidenceExtractionResult | null = React.useMemo(() => {
+    if (labGeminiProvider == null || workbenchSurfaceMode !== "lab") {
+      return null;
+    }
+
+    return evaluateGeminiEvidenceReport({
+      fileContents: fileFixtures,
+      report: geminiEvidenceLabReport,
+      providerAdapter: labGeminiProvider,
+    });
+  }, [labGeminiProvider, geminiEvidenceLabReport, workbenchSurfaceMode]);
 
   const latestTransferAttempt = transferHistoryForCurrentProbe.at(-1) ?? null;
 
@@ -595,6 +618,7 @@ export default function App() {
           markUnknown();
         }}
         onRetryAttempt={retryOwnershipAttempt}
+        geminiEvidenceExtraction={workbenchSurfaceMode === "lab" ? labGeminiExtraction : null}
         transferQuestion={transferProbe.question}
         transferAnswerText={transferAnswerText}
         onTransferAnswerChange={setTransferAnswerText}

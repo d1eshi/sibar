@@ -182,6 +182,19 @@ release yet.
   behavior, and explicit opt-in allow rules in
   `Tests/sibi-ownership-workbench.test.ts`.
 
+### Added - Slice 12 Gemini Evidence Extractor
+
+- Added `src/ownershipWorkbench/geminiEvidenceExtractor.ts` with Gemini-first
+  provider abstraction (`gemini`, `gemini-first`), deterministic report
+  generation, schema validation, and citation-level verification.
+- Added deterministic verification outcomes for evidence claims with explicit
+  dispositions (`verified`, `downgraded`, `rejected`) and question proposals.
+- Added lab-only evidence diagnostics rendering in
+  `src/ownershipWorkbench/components/OwnershipHarnessPanel.tsx` and wired it from
+  `src/App.tsx` with default-mode hiding.
+- Added unit coverage for invented sources/files, inferred/downgraded claims,
+  readiness rejection, out-of-bounds lines, and report determinism.
+
 ### Added - Slice 1 Inventory Runtime
 
 - Moved the Slice 1 contract/runtime base for deterministic `repoInventory(sourceRoot)`
