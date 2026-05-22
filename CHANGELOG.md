@@ -294,6 +294,30 @@ release yet.
 - Removed obsolete attempt-readiness prototype artifacts and generated visual
   assets so future worktree creation does not need to carry stale binary deletes.
 
+### Changed - Public Web Landing
+
+- Reworked the public index into a two-section editorial manifesto poster:
+  hero plus ownership artifacts, matching the paper/rules/red-annotation
+  direction for Sibi cognitive debt.
+- Added the poster-style top navigation with manifesto links, login, and a
+  black `Try Sibi` call to action.
+- Replaced the artifact-card row with a wide Sibi product mockup section for
+  the future demo: pasted diff, ownership attempt, and debt-reduction outcome.
+- Added a simple poster-style footer CTA with `Try Sibi free`, `See how it
+  works`, and four ownership principles.
+- Added a responsive landing check for mobile, tablet, laptop, and desktop
+  widths.
+- Removed temporary landing prototype pages so the public web keeps a single
+  Sibi manifesto entrypoint.
+- Renamed the landing stylesheet from `reader.css` to `main.css` and made the
+  public index use the product-interaction prototype direction.
+- Reframed the public landing around Sibi as an ownership engine for
+  AI-generated software, centered on cognitive debt, demonstrated ownership, and
+  the Diff Ownership Review wedge.
+- Replaced workspace-oriented copy and preview with a manifest, ownership
+  boundary map, diff evidence surface, attempt diagnosis loop, and ownership
+  quality metrics.
+
 ### Docs - Deep Ownership Workspace North Star
 
 - Added a current north-star entrypoint for the source-driven MVP:
