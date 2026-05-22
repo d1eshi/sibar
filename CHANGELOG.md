@@ -36,6 +36,8 @@ release yet.
   Platzi` with a central `Clase 8, notas` writing surface.
 - Restored the active study session to the original light/cream workspace palette
   while keeping the reusable notebook layout.
+- Moved the default workspace/session seed data out of `workspaceProjection.ts`
+  into an explicit workspace catalog so projection code only derives UI state.
 
 ### Docs - Ownership Workbench Product Research
 
