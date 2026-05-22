@@ -3,10 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sibi - Prove ownership before you merge</title>
-<meta name="description" content="Sibi convierte diffs generados con AI en un loop de ownership: pegar diff, explicar que rompe, diagnosticar gaps y reducir deuda cognitiva.">
-<meta property="og:title" content="Sibi - Prove ownership before you merge">
-<meta property="og:description" content="El ownership engine para reducir cognitive debt en software generado con AI.">
+<title>Sibi - AI made software faster than understanding</title>
+<meta name="description" content="Sibi convierte cognitive debt en ownership demostrado: prove it, diagnose the gap, repair the boundary.">
+<meta property="og:title" content="Sibi - Cognitive debt is code you cannot defend">
+<meta property="og:description" content="Ownership is a practice, not a feeling. Sibi helps engineering teams prove ownership over AI-generated software.">
 <script>
 window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
 window.va("beforeSend", (event) => {
@@ -26,124 +26,90 @@ if (location.protocol !== "file:" && location.hostname !== "localhost" && locati
   document.head.appendChild(analyticsScript);
 }
 </script>
-<link rel="stylesheet" href="styles/main.css">
+<link rel="stylesheet" href="styles/main.css?v=poster">
 </head>
-<body class="landing variant-product">
-<header class="site-header" aria-label="Navegacion principal">
-  <a class="brand" href="#top" aria-label="Sibi inicio"><span>S</span><strong>Sibi</strong></a>
-  <nav class="site-nav" aria-label="Variaciones">
-    <a aria-current="page" href="index.html">html</a>
-    <a href="html2.html">html2</a>
-    <a href="html3.html">html3</a>
-  </nav>
-  <a class="header-cta" href="#early-access">Pedir acceso</a>
-</header>
-
-<main id="top">
-  <section class="hero product-hero section-band" aria-labelledby="hero-title">
-    <div class="hero-copy">
-      <p class="eyebrow">Cognitive debt -> ownership recovery</p>
-      <h1 id="hero-title">Prove ownership before you merge.</h1>
-      <p class="hero-lede">Sibi toma el diff que escribio la AI y lo transforma en una prueba concreta: que cambio, que evidencia lo sostiene y que rompe si no lo entendes.</p>
-      <div class="hero-actions">
-        <a class="primary-action" href="#live-review">Probar el loop</a>
-        <a class="secondary-action" href="#manifesto">Leer manifesto</a>
-      </div>
-    </div>
-
-    <section class="live-card" aria-label="Interactive diff ownership review">
-      <div class="live-toolbar">
-        <span></span><span></span><span></span>
-        <strong>Diff Ownership Review</strong>
-      </div>
-      <div class="live-grid">
-        <article class="diff-entry">
-          <header><span>Paste diff</span><strong>session.ts</strong></header>
-          <pre><code>- return response.json();
-+ if (response.status === 204) return null;
-+ return response.json();</code></pre>
-        </article>
-        <article class="claim-entry">
-          <header><span>Sibi asks</span><strong>Explain what breaks</strong></header>
-          <p>What downstream caller changes behavior when `createSession` returns `null`?</p>
-          <div class="answer-line">User attempt: "It handles empty auth responses."</div>
-        </article>
-        <article class="debt-entry">
-          <header><span>Diagnosis</span><strong>Missing deletion-risk argument</strong></header>
-          <div class="meter"><span style="width: 68%"></span></div>
-          <p><b>Debt reduced</b> after retry: added caller evidence and null-contract risk.</p>
-        </article>
-      </div>
-    </section>
-  </section>
-
-  <section class="interaction-strip section-band" id="live-review" aria-label="Sibi interaction loop">
-    <article>
-      <span>1</span>
-      <h2>Diff enters</h2>
-      <p>Imports, touched files, tests and goal context become deterministic evidence.</p>
-    </article>
-    <article>
-      <span>2</span>
-      <h2>User attempts</h2>
-      <p>Sibi does not explain first. It asks for ownership in your own words.</p>
-    </article>
-    <article>
-      <span>3</span>
-      <h2>Gap diagnosed</h2>
-      <p>Weak evidence, missing consumers and deletion risk become visible.</p>
-    </article>
-    <article>
-      <span>4</span>
-      <h2>Debt drops</h2>
-      <p>The retry is scored against evidence, not confidence theater.</p>
-    </article>
-  </section>
-
-  <section class="manifesto section-band" id="manifesto" aria-labelledby="manifesto-title">
-    <div>
-      <p class="eyebrow">Manifesto</p>
-      <h2 id="manifesto-title">AI made software faster than understanding.</h2>
-    </div>
-    <div class="manifesto-copy">
-      <p>Technical debt is code that costs more later. Cognitive debt is sharper: code that exists, passes tests and maybe ships, but cannot be explained, modified or defended by the people responsible for it.</p>
-      <p>Sibi is not an AI coding assistant. It is an ownership engine for AI-generated software.</p>
-    </div>
-  </section>
-
-  <section class="ownership-demo section-band" aria-label="Ownership recovery demo">
-    <div class="boundary-map">
-      <h2>Ownership states are cognitive, not technical.</h2>
-      <ol>
-        <li><strong>owned</strong><span>Prompt Generation</span></li>
-        <li><strong>partial</strong><span>Evidence Collection: weak tests</span></li>
-        <li class="gap"><strong>gap</strong><span>Runtime Validation: confuses evaluation with validation</span></li>
-        <li><strong>recovered</strong><span>Deletion-risk argument added after retry</span></li>
-      </ol>
-    </div>
-    <aside class="coverage-panel">
-      <span>Ownership Coverage</span>
-      <strong>43% -> 71%</strong>
-      <p>Not test coverage. Cognitive coverage: how much of the changed system the developer can prove they own.</p>
+<body class="landing variant-poster">
+<main class="poster-page" id="top">
+  <section class="poster-hero" aria-labelledby="hero-title">
+    <aside class="poster-rail" aria-label="Sibi manifesto notes">
+      <div class="rail-rule"></div>
+      <p>SIBI MANIFESTO<br>FOR ENGINEERING<br>TEAMS</p>
+      <div class="rail-rule"></div>
+      <span class="rail-stamp" aria-hidden="true"> ownership</span>
+      <p>OWNERSHIP<br>IS A PRACTICE,<br>NOT A FEELING.</p>
     </aside>
+
+    <div class="poster-main">
+      <h1 id="hero-title">AI made<br>software faster<br>than understanding</h1>
+      <div class="red-underline" aria-hidden="true"></div>
+
+      <div class="hero-lower">
+        <div class="hero-claim">
+          <h2>Cognitive debt is<br>code you cannot defend.</h2>
+          <p>You can generate more code than you can understand.<br>Tests can pass while your mental model falls behind.<br>Sibi exists to close that gap.</p>
+          <a class="poster-button" href="#artifacts">Prove it <span aria-hidden="true">-></span></a>
+        </div>
+        <p class="hand-note">Ownership<br>is the only<br>real velocity.</p>
+      </div>
+    </div>
   </section>
 
-  <section class="access-section section-band" id="early-access" aria-labelledby="access-title">
-    <div class="access-copy-block">
-      <p class="eyebrow">Early access</p>
-      <h2 id="access-title">Para builders que ya sienten cognitive debt.</h2>
-      <p>Deja tu correo y, si queres, tu handle de X. La siguiente tanda va a probar Sibi sobre diffs reales, boundaries tocadas, intentos de ownership y reparaciones minimas.</p>
+  <section class="poster-artifacts" id="artifacts" aria-labelledby="artifacts-title">
+    <h2 id="artifacts-title">OWNERSHIP IS A PRACTICE</h2>
+    <div class="artifact-grid">
+      <article class="artifact-column">
+        <header>
+          <h3>1. Prove it</h3>
+          <p>You attempt an explanation of the boundary.</p>
+        </header>
+        <div class="artifact-card code-artifact" aria-label="Code diff artifact">
+          <pre><code>diff -- src/runtime/evaluateAttempt.ts
+@@ -48,6 +48,11 @@ export function evaluateAttempt(state) {
+
+48   const result = run(input);
+49   const score = scoreResult(result);
+50 + validateOwnershipBoundary(result);
+51 + recordEvidence(result);
+52 + updateRuntimeState(result);
+53   return { score, result };</code></pre>
+        </div>
+      </article>
+
+      <div class="artifact-arrow" aria-hidden="true">-></div>
+
+      <article class="artifact-column">
+        <header>
+          <h3>2. Gap diagnosed</h3>
+          <p>Sibi shows what you missed, with evidence.</p>
+        </header>
+        <div class="artifact-card diagnosis-artifact" aria-label="Gap diagnosis artifact">
+          <h4>GAP DIAGNOSIS</h4>
+          <ul>
+            <li>Confused validation with evaluation</li>
+            <li>No downstream consumer identified</li>
+            <li>Deletion risk not explained</li>
+            <li>Missing failure mode</li>
+          </ul>
+          <p class="evidence-line">Evidence available in 3 files</p>
+        </div>
+      </article>
+
+      <div class="artifact-arrow" aria-hidden="true">-></div>
+
+      <article class="artifact-column">
+        <header>
+          <h3>3. Repair the boundary</h3>
+          <p>Smallest next step to close the gap.</p>
+        </header>
+        <div class="artifact-card repair-artifact" aria-label="Next repair artifact">
+          <h4>NEXT SMALLEST REPAIR</h4>
+          <p>Explain the difference between:</p>
+          <blockquote>"checking if an answer is good"<br>vs<br>"proving the user owns a system boundary".</blockquote>
+          <a class="repair-button" href="#top">Retry attempt <span aria-hidden="true">-></span></a>
+        </div>
+      </article>
     </div>
-    <form class="access-form" id="earlyAccessForm">
-      <label for="earlyAccessEmail">Email</label>
-      <input id="earlyAccessEmail" name="email" type="email" placeholder="tu@email.com" autocomplete="email" required>
-      <label for="earlyAccessXHandle">X handle <span>opcional</span></label>
-      <input id="earlyAccessXHandle" name="x_handle" type="text" placeholder="@usuario" autocomplete="off" inputmode="text">
-      <button class="primary-action" type="submit">Pedir early access</button>
-      <p class="form-status" id="earlyAccessStatus" aria-live="polite"></p>
-    </form>
   </section>
 </main>
-<script type="module" src="scripts/landing.js"></script>
 </body>
 </html>
