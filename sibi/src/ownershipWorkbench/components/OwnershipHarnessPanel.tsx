@@ -18,6 +18,7 @@ import { ReviewGuidePanel } from "./ReviewGuidePanel";
 import { RepoInventoryStatusPanel } from "./RepoInventoryStatusPanel";
 import type { TransferAttemptRecord } from "../transferVerification.ts";
 import type { WorkspaceEscalationDecision } from "../workspaceEscalation.ts";
+import type { OwnershipMemoryExportBundle } from "../ownershipMemory.ts";
 
 interface OwnershipLabContext {
   selectedFile: string;
@@ -55,6 +56,7 @@ interface OwnershipHarnessPanelProps {
   escalationDecision: WorkspaceEscalationDecision;
   authorizedHandoffArtifact: OwnershipReviewArtifact | null;
   onAuthorizeHandoff: () => void;
+  ownershipMemoryExport: OwnershipMemoryExportBundle;
 }
 
 export function OwnershipHarnessPanel({
@@ -85,6 +87,7 @@ export function OwnershipHarnessPanel({
   escalationDecision,
   authorizedHandoffArtifact,
   onAuthorizeHandoff,
+  ownershipMemoryExport,
 }: OwnershipHarnessPanelProps): React.ReactElement {
   const isLabView = surfaceMode === "lab" && labContext != null;
   const currentQuestion = sessionState.isComplete ? null : sessionQuestions[sessionState.currentIndex] ?? null;
@@ -102,6 +105,27 @@ export function OwnershipHarnessPanel({
     latestReadiness == null ? "—" : `${Math.round(latestReadiness.calibration_score * 100)}%`;
   const hasHandoffCandidate = escalationDecision.isCandidate;
   const handoffSummaryEvidenceRefs = escalationDecision.evidence_refs.slice(0, 6);
+  const memoryBoundaryHistory = ownershipMemoryExport.boundary_history.slice(-5);
+  const memoryExportPreview = JSON.stringify(
+    {
+      export_id: ownershipMemoryExport.export_id,
+      event_count: ownershipMemoryExport.event_count,
+      revisit_labels: ownershipMemoryExport.revisit_labels,
+      boundary_history: ownershipMemoryExport.boundary_history.map((entry) => ({
+        record_id: entry.record_id,
+        state: entry.state,
+        evidence_refs: entry.evidence_refs.map((evidence) => evidence.id),
+      })),
+      recurring_gaps: ownershipMemoryExport.recurring_gaps.map((gap) => ({
+        gap_key: gap.gap_key,
+        count: gap.count,
+        evidence_refs: gap.evidence_refs.map((evidence) => evidence.id),
+      })),
+      compaction: ownershipMemoryExport.compaction,
+    },
+    null,
+    2,
+  );
 
   return (
     <aside className="panel ownershipPanel">
@@ -423,6 +447,53 @@ export function OwnershipHarnessPanel({
               </ul>
             </section>
           )}
+        </section>
+
+        <section className="ownershipMemoryPanel" aria-label="Ownership memory store">
+          <div className="memoryHeader">
+            <div>
+              <p className="panelSub">Ownership memory</p>
+              <h2>Append-only store</h2>
+            </div>
+            <span>{ownershipMemoryExport.event_count} events</span>
+          </div>
+          <div className="readinessMetrics">
+            <span>Export: {ownershipMemoryExport.export_id}</span>
+            <span>Compaction: {ownershipMemoryExport.compaction.mode}</span>
+            <span>Revisit labels: {ownershipMemoryExport.revisit_labels.join(", ")}</span>
+          </div>
+          {memoryBoundaryHistory.length > 0 ? (
+            <div className="gapCard">
+              <p>Boundary history</p>
+              <ol>
+                {memoryBoundaryHistory.map((entry) => (
+                  <li key={entry.record_id}>
+                    <strong>{entry.state}</strong> {entry.source_event_id}
+                    <span> evidence_refs: {entry.evidence_refs.map((evidence) => evidence.id).join(", ")}</span>
+                  </li>
+                ))}
+              </ol>
+            </div>
+          ) : (
+            <p className="memoryEmpty">No memory events recorded yet.</p>
+          )}
+          {ownershipMemoryExport.recurring_gaps.length > 0 ? (
+            <div className="gapCard">
+              <p>Recurring gaps</p>
+              <ul>
+                {ownershipMemoryExport.recurring_gaps.map((gap) => (
+                  <li key={gap.gap_id}>
+                    {gap.gap_key} x{gap.count} evidence_refs:{" "}
+                    {gap.evidence_refs.map((evidence) => evidence.id).join(", ")}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ) : null}
+          <details className="memoryExportDetails">
+            <summary>Export bundle with evidence refs</summary>
+            <pre>{memoryExportPreview}</pre>
+          </details>
         </section>
 
         {isLabView && (

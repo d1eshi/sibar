@@ -232,6 +232,8 @@ Acceptance:
 
 Goal: persist attempt history needed by calibration, transfer, escalation, and metrics.
 
+Status: implemented in current baseline.
+
 Deliverables:
 
 - `ownership-memory` event and boundary-state contracts:
@@ -241,6 +243,29 @@ Deliverables:
   - revisit labels,
   - export bundles with evidence refs.
 - deterministic memory compaction policy (daily or manual export).
+
+Slice 8 deterministic policy for this iteration:
+
+- durable memory is boundary-scoped and represented as append-only events only:
+  `guided_observation`, `readiness_attempt`, `transfer_attempt`, and
+  `handoff_artifact`; the in-app container may hold multiple boundaries, but
+  projection/export reads are filtered to the selected `boundary_id`;
+- boundary state history is a projection from events, not mutable durable truth;
+  readiness events record the effective boundary state after transfer gating;
+- recurring gaps are emitted when the same normalized gap key appears at least 2
+  times:
+  `relation-gap:caller-test`, `readiness-gap:low-calibration`, readiness gap
+  reasons, or transfer fail/skip gap keys;
+- revisit labels are deterministic projections:
+  `revisit-transfer` for latest or recurring transfer fail/skip,
+  `revisit-calibration` for repeated low-calibration readiness gaps,
+  `revisit-relation-gap` for repeated caller/test relation gaps, and `stable`
+  only when no revisit label applies;
+- manual export compacts the whole append-only event set into the export read
+  model, while daily export uses the UTC start of the export day as the cutoff
+  and reports pre-cutoff events as compacted;
+- compaction never drops boundary-state evidence: every projected boundary
+  state record must include non-empty `evidence_refs`.
 
 Acceptance:
 

@@ -295,3 +295,43 @@ test("repeated transfer failures expose a deterministic workspace handoff candid
   await expect(handoffArtifact.getByText("Blocked reasons")).toBeVisible();
   await expect(handoffArtifact.getByText("Suggested workspace seed:")).toBeVisible();
 });
+
+test("ownership memory records failed and retried attempts with export evidence refs", async ({ page }) => {
+  await page.goto("/?view=lab");
+
+  await completeReviewSession(page);
+  await page
+    .getByLabel("Final boundary attempt")
+    .fill("I do not know.");
+  await page.getByLabel("Self confidence").fill("95");
+  await page.getByRole("button", { name: "Submit attempt" }).click();
+  await expect(page.getByText("Readiness gate: blocked")).toBeVisible();
+
+  await page.getByRole("button", { name: "Retry after repair" }).click();
+  await page.getByLabel("Final boundary attempt").fill("Still not sure.");
+  await page.getByLabel("Self confidence").fill("95");
+  await page.getByRole("button", { name: "Submit attempt" }).click();
+  await expect(page.getByText("Readiness gate: blocked")).toBeVisible();
+
+  await page.getByRole("button", { name: "Retry after repair" }).click();
+  await page
+    .getByLabel("Final boundary attempt")
+    .fill(
+      "The createSession branch returns null from 204; callers must guard with `if (!session)` before privileged work and unauthenticated paths stop there.",
+    );
+  await page.getByLabel("Self confidence").fill("60");
+  await page.getByRole("button", { name: "Submit attempt" }).click();
+  await expect(page.getByText("Readiness gate: ready")).toBeVisible();
+
+  const memoryPanel = page.getByLabel("Ownership memory store");
+  await expect(memoryPanel).toBeVisible();
+  await expect(memoryPanel).toContainText("4 events");
+  await expect(memoryPanel).toContainText("Boundary history");
+  await expect(memoryPanel).toContainText("evidence_refs:");
+  await expect(memoryPanel).toContainText("revisit-calibration");
+
+  await memoryPanel.getByText("Export bundle with evidence refs").click();
+  await expect(memoryPanel.locator("pre")).toContainText("\"event_count\": 4");
+  await expect(memoryPanel.locator("pre")).toContainText("memory-boundary-01-observation-observation-1");
+  await expect(memoryPanel.locator("pre")).toContainText("\"evidence_refs\"");
+});

@@ -15,6 +15,7 @@ type OwnershipWorkspaceEscalation = typeof import("../src/ownershipWorkbench/wor
 type OwnershipBoundaryBuilder = typeof import("../src/ownershipWorkbench/boundaryBuilder.ts");
 type OwnershipTreeReasonFormatting = typeof import("../src/ownershipWorkbench/fileTreeReasonFormatting.ts");
 type OwnershipTransferVerification = typeof import("../src/ownershipWorkbench/transferVerification.ts");
+type OwnershipMemory = typeof import("../src/ownershipWorkbench/ownershipMemory.ts");
 
 const EXPECTED_DIFF_FILES = ["src/api/session.ts", "src/api/session.test.ts"] as const;
 const DIRECTORY_PATHS = ["src", "src/api", "src/runtime"] as const;
@@ -29,6 +30,7 @@ let cachedWorkspaceEscalation: OwnershipWorkspaceEscalation | null = null;
 let cachedBoundaryBuilder: OwnershipBoundaryBuilder | null = null;
 let cachedFileTreeReasonFormatting: OwnershipTreeReasonFormatting | null = null;
 let cachedTransferVerification: OwnershipTransferVerification | null = null;
+let cachedOwnershipMemory: OwnershipMemory | null = null;
 let fixtureImportConsoleErrors: unknown[] = [];
 
 async function loadFixturesModule(): Promise<OwnershipWorkbenchFixtures> {
@@ -130,6 +132,15 @@ async function loadTransferVerificationModule(): Promise<OwnershipTransferVerifi
 
   cachedTransferVerification = (await import("../src/ownershipWorkbench/transferVerification.ts")) as OwnershipTransferVerification;
   return cachedTransferVerification;
+}
+
+async function loadOwnershipMemoryModule(): Promise<OwnershipMemory> {
+  if (cachedOwnershipMemory != null) {
+    return cachedOwnershipMemory;
+  }
+
+  cachedOwnershipMemory = (await import("../src/ownershipWorkbench/ownershipMemory.ts")) as OwnershipMemory;
+  return cachedOwnershipMemory;
 }
 
 test("fixture file tree paths only include leaf file paths", async () => {
@@ -679,6 +690,272 @@ test("transfer readiness integration updates continuity and debt by transfer out
   assert.equal(failed.transfer.transferRecurrenceTags.includes("transfer-recurrence-2"), true);
   assert.equal(Math.round(failed.transfer.readinessContinuity * 100), 47);
   assert.equal(Math.round(failed.transfer.debtSignal * 100), 53);
+});
+
+test("ownership memory appends attempt outcomes instead of replacing previous attempts", async () => {
+  const fixtures = await loadFixturesModule();
+  const attemptReadiness = await loadAttemptReadinessModule();
+  const memory = await loadOwnershipMemoryModule();
+  const boundary = { ...fixtures.ownershipBoundary, evidence: fixtures.fixtureEvidence };
+  const initialMemory = memory.createOwnershipMemoryState();
+  const firstAttempt = attemptReadiness.evaluateOwnershipAttemptReadiness({
+    attemptText: "I do not yet know how null relates to the caller.",
+    boundary,
+    selfConfidence: 70,
+    attemptIndex: 1,
+    startedAt: 10_000,
+    submittedAt: 10_200,
+  });
+  const secondAttempt = attemptReadiness.evaluateOwnershipAttemptReadiness({
+    attemptText:
+      "The createSession branch returns null from 204; callers must guard with `if (!session)` before privileged work.",
+    boundary,
+    selfConfidence: 60,
+    attemptIndex: 2,
+    startedAt: 11_000,
+    submittedAt: 11_250,
+  });
+
+  const afterFirst = memory.appendReadinessAttempt({
+    memory: initialMemory,
+    boundary,
+    readiness: firstAttempt,
+  });
+  const afterSecond = memory.appendReadinessAttempt({
+    memory: afterFirst,
+    boundary,
+    readiness: secondAttempt,
+  });
+  const projection = memory.buildOwnershipMemoryProjection(afterSecond);
+
+  assert.equal(initialMemory.events.length, 0, "append should not mutate the previous memory state");
+  assert.equal(afterFirst.events.length, 1);
+  assert.equal(afterSecond.events.length, 2);
+  assert.deepEqual(
+    projection.boundary_history.map((entry) => entry.source_event_id),
+    afterSecond.events.map((event) => event.event_id),
+  );
+});
+
+test("ownership memory projects readiness state from effective transfer-gated boundary state", async () => {
+  const fixtures = await loadFixturesModule();
+  const attemptReadiness = await loadAttemptReadinessModule();
+  const memory = await loadOwnershipMemoryModule();
+  const boundary = { ...fixtures.ownershipBoundary, evidence: fixtures.fixtureEvidence };
+  const readyAttempt = attemptReadiness.evaluateOwnershipAttemptReadiness({
+    attemptText:
+      "The createSession branch returns null from 204; callers must guard with `if (!session)` before privileged work and unauthenticated flow stops.",
+    boundary,
+    selfConfidence: 60,
+    attemptIndex: 1,
+    startedAt: 12_000,
+    submittedAt: 12_300,
+  });
+
+  assert.equal(readyAttempt.readiness_gate, "ready");
+  assert.equal(readyAttempt.state, "owned");
+
+  const nextMemory = memory.appendReadinessAttempt({
+    memory: memory.createOwnershipMemoryState(),
+    boundary,
+    readiness: readyAttempt,
+    effectiveBoundaryState: "partial",
+  });
+  const projection = memory.buildOwnershipMemoryProjection(nextMemory, {
+    boundaryId: boundary.id,
+  });
+
+  assert.equal(projection.boundary_history.length, 1);
+  assert.equal(
+    projection.boundary_history[0]?.state,
+    "partial",
+    "readiness memory should project the transfer-gated boundary state, not raw evaluator ownership",
+  );
+});
+
+test("ownership memory tracks recurring gaps and derives revisit labels", async () => {
+  const fixtures = await loadFixturesModule();
+  const memory = await loadOwnershipMemoryModule();
+  const boundary = fixtures.ownershipBoundary;
+  const firstObservation = {
+    id: "observation-101",
+    filePath: boundary.filePath,
+    reason: "could not connect caller/test" as const,
+    note: "Caller/test relation was not connected.",
+  };
+  const secondObservation = {
+    id: "observation-102",
+    filePath: boundary.filePath,
+    reason: "could not connect caller/test" as const,
+    note: "Caller/test relation was still missing on revisit.",
+  };
+
+  const withFirst = memory.appendGuidedObservation({
+    memory: memory.createOwnershipMemoryState(),
+    boundary,
+    observation: firstObservation,
+    occurredAt: 1_700_000_000_000,
+  });
+  const withSecond = memory.appendGuidedObservation({
+    memory: withFirst,
+    boundary,
+    observation: secondObservation,
+    occurredAt: 1_700_000_060_000,
+  });
+  const projection = memory.buildOwnershipMemoryProjection(withSecond);
+
+  assert.equal(projection.recurring_gaps.length, 1);
+  assert.equal(projection.recurring_gaps[0]?.gap_key, "relation-gap:caller-test");
+  assert.equal(projection.recurring_gaps[0]?.count, 2);
+  assert.equal(projection.revisit_labels.includes("revisit-relation-gap"), true);
+  assert.deepEqual(projection.recurring_gaps[0]?.source_event_ids, [
+    withFirst.events[0]?.event_id,
+    withSecond.events[1]?.event_id,
+  ]);
+});
+
+test("ownership memory projection and export filter events by boundary id", async () => {
+  const fixtures = await loadFixturesModule();
+  const attemptReadiness = await loadAttemptReadinessModule();
+  const memory = await loadOwnershipMemoryModule();
+  const boundaryA = { ...fixtures.ownershipBoundary, evidence: fixtures.fixtureEvidence };
+  const boundaryB = {
+    ...fixtures.ownershipBoundary,
+    id: "boundary-02",
+    filePath: "src/runtime/consumer.ts",
+    title: "Caller boundary",
+  };
+  const readyAttemptA = attemptReadiness.evaluateOwnershipAttemptReadiness({
+    attemptText:
+      "The createSession branch returns null from 204; callers must guard with `if (!session)` before privileged work.",
+    boundary: boundaryA,
+    selfConfidence: 60,
+    attemptIndex: 1,
+    startedAt: 13_000,
+    submittedAt: 13_400,
+  });
+  const observationOneB = {
+    id: "observation-b-01",
+    filePath: boundaryB.filePath,
+    reason: "could not connect caller/test" as const,
+    note: "Boundary B relation gap should not leak into boundary A.",
+  };
+  const observationTwoB = {
+    id: "observation-b-02",
+    filePath: boundaryB.filePath,
+    reason: "could not connect caller/test" as const,
+    note: "Boundary B relation gap repeated.",
+  };
+
+  const withA = memory.appendReadinessAttempt({
+    memory: memory.createOwnershipMemoryState(),
+    boundary: boundaryA,
+    readiness: readyAttemptA,
+    effectiveBoundaryState: "partial",
+  });
+  const withBOne = memory.appendGuidedObservation({
+    memory: withA,
+    boundary: boundaryB,
+    observation: observationOneB,
+    occurredAt: 14_000,
+  });
+  const globalMemory = memory.appendGuidedObservation({
+    memory: withBOne,
+    boundary: boundaryB,
+    observation: observationTwoB,
+    occurredAt: 14_500,
+  });
+  const projectionA = memory.buildOwnershipMemoryProjection(globalMemory, {
+    boundaryId: boundaryA.id,
+  });
+  const exportA = memory.buildOwnershipMemoryExportBundle({
+    memory: globalMemory,
+    mode: "manual",
+    boundaryId: boundaryA.id,
+    exportedAt: 1_700_000_000_000,
+  });
+
+  assert.equal(projectionA.event_count, 1);
+  assert.equal(projectionA.boundary_history.every((entry) => entry.boundary_id === boundaryA.id), true);
+  assert.deepEqual(projectionA.recurring_gaps, []);
+  assert.equal(projectionA.revisit_labels.includes("revisit-relation-gap"), false);
+  assert.equal(exportA.events.length, 1);
+  assert.equal(exportA.events.every((event) => event.boundary_id === boundaryA.id), true);
+  assert.equal(exportA.boundary_history.every((entry) => entry.boundary_id === boundaryA.id), true);
+});
+
+test("ownership memory export includes evidence refs on every boundary state record", async () => {
+  const fixtures = await loadFixturesModule();
+  const attemptReadiness = await loadAttemptReadinessModule();
+  const memory = await loadOwnershipMemoryModule();
+  const boundary = { ...fixtures.ownershipBoundary, evidence: fixtures.fixtureEvidence };
+  const readiness = attemptReadiness.evaluateOwnershipAttemptReadiness({
+    attemptText:
+      "The createSession branch returns null from 204; callers must guard with `if (!session)` before privileged work.",
+    boundary,
+    selfConfidence: 60,
+    attemptIndex: 1,
+    startedAt: 20_000,
+    submittedAt: 20_400,
+  });
+  const exported = memory.buildOwnershipMemoryExportBundle({
+    memory: memory.appendReadinessAttempt({
+      memory: memory.createOwnershipMemoryState(),
+      boundary,
+      readiness,
+    }),
+    mode: "manual",
+    exportedAt: 1_700_000_000_000,
+  });
+
+  assert.equal(exported.event_count, 1);
+  assert.equal(exported.boundary_history.length, 1);
+  assert.equal(
+    exported.boundary_history.every((entry) => entry.evidence_refs.length > 0),
+    true,
+    "each boundary state history record must carry evidence refs",
+  );
+});
+
+test("ownership memory daily compaction is deterministic and preserves evidence refs", async () => {
+  const fixtures = await loadFixturesModule();
+  const memory = await loadOwnershipMemoryModule();
+  const boundary = fixtures.ownershipBoundary;
+  const one = {
+    id: "observation-201",
+    filePath: boundary.filePath,
+    reason: "inconclusive" as const,
+    note: "First incomplete boundary proof.",
+  };
+  const two = {
+    id: "observation-202",
+    filePath: boundary.filePath,
+    reason: "inconclusive" as const,
+    note: "Second incomplete boundary proof.",
+  };
+  const withOne = memory.appendGuidedObservation({
+    memory: memory.createOwnershipMemoryState(),
+    boundary,
+    observation: one,
+    occurredAt: Date.UTC(2026, 4, 20, 22),
+  });
+  const withTwo = memory.appendGuidedObservation({
+    memory: withOne,
+    boundary,
+    observation: two,
+    occurredAt: Date.UTC(2026, 4, 21, 1),
+  });
+  const exported = memory.buildOwnershipMemoryExportBundle({
+    memory: withTwo,
+    mode: "daily",
+    exportedAt: Date.UTC(2026, 4, 21, 12),
+  });
+
+  assert.equal(exported.compaction.compacted_event_count, 1);
+  assert.equal(exported.compaction.retained_event_count, 1);
+  assert.equal(exported.compaction.daily_cutoff_at, "2026-05-21T00:00:00.000Z");
+  assert.equal(exported.boundary_history.length, 2);
+  assert.equal(exported.boundary_history.every((entry) => entry.evidence_refs.length > 0), true);
 });
 
 test("workspace escalation detects relation-gap recurrence and repeated low calibration", async () => {

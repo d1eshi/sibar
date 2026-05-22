@@ -56,6 +56,14 @@ import {
   evaluateWorkspaceEscalation,
   type WorkspaceEscalationDecision,
 } from "./ownershipWorkbench/workspaceEscalation.ts";
+import {
+  appendGuidedObservation,
+  appendHandoffArtifact,
+  appendReadinessAttempt,
+  appendTransferAttempt as appendTransferMemoryAttempt,
+  buildOwnershipMemoryExportBundle,
+  createOwnershipMemoryState,
+} from "./ownershipWorkbench/ownershipMemory.ts";
 
 export default function App() {
   const workbenchSurfaceMode = getWorkbenchSurfaceMode(
@@ -76,6 +84,7 @@ export default function App() {
   const [authorizedEscalationArtifacts, setAuthorizedEscalationArtifacts] = React.useState<
     Record<string, OwnershipReviewArtifact | null>
   >({});
+  const [ownershipMemory, setOwnershipMemory] = React.useState(createOwnershipMemoryState);
   const [sessionState, setSessionState] = React.useState<OwnershipSessionState>(
     createOwnershipSessionState,
   );
@@ -187,6 +196,16 @@ export default function App() {
   const authorizedHandoffArtifact =
     authorizedEscalationArtifacts[selectedBoundary.id] ?? null;
   const isTransferRequired = latestReadinessWithTransfer?.transfer.required ?? transferProbe.required;
+  const ownershipMemoryExport = React.useMemo(
+    () =>
+      buildOwnershipMemoryExportBundle({
+        memory: ownershipMemory,
+        mode: "manual",
+        boundaryId: selectedBoundary.id,
+        exportedAt: 1_700_000_000_000,
+      }),
+    [ownershipMemory, selectedBoundary.id],
+  );
 
   const latestTransferAttempt = transferHistoryForCurrentProbe.at(-1) ?? null;
 
@@ -270,6 +289,13 @@ export default function App() {
       ...prev,
       [selectedBoundary.id]: artifact,
     }));
+    setOwnershipMemory((prev) =>
+      appendHandoffArtifact({
+        memory: prev,
+        boundary: selectedBoundary,
+        artifact,
+      }),
+    );
   }
 
   function submitOwnershipAttempt() {
@@ -304,6 +330,14 @@ export default function App() {
             : projectedAttempt.state;
 
     setReadinessHistory((prev) => [...prev, projectedAttempt]);
+    setOwnershipMemory((prev) =>
+      appendReadinessAttempt({
+        memory: prev,
+        boundary: selectedBoundary,
+        readiness: projectedAttempt,
+        effectiveBoundaryState: nextBoundaryState,
+      }),
+    );
     setFileStates((prev) => withBoundaryFileState(prev, selectedBoundary, nextBoundaryState));
     setAttemptText("");
     setTransferAnswerText("");
@@ -325,6 +359,13 @@ export default function App() {
     setAttemptText("");
 
     if (result.observation) {
+      setOwnershipMemory((prev) =>
+        appendGuidedObservation({
+          memory: prev,
+          boundary: selectedBoundary,
+          observation: result.observation!,
+        }),
+      );
       setFileStates((prev) => ({
         ...prev,
         [result.observation.filePath]: "gap",
@@ -340,6 +381,13 @@ export default function App() {
         [selectedBoundary.id]: [...previousAttempts, nextAttempt],
       };
     });
+    setOwnershipMemory((prev) =>
+      appendTransferMemoryAttempt({
+        memory: prev,
+        boundary: selectedBoundary,
+        transfer: nextAttempt,
+      }),
+    );
   }
 
   function submitTransferAttempt() {
@@ -448,6 +496,7 @@ export default function App() {
         escalationDecision={escalationDecision}
         authorizedHandoffArtifact={authorizedHandoffArtifact}
         onAuthorizeHandoff={authorizeWorkspaceHandoff}
+        ownershipMemoryExport={ownershipMemoryExport}
       />
 
       <EvidenceDrawerPanel evidenceGroups={evidenceGroups} />

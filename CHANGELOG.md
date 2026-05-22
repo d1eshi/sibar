@@ -123,6 +123,20 @@ release yet.
   executes repeated transfer failures, validates candidate visibility, and verifies
   handoff authorization and trace rendering.
 
+### Added - Slice 8 Ownership Memory Store
+
+- Added a pure append-only `ownership-memory` store for guided observations,
+  readiness attempts, transfer attempts, and authorized handoff artifacts, with
+  boundary history, recurring gaps, revisit labels, and export-bundle projections.
+- Wired the workbench to append memory events during guided gaps, readiness
+  submissions, transfer outcomes, and handoff authorization while keeping latest
+  state as a projection rather than mutable durable truth.
+- Added a reproducible memory/export panel that exposes event count, boundary
+  history, recurring gaps, revisit labels, and an export preview with evidence refs.
+- Documented deterministic Slice 8 recurring-gap thresholds, revisit label rules,
+  and manual/daily compaction policy, and added unit/e2e coverage for append-only
+  behavior, evidence-preserving exports, and memory UI replay.
+
 ### Added - Slice 1 Inventory Runtime
 
 - Moved the Slice 1 contract/runtime base for deterministic `repoInventory(sourceRoot)`
