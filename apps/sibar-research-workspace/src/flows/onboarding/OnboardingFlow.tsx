@@ -5,9 +5,9 @@ import {
   compileFrontierLabMissionFromUrl,
   type FrontierLabMissionCompileDiagnostic,
   type FrontierLabMissionCompileResult,
-} from "../../../../../engine/runtime-source-mission-frontier-lab-compiler.ts";
-import { FRONTIER_LAB_BLOG_URL } from "../../../../../engine/runtime-source-mission-frontier-lab-fixture.ts";
-import type { MissionUiProjection } from "../../../../../engine/runtime-source-mission-ui-projection.ts";
+} from "../../../../../engine/workspace/source-mission/frontier-lab-compiler.ts";
+import { FRONTIER_LAB_BLOG_URL } from "../../../../../engine/workspace/source-mission/frontier-lab-fixture.ts";
+import type { MissionUiProjection } from "../../../../../engine/workspace/source-mission/ui-projection.ts";
 
 const fieldDefaults = {
   intent: "Why should this source become a mission now?",

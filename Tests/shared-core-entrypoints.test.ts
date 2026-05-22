@@ -29,7 +29,8 @@ function expectNoSourceMissionPlanningAdapters(modulePath: CoreModulePath): void
   const absolutePath = join(REPO_ROOT, modulePath.replace(/^\.\.\//, ""));
   const source = readFileSync(absolutePath, "utf8");
 
-  assert.doesNotMatch(source, /from\s+["'][^"']*runtime-source-mission-/);
+  assert.doesNotMatch(source, /from\s+["'][^"']*workspace\/source-mission/);
+  assert.doesNotMatch(source, /from\s+["'][^"']*workspace\/traces\/source-mission/);
   assert.doesNotMatch(source, /from\s+["'][^"']*article-workspace/);
   assert.doesNotMatch(source, /from\s+["'][^"']*pedagogoai\/workspace-intent/);
 }

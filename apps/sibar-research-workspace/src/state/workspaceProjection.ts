@@ -1,10 +1,10 @@
 import type { WorkspaceSessionState } from "./workspaceReducer";
-import { buildFrontierLabMissionUiProjection } from "../../../../engine/runtime-source-mission-frontier-lab-ui-projection.ts";
+import { buildFrontierLabMissionUiProjection } from "../../../../engine/workspace/source-mission/frontier-lab-ui-projection.ts";
 import type {
   MissionQueueSessionProjection,
   MissionSourceSliceProjection,
   MissionUiProjection,
-} from "../../../../engine/runtime-source-mission-ui-projection.ts";
+} from "../../../../engine/workspace/source-mission/ui-projection.ts";
 
 export type WorkspaceMaterialMode =
   | "paper"

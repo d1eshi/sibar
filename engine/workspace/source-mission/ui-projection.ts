@@ -4,9 +4,9 @@ import type {
   ThinkingArtifact,
   ThinkingArtifactKind,
   UserOperationKind,
-} from "./runtime-deep-ownership.ts";
-import { buildMissionSessionBridge } from "./runtime-source-mission-bridge.ts";
-import type { MissionSessionBridgeDiagnostic, MissionSessionBridgeOutput } from "./runtime-source-mission-bridge.ts";
+} from "../../runtime-deep-ownership.ts";
+import { buildMissionSessionBridge } from "./bridge.ts";
+import type { MissionSessionBridgeDiagnostic, MissionSessionBridgeOutput } from "./bridge.ts";
 import type {
   MissionPreview,
   ProposedSession,
@@ -22,7 +22,7 @@ import type {
   SourceSignalKind,
   SourceSignalUserRelevance,
   SourceSlice,
-} from "./runtime-source-mission-contracts.ts";
+} from "./contracts.ts";
 
 export const MISSION_UI_PROJECTION_SCHEMA_VERSION = "0.1.0";
 export const MISSION_EXECUTION_JOB_STATUSES = [

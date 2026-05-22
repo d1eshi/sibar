@@ -49,6 +49,9 @@ release yet.
 - Renamed the top-level TypeScript runtime tree from `src/` to `engine/` and
   updated runtime scripts, imports, Swift lookup, and eval metadata to use the
   new engine root.
+- Split the source-driven workspace mission modules under
+  `engine/workspace/source-mission/` and moved source-mission workspace traces
+  under `engine/workspace/traces/source-mission/`.
 - Expanded `engine/pedagogy-core/index.ts` to expose the mission
   attempt/evidence/readiness contracts and closed operation/artifact/evidence
   taxonomies without re-exporting the adapter-heavy deep ownership runtime
@@ -598,10 +601,10 @@ release yet.
 ### Added - Source Mission Runtime Contracts (MVP)
 
 - Added source-to-mission contract definitions in
-  `src/runtime-source-mission-contracts.ts`:
+  `engine/workspace/source-mission/contracts.ts`:
   `SourceIntentInput`, `SourceIntakeResult`, `SourceSignal`, `MissionPreview`,
   `ProposedTrack`, and `ProposedSession`.
-- Added pure validators in `src/runtime-source-mission-validate.ts` for the same
+- Added pure validators in `engine/workspace/source-mission/validate.ts` for the same
   contract chain: source intent/input kinds, intake status/diagnostics, signal
   integrity, and mission preview invariants (`first_sessions` cap, track/session
   references, and source-backed references).

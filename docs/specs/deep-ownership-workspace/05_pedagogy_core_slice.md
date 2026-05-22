@@ -17,7 +17,7 @@ Pedagogy-related source currently splits across these areas:
    runtime commands, store types, and `pedagogoai` exports.
 6. `src/pedagogoai/*` is a product/runtime facade: tracks, readiness, gap
    repair, recall, source-to-roadmap, and workspace-intent projection.
-7. `src/runtime-source-mission-*`, `src/article-workspace*`, and
+7. `engine/workspace/source-mission/*`, `engine/article-workspace*`, and
    `src/pedagogoai/workspace-intent*` are source/workspace planning adapters,
    not pedagogy core.
 
@@ -36,7 +36,7 @@ Pedagogy-related source currently splits across these areas:
    core loop pieces directly, creating a second public path around the same
    concepts.
 5. Source-to-workspace planning is duplicated between
-   `runtime-source-mission-contracts.ts` (`MissionPreview`) and
+   `engine/workspace/source-mission/contracts.ts` (`MissionPreview`) and
    `pedagogoai/workspace-intent*` (`WorkspacePlan`, `SessionPlan`,
    `EvidencePlan`). That duplication is runtime/product projection, not a
    reason to create another pedagogy taxonomy.
@@ -259,11 +259,11 @@ Do not schedule UI work before the bridge can produce an executable
 13. `src/runtime-pedagogy-loop/pipeline.ts`
 14. `src/runtime-attempt-evaluation.ts`
 15. `src/runtime-deep-ownership.ts`
-16. `src/runtime-source-mission-contracts.ts`
-17. `src/runtime-source-mission-validate.ts`
+16. `engine/workspace/source-mission/contracts.ts`
+17. `engine/workspace/source-mission/validate.ts`
 18. `src/runtime-workspace-session-contracts.ts`
-19. `src/article-workspace.ts`
-20. `src/article-workspace-server.ts`
+19. `engine/article-workspace.ts`
+20. `engine/article-workspace-server.ts`
 21. `src/pedagogoai/contracts.ts`
 22. `src/pedagogoai/source-to-roadmap-session.ts`
 23. `src/pedagogoai/tracks/deep-ownership.ts`

@@ -1,5 +1,5 @@
-import { buildMissionSessionBridge } from "./runtime-source-mission-bridge.ts";
-import type { MissionSessionBridgeOutput } from "./runtime-source-mission-bridge.ts";
+import { buildMissionSessionBridge } from "./bridge.ts";
+import type { MissionSessionBridgeOutput } from "./bridge.ts";
 import {
   SOURCE_MISSION_SCHEMA_VERSION,
   type MissionPreview,
@@ -7,7 +7,7 @@ import {
   type SourceIntakeResult,
   type SourceSignal,
   type SourceSlice,
-} from "./runtime-source-mission-contracts.ts";
+} from "./contracts.ts";
 
 export const FRONTIER_LAB_BLOG_URL =
   "https://vladfeinberg.com/2026/05/10/how-to-land-a-job-at-a-frontier-lab.html";

@@ -2,18 +2,18 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
 
-import { buildFrontierLabMissionUiProjection } from "../engine/runtime-source-mission-frontier-lab-ui-projection.ts";
+import { buildFrontierLabMissionUiProjection } from "../engine/workspace/source-mission/frontier-lab-ui-projection.ts";
 import {
   buildMissionUiProjection,
   MISSION_EXECUTION_JOB_STATUSES,
-} from "../engine/runtime-source-mission-ui-projection.ts";
+} from "../engine/workspace/source-mission/ui-projection.ts";
 import {
   frontierLabMissionPreview,
   frontierLabSourceIntake,
   frontierLabSourceIntent,
   frontierLabSourceSignals,
   frontierLabSourceSlices,
-} from "../engine/runtime-source-mission-frontier-lab-fixture.ts";
+} from "../engine/workspace/source-mission/frontier-lab-fixture.ts";
 
 function serializedProjectionText(value: unknown): string {
   return JSON.stringify(value).toLowerCase();
@@ -213,9 +213,9 @@ test("queue reasons fall back when prerequisite notes are empty or whitespace", 
 });
 
 test("generic Mission UI projection module does not import the frontier-lab fixture helper", () => {
-  const source = readFileSync(new URL("../engine/runtime-source-mission-ui-projection.ts", import.meta.url), "utf8");
+  const source = readFileSync(new URL("../engine/workspace/source-mission/ui-projection.ts", import.meta.url), "utf8");
 
-  assert.equal(source.includes("runtime-source-mission-frontier-lab-fixture"), false);
+  assert.equal(source.includes("frontier-lab-fixture"), false);
   assert.equal(source.includes("buildFrontierLabMissionUiProjection"), false);
 });
 

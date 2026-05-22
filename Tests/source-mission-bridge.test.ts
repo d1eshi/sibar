@@ -3,14 +3,14 @@ import test from "node:test";
 
 import { evaluateAttempt } from "../engine/runtime-attempt-evaluation.ts";
 import { attemptToReadiness } from "../engine/runtime-pedagogy-loop.ts";
-import { buildMissionSessionBridge } from "../engine/runtime-source-mission-bridge.ts";
+import { buildMissionSessionBridge } from "../engine/workspace/source-mission/bridge.ts";
 import type {
   MissionPreview,
   ProposedSession,
   SourceIntakeResult,
   SourceSignal,
   SourceSlice,
-} from "../engine/runtime-source-mission-contracts.ts";
+} from "../engine/workspace/source-mission/contracts.ts";
 import type { UserAttempt } from "../engine/runtime-deep-ownership.ts";
 
 const sourceIntake: SourceIntakeResult = {
