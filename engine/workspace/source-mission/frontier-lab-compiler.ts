@@ -5,20 +5,20 @@ import type {
   SourceIntakeResult,
   SourceSignal,
   SourceSlice,
-} from "./runtime-source-mission-contracts.ts";
+} from "./contracts.ts";
 import {
   SOURCE_MISSION_SCHEMA_VERSION,
-} from "./runtime-source-mission-contracts.ts";
+} from "./contracts.ts";
 import {
   FRONTIER_LAB_BLOG_URL,
   frontierLabMissionPreview,
   frontierLabSourceIntake,
   frontierLabSourceSignals,
   frontierLabSourceSlices,
-} from "./runtime-source-mission-frontier-lab-fixture.ts";
-import { buildMissionUiProjection } from "./runtime-source-mission-ui-projection.ts";
-import type { MissionUiProjection } from "./runtime-source-mission-ui-projection.ts";
-import type { validateSourceMissionMVPFlow } from "./runtime-source-mission-validate.ts";
+} from "./frontier-lab-fixture.ts";
+import { buildMissionUiProjection } from "./ui-projection.ts";
+import type { MissionUiProjection } from "./ui-projection.ts";
+import type { validateSourceMissionMVPFlow } from "./validate.ts";
 
 type ValidateSourceMissionMVPFlow = typeof validateSourceMissionMVPFlow;
 type SourceMissionMVPFlowPayload = Parameters<ValidateSourceMissionMVPFlow>[0];
@@ -109,7 +109,7 @@ function loadValidateSourceMissionMVPFlow(): ValidateSourceMissionMVPFlow | null
   if (!createRequire) return null;
 
   const require = createRequire(import.meta.url);
-  const validationModule = require("./runtime-source-mission-validate.ts") as {
+  const validationModule = require("./validate.ts") as {
     validateSourceMissionMVPFlow?: ValidateSourceMissionMVPFlow;
   };
 

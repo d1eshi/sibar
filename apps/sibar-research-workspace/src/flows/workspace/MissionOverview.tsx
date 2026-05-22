@@ -5,7 +5,7 @@ import type {
   WorkspaceSessionProjection,
   WorkspaceStudyNode,
 } from "../../state/workspaceProjection";
-import type { MissionQueueSessionProjection, MissionUiProjection } from "../../../../../engine/runtime-source-mission-ui-projection.ts";
+import type { MissionQueueSessionProjection, MissionUiProjection } from "../../../../../engine/workspace/source-mission/ui-projection.ts";
 
 interface MissionOverviewProps {
   mission: MissionUiProjection;

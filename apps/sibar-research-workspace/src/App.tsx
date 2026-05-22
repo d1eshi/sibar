@@ -16,7 +16,7 @@ import {
   projectWorkspaceSession,
 } from "./state/workspaceProjection";
 import { workspaceSessionReducer } from "./state/workspaceReducer";
-import type { MissionUiProjection } from "../../../engine/runtime-source-mission-ui-projection.ts";
+import type { MissionUiProjection } from "../../../engine/workspace/source-mission/ui-projection.ts";
 
 export default function App() {
   type AppFlowStep = "home" | "onboarding" | "overview" | "session";

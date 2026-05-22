@@ -4,20 +4,20 @@ import type {
   SourceIntakeExtractionStatus,
   SourceIntakeResult,
   SourceIntentInput,
-} from "./runtime-source-mission-contracts.ts";
+} from "../../source-mission/contracts.ts";
 import type {
   FrontierLabMissionCompileDiagnostic,
   FrontierLabMissionCompileResult,
-} from "./runtime-source-mission-frontier-lab-compiler.ts";
+} from "../../source-mission/frontier-lab-compiler.ts";
 import {
   buildSourceMissionTraceRecordFromCompileResult,
-} from "./runtime-source-mission-trace.ts";
+} from "./trace.ts";
 import type {
   SourceMissionTraceBuildResult,
   SourceMissionTraceDiagnostic,
   SourceMissionTraceRecord,
   SourceMissionTraceStatus,
-} from "./runtime-source-mission-trace.ts";
+} from "./trace.ts";
 
 export const WORKSPACE_TRACE_STORE_VERSION = "0.1.0";
 

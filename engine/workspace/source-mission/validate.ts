@@ -1,6 +1,6 @@
 import { URL } from "node:url";
 
-import { SOURCE_MISSION_SCHEMA_VERSION } from "./runtime-source-mission-contracts.ts";
+import { SOURCE_MISSION_SCHEMA_VERSION } from "./contracts.ts";
 import type {
   MissionPreview,
   ProposedSession,
@@ -20,7 +20,7 @@ import type {
   SourceSignalUserRelevance,
   ProposedTrackStatus,
   ProposedSessionStatus,
-} from "./runtime-source-mission-contracts.ts";
+} from "./contracts.ts";
 
 type RecordInput = Record<string, unknown>;
 

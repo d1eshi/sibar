@@ -1,26 +1,26 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import type { SourceIntentInput } from "../engine/runtime-source-mission-contracts.ts";
+import type { SourceIntentInput } from "../engine/workspace/source-mission/contracts.ts";
 import {
   SOURCE_MISSION_SCHEMA_VERSION,
-} from "../engine/runtime-source-mission-contracts.ts";
+} from "../engine/workspace/source-mission/contracts.ts";
 import {
   compileFrontierLabMissionFromIntent,
-} from "../engine/runtime-source-mission-frontier-lab-compiler.ts";
-import type { FrontierLabMissionCompileResult } from "../engine/runtime-source-mission-frontier-lab-compiler.ts";
+} from "../engine/workspace/source-mission/frontier-lab-compiler.ts";
+import type { FrontierLabMissionCompileResult } from "../engine/workspace/source-mission/frontier-lab-compiler.ts";
 import {
   FRONTIER_LAB_BLOG_URL,
   frontierLabSourceIntent,
-} from "../engine/runtime-source-mission-frontier-lab-fixture.ts";
+} from "../engine/workspace/source-mission/frontier-lab-fixture.ts";
 import {
   buildSourceMissionTraceRecordFromCompileResult,
-} from "../engine/runtime-source-mission-trace.ts";
+} from "../engine/workspace/traces/source-mission/trace.ts";
 import {
   appendSourceMissionCompileTrace,
   createWorkspaceTraceStore,
-} from "../engine/runtime-source-mission-trace-store.ts";
-import type { WorkspaceTraceStore } from "../engine/runtime-source-mission-trace-store.ts";
+} from "../engine/workspace/traces/source-mission/trace-store.ts";
+import type { WorkspaceTraceStore } from "../engine/workspace/traces/source-mission/trace-store.ts";
 
 function cloneData<T>(value: T): T {
   return JSON.parse(JSON.stringify(value)) as T;

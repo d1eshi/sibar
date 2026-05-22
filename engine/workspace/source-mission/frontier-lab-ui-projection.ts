@@ -1,7 +1,7 @@
-import { compileFrontierLabMissionFromIntent } from "./runtime-source-mission-frontier-lab-compiler.ts";
-import { frontierLabSourceIntent } from "./runtime-source-mission-frontier-lab-fixture.ts";
-import { buildMissionUiProjection } from "./runtime-source-mission-ui-projection.ts";
-import type { MissionUiProjection } from "./runtime-source-mission-ui-projection.ts";
+import { compileFrontierLabMissionFromIntent } from "./frontier-lab-compiler.ts";
+import { frontierLabSourceIntent } from "./frontier-lab-fixture.ts";
+import { buildMissionUiProjection } from "./ui-projection.ts";
+import type { MissionUiProjection } from "./ui-projection.ts";
 
 export function buildFrontierLabMissionUiProjection(activeSessionId?: string): MissionUiProjection {
   const compiled = compileFrontierLabMissionFromIntent(frontierLabSourceIntent);

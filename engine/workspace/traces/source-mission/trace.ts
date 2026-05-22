@@ -9,17 +9,17 @@ import type {
   SourceIntentInput,
   SourceSignal,
   SourceSlice,
-} from "./runtime-source-mission-contracts.ts";
-import { buildMissionUiProjection } from "./runtime-source-mission-ui-projection.ts";
+} from "../../source-mission/contracts.ts";
+import { buildMissionUiProjection } from "../../source-mission/ui-projection.ts";
 import type {
   FrontierLabMissionCompileDiagnostic,
   FrontierLabMissionCompileResult,
   FrontierLabMissionCompileSuccess,
-} from "./runtime-source-mission-frontier-lab-compiler.ts";
+} from "../../source-mission/frontier-lab-compiler.ts";
 import type {
   MissionExecutionJobStatus,
   MissionUiProjection,
-} from "./runtime-source-mission-ui-projection.ts";
+} from "../../source-mission/ui-projection.ts";
 
 export const SOURCE_MISSION_TRACE_SCHEMA_VERSION = "0.1.0";
 export const SOURCE_MISSION_TRACE_QUEUE_ID_LIMIT = 12;

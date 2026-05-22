@@ -6,7 +6,7 @@ import type {
   UserOperation,
   UserOperationKind,
   ConceptSlice,
-} from "./runtime-deep-ownership.ts";
+} from "../../runtime-deep-ownership.ts";
 import type {
   MissionPreview,
   PedagogyInput,
@@ -15,7 +15,7 @@ import type {
   SourceIntakeResult,
   SourceSignal,
   SourceSlice,
-} from "./runtime-source-mission-contracts.ts";
+} from "./contracts.ts";
 
 export type MissionSessionBridgeDiagnosticSeverity = "error" | "warning" | "info";
 

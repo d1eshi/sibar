@@ -4,7 +4,7 @@ import test from "node:test";
 import { evaluateAttempt } from "../engine/runtime-attempt-evaluation.ts";
 import type { UserAttempt } from "../engine/runtime-deep-ownership.ts";
 import { attemptToReadiness } from "../engine/runtime-pedagogy-loop.ts";
-import { buildMissionSessionBridge } from "../engine/runtime-source-mission-bridge.ts";
+import { buildMissionSessionBridge } from "../engine/workspace/source-mission/bridge.ts";
 import {
   buildFrontierLabMissionSessionBridge,
   frontierLabMissionPreview,
@@ -12,8 +12,8 @@ import {
   frontierLabSourceIntent,
   frontierLabSourceSignals,
   frontierLabSourceSlices,
-} from "../engine/runtime-source-mission-frontier-lab-fixture.ts";
-import { validateSourceMissionMVPFlow } from "../engine/runtime-source-mission-validate.ts";
+} from "../engine/workspace/source-mission/frontier-lab-fixture.ts";
+import { validateSourceMissionMVPFlow } from "../engine/workspace/source-mission/validate.ts";
 
 const requiredSignalLabels = [
   "JAX tutorials",
