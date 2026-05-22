@@ -152,78 +152,68 @@ function CapturePrScreen({ onAnalyze }: CapturePrScreenProps): React.ReactElemen
         <div className="routeCanvas">
           <div className="routeSlideDeck" aria-label="Automatic ownership route guide">
             <article className="routeSlide slideOne" aria-label="Step 1 Capture PR">
-              <span className="slideStep">1. Capture PR</span>
-              <h3>Start with the GitHub pull request.</h3>
-              <p>Paste the PR URL or a diff. Sibi keeps the capture focused on the change under review.</p>
+              <div className="slideTopline">
+                <span className="slideStep">Step 1</span>
+                <span className="slideProgressText">Capture PR</span>
+              </div>
+              <h3>Give Sibi one real change to inspect.</h3>
+              <p>Paste the PR URL or a unified diff. The first job is narrowing ownership to this review, not the whole repo.</p>
               <div className="slidePreview prMini" aria-hidden="true">
                 <span className="prAvatar" />
-                <strong>#18</strong>
-                <small>+142 -27 · 8 files</small>
+                <div>
+                  <strong>#18</strong>
+                  <small>Sibi ownership workbench</small>
+                </div>
+                <span className="miniToken">8 files</span>
               </div>
+              <div className="slideMeter" aria-hidden="true"><span /></div>
             </article>
             <article className="routeSlide slideTwo" aria-label="Step 2 Sibi reads the diff">
-              <span className="slideStep">2. Sibi reads the diff</span>
-              <h3>The changed lines become the working context.</h3>
-              <p>Sibi pulls out touched files, callers, tests, and relation hints before asking anything.</p>
+              <div className="slideTopline">
+                <span className="slideStep">Step 2</span>
+                <span className="slideProgressText">Read diff</span>
+              </div>
+              <h3>The diff becomes a bounded reading path.</h3>
+              <p>Sibi extracts touched files, caller hints, tests, and missing evidence before it asks you to claim ownership.</p>
               <div className="slidePreview diffMini" aria-hidden="true">
                 <span />
                 <span />
                 <span />
+                <small>Touched lines → evidence anchors</small>
               </div>
+              <div className="slideMeter" aria-hidden="true"><span /></div>
             </article>
             <article className="routeSlide slideThree" aria-label="Step 3 You prove the boundary">
-              <span className="slideStep">3. You prove the boundary</span>
-              <h3>Answer the smallest ownership question.</h3>
-              <p>You show which team owns the change, what evidence proves it, and where gaps remain.</p>
+              <div className="slideTopline">
+                <span className="slideStep">Step 3</span>
+                <span className="slideProgressText">Prove boundary</span>
+              </div>
+              <h3>You answer the smallest ownership question.</h3>
+              <p>The workbench asks for one explanation: what changed, why it is safe, and what evidence supports that claim.</p>
               <div className="slidePreview graphMini" aria-hidden="true">
                 <span className="node green" />
                 <span className="node green lower" />
                 <span className="node amber" />
                 <span className="node red" />
+                <strong>claim → evidence → gap</strong>
               </div>
+              <div className="slideMeter" aria-hidden="true"><span /></div>
             </article>
             <article className="routeSlide slideFour" aria-label="Step 4 Ownership artifact">
-              <span className="slideStep">4. Ownership artifact</span>
-              <h3>Leave with a reviewable artifact.</h3>
-              <p>The workbench turns your answers into owned, supported, and unresolved boundaries.</p>
-              <div className="slidePreview artifactMini" aria-hidden="true">
-                <span>Owns</span>
-                <span>Supports</span>
-                <span>Gap</span>
+              <div className="slideTopline">
+                <span className="slideStep">Step 4</span>
+                <span className="slideProgressText">Ownership artifact</span>
               </div>
+              <h3>Leave with a reviewable ownership artifact.</h3>
+              <p>Your answers become a compact route: what you own, what only supports the claim, and what remains unresolved.</p>
+              <div className="slidePreview artifactMini" aria-hidden="true">
+                <span><strong>Owns</strong><small>ready to carry forward</small></span>
+                <span><strong>Supports</strong><small>evidence, not ownership</small></span>
+                <span><strong>Gap</strong><small>return condition</small></span>
+              </div>
+              <div className="slideMeter" aria-hidden="true"><span /></div>
             </article>
           </div>
-
-          <ol className="routeTimeline" aria-label="Ownership route steps">
-            <li>
-              <span className="stepIndex">1</span>
-              <div>
-                <strong>GitHub PR</strong>
-                <p>Capture PR</p>
-              </div>
-            </li>
-            <li>
-              <span className="stepIndex">2</span>
-              <div>
-                <strong>Read diff</strong>
-                <p>Sibi reads the diff</p>
-              </div>
-            </li>
-            <li>
-              <span className="stepIndex">3</span>
-              <div>
-                <strong>Analyze ownership</strong>
-                <p>You prove the boundary</p>
-              </div>
-            </li>
-            <li>
-              <span className="stepIndex">4</span>
-              <div>
-                <strong>Ownership route</strong>
-                <p>Ownership artifact</p>
-              </div>
-            </li>
-          </ol>
         </div>
       </section>
     </main>
