@@ -4,6 +4,8 @@ import { CodeDiffPanel } from "./ownershipWorkbench/components/CodeDiffPanel";
 import { EvidenceDrawerPanel } from "./ownershipWorkbench/components/EvidenceDrawerPanel";
 import { FileTreePanel } from "./ownershipWorkbench/components/FileTreePanel";
 import { OwnershipHarnessPanel } from "./ownershipWorkbench/components/OwnershipHarnessPanel";
+import type { RepoInventoryStatus } from "./ownershipWorkbench/repoInventoryTypes.ts";
+import { loadRepoInventoryStatus } from "./ownershipWorkbench/repoInventoryClient.ts";
 import type {
   BoundaryState,
   LineSelection,
@@ -45,6 +47,7 @@ export default function App() {
   const [sessionState, setSessionState] = React.useState<OwnershipSessionState>(
     createOwnershipSessionState,
   );
+  const [inventoryStatus, setInventoryStatus] = React.useState<RepoInventoryStatus>({ kind: "loading" });
 
   const evidenceGroups = React.useMemo(() => groupedEvidence(fixtureEvidence), []);
   const sessionQuestions = React.useMemo(
@@ -76,6 +79,21 @@ export default function App() {
       setSelectedFile(currentQuestion.filePath);
     }
   }, [selectedFile, sessionQuestions, sessionState.currentIndex]);
+
+  React.useEffect(() => {
+    const controller = new AbortController();
+
+    void (async () => {
+      const nextStatus = await loadRepoInventoryStatus("src", { signal: controller.signal });
+      if (!controller.signal.aborted) {
+        setInventoryStatus(nextStatus);
+      }
+    })();
+
+    return () => {
+      controller.abort();
+    };
+  }, []);
 
   function submitAttempt() {
     advanceSession("submit");
@@ -121,6 +139,7 @@ export default function App() {
 
       <OwnershipHarnessPanel
         boundary={ownershipBoundary}
+        inventoryStatus={inventoryStatus}
         boundaryState={boundaryState}
         reviewQueue={ownershipReviewQueue}
         sessionQuestions={sessionQuestions}
