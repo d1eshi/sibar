@@ -57,6 +57,16 @@ import {
   type WorkspaceEscalationDecision,
 } from "./ownershipWorkbench/workspaceEscalation.ts";
 import {
+  buildCognitiveDebtMetric,
+  buildCognitiveLoadMetric,
+  buildDailyCognitiveReadout,
+} from "./ownershipWorkbench/cognitiveMetrics.ts";
+import type {
+  DailyCognitiveReadout,
+  CognitiveDebtMetric,
+  CognitiveLoadMetric,
+} from "./ownershipWorkbench/cognitiveMetrics.ts";
+import {
   appendGuidedObservation,
   appendHandoffArtifact,
   appendReadinessAttempt,
@@ -153,6 +163,16 @@ export default function App() {
       }),
     [selectedFile],
   );
+  const boundaryRelationEvidence = React.useMemo(
+    () =>
+      extractCodeEvidence({
+        selectedFile: selectedBoundary.filePath,
+        fileFixtures,
+        evidenceRefs: fixtureEvidence,
+        reviewQueue: ownershipReviewQueue,
+      }),
+    [selectedBoundary.filePath],
+  );
   const transferHistory = React.useMemo(
     () => transferHistoryByBoundary[selectedBoundary.id] ?? [],
     [selectedBoundary.id, transferHistoryByBoundary],
@@ -205,6 +225,36 @@ export default function App() {
         exportedAt: 1_700_000_000_000,
       }),
     [ownershipMemory, selectedBoundary.id],
+  );
+  const cognitiveDebtMetric = React.useMemo<CognitiveDebtMetric>(
+    () =>
+      buildCognitiveDebtMetric({
+        boundary: selectedBoundary,
+        memoryExport: ownershipMemoryExport,
+        reviewQueue: ownershipReviewQueue,
+        codeEvidence: [boundaryRelationEvidence],
+      }),
+    [ownershipMemoryExport, selectedBoundary, boundaryRelationEvidence],
+  );
+  const cognitiveLoadMetric = React.useMemo<CognitiveLoadMetric>(
+    () =>
+      buildCognitiveLoadMetric({
+        boundary: selectedBoundary,
+        memoryExport: ownershipMemoryExport,
+        reviewQueue: ownershipReviewQueue,
+        codeEvidence: [boundaryRelationEvidence],
+      }),
+    [ownershipMemoryExport, selectedBoundary, boundaryRelationEvidence],
+  );
+  const cognitiveDailyReadout = React.useMemo<DailyCognitiveReadout>(
+    () =>
+      buildDailyCognitiveReadout({
+        boundary: selectedBoundary,
+        memoryExport: ownershipMemoryExport,
+        reviewQueue: ownershipReviewQueue,
+        codeEvidence: [boundaryRelationEvidence],
+      }),
+    [ownershipMemoryExport, selectedBoundary, boundaryRelationEvidence],
   );
 
   const latestTransferAttempt = transferHistoryForCurrentProbe.at(-1) ?? null;
@@ -497,6 +547,9 @@ export default function App() {
         authorizedHandoffArtifact={authorizedHandoffArtifact}
         onAuthorizeHandoff={authorizeWorkspaceHandoff}
         ownershipMemoryExport={ownershipMemoryExport}
+        cognitiveDebtMetric={cognitiveDebtMetric}
+        cognitiveLoadMetric={cognitiveLoadMetric}
+        cognitiveDailyReadout={cognitiveDailyReadout}
       />
 
       <EvidenceDrawerPanel evidenceGroups={evidenceGroups} />

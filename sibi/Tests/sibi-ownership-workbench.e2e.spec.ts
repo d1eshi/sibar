@@ -130,6 +130,48 @@ test("relation evidence extraction is visible and updates with explicit gap reas
   await expect(extractionSection).not.toContainText("Relation gaps");
 });
 
+test("lab mode renders cognitive daily readout and updates from attempts", async ({ page }) => {
+  await page.goto("/?view=lab");
+
+  const readout = page.getByLabel("Cognitive daily readout");
+
+  await expect(readout).toBeVisible();
+  await expect(readout).toContainText("Ownership signals");
+  await expect(readout).toContainText("Cognitive debt metric");
+  await expect(readout).toContainText("Ready count: 0");
+  await expect(readout).toContainText("No transfer attempt recorded yet.");
+
+  await completeReviewSession(page);
+  await page
+    .getByLabel("Final boundary attempt")
+    .fill("I do not know why this contract is safe yet.");
+  await page.getByLabel("Self confidence").fill("95");
+  await page.getByRole("button", { name: "Submit attempt" }).click();
+
+  await expect(readout).toContainText("Outstanding gaps:");
+
+  await page.getByRole("button", { name: "Retry after repair" }).click();
+  await page
+    .getByLabel("Final boundary attempt")
+    .fill(
+      "The `createSession` branch returns null for 204, and callers must guard with `if (!session)` before any privileged work.",
+    );
+  await page.getByLabel("Self confidence").fill("60");
+  await page.getByRole("button", { name: "Submit attempt" }).click();
+
+  await expect(readout).toContainText("Ready count: 1");
+  await expect(readout).toContainText("Top 3 follow-up actions");
+
+  await page.getByLabel("Transfer answer").fill("I cannot map this invariant to the related boundary yet.");
+  await page.getByRole("button", { name: "Submit transfer answer" }).click();
+
+  await expect(readout).toContainText("fail");
+  await expect(readout).toContainText("Load hotspots");
+  await expect(readout).toContainText(
+    "Retry transfer using one invariant and one guard phrase from the related boundary.",
+  );
+});
+
 test("line/range selection updates selection summary when code lines expose selectors", async ({ page }) => {
   await page.goto("/");
 
