@@ -91,10 +91,181 @@ import {
   type GeminiEvidenceExtractionResult,
 } from "./ownershipWorkbench/geminiEvidenceExtractor.ts";
 
+interface CapturePrScreenProps {
+  onAnalyze: () => void;
+}
+
+function CapturePrScreen({ onAnalyze }: CapturePrScreenProps): React.ReactElement {
+  const [prUrl, setPrUrl] = React.useState("https://github.com/d1eshi/sibar/pull/18");
+
+  function submitCapture(event: React.FormEvent<HTMLFormElement>): void {
+    event.preventDefault();
+    onAnalyze();
+  }
+
+  return (
+    <main className="captureRoot">
+      <form className="capturePanel" aria-label="Capture PR" onSubmit={submitCapture}>
+        <div className="captureBrand">Sibi</div>
+        <section className="captureIntro">
+          <h1>Capture PR</h1>
+          <p>Capture a GitHub pull request and turn it into an ownership artifact.</p>
+        </section>
+
+        <label className="captureInput">
+          <span>Pull request URL</span>
+          <div className="captureInputControl">
+            <span className="githubGlyph" aria-hidden="true" />
+            <input
+              value={prUrl}
+              onChange={(event) => setPrUrl(event.target.value)}
+              placeholder="https://github.com/org/repo/pull/123"
+            />
+            <span className="captureCheck" aria-hidden="true">✓</span>
+          </div>
+        </label>
+
+        <div className="captureDivider">
+          <span />
+          <p>or</p>
+          <span />
+        </div>
+
+        <button className="pasteDiffDropzone" type="button" aria-label="Paste diff">
+          <span className="documentGlyph" aria-hidden="true">&lt;/&gt;</span>
+          <strong>Paste diff</strong>
+          <small>Paste a unified diff to analyze ownership</small>
+        </button>
+
+        <button className="capturePrimary" type="submit">
+          <span aria-hidden="true">✦</span>
+          Analyze ownership
+        </button>
+      </form>
+
+      <section className="routePreview" aria-label="Ownership route preview">
+        <header className="routePreviewHeader">
+          <h2>Ownership route</h2>
+          <span className="routeStatus ready">Ready</span>
+        </header>
+
+        <div className="routeCanvas">
+          <ol className="routeSteps">
+            <li className="routeStep">
+              <span className="stepIndex">1</span>
+              <strong>GitHub PR</strong>
+            </li>
+            <li className="routeStep">
+              <span className="stepIndex">2</span>
+              <strong>Read diff</strong>
+            </li>
+            <li className="routeStep">
+              <span className="stepIndex">3</span>
+              <strong>Analyze ownership</strong>
+            </li>
+            <li className="routeStep">
+              <span className="stepIndex">4</span>
+              <strong>Ownership route</strong>
+            </li>
+          </ol>
+
+          <div className="routeCards">
+            <article className="routeCard prCard" aria-label="GitHub PR card">
+              <div className="prAvatar" aria-hidden="true" />
+              <div className="prNumber"><span aria-hidden="true">⌘</span> #18</div>
+              <h3>Sibi ownership workbench slices</h3>
+              <div className="prAuthor">
+                <span className="authorAvatar" aria-hidden="true" />
+                <p><strong>d1eshi</strong><small>updated 2 hours ago</small></p>
+              </div>
+              <div className="prStats">
+                <span className="added">+142</span>
+                <span className="removed">-27</span>
+                <span className="filesGlyph" aria-hidden="true">⌑</span>
+                <span>8 files</span>
+              </div>
+            </article>
+
+            <span className="routeArrow" aria-hidden="true">→</span>
+
+            <article className="routeCard diffCard" aria-label="Read diff card">
+              <span className="fileGlyph" aria-hidden="true">&lt;/&gt;</span>
+              <div className="diffLines">
+                <span />
+                <span />
+                <span />
+              </div>
+            </article>
+
+            <span className="routeArrow" aria-hidden="true">→</span>
+
+            <article className="routeCard analysisCard" aria-label="Analyze ownership card">
+              <div className="analysisGraph">
+                <span className="node green" />
+                <span className="node green lower" />
+                <span className="node amber" />
+                <span className="node red" />
+                <span className="graphLine one" />
+                <span className="graphLine two" />
+              </div>
+              <div className="magnifier" aria-hidden="true" />
+            </article>
+
+            <span className="routeArrow" aria-hidden="true">→</span>
+
+            <article className="routeCard ownershipArtifact" aria-label="Ownership artifact preview">
+              <div className="artifactRow">
+                <span className="artifactDot owned" />
+                <p>Payment API Team</p>
+                <strong>Owns</strong>
+              </div>
+              <div className="artifactRow">
+                <span className="artifactDot support" />
+                <p>Platform Team</p>
+                <strong>Supports</strong>
+              </div>
+              <div className="artifactRow">
+                <span className="artifactDot gap" />
+                <p>Risk &amp; Compliance</p>
+                <strong>Gap</strong>
+              </div>
+              <div className="artifactRow">
+                <span className="artifactDot gapRed" />
+                <p>Data Governance</p>
+                <strong>Gap</strong>
+              </div>
+            </article>
+          </div>
+
+          <div className="routeProgress" aria-hidden="true">
+            <span className="solid" />
+            <span className="dot one" />
+            <span className="dot two" />
+            <span className="dot three" />
+            <span className="dot final" />
+          </div>
+
+          <div className="routeStateLabels">
+            <span className="routeStatus ready">Ready</span>
+            <span className="routeStatus ready">Ready</span>
+            <span className="routeStatus ready">Ready</span>
+            <span className="routeStatus gap">Gap</span>
+          </div>
+        </div>
+      </section>
+    </main>
+  );
+}
+
 export default function App() {
   const workbenchSurfaceMode = getWorkbenchSurfaceMode(
     typeof window === "undefined" ? "" : window.location.search,
   );
+  const [showWorkbench, setShowWorkbench] = React.useState(() => {
+    if (typeof window === "undefined") return true;
+    const params = new URLSearchParams(window.location.search);
+    return workbenchSurfaceMode === "lab" || params.get("workbench") === "1";
+  });
   const [selectedFile, setSelectedFile] = React.useState(initialFile);
   const [viewMode, setViewMode] = React.useState<ViewMode>("diff");
   const [selection, setSelection] = React.useState<LineSelection | null>(null);
@@ -571,6 +742,19 @@ export default function App() {
     setTransferAnswerText("");
     setReadinessStartedAt(Date.now());
     setFileStates((prev) => withBoundaryFileState(prev, selectedBoundary, "partial"));
+  }
+
+  if (!showWorkbench && workbenchSurfaceMode !== "lab") {
+    return (
+      <CapturePrScreen
+        onAnalyze={() => {
+          setShowWorkbench(true);
+          if (typeof window !== "undefined") {
+            window.history.pushState({}, "", "?workbench=1");
+          }
+        }}
+      />
+    );
   }
 
   return (
