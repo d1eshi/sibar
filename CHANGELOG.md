@@ -72,6 +72,10 @@ release yet.
   hiding `OwnershipLabPanel` from the default harness view.
 - Added deterministic workbench coverage that gates the detailed priority queue
   behind lab mode.
+### Docs - Attempt Readiness Prototype Pruning
+
+- Removed obsolete attempt-readiness prototype artifacts and generated visual
+  assets so future worktree creation does not need to carry stale binary deletes.
 
 ### Docs - Deep Ownership Workspace North Star
 
