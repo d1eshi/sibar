@@ -17,6 +17,9 @@ release yet.
   signal/slice refs, maps free-form session operations into the closed pedagogy
   operation taxonomy, builds stable source-slice excerpt evidence inventory
   entries, and emits the existing attempt/readiness loop inputs.
+- Added a reusable frontier-lab blog fixture that validates through
+  SourceSignal, SourceSlice, MissionPreview, and MissionSessionBridge with a
+  focused first-session queue.
 
 ### Changed - Pedagogy Core Facade
 
