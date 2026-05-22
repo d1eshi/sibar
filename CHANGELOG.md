@@ -35,6 +35,13 @@ release yet.
 
 ### Docs - Sibi Ownership Workbench Review Guide
 
+- Marked Slice 0 as PR-ready in the implementation spec, updated Sibi
+  verification commands to `pnpm -s sibi:test`, `pnpm -s sibi:build`, and
+  `pnpm -s sibi:e2e`, and documented that root `typecheck` is not a Slice 0
+  gate while it has pre-existing non-Sibi errors.
+- Added the Slice 1 handoff contract for `repo_inventory(sourceRoot) ->
+  deterministic JSON`, including skip rules, file metadata, tree projection,
+  and the invariant that the browser never reads the filesystem directly.
 - Defined the first-run review sequence in the ownership wedge and boundary
   docs, including touched status, priority, order reason, next step, and the
   prompt as a later stage.
