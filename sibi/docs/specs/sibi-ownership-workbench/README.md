@@ -41,6 +41,10 @@ ownership loop.
    contracts, confidence rules, and LLM/runtime boundary.
 4. `04_implementation_slices.md` defines build slices, verification gates, and
    the order to create the project.
+5. `05_agent_flow_manifest.md` defines action-level manifest contracts for
+   agents, control-surface safety, and Playwright replayable validation.
+6. `06_cognitive_debt_metrics.md` defines debt/load signal derivation, transfer
+   readout behavior, and daily learning readout outputs.
 
 ## Build Rule
 
@@ -50,23 +54,28 @@ Build slices in this order:
 static fixture workbench
   -> repo tree scanner
   -> code/diff viewer
-  -> evidence contract
-  -> attempt harness
-  -> LLM evidence extractor
-  -> persisted ownership memory
+  -> relation gap evidence contract
+  -> attempt/certification harness
+  -> ownership memory store
+  -> transfer + workspace escalation
+  -> cognitive debt/readout
+  -> agent-flow manifest
+  -> UI control surface
+  -> experiment/channel gates
+  -> LLM evidence extractor (post-gates)
 ```
 
-Do not start with a full AST, live GitHub connector, whole-repo chat, or broad
-learning workspace.
+Do not start with a full AST, live GitHub connector, whole-repo chat, broad
+learning workspace, or post-v0.1 experimental channels (voice/Jarvis).
 
 ## Current Relationship To Existing Docs
 
 This pack operationalizes:
 
-- `docs/ownership-boundaries.md`
-- `docs/ownership-wedge.md`
-- parent runtime references such as `../docs/specs/04_ownership_question_policy.md`
-  and `../docs/specs/05_gap_and_misconception_detection.md` only when a Sibi
+- `sibi/docs/ownership-boundaries.md`
+- `sibi/docs/ownership-wedge.md`
+- parent runtime references such as `docs/specs/04_ownership_question_policy.md`
+  and `docs/specs/05_gap_and_misconception_detection.md` only when a Sibi
   implementation needs the shared pedagogy contracts.
 
 When these specs conflict, prefer this workbench pack for Sibi web product/UI
