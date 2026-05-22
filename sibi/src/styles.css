@@ -1312,10 +1312,20 @@ button.secondary {
   padding: 30px clamp(36px, 5vw, 72px) 34px;
   display: flex;
   flex-direction: column;
+  align-items: flex-start;
   border: 1px solid #d6dde3;
   border-radius: 0 12px 12px 0;
   background: rgba(255, 255, 255, 0.92);
   box-shadow: 18px 0 44px rgba(30, 50, 58, 0.05);
+}
+
+.captureBrand,
+.captureIntro,
+.captureInput,
+.captureDivider,
+.pasteDiffDropzone,
+.capturePrimary {
+  width: min(100%, 632px);
 }
 
 .captureBrand {
@@ -1909,6 +1919,7 @@ button.secondary {
 
   .capturePanel {
     padding-bottom: 32px;
+    align-items: stretch;
   }
 
   .routePreview {
