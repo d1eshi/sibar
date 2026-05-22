@@ -122,7 +122,7 @@ function createArtifactSession(testCase: EvalCase, root: string): string {
 }
 
 function firstRequiredPath(testCase: EvalCase): string {
-  return testCase.required_evidence[0]?.path ?? testCase.artifact_boundary.included_paths[0] ?? "src/runtime.ts";
+  return testCase.required_evidence[0]?.path ?? testCase.artifact_boundary.included_paths[0] ?? "engine/runtime.ts";
 }
 
 function firstForbiddenPath(testCase: EvalCase): string {

@@ -1,7 +1,7 @@
 import test, { describe } from "node:test";
 import assert from "node:assert/strict";
 
-import { generateDeterministicArtifacts } from "../../src/runtime-artifact-generation.ts";
+import { generateDeterministicArtifacts } from "../../engine/runtime-artifact-generation.ts";
 import { loadFixture } from "./helpers.ts";
 
 describe("Evidence Identity Stability Through Generation", () => {

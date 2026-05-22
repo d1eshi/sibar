@@ -24,22 +24,22 @@ export const PEDAGOGOAI_LAYER_NAME = "PedagogoAI";
 export const PEDAGOGOAI_BOUNDARIES: PedagogoAIModuleBoundary[] = [
   {
     capability: "workspace-contracts",
-    entrypoint: "src/pedagogoai/contracts.ts",
+    entrypoint: "engine/pedagogoai/contracts.ts",
     owns: [
       "learning workspace session contracts",
       "runtime question/session summary contracts",
       "attempt submission and scoped readiness contract shapes",
     ],
     adapters: [
-      "src/pedagogy/index.ts",
-      "src/runtime-support.ts",
-      "src/runtime-workspace-session-contracts.ts",
+      "engine/pedagogy/index.ts",
+      "engine/runtime-support.ts",
+      "engine/runtime-workspace-session-contracts.ts",
     ],
     track: "core-workspace",
   },
   {
     capability: "workspace-intent",
-    entrypoint: "src/pedagogoai/workspace-intent.ts",
+    entrypoint: "engine/pedagogoai/workspace-intent.ts",
     owns: [
       "WorkspaceIntent user input contract",
       "SourceIntake source/playbook contract",
@@ -53,19 +53,19 @@ export const PEDAGOGOAI_BOUNDARIES: PedagogoAIModuleBoundary[] = [
   },
   {
     capability: "pedagogical-policies",
-    entrypoint: "src/pedagogoai/policies.ts",
+    entrypoint: "engine/pedagogoai/policies.ts",
     owns: [
       "pedagogical layers",
       "signal rubrics",
       "question depth and answer-style policies",
       "deterministic observation to verification pipeline",
     ],
-    adapters: ["src/pedagogy/index.ts"],
+    adapters: ["engine/pedagogy/index.ts"],
     track: "core-workspace",
   },
   {
     capability: "evidence-artifacts",
-    entrypoint: "src/pedagogoai/evidence-artifacts.ts",
+    entrypoint: "engine/pedagogoai/evidence-artifacts.ts",
     owns: [
       "evidence identity",
       "thinking artifact contracts",
@@ -73,15 +73,15 @@ export const PEDAGOGOAI_BOUNDARIES: PedagogoAIModuleBoundary[] = [
       "workspace evidence previews",
     ],
     adapters: [
-      "src/runtime-deep-ownership.ts",
-      "src/runtime-artifact-generation.ts",
-      "src/runtime-workspace-session-contracts.ts",
+      "engine/runtime-deep-ownership.ts",
+      "engine/runtime-artifact-generation.ts",
+      "engine/runtime-workspace-session-contracts.ts",
     ],
     track: "core-workspace",
   },
   {
     capability: "readiness-mastery",
-    entrypoint: "src/pedagogoai/readiness-mastery.ts",
+    entrypoint: "engine/pedagogoai/readiness-mastery.ts",
     owns: [
       "scoped readiness claims",
       "mastery and ownership memory projections",
@@ -89,15 +89,15 @@ export const PEDAGOGOAI_BOUNDARIES: PedagogoAIModuleBoundary[] = [
       "readiness reports",
     ],
     adapters: [
-      "src/runtime-readiness.ts",
-      "src/runtime-pedagogy-loop.ts",
-      "src/runtime-deep-ownership.ts",
+      "engine/runtime-readiness.ts",
+      "engine/runtime-pedagogy-loop.ts",
+      "engine/runtime-deep-ownership.ts",
     ],
     track: "core-workspace",
   },
   {
     capability: "gap-repair",
-    entrypoint: "src/pedagogoai/gap-repair.ts",
+    entrypoint: "engine/pedagogoai/gap-repair.ts",
     owns: [
       "learning gap detection",
       "ownership gap taxonomy",
@@ -106,15 +106,15 @@ export const PEDAGOGOAI_BOUNDARIES: PedagogoAIModuleBoundary[] = [
       "reevaluation prompts",
     ],
     adapters: [
-      "src/runtime-gap-detection.ts",
-      "src/runtime-attempt-evaluation.ts",
-      "src/runtime-pedagogy-loop.ts",
+      "engine/runtime-gap-detection.ts",
+      "engine/runtime-attempt-evaluation.ts",
+      "engine/runtime-pedagogy-loop.ts",
     ],
     track: "core-workspace",
   },
   {
     capability: "recall-review",
-    entrypoint: "src/pedagogoai/recall-review.ts",
+    entrypoint: "engine/pedagogoai/recall-review.ts",
     owns: [
       "understanding memory",
       "practice challenges",
@@ -122,15 +122,15 @@ export const PEDAGOGOAI_BOUNDARIES: PedagogoAIModuleBoundary[] = [
       "misconception memory",
     ],
     adapters: [
-      "src/runtime-memory.ts",
-      "src/runtime-practice.ts",
-      "src/runtime-pedagogy-loop.ts",
+      "engine/runtime-memory.ts",
+      "engine/runtime-practice.ts",
+      "engine/runtime-pedagogy-loop.ts",
     ],
     track: "core-workspace",
   },
   {
     capability: "source-to-roadmap-session",
-    entrypoint: "src/pedagogoai/source-to-roadmap-session.ts",
+    entrypoint: "engine/pedagogoai/source-to-roadmap-session.ts",
     owns: [
       "source intake",
       "concept graph compilation",
@@ -138,24 +138,24 @@ export const PEDAGOGOAI_BOUNDARIES: PedagogoAIModuleBoundary[] = [
       "live workspace session compilation",
     ],
     adapters: [
-      "src/runtime-concept-graph.ts",
-      "src/runtime-autopsy.ts",
-      "src/runtime-workspace-session.ts",
-      "src/runtime-workspace-session-logic.ts",
+      "engine/runtime-concept-graph.ts",
+      "engine/runtime-autopsy.ts",
+      "engine/runtime-workspace-session.ts",
+      "engine/runtime-workspace-session-logic.ts",
     ],
     track: "core-workspace",
   },
   {
     capability: "track-specialization",
-    entrypoint: "src/pedagogoai/tracks/index.ts",
+    entrypoint: "engine/pedagogoai/tracks/index.ts",
     owns: [
       "Deep Ownership track boundaries",
       "Explain A-Z track boundaries",
       "track-specific runtime bridges",
     ],
     adapters: [
-      "src/pedagogoai/tracks/deep-ownership.ts",
-      "src/pedagogoai/tracks/explain-a-z.ts",
+      "engine/pedagogoai/tracks/deep-ownership.ts",
+      "engine/pedagogoai/tracks/explain-a-z.ts",
     ],
     track: "core-workspace",
   },
@@ -169,17 +169,17 @@ export const PEDAGOGOAI_TRACKS: Record<PedagogoAITrack, {
   "core-workspace": {
     label: "Learning/Research Workspace Core",
     role: "Owns generic learning contracts, pedagogy policy, evidence, memory, readiness, repair, and source-to-session compilation.",
-    entrypoint: "src/pedagogoai/index.ts",
+    entrypoint: "engine/pedagogoai/index.ts",
   },
   "deep-ownership": {
     label: "Deep Ownership",
     role: "Specializes the core for evidence-backed construction, bounded mutation, validation, and scoped ownership claims.",
-    entrypoint: "src/pedagogoai/tracks/deep-ownership.ts",
+    entrypoint: "engine/pedagogoai/tracks/deep-ownership.ts",
   },
   "explain-a-z": {
     label: "Explain A-Z",
     role: "Specializes the core for whole-project explanation sessions; it is a track, not the center of PedagogoAI.",
-    entrypoint: "src/pedagogoai/tracks/explain-a-z.ts",
+    entrypoint: "engine/pedagogoai/tracks/explain-a-z.ts",
   },
 };
 

@@ -11,7 +11,7 @@ import {
   PedagogoAITracks,
   PedagogoAIWorkspaceIntent,
   boundariesForCapability,
-} from "../src/pedagogoai/index.ts";
+} from "../engine/pedagogoai/index.ts";
 
 test("PedagogoAI exposes a declarative architecture map for core learning capabilities", () => {
   assert.equal(PEDAGOGOAI_LAYER_NAME, "PedagogoAI");
@@ -33,7 +33,7 @@ test("PedagogoAI exposes a declarative architecture map for core learning capabi
   );
 
   assert.equal(PEDAGOGOAI_TRACKS["explain-a-z"].role.includes("track"), true);
-  assert.equal(PEDAGOGOAI_TRACKS["core-workspace"].entrypoint, "src/pedagogoai/index.ts");
+  assert.equal(PEDAGOGOAI_TRACKS["core-workspace"].entrypoint, "engine/pedagogoai/index.ts");
 });
 
 test("PedagogoAI facade reexports existing runtime pieces through stable subdomains", () => {
@@ -50,6 +50,6 @@ test("PedagogoAI facade reexports existing runtime pieces through stable subdoma
 
   const workspaceIntent = boundariesForCapability("workspace-intent");
   assert.equal(workspaceIntent.length, 1);
-  assert.equal(workspaceIntent[0].entrypoint, "src/pedagogoai/workspace-intent.ts");
+  assert.equal(workspaceIntent[0].entrypoint, "engine/pedagogoai/workspace-intent.ts");
   assert.ok(workspaceIntent[0].adapters.includes("apps/sibar-research-workspace/scripts/workspace-intent-adapter.js"));
 });

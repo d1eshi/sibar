@@ -168,7 +168,7 @@ final class RuntimeClientTests: XCTestCase {
         defer { unsetenv("SIBI_RUNTIME_HOME") }
 
         let runtimePath = URL(fileURLWithPath: fileManager.currentDirectoryPath)
-            .appendingPathComponent("src/runtime.ts")
+            .appendingPathComponent("engine/runtime.ts")
             .path
         let client = RuntimeClient(runtimePath: runtimePath)
 
@@ -233,15 +233,15 @@ final class RuntimeClientTests: XCTestCase {
             environment: ["SIBI_REPO_ROOT": "/tmp/sibi"],
             currentDirectory: "/",
             executablePath: nil,
-            fileExists: { $0 == "/tmp/sibi/src/runtime.ts" }
+            fileExists: { $0 == "/tmp/sibi/engine/runtime.ts" }
         )
 
-        XCTAssertEqual(path, "/tmp/sibi/src/runtime.ts")
+        XCTAssertEqual(path, "/tmp/sibi/engine/runtime.ts")
     }
 
     func testRuntimePathResolvesFromExecutableAncestor() {
         let repoRoot = "/tmp/sibi"
-        let runtime = repoRoot + "/src/runtime.ts"
+        let runtime = repoRoot + "/engine/runtime.ts"
         let executable = repoRoot + "/.build/debug/SibiCoreTests"
 
         let path = RuntimeClient.resolveRuntimePath(
@@ -253,6 +253,14 @@ final class RuntimeClientTests: XCTestCase {
         )
 
         XCTAssertEqual(path, runtime)
+    }
+
+    func testRepoRootResolvesFromEngineRuntimePath() {
+        XCTAssertEqual(
+            RuntimeClient.resolveRepoRoot(runtimePath: "/tmp/sibi/engine/runtime.ts"),
+            "/tmp/sibi"
+        )
+        XCTAssertNil(RuntimeClient.resolveRepoRoot(runtimePath: "/tmp/sibi/src/runtime.ts"))
     }
 
     func testSendsStartWorkspaceSessionCommand() throws {

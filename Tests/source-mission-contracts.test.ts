@@ -7,7 +7,7 @@ import {
   validateSourceIntentInput,
   validateSourceMissionMVPFlow,
   validateSourceSignals,
-} from "../src/runtime-source-mission-validate.ts";
+} from "../engine/runtime-source-mission-validate.ts";
 
 function makeValidFrontierLabPayload() {
   const sourceIntent = {

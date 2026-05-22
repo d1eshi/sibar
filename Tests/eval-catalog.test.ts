@@ -3,7 +3,7 @@ import { spawnSync } from "node:child_process";
 import { resolve } from "node:path";
 import test from "node:test";
 
-import { validateEvalCatalog } from "../src/evals/catalog.ts";
+import { validateEvalCatalog } from "../engine/evals/catalog.ts";
 
 test("eval catalog declares discoverable suites with valid commands and paths", () => {
   const validation = validateEvalCatalog();
@@ -36,7 +36,7 @@ test("eval catalog declares discoverable suites with valid commands and paths", 
 test("eval:catalog prints the repo eval suites", () => {
   const result = spawnSync(
     process.execPath,
-    ["--experimental-strip-types", resolve("src/evals/catalog.ts")],
+    ["--experimental-strip-types", resolve("engine/evals/catalog.ts")],
     { encoding: "utf8" },
   );
 

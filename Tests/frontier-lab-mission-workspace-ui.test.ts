@@ -11,8 +11,8 @@ import {
 } from "../apps/sibar-research-workspace/src/state/workspaceProjection.ts";
 import {
   compileFrontierLabMissionFromUrl,
-} from "../src/runtime-source-mission-frontier-lab-compiler.ts";
-import { FRONTIER_LAB_BLOG_URL } from "../src/runtime-source-mission-frontier-lab-fixture.ts";
+} from "../engine/runtime-source-mission-frontier-lab-compiler.ts";
+import { FRONTIER_LAB_BLOG_URL } from "../engine/runtime-source-mission-frontier-lab-fixture.ts";
 
 const root = process.cwd();
 const appSource = readFileSync(join(root, "apps/sibar-research-workspace/src/App.tsx"), "utf8");

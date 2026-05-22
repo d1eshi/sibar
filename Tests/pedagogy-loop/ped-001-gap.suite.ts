@@ -1,8 +1,8 @@
 import test, { describe } from "node:test";
 import assert from "node:assert/strict";
 
-import { createOwnershipGap } from "../../src/runtime-pedagogy-loop.ts";
-import { evaluateAttempt } from "../../src/runtime-attempt-evaluation.ts";
+import { createOwnershipGap } from "../../engine/runtime-pedagogy-loop.ts";
+import { evaluateAttempt } from "../../engine/runtime-attempt-evaluation.ts";
 import {
   evaluateOverconfidentAttempt,
   evaluateShallowAttempt,

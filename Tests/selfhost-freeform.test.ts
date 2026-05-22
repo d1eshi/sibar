@@ -5,14 +5,14 @@ import { spawnSync } from "node:child_process";
 import test from "node:test";
 import assert from "node:assert/strict";
 
-import { evaluateFreeformOwnershipAnswer, runSelfhostFreeformEval, isRepeatedAnswer, simulateReevaluation } from "../src/evals/selfhost-freeform.ts";
+import { evaluateFreeformOwnershipAnswer, runSelfhostFreeformEval, isRepeatedAnswer, simulateReevaluation } from "../engine/evals/selfhost-freeform.ts";
 import type {
   FreeformEvaluationFinding,
   IssueCandidate,
   RepairTaskInfo,
   ReevaluationInfo,
   SelfhostFreeformReport,
-} from "../src/evals/selfhost-freeform.ts";
+} from "../engine/evals/selfhost-freeform.ts";
 
 function masteryCheckFixture(overrides: Partial<{
   id: string;
@@ -312,7 +312,7 @@ test("eval:selfhost-freeform CLI processes 40 cases and writes report", () => {
   try {
     const result = spawnSync(process.execPath, [
       "--experimental-strip-types",
-      resolve("src/evals/selfhost-freeform.ts"),
+      resolve("engine/evals/selfhost-freeform.ts"),
       "--report",
       reportPath,
     ], { encoding: "utf8" });
@@ -345,7 +345,7 @@ test("eval:selfhost-freeform CLI fails closed on incomplete runs (VAL-EVAL-008)"
   try {
     const result = spawnSync(process.execPath, [
       "--experimental-strip-types",
-      resolve("src/evals/selfhost-freeform.ts"),
+      resolve("engine/evals/selfhost-freeform.ts"),
       "--index",
       indexPath,
     ], { encoding: "utf8" });
@@ -474,7 +474,7 @@ test("eval:selfhost-freeform CLI exits nonzero for observed-vs-expected mismatch
   try {
     const result = spawnSync(process.execPath, [
       "--experimental-strip-types",
-      resolve("src/evals/selfhost-freeform.ts"),
+      resolve("engine/evals/selfhost-freeform.ts"),
       "--index",
       indexPath,
       "--report",

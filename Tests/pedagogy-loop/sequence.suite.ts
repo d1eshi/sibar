@@ -6,8 +6,8 @@ import {
   buildDeepOwnershipMemory,
   evaluateFullLoop,
   validateEvidenceIdentity,
-} from "../../src/runtime-pedagogy-loop.ts";
-import { createAttempt, evaluateAttempt } from "../../src/runtime-attempt-evaluation.ts";
+} from "../../engine/runtime-pedagogy-loop.ts";
+import { createAttempt, evaluateAttempt } from "../../engine/runtime-attempt-evaluation.ts";
 import {
   makeConceptSlice,
   makeEvidenceInventory,

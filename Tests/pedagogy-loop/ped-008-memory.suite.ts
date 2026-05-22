@@ -4,12 +4,12 @@ import assert from "node:assert/strict";
 import {
   buildDeepOwnershipMemory,
   evaluateFullLoop,
-} from "../../src/runtime-pedagogy-loop.ts";
-import { createAttempt, evaluateAttempt } from "../../src/runtime-attempt-evaluation.ts";
+} from "../../engine/runtime-pedagogy-loop.ts";
+import { createAttempt, evaluateAttempt } from "../../engine/runtime-attempt-evaluation.ts";
 import type {
   MemoryAnswerEntry,
-} from "../../src/runtime-pedagogy-loop.ts";
-import type { OwnershipGap, UserOperationKind } from "../../src/runtime-deep-ownership.ts";
+} from "../../engine/runtime-pedagogy-loop.ts";
+import type { OwnershipGap, UserOperationKind } from "../../engine/runtime-deep-ownership.ts";
 import {
   makeConceptSlice,
   makeEvidenceRef,

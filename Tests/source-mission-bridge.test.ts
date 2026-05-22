@@ -1,17 +1,17 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { evaluateAttempt } from "../src/runtime-attempt-evaluation.ts";
-import { attemptToReadiness } from "../src/runtime-pedagogy-loop.ts";
-import { buildMissionSessionBridge } from "../src/runtime-source-mission-bridge.ts";
+import { evaluateAttempt } from "../engine/runtime-attempt-evaluation.ts";
+import { attemptToReadiness } from "../engine/runtime-pedagogy-loop.ts";
+import { buildMissionSessionBridge } from "../engine/runtime-source-mission-bridge.ts";
 import type {
   MissionPreview,
   ProposedSession,
   SourceIntakeResult,
   SourceSignal,
   SourceSlice,
-} from "../src/runtime-source-mission-contracts.ts";
-import type { UserAttempt } from "../src/runtime-deep-ownership.ts";
+} from "../engine/runtime-source-mission-contracts.ts";
+import type { UserAttempt } from "../engine/runtime-deep-ownership.ts";
 
 const sourceIntake: SourceIntakeResult = {
   schema: "SourceIntakeResult",

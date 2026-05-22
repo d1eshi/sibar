@@ -5,8 +5,8 @@ import {
   attemptToReadiness,
   evaluateFullLoop,
   validateEvidenceIdentity,
-} from "../../src/runtime-pedagogy-loop.ts";
-import { evaluateAttempt } from "../../src/runtime-attempt-evaluation.ts";
+} from "../../engine/runtime-pedagogy-loop.ts";
+import { evaluateAttempt } from "../../engine/runtime-attempt-evaluation.ts";
 import { makeArtifact, makeConceptSlice, makeEvidenceInventory, makeEvidenceRef, makeOperation, makeShallowAttempt } from "./fixtures.ts";
 
 describe("VAL-CROSS-009: Evidence identity is stable across the loop", () => {

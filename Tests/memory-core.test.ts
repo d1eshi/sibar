@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import * as memoryCore from "../src/memory-core/index.ts";
+import * as memoryCore from "../engine/memory-core/index.ts";
 
 const SUBJECT_ID = "subject-1";
 const SECOND_SUBJECT_ID = "subject-2";

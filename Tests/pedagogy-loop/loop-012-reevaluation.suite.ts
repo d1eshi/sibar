@@ -4,9 +4,9 @@ import assert from "node:assert/strict";
 import {
   createOwnershipGap,
   generateReevaluation,
-} from "../../src/runtime-pedagogy-loop.ts";
-import { evaluateAttempt } from "../../src/runtime-attempt-evaluation.ts";
-import { RECOGNIZED_OPERATION_KINDS } from "../../src/runtime-deep-ownership.ts";
+} from "../../engine/runtime-pedagogy-loop.ts";
+import { evaluateAttempt } from "../../engine/runtime-attempt-evaluation.ts";
+import { RECOGNIZED_OPERATION_KINDS } from "../../engine/runtime-deep-ownership.ts";
 import {
   evaluateShallowAttempt,
   makeConceptSlice,

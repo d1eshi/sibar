@@ -4,9 +4,9 @@ import { mkdirSync, mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
-import { handleRequest } from "../src/runtime.ts";
-import type { AutopsyStep, ConceptGraph, LearningGap, PracticeChallenge } from "../src/runtime-support.ts";
-import type { ReadinessReport } from "../src/runtime-readiness.ts";
+import { handleRequest } from "../engine/runtime.ts";
+import type { AutopsyStep, ConceptGraph, LearningGap, PracticeChallenge } from "../engine/runtime-support.ts";
+import type { ReadinessReport } from "../engine/runtime-readiness.ts";
 
 type Success<T> = { ok: true; data: T };
 

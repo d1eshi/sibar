@@ -6,7 +6,7 @@ import { join } from "node:path";
 import {
   PedagogoAIContracts,
   PedagogoAIWorkspaceIntent,
-} from "../src/pedagogoai/index.ts";
+} from "../engine/pedagogoai/index.ts";
 
 const root = process.cwd();
 

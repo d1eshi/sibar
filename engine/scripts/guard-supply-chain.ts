@@ -61,7 +61,7 @@ const SCAN_FILES = [
 const SCAN_DIRS = [
   "prototypes/attempt-readiness",
   "docs/demo",
-  "src/scripts",
+  "engine/scripts",
 ];
 
 // Patterns that must NOT appear in mission-owned files.
@@ -271,7 +271,7 @@ function checkDemoFiles(): Violation[] {
  */
 function checkScriptFiles(): Violation[] {
   const violations: Violation[] = [];
-  const scriptsDir = resolve(REPO_ROOT, "src/scripts");
+  const scriptsDir = resolve(REPO_ROOT, "engine/scripts");
   if (!fileExists(scriptsDir)) return violations;
 
   for (const file of walkDir(scriptsDir, ".ts")) {

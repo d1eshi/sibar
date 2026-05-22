@@ -96,7 +96,7 @@ public final class RuntimeClient: Sendable {
     static func resolveRepoRoot(runtimePath: String) -> String? {
         let runtimeURL = URL(fileURLWithPath: runtimePath).standardizedFileURL
         guard runtimeURL.lastPathComponent == "runtime.ts",
-              runtimeURL.deletingLastPathComponent().lastPathComponent == "src" else {
+              runtimeURL.deletingLastPathComponent().lastPathComponent == "engine" else {
             return nil
         }
         return runtimeURL.deletingLastPathComponent().deletingLastPathComponent().path
@@ -127,13 +127,13 @@ public final class RuntimeClient: Sendable {
 
         var directCandidates: [String] = []
         if let repoRoot = nonEmpty(environment["SIBI_REPO_ROOT"]) {
-            directCandidates.append(URL(fileURLWithPath: repoRoot).appendingPathComponent("src/runtime.ts").path)
+            directCandidates.append(URL(fileURLWithPath: repoRoot).appendingPathComponent("engine/runtime.ts").path)
         }
         if let bundleResourcePath = nonEmpty(bundleResourcePath) {
-            directCandidates.append(URL(fileURLWithPath: bundleResourcePath).appendingPathComponent("src/runtime.ts").path)
+            directCandidates.append(URL(fileURLWithPath: bundleResourcePath).appendingPathComponent("engine/runtime.ts").path)
             directCandidates.append(URL(fileURLWithPath: bundleResourcePath).appendingPathComponent("runtime.ts").path)
         }
-        directCandidates.append(URL(fileURLWithPath: currentDirectory).appendingPathComponent("src/runtime.ts").path)
+        directCandidates.append(URL(fileURLWithPath: currentDirectory).appendingPathComponent("engine/runtime.ts").path)
 
         for candidate in directCandidates where fileExists(candidate) {
             return candidate
@@ -147,14 +147,14 @@ public final class RuntimeClient: Sendable {
 
         for root in roots {
             for ancestor in ancestors(startingAt: root) {
-                let candidate = URL(fileURLWithPath: ancestor).appendingPathComponent("src/runtime.ts").path
+                let candidate = URL(fileURLWithPath: ancestor).appendingPathComponent("engine/runtime.ts").path
                 if fileExists(candidate) {
                     return candidate
                 }
             }
         }
 
-        return URL(fileURLWithPath: currentDirectory).appendingPathComponent("src/runtime.ts").path
+        return URL(fileURLWithPath: currentDirectory).appendingPathComponent("engine/runtime.ts").path
     }
 
     private static func nonEmpty(_ value: String?) -> String? {

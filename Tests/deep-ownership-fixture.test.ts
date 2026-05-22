@@ -24,7 +24,7 @@ import {
   RECOGNIZED_EVIDENCE_ROLES,
   RECOGNIZED_OPERATION_KINDS,
   RECOGNIZED_ARTIFACT_KINDS,
-} from "../src/runtime-deep-ownership.ts";
+} from "../engine/runtime-deep-ownership.ts";
 
 // ── Helpers ───────────────────────────────────────────────────────────
 

@@ -40,10 +40,16 @@ release yet.
   mission projection, focused queue status, source/evidence counts, diagnostics,
   and reproducibility hashes without exposing raw source maps in primary trace
   output.
+- Added a pure append-only workspace trace store for source-mission compile
+  attempts, preserving completed, blocked, and failed source-intent attempts with
+  bounded intake summaries, compiler decisions, and mission snapshots.
 
 ### Changed - Pedagogy Core Facade
 
-- Expanded `src/pedagogy-core/index.ts` to expose the mission
+- Renamed the top-level TypeScript runtime tree from `src/` to `engine/` and
+  updated runtime scripts, imports, Swift lookup, and eval metadata to use the
+  new engine root.
+- Expanded `engine/pedagogy-core/index.ts` to expose the mission
   attempt/evidence/readiness contracts and closed operation/artifact/evidence
   taxonomies without re-exporting the adapter-heavy deep ownership runtime
   entrypoint.

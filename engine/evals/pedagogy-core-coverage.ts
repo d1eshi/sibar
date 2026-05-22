@@ -176,7 +176,7 @@ export function runPedagogyCoreCoverageEval(
   const adaptation = adaptQuestion(
     Layer.L3_CONTEXTUAL_CONNECTION,
     "important",
-    "src/pedagogy/pipeline.ts",
+    "engine/pedagogy/pipeline.ts",
     ["User traced a flow but could not reason about failure impact."],
   );
   const depthsByLayer = Object.fromEntries(allLayers.map((layer) => [`L${layer}`, selectDepth(layer)]));
@@ -197,9 +197,9 @@ export function runPedagogyCoreCoverageEval(
     && severityExamples.later === "later";
 
   const concepts = [
-    layerDetection("src/pedagogy/layers.ts", ["S2.1"]),
-    layerDetection("src/pedagogy/questions.ts", ["S1.1"]),
-    layerDetection("src/pedagogy/signals.ts", ["S4.1"]),
+    layerDetection("engine/pedagogy/layers.ts", ["S2.1"]),
+    layerDetection("engine/pedagogy/questions.ts", ["S1.1"]),
+    layerDetection("engine/pedagogy/signals.ts", ["S4.1"]),
   ];
   const gaps = detectGaps(concepts, "review-architecture");
   const questions = generateQuestions(gaps, "core-coverage-session", 1);

@@ -9,7 +9,7 @@ import {
   PEDAGOGY_COVERAGE_EVAL_GENERATED_AT,
   runPedagogyCoverageEval,
   type PedagogyCoverageReport,
-} from "../src/evals/pedagogy-coverage.ts";
+} from "../engine/evals/pedagogy-coverage.ts";
 
 test("pedagogy coverage eval reports semantic dimensions and known missing coverage", () => {
   const outputDir = mkdtempSync(join(tmpdir(), "sibar-pedagogy-coverage-eval-"));
@@ -65,7 +65,7 @@ test("pedagogy coverage CLI fails closed by default when semantic coverage is mi
   try {
     const result = spawnSync(process.execPath, [
       "--experimental-strip-types",
-      "src/evals/pedagogy-coverage.ts",
+      "engine/evals/pedagogy-coverage.ts",
       "--report",
       reportPath,
     ], {
@@ -93,7 +93,7 @@ test("pedagogy coverage CLI allows explicit reporting override", () => {
   try {
     const result = spawnSync(process.execPath, [
       "--experimental-strip-types",
-      "src/evals/pedagogy-coverage.ts",
+      "engine/evals/pedagogy-coverage.ts",
       "--report",
       reportPath,
       "--allow-coverage-gaps",

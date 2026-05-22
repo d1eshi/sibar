@@ -1,13 +1,13 @@
 import test, { describe } from "node:test";
 import assert from "node:assert/strict";
 
-import type { ThinkingArtifact } from "../../src/runtime-deep-ownership.ts";
+import type { ThinkingArtifact } from "../../engine/runtime-deep-ownership.ts";
 import {
   generateCodeSliceArtifact,
   generateDeterministicArtifacts,
   generateFlowDiagramArtifact,
   validateArtifactCitations,
-} from "../../src/runtime-artifact-generation.ts";
+} from "../../engine/runtime-artifact-generation.ts";
 import { loadFixture, makeConceptSlice, makeEvidenceEntry } from "./helpers.ts";
 
 describe("Hidden Solution & Fail-Closed Behavior", () => {
