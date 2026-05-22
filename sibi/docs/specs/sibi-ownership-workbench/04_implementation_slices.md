@@ -4,6 +4,11 @@
 
 Goal: create the web workbench shell without real repo intelligence.
 
+Status: PR-ready as a fixture-backed shell. Slice 0 is intentionally not a repo
+scanner yet; it proves the workbench shape, the attempt-first ownership loop,
+and the library-backed tree/code surfaces without adding filesystem or model
+runtime behavior.
+
 Deliverables:
 
 - Vite/React route or app entry for Sibi Ownership Workbench.
@@ -19,6 +24,12 @@ Deliverables:
   - `App` kept as behavior/state orchestration only.
 - Prefer component modules that stay focused: avoid >500-line monoliths and avoid
   excessive hyper-granular splits / unnecessary tiny recursive component decomposition.
+- Keep Sibi-owned tests under `sibi/Tests/`, not the parent `Tests/`
+  directory, so the parent repo remains only the orchestration workspace.
+- Keep build-warning hygiene strict: known `@pierre/*/dist/react/*`
+  module-level `"use client"` directive warnings are handled through an exact
+  allowlist and build-backed contract test. Any new `@pierre` directive source
+  should force a bundle-boundary decision, not a wider warning filter.
 
 Acceptance:
 
@@ -32,9 +43,31 @@ Acceptance:
 - Once `load` and `select-empty` states are introduced, their empty-state copy is required;
   fixture-only fallback renderings still must avoid chat invitations.
 
+Current PR-ready scope:
+
+- Vite/React Sibi app shell.
+- `@pierre/trees` / `@pierre/trees/react` file tree integration.
+- `@pierre/diffs` code and diff view integration through explicit adapters.
+- Modular workbench components for file tree, code/diff, review guide,
+  ownership harness, lab, and evidence drawer.
+- Guided attempt-first ownership sequence over the fixture diff.
+- Local derivation lab gated behind query params (`?view=lab` or `?lab=1`).
+- Sibi JS/TS tests located under `sibi/Tests/`.
+- Strict `@pierre` warning contract test that keeps chunk-size warnings visible.
+
 ## Slice 1 - Deterministic Repo Inventory
 
 Goal: read a bounded directory and produce a fast tree model.
+
+Next-session starting contract:
+
+```text
+repo_inventory(sourceRoot) -> deterministic JSON
+```
+
+The first implementation should be a bounded local runtime contract, not a
+browser filesystem reader. The browser requests inventory data; it never walks
+the filesystem directly.
 
 Deliverables:
 
@@ -42,6 +75,33 @@ Deliverables:
 - skip rules for `.git`, `node_modules`, build outputs, caches;
 - file metadata: path, extension, size, lines, role, excerpt;
 - tree projection with rollup counts.
+
+Initial JSON shape should be boring and stable:
+
+```ts
+type RepoInventory = {
+  sourceRoot: string;
+  generatedAt: string;
+  files: {
+    path: string;
+    extension: string;
+    sizeBytes: number;
+    lineCount: number;
+    role: "source" | "test" | "doc" | "config" | "unknown";
+    excerpt: string;
+  }[];
+  tree: {
+    path: string;
+    kind: "directory" | "file";
+    fileCount: number;
+    totalSizeBytes: number;
+    children?: RepoInventory["tree"][];
+  };
+};
+```
+
+Slice 1 should start with fixture tests for this repo's bounded `src/` surface,
+then add the endpoint/script once the JSON contract is stable.
 
 Acceptance:
 
@@ -166,10 +226,14 @@ contracts and product semantics.
 Use the smallest meaningful command for the touched surface:
 
 ```text
-pnpm run sibi:build
-pnpm test -- Tests/ownership-core.test.ts
-pnpm run typecheck
+pnpm -s sibi:test
+pnpm -s sibi:build
+pnpm -s sibi:e2e
 ```
 
-If the first implementation uses only static docs/prototypes, `git diff --check`
-is sufficient.
+`pnpm -s typecheck` is not a Slice 0 PR gate while the root project still has
+pre-existing non-Sibi type errors under `src/**` and parent `Tests/**`. Do not
+use those parent errors to block the Sibi Slice 0 PR unless the root typecheck
+is fixed in a separate cleanup slice.
+
+For docs-only changes, `git diff --check` is sufficient.
