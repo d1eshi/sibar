@@ -27,6 +27,18 @@ The manifest is derived from:
 - current Playwright/agent-flow report;
 - current UI state source graph.
 
+### Scope derivation (deterministic)
+
+For this slice, scope is normalized as:
+
+`scope = boundary=<boundary.id>;file=<selectedFile>;state=<boundaryState>;readiness=<readiness>;openQuestions=<remainingOpenQuestions>;evidence=<sortedEvidenceIds>`
+
+Remaining open questions:
+
+`openQuestions = max(0, boundary.open_questions.length - sessionState.currentIndex)`.
+
+`evidence` IDs are deduplicated and sorted to keep manifest generation deterministic.
+
 ## Data Shapes
 
 ### `ActionManifest`
@@ -42,6 +54,8 @@ type ActionManifest = {
   restrictions: ManifestRestriction[];
 };
 ```
+
+`scope` is the runtime key, and `generatedAt` is explicit for replayability checks.
 
 ### `ActionDescriptor`
 
@@ -63,6 +77,20 @@ type ActionDescriptor = {
   postconditions: string[];
 };
 ```
+
+`requiredArtifacts` and `requiredEvidenceKinds` are validated at runtime before an
+action is allowed.
+`playwrightLinkage` must point to trace IDs that include:
+
+- at least one passing assertion tied to the allowed action,
+- one deterministic recovery linkage when assertions fail.
+
+For this slice, actions are:
+
+- `submit_guided_attempt` (actor: agent, control: agent)
+- `mark_unknown` (actor: human, control: user)
+- `read_manifest` (actor: agent, control: agent_readonly): manifest introspection
+  action that does not mutate state and has readonly outputs.
 
 ### `ControlSurfaceEntry`
 
@@ -105,6 +133,15 @@ type PlaywrightLinkage = {
 };
 ```
 
+### Deterministic identifiers
+
+- `manifestId` is generated from stable manifest scope and manifest tuple:
+  `version + scope + boundary.id + boundaryState + readiness`.
+- `decisionId` is deterministic for decision replay and includes manifest/runtime
+  request tuple.
+
+Both IDs are re-generated when equivalent runtime input changes.
+
 ## Playwright Linkage
 
 The manifest must include references to one or more Playwright fixtures that are
@@ -139,6 +176,16 @@ If an action attempts to:
 - use unlisted input types,
 
 it must be blocked and logged as a manifest violation.
+
+The policy includes an explicit `no_private_action` restriction that blocks action
+IDs matching private setters such as:
+`set_*`, `write_*`, `delete_*`, `readiness`, `ownership`, `fact*`.
+
+When mismatch/staleness occurs, return:
+
+- `kind: "agent_action_rejected"`
+- a deterministic `reasonCode` and `reason`
+- optional `expectedActionHint` and `recoveryAction`.
 
 ## Acceptance
 

@@ -16,6 +16,7 @@ import * as React from "react";
 import { OwnershipLabPanel } from "./OwnershipLabPanel";
 import { ReviewGuidePanel } from "./ReviewGuidePanel";
 import { RepoInventoryStatusPanel } from "./RepoInventoryStatusPanel";
+import type { AgentActionValidationResult, AgentFlowManifest } from "../agentFlowManifest.ts";
 import type { TransferAttemptRecord } from "../transferVerification.ts";
 import type { WorkspaceEscalationDecision } from "../workspaceEscalation.ts";
 import type { OwnershipMemoryExportBundle } from "../ownershipMemory.ts";
@@ -65,6 +66,9 @@ interface OwnershipHarnessPanelProps {
   cognitiveDebtMetric: CognitiveDebtMetric;
   cognitiveLoadMetric: CognitiveLoadMetric;
   cognitiveDailyReadout: DailyCognitiveReadout;
+  agentFlowManifest: AgentFlowManifest | null;
+  agentFlowHappyValidation: AgentActionValidationResult | null;
+  agentFlowBlockedValidation: AgentActionValidationResult | null;
 }
 
 export function OwnershipHarnessPanel({
@@ -99,6 +103,9 @@ export function OwnershipHarnessPanel({
   cognitiveDebtMetric,
   cognitiveLoadMetric,
   cognitiveDailyReadout,
+  agentFlowManifest,
+  agentFlowHappyValidation,
+  agentFlowBlockedValidation,
 }: OwnershipHarnessPanelProps): React.ReactElement {
   const isLabView = surfaceMode === "lab" && labContext != null;
   const currentQuestion = sessionState.isComplete ? null : sessionQuestions[sessionState.currentIndex] ?? null;
@@ -137,6 +144,21 @@ export function OwnershipHarnessPanel({
     null,
     2,
   );
+  const diagnostics = [agentFlowHappyValidation, agentFlowBlockedValidation].filter(
+    (entry): entry is AgentActionValidationResult => entry != null,
+  );
+  const manifestControls = agentFlowManifest == null
+    ? null
+    : {
+        allowedActions: agentFlowManifest.allowedActions.map((action) => `${action.id} (${action.actor})`),
+        controlSurface: agentFlowManifest.controlSurface.map((control) => `${control.controlId} (${control.mode})`),
+        scope: agentFlowManifest.scope,
+        manifestId: agentFlowManifest.manifestId,
+        version: agentFlowManifest.version,
+      };
+
+  const renderValidation = (entry: AgentActionValidationResult): string =>
+    JSON.stringify(entry, null, 2);
 
   return (
     <aside className="panel ownershipPanel">
@@ -149,7 +171,7 @@ export function OwnershipHarnessPanel({
       <div className="ownershipPanelBody">
         <RepoInventoryStatusPanel status={inventoryStatus} />
 
-      {isLabView && (
+        {isLabView && (
           <section className="ownershipSection labModeNotice">
             <p className="panelSub">Debug view</p>
             <h2>Local trace lab</h2>
@@ -159,6 +181,41 @@ export function OwnershipHarnessPanel({
             </p>
           </section>
         )}
+
+        {isLabView && manifestControls != null ? (
+          <section className="ownershipSection" aria-label="Agent-flow manifest">
+            <p className="panelSub">Manifest</p>
+            <h2>Agent-flow manifest</h2>
+            <div className="readinessMetrics">
+              <span>Manifest ID: {manifestControls.manifestId}</span>
+              <span>Version: {manifestControls.version}</span>
+            </div>
+            <div className="readinessMetrics">
+              <span>Scope: {manifestControls.scope}</span>
+            </div>
+            <p>Allowed actions: {manifestControls.allowedActions.join(", ")}</p>
+            <p>Control surface: {manifestControls.controlSurface.join(", ")}</p>
+            <details>
+              <summary>Manifest shape</summary>
+              <pre>{JSON.stringify(manifestControls, null, 2)}</pre>
+            </details>
+          </section>
+        ) : null}
+
+        {isLabView && diagnostics.length > 0 ? (
+          <section className="ownershipSection" aria-label="Agent action validation">
+            <p className="panelSub">Validation samples</p>
+            <h2>Action validation</h2>
+            <div className="gapCard">
+              {diagnostics.map((entry, index) => (
+                <section key={`${entry.decisionId}-${index}`}>
+                  <h3>{entry.kind.replaceAll("_", " ")}</h3>
+                  <pre>{renderValidation(entry)}</pre>
+                </section>
+              ))}
+            </div>
+          </section>
+        ) : null}
 
         {isLabView ? (
           <section className="ownershipSection" aria-label="Cognitive daily readout">

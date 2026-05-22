@@ -324,6 +324,8 @@ Implementation check for this slice:
 
 Goal: give agents explicit operating limits and runnable assertions.
 
+Status: implemented.
+
 Deliverables:
 
 - Playwright report ingestion format and runtime-normalized manifest;
@@ -340,6 +342,28 @@ Acceptance:
 - every agent action has one manifest entry before execution;
 - manifest mismatch blocks action and generates actionable diagnostic;
 - same manifest can be replayed from captured Playwright trace.
+
+Implementation policy for this slice:
+
+- Manifest is runtime-normalized and deterministic for the tuple (`boundary.id`,
+  `selectedFile`, `boundaryState`, `readiness`, remaining `open_questions`,
+  sorted evidence IDs).
+- `agent_action_rejected` is mandatory for every blocked action and includes:
+  `reasonCode` + `decisionId` + optional `expectedActionHint` + optional
+  `recoveryAction`.
+- Rejection order is deterministic:
+  1. stale scope/version,
+  2. private action restriction,
+  3. action/control listing and ownership checks,
+  4. control mode check,
+  5. payload check,
+  6. preconditions check,
+  7. evidence + artifact check.
+- Block lists are policy-based and explicit in manifest restrictions:
+  - `no_auto_readiness` (readiness cannot be mutated by action),
+  - `no_private_action` (no ownership/readiness/private control setters).
+- Lab validation in UI must render manifest and one happy-path + one blocked-path
+  diagnostic using deterministic sample requests.
 
 ## Slice 11 - UI Control Surface Authorization
 

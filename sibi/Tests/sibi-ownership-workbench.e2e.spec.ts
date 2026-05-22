@@ -377,3 +377,20 @@ test("ownership memory records failed and retried attempts with export evidence 
   await expect(memoryPanel.locator("pre")).toContainText("memory-boundary-01-observation-observation-1");
   await expect(memoryPanel.locator("pre")).toContainText("\"evidence_refs\"");
 });
+
+test("lab mode renders agent-flow manifest and diagnostics", async ({ page }) => {
+  await page.goto("/?view=lab");
+
+  await expect(page.getByLabel("Agent-flow manifest")).toBeVisible();
+  await expect(page.getByLabel("Agent action validation")).toBeVisible();
+  await expect(page.getByLabel("Agent action validation")).toContainText("agent_action_allowed");
+  await expect(page.getByLabel("Agent action validation")).toContainText("agent_action_rejected");
+  await expect(page.getByLabel("Agent action validation")).toContainText("private_action_blocked");
+});
+
+test("agent-flow diagnostics are hidden in default view", async ({ page }) => {
+  await page.goto("/");
+
+  await expect(page.getByLabel("Agent-flow manifest")).toHaveCount(0);
+  await expect(page.getByLabel("Agent action validation")).toHaveCount(0);
+});
