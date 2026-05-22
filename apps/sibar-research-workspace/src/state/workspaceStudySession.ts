@@ -1,9 +1,6 @@
 import type { WorkspaceStudyNote } from "./workspaceReducer";
 import type { WorkspaceMiniNode, WorkspaceSource, WorkspaceStudyNode } from "./workspaceProjection";
 
-export const defaultStudyCourseTitle =
-  "Curso de Estadística y Probabilidad - Platzi";
-
 const studyNoteDateFormatter = new Intl.DateTimeFormat("es-AR", {
   dateStyle: "medium",
   timeStyle: "short",

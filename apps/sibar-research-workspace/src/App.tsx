@@ -9,9 +9,11 @@ import { StudySessionNotes } from "./flows/workspace/StudySessionNotes";
 import { WorkspaceSessionLayout } from "./flows/workspace/WorkspaceSessionLayout";
 import stylesWorkspace from "./flows/workspace/workspace.module.css";
 import {
-  createInitialWorkspaceStateFromFixture,
   firstWorkspaceSessionFixture,
   workspaceHomeProjection,
+} from "./data/workspaceCatalog";
+import {
+  createInitialWorkspaceStateFromFixture,
   projectWorkspaceSession,
 } from "./state/workspaceProjection";
 import { workspaceSessionReducer } from "./state/workspaceReducer";
