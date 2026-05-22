@@ -18,6 +18,11 @@ release yet.
 
 ### Changed - Public Web Landing
 
+- Added three Sibi landing prototypes (`html`, `html2`, `html3`) exploring a
+  direct diff interaction, an editorial cognitive-debt ledger, and a dark
+  ownership ceremony flow.
+- Renamed the landing stylesheet from `reader.css` to `main.css` and made the
+  public index use the product-interaction prototype direction.
 - Reframed the public landing around Sibi as an ownership engine for
   AI-generated software, centered on cognitive debt, demonstrated ownership, and
   the Diff Ownership Review wedge.

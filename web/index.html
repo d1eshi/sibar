@@ -3,10 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sibi - Ownership engine for AI-generated software</title>
-<meta name="description" content="Sibi convierte codigo generado con AI en deuda cognitiva visible y te hace demostrar ownership boundary por boundary.">
-<meta property="og:title" content="Sibi - Cognitive debt to ownership recovery">
-<meta property="og:description" content="El primer ownership engine para equipos que producen software mas rapido de lo que pueden entenderlo.">
+<title>Sibi - Prove ownership before you merge</title>
+<meta name="description" content="Sibi convierte diffs generados con AI en un loop de ownership: pegar diff, explicar que rompe, diagnosticar gaps y reducir deuda cognitiva.">
+<meta property="og:title" content="Sibi - Prove ownership before you merge">
+<meta property="og:description" content="El ownership engine para reducir cognitive debt en software generado con AI.">
 <script>
 window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
 window.va("beforeSend", (event) => {
@@ -26,224 +26,106 @@ if (location.protocol !== "file:" && location.hostname !== "localhost" && locati
   document.head.appendChild(analyticsScript);
 }
 </script>
-<link rel="stylesheet" href="styles/reader.css">
+<link rel="stylesheet" href="styles/main.css">
 </head>
-<body>
+<body class="landing variant-product">
 <header class="site-header" aria-label="Navegacion principal">
-  <a class="brand" href="#top" aria-label="Sibi inicio">
-    <span>S</span>
-    <strong>Sibi</strong>
-  </a>
-  <nav class="site-nav" aria-label="Secciones">
-    <a href="#manifesto">Manifesto</a>
-    <a href="#review">Review</a>
-    <a href="#ownership">Ownership</a>
-    <a href="#early-access">Early access</a>
+  <a class="brand" href="#top" aria-label="Sibi inicio"><span>S</span><strong>Sibi</strong></a>
+  <nav class="site-nav" aria-label="Variaciones">
+    <a aria-current="page" href="index.html">html</a>
+    <a href="html2.html">html2</a>
+    <a href="html3.html">html3</a>
   </nav>
   <a class="header-cta" href="#early-access">Pedir acceso</a>
 </header>
 
 <main id="top">
-  <section class="hero section-band" aria-labelledby="hero-title">
+  <section class="hero product-hero section-band" aria-labelledby="hero-title">
     <div class="hero-copy">
       <p class="eyebrow">Cognitive debt -> ownership recovery</p>
-      <h1 id="hero-title">La AI hizo software mas rapido que el entendimiento humano.</h1>
-      <p class="hero-lede">Sibi no es otro assistant que explica codigo. Es un ownership engine para equipos que necesitan probar que entienden, pueden modificar y pueden defender lo que ahora son capaces de crear demasiado rapido.</p>
+      <h1 id="hero-title">Prove ownership before you merge.</h1>
+      <p class="hero-lede">Sibi toma el diff que escribio la AI y lo transforma en una prueba concreta: que cambio, que evidencia lo sostiene y que rompe si no lo entendes.</p>
       <div class="hero-actions">
-        <a class="primary-action" href="#review">Ver Diff Ownership Review</a>
-        <a class="secondary-action" href="#manifesto">Leer el manifiesto</a>
+        <a class="primary-action" href="#live-review">Probar el loop</a>
+        <a class="secondary-action" href="#manifesto">Leer manifesto</a>
       </div>
     </div>
 
-    <aside class="hero-ledger" aria-label="Cognitive debt ledger">
-      <div>
-        <span>Diff</span>
-        <strong>+423 lines</strong>
+    <section class="live-card" aria-label="Interactive diff ownership review">
+      <div class="live-toolbar">
+        <span></span><span></span><span></span>
+        <strong>Diff Ownership Review</strong>
       </div>
-      <div>
-        <span>Tests</span>
-        <strong>3 passing</strong>
+      <div class="live-grid">
+        <article class="diff-entry">
+          <header><span>Paste diff</span><strong>session.ts</strong></header>
+          <pre><code>- return response.json();
++ if (response.status === 204) return null;
++ return response.json();</code></pre>
+        </article>
+        <article class="claim-entry">
+          <header><span>Sibi asks</span><strong>Explain what breaks</strong></header>
+          <p>What downstream caller changes behavior when `createSession` returns `null`?</p>
+          <div class="answer-line">User attempt: "It handles empty auth responses."</div>
+        </article>
+        <article class="debt-entry">
+          <header><span>Diagnosis</span><strong>Missing deletion-risk argument</strong></header>
+          <div class="meter"><span style="width: 68%"></span></div>
+          <p><b>Debt reduced</b> after retry: added caller evidence and null-contract risk.</p>
+        </article>
       </div>
-      <div class="danger">
-        <span>Ownership</span>
-        <strong>weak runtime boundary</strong>
-      </div>
-      <div class="danger">
-        <span>Debt delta</span>
-        <strong>+ high</strong>
-      </div>
-    </aside>
+    </section>
+  </section>
+
+  <section class="interaction-strip section-band" id="live-review" aria-label="Sibi interaction loop">
+    <article>
+      <span>1</span>
+      <h2>Diff enters</h2>
+      <p>Imports, touched files, tests and goal context become deterministic evidence.</p>
+    </article>
+    <article>
+      <span>2</span>
+      <h2>User attempts</h2>
+      <p>Sibi does not explain first. It asks for ownership in your own words.</p>
+    </article>
+    <article>
+      <span>3</span>
+      <h2>Gap diagnosed</h2>
+      <p>Weak evidence, missing consumers and deletion risk become visible.</p>
+    </article>
+    <article>
+      <span>4</span>
+      <h2>Debt drops</h2>
+      <p>The retry is scored against evidence, not confidence theater.</p>
+    </article>
   </section>
 
   <section class="manifesto section-band" id="manifesto" aria-labelledby="manifesto-title">
-    <div class="manifesto-copy">
-      <p class="eyebrow">Manifesto</p>
-      <h2 id="manifesto-title">No mas respuestas antes de evidencia.</h2>
-      <p>Los equipos ya pueden generar codigo, features, diffs y arquitecturas a una velocidad que sus modelos mentales no pueden absorber. El resultado no es solo deuda tecnica. Es deuda cognitiva: codigo que existe, compila y quizas funciona, pero que nadie puede explicar con claridad.</p>
-    </div>
-    <div class="manifesto-lines" aria-label="Sibi manifesto statements">
-      <p>Copilot explica codigo.</p>
-      <p>ChatGPT responde preguntas.</p>
-      <p><strong>Sibi convierte codigo en deuda cognitiva visible.</strong></p>
-      <p><strong>Sibi exige evidencia de comprension.</strong></p>
-    </div>
-  </section>
-
-  <section class="review-section section-band" id="review" aria-label="Diff Ownership Review">
-    <div class="product-shell">
-      <div class="product-titlebar">
-        <span class="window-dot ink"></span>
-        <span class="window-dot amber"></span>
-        <span class="window-dot green"></span>
-        <strong>Diff Ownership Review</strong>
-        <em>PR #42 / runtime boundary</em>
-      </div>
-
-      <div class="review-grid">
-        <aside class="ownership-map" aria-label="Ownership map">
-          <header>
-            <p>Changed boundaries</p>
-            <strong>7 touched</strong>
-          </header>
-          <ol>
-            <li data-state="owned">
-              <span></span>
-              <div>
-                <strong>Prompt Generation</strong>
-                <em>owned</em>
-              </div>
-            </li>
-            <li data-state="partial">
-              <span></span>
-              <div>
-                <strong>Evidence Collection</strong>
-                <em>partial: weak test evidence</em>
-              </div>
-            </li>
-            <li data-state="gap" class="selected">
-              <span></span>
-              <div>
-                <strong>Runtime Validation</strong>
-                <em>gap: confuses validation with evaluation</em>
-              </div>
-            </li>
-            <li data-state="blocked">
-              <span></span>
-              <div>
-                <strong>Repair Planning</strong>
-                <em>blocked: missing prerequisite</em>
-              </div>
-            </li>
-          </ol>
-        </aside>
-
-        <section class="diff-panel" aria-label="Selected diff">
-          <header>
-            <p>Selected boundary</p>
-            <h2>Attempt Evaluation vs Ownership Validation</h2>
-          </header>
-          <div class="code-surface" aria-label="Code diff preview">
-            <p><span>18</span><code>export function validateOwnershipAttempt(input) {</code></p>
-            <p class="add"><span>19</span><code>+ const evidence = collectRuntimeEvidence(input.diff);</code></p>
-            <p class="add"><span>20</span><code>+ const claim = buildOwnershipClaim(evidence.boundary);</code></p>
-            <p><span>21</span><code>  return judgeAttempt({</code></p>
-            <p class="add"><span>22</span><code>+   requiredDeletionRisk: evidence.downstreamConsumers,</code></p>
-            <p class="remove"><span>23</span><code>-   score: explainWithLLM(input.answer),</code></p>
-            <p><span>24</span><code>  });</code></p>
-          </div>
-          <div class="evidence-row">
-            <article>
-              <span>imports</span>
-              <strong>12</strong>
-            </article>
-            <article>
-              <span>callers</span>
-              <strong>4</strong>
-            </article>
-            <article>
-              <span>tests</span>
-              <strong>3 pass</strong>
-            </article>
-            <article class="risk">
-              <span>unowned risk</span>
-              <strong>2</strong>
-            </article>
-          </div>
-        </section>
-
-        <aside class="attempt-panel" aria-label="Ownership attempt loop">
-          <header>
-            <p>Current claim</p>
-            <strong>Prove ownership</strong>
-          </header>
-          <section class="question-block">
-            <h3>Explain in your own words</h3>
-            <ol>
-              <li>What is being evaluated?</li>
-              <li>What evidence proves it?</li>
-              <li>What breaks if this layer is removed?</li>
-            </ol>
-          </section>
-          <section class="attempt-box" aria-label="User attempt preview">
-            <p>The runtime checks if the answer is good and then marks the boundary as owned.</p>
-          </section>
-          <section class="diagnosis-box">
-            <h3>Diagnosis</h3>
-            <p>You explained purpose, but confused evaluation with validation and gave no deletion-risk argument.</p>
-          </section>
-          <section class="repair-box">
-            <h3>Next smallest repair</h3>
-            <p>Before continuing, distinguish "checking answer quality" from "proving ownership of a system boundary".</p>
-          </section>
-        </aside>
-      </div>
-    </div>
-  </section>
-
-  <section class="metrics-section section-band" id="ownership" aria-labelledby="ownership-title">
-    <div class="signal-intro">
-      <p class="eyebrow">Ownership quality</p>
-      <h2 id="ownership-title">Cada diff aumenta o reduce deuda cognitiva.</h2>
-    </div>
-    <div class="metric-stack">
-      <article class="metric-card active">
-        <span>formula</span>
-        <strong>Cognitive Debt = Code Surface Area - Demonstrated Ownership</strong>
-        <p>No es una metrica matematica cerrada. Es una forma de volver visible la brecha entre lo que el sistema hace y lo que el equipo puede defender.</p>
-      </article>
-      <article class="metric-card">
-        <span>coverage</span>
-        <strong>Ownership Coverage</strong>
-        <p>Changed boundaries: 7. Proven ownership: 3. Partial: 2. Unowned risk: 2. Coverage: 43%.</p>
-      </article>
-      <article class="metric-card">
-        <span>loop</span>
-        <strong>Attempt -> diagnosis -> repair -> retry</strong>
-        <p>Sibi no entrega una explicacion final. Guia un loop hasta que el usuario pueda explicar, modificar y defender la boundary.</p>
-      </article>
-      <article class="metric-card">
-        <span>memory</span>
-        <strong>Longitudinal ownership memory</strong>
-        <p>GitHub conoce commits. Cursor conoce contexto. Sibi conoce tu relacion cognitiva con tu sistema.</p>
-      </article>
-    </div>
-  </section>
-
-  <section class="principles section-band" aria-label="Sibi principles">
     <div>
-      <p class="eyebrow">Anti-pattern</p>
-      <h2>Sibi no existe para explicarte mas cosas.</h2>
+      <p class="eyebrow">Manifesto</p>
+      <h2 id="manifesto-title">AI made software faster than understanding.</h2>
     </div>
-    <div class="principle-grid">
-      <article>
-        <span>No</span>
-        <p>Explain file. Summarize folder. Ask anything about codebase. Generate docs.</p>
-      </article>
-      <article>
-        <span>Yes</span>
-        <p>Prove ownership. Diagnose gap. Repair boundary. Re-attempt. Track debt.</p>
-      </article>
+    <div class="manifesto-copy">
+      <p>Technical debt is code that costs more later. Cognitive debt is sharper: code that exists, passes tests and maybe ships, but cannot be explained, modified or defended by the people responsible for it.</p>
+      <p>Sibi is not an AI coding assistant. It is an ownership engine for AI-generated software.</p>
     </div>
+  </section>
+
+  <section class="ownership-demo section-band" aria-label="Ownership recovery demo">
+    <div class="boundary-map">
+      <h2>Ownership states are cognitive, not technical.</h2>
+      <ol>
+        <li><strong>owned</strong><span>Prompt Generation</span></li>
+        <li><strong>partial</strong><span>Evidence Collection: weak tests</span></li>
+        <li class="gap"><strong>gap</strong><span>Runtime Validation: confuses evaluation with validation</span></li>
+        <li><strong>recovered</strong><span>Deletion-risk argument added after retry</span></li>
+      </ol>
+    </div>
+    <aside class="coverage-panel">
+      <span>Ownership Coverage</span>
+      <strong>43% -> 71%</strong>
+      <p>Not test coverage. Cognitive coverage: how much of the changed system the developer can prove they own.</p>
+    </aside>
   </section>
 
   <section class="access-section section-band" id="early-access" aria-labelledby="access-title">
@@ -262,7 +144,6 @@ if (location.protocol !== "file:" && location.hostname !== "localhost" && locati
     </form>
   </section>
 </main>
-
 <script type="module" src="scripts/landing.js"></script>
 </body>
 </html>

@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sibi - Editorial cognitive debt prototype</title>
+<meta name="description" content="Prototype html2 para la landing de Sibi enfocada en manifiesto, ledger de cognitive debt y ownership coverage.">
+<link rel="stylesheet" href="styles/main.css">
+</head>
+<body class="landing variant-editorial">
+<header class="site-header editorial-header" aria-label="Navegacion principal">
+  <a class="brand" href="index.html" aria-label="Sibi inicio"><span>S</span><strong>Sibi</strong></a>
+  <nav class="site-nav" aria-label="Variaciones">
+    <a href="html.html">html</a>
+    <a aria-current="page" href="html2.html">html2</a>
+    <a href="html3.html">html3</a>
+  </nav>
+  <a class="header-cta" href="#early-access">Pedir acceso</a>
+</header>
+<main id="top">
+  <section class="editorial-hero section-band" aria-labelledby="hero-title">
+    <div class="editorial-type">
+      <p class="eyebrow">Prototype 02 / manifesto ledger</p>
+      <h1 id="hero-title">AI made software faster than understanding.</h1>
+      <p>Cognitive debt is code you cannot defend. Sibi turns every diff into a proof ritual: claim, attempt, evidence, repair.</p>
+      <div class="hero-actions">
+        <a class="primary-action" href="#ledger">Ver ledger</a>
+        <a class="secondary-action" href="html3.html">Comparar html3</a>
+      </div>
+    </div>
+    <aside class="ledger-column" id="ledger" aria-label="Cognitive debt ledger">
+      <div><span>Code surface area</span><strong>+423 LOC</strong></div>
+      <div><span>Demonstrated ownership</span><strong>3 / 7 boundaries</strong></div>
+      <div class="debt"><span>Cognitive debt</span><strong>+18%</strong></div>
+      <div class="repair"><span>After retry</span><strong>-14%</strong></div>
+    </aside>
+  </section>
+  <section class="contract-section section-band" aria-label="Ownership proof contract">
+    <h2>Sibi no responde primero. Exige evidencia.</h2>
+    <div class="contract-grid">
+      <article><span>Prove it</span><p>What changed in the system?</p></article>
+      <article><span>Gap diagnosed</span><p>You explained purpose, but not deletion risk.</p></article>
+      <article><span>Repair boundary</span><p>Name the caller that consumes `null` and the contract that changed.</p></article>
+    </div>
+  </section>
+  <section class="paper-demo section-band" aria-label="Ownership boundary states">
+    <div>
+      <p class="eyebrow">Boundary memory</p>
+      <h2>Ownership is longitudinal.</h2>
+      <p>GitHub knows commits. Cursor knows context. Sibi knows how your team understands the system over time.</p>
+    </div>
+    <ol>
+      <li><strong>runtime validation</strong><span>gap: confuses validation with evaluation</span></li>
+      <li><strong>evidence collection</strong><span>partial: no test-backed explanation</span></li>
+      <li><strong>session contract</strong><span>recovered: caller and deletion risk explained</span></li>
+    </ol>
+  </section>
+  <section class="access-section section-band" id="early-access" aria-labelledby="access-title">
+    <div class="access-copy-block">
+      <p class="eyebrow">Early access</p>
+      <h2 id="access-title">Para equipos que ya producen mas de lo que pueden defender.</h2>
+      <p>Sumate a probar Sibi como tracker de cognitive debt para diffs generados con AI.</p>
+    </div>
+    <form class="access-form" id="earlyAccessForm">
+      <label for="earlyAccessEmail">Email</label>
+      <input id="earlyAccessEmail" name="email" type="email" placeholder="tu@email.com" autocomplete="email" required>
+      <label for="earlyAccessXHandle">X handle <span>opcional</span></label>
+      <input id="earlyAccessXHandle" name="x_handle" type="text" placeholder="@usuario" autocomplete="off">
+      <button class="primary-action" type="submit">Pedir early access</button>
+      <p class="form-status" id="earlyAccessStatus" aria-live="polite"></p>
+    </form>
+  </section>
+</main>
+<script type="module" src="scripts/landing.js"></script>
+</body>
+</html>

@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sibi - Product interaction prototype</title>
+<meta name="description" content="Prototype html para la landing de Sibi enfocada en interaccion directa con diff y reduccion de cognitive debt.">
+<link rel="stylesheet" href="styles/main.css">
+</head>
+<body class="landing variant-product">
+<header class="site-header" aria-label="Navegacion principal">
+  <a class="brand" href="index.html" aria-label="Sibi inicio"><span>S</span><strong>Sibi</strong></a>
+  <nav class="site-nav" aria-label="Variaciones">
+    <a aria-current="page" href="html.html">html</a>
+    <a href="html2.html">html2</a>
+    <a href="html3.html">html3</a>
+  </nav>
+  <a class="header-cta" href="#early-access">Pedir acceso</a>
+</header>
+<main id="top">
+  <section class="hero product-hero section-band" aria-labelledby="hero-title">
+    <div class="hero-copy">
+      <p class="eyebrow">Prototype 01 / product loop</p>
+      <h1 id="hero-title">Prove ownership before you merge.</h1>
+      <p class="hero-lede">La landing abre con la accion real: pegar un diff, responder el claim de ownership y ver como baja la deuda cognitiva cuando la evidencia mejora.</p>
+      <div class="hero-actions">
+        <a class="primary-action" href="#live-review">Ver interaccion</a>
+        <a class="secondary-action" href="html2.html">Comparar html2</a>
+      </div>
+    </div>
+    <section class="live-card" aria-label="Interactive diff ownership review">
+      <div class="live-toolbar"><span></span><span></span><span></span><strong>Live ownership loop</strong></div>
+      <div class="live-grid">
+        <article class="diff-entry">
+          <header><span>Paste diff</span><strong>session.ts</strong></header>
+          <pre><code>- return response.json();
++ if (response.status === 204) return null;
++ return response.json();</code></pre>
+        </article>
+        <article class="claim-entry">
+          <header><span>Sibi asks</span><strong>Explain what breaks</strong></header>
+          <p>What downstream caller changes behavior when `createSession` returns `null`?</p>
+          <div class="answer-line">User attempt: "It handles empty auth responses."</div>
+        </article>
+        <article class="debt-entry">
+          <header><span>Recovered</span><strong>Debt reduced</strong></header>
+          <div class="meter"><span style="width: 68%"></span></div>
+          <p>Retry includes caller evidence and deletion-risk argument.</p>
+        </article>
+      </div>
+    </section>
+  </section>
+  <section class="interaction-strip section-band" id="live-review" aria-label="Sibi interaction loop">
+    <article><span>1</span><h2>Diff enters</h2><p>Runtime evidence is built before any answer.</p></article>
+    <article><span>2</span><h2>Claim asked</h2><p>The user must explain what changed and what breaks.</p></article>
+    <article><span>3</span><h2>Gap diagnosed</h2><p>Sibi finds weak evidence and missing downstream consumers.</p></article>
+    <article><span>4</span><h2>Ownership recovered</h2><p>The retry proves the boundary, one attempt at a time.</p></article>
+  </section>
+  <section class="access-section section-band" id="early-access" aria-labelledby="access-title">
+    <div class="access-copy-block">
+      <p class="eyebrow">Early access</p>
+      <h2 id="access-title">Para builders que ya sienten cognitive debt.</h2>
+      <p>Proba Sibi con diffs reales y ownership questions antes del merge.</p>
+    </div>
+    <form class="access-form" id="earlyAccessForm">
+      <label for="earlyAccessEmail">Email</label>
+      <input id="earlyAccessEmail" name="email" type="email" placeholder="tu@email.com" autocomplete="email" required>
+      <label for="earlyAccessXHandle">X handle <span>opcional</span></label>
+      <input id="earlyAccessXHandle" name="x_handle" type="text" placeholder="@usuario" autocomplete="off">
+      <button class="primary-action" type="submit">Pedir early access</button>
+      <p class="form-status" id="earlyAccessStatus" aria-live="polite"></p>
+    </form>
+  </section>
+</main>
+<script type="module" src="scripts/landing.js"></script>
+</body>
+</html>
