@@ -1,10 +1,10 @@
 import type { WorkspaceStudyNote } from "./workspaceReducer";
 import { shouldUseLocalWorkspaceStorage } from "../config/publicRuntimeConfig";
 
-const studyNotesStorageKey = "sibar:workspace-study-notes:v1";
+const studyNotesStorageKey = "sibar:workspace-study-notes:v2";
 
 export type StoredStudyNotesState = {
-  version: 1;
+  version: 2;
   courseTitle: string;
   notes: readonly WorkspaceStudyNote[];
 };
@@ -54,7 +54,7 @@ export function readStoredStudyNotesState(): Partial<StoredStudyNotesState> {
     const stored = parsed as Record<string, unknown>;
 
     if (
-      stored.version !== 1 ||
+      stored.version !== 2 ||
       typeof stored.courseTitle !== "string" ||
       !Array.isArray(stored.notes) ||
       !stored.notes.every(isStudyNote)
