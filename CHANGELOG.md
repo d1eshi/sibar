@@ -28,6 +28,10 @@ release yet.
 - Added the frontier-lab blog Mission Brief as the primary Tauri React workspace
   experience, with Home opening to a focused queue before the active Session and
   the static web workspace leading with the same mission context.
+- Added a deterministic frontier-lab source mission compiler that accepts the
+  supported blog URL intent, canonicalizes URL variants, clones the static source
+  facts into validated mission output, and rejects unsupported URLs without
+  inventing source signals.
 
 ### Changed - Pedagogy Core Facade
 
