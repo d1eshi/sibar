@@ -457,6 +457,17 @@ textarea {
   border-bottom: 1px solid #edf0f1;
 }
 
+.inventoryStatusPanel p {
+  margin: 0;
+  color: #253736;
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.inventoryStatusPanel .unavailableReason {
+  color: #8a3d2f;
+}
+
 .ownershipSession {
   display: grid;
   gap: 0;
@@ -660,16 +671,28 @@ textarea {
   display: grid;
   gap: 5px;
   margin: 0;
+  grid-template-columns: 74px minmax(0, 1fr);
+  column-gap: 8px;
 }
 
 .labFacts div {
   display: grid;
   grid-template-columns: 74px minmax(0, 1fr);
   gap: 8px;
+  grid-column: 1 / -1;
 }
 
 .labFacts.compact div {
   grid-template-columns: 92px minmax(0, 1fr);
+}
+
+.labFacts.compact {
+  grid-template-columns: 92px minmax(0, 1fr);
+}
+
+.labFacts dt,
+.labFacts dd {
+  min-width: 0;
 }
 
 .labFacts dt {
@@ -677,15 +700,17 @@ textarea {
   font-size: 11px;
   font-weight: 800;
   text-transform: uppercase;
+  margin: 0;
+  grid-column: 1;
 }
 
 .labFacts dd {
-  margin: 0;
   color: #213433;
   font-size: 12px;
   line-height: 1.35;
-  min-width: 0;
   overflow-wrap: anywhere;
+  margin: 0;
+  grid-column: 2;
 }
 
 .signalRow {

@@ -9,9 +9,11 @@ import type {
   ViewMode,
   WorkbenchSurfaceMode,
 } from "../types";
+import type { RepoInventoryStatus } from "../repoInventoryTypes.ts";
 import * as React from "react";
 import { OwnershipLabPanel } from "./OwnershipLabPanel";
 import { ReviewGuidePanel } from "./ReviewGuidePanel";
+import { RepoInventoryStatusPanel } from "./RepoInventoryStatusPanel";
 
 interface OwnershipLabContext {
   selectedFile: string;
@@ -23,6 +25,7 @@ interface OwnershipLabContext {
 
 interface OwnershipHarnessPanelProps {
   boundary: OwnershipBoundary;
+  inventoryStatus: RepoInventoryStatus;
   boundaryState: BoundaryState;
   reviewQueue: ReviewQueueItem[];
   sessionQuestions: OwnershipSessionQuestion[];
@@ -37,6 +40,7 @@ interface OwnershipHarnessPanelProps {
 
 export function OwnershipHarnessPanel({
   boundary,
+  inventoryStatus,
   boundaryState,
   reviewQueue,
   sessionQuestions,
@@ -60,6 +64,8 @@ export function OwnershipHarnessPanel({
       </header>
 
       <div className="ownershipPanelBody">
+        <RepoInventoryStatusPanel status={inventoryStatus} />
+
         {isLabView && (
           <section className="ownershipSection labModeNotice">
             <p className="panelSub">Debug view</p>

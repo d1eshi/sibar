@@ -5,6 +5,7 @@ test("default workbench starts a guided ownership session without lab traces", a
   await page.goto("/");
 
   await expect(page.getByLabel("Guided ownership review session")).toBeVisible();
+  await expect(page.getByLabel("Repo inventory status")).toBeVisible();
   await expect(page.getByLabel("Current Sibi question")).toContainText("Repasá `src/api/session.ts`");
   await expect(page.getByLabel("Ownership derivation lab")).toHaveCount(0);
 
