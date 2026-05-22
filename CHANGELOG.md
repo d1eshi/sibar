@@ -25,6 +25,8 @@ release yet.
   black `Try Sibi` call to action.
 - Replaced the left manifesto rail with a simple hand-drawn ownership flow note:
   code change -> ownership proof -> debt reduced.
+- Replaced the artifact-card row with a wide Sibi product mockup section for
+  the future demo: pasted diff, ownership attempt, and debt-reduction outcome.
 - Added three Sibi landing prototypes (`html`, `html2`, `html3`) exploring a
   direct diff interaction, an editorial cognitive-debt ledger, and a dark
   ownership ceremony flow.
