@@ -20,6 +20,11 @@ release yet.
 - Added a reusable frontier-lab blog fixture that validates through
   SourceSignal, SourceSlice, MissionPreview, and MissionSessionBridge with a
   focused first-session queue.
+- Added a UI-neutral Mission -> Track -> Session -> Artifact projection for the
+  source-mission runtime, including execution job status, bridge-backed queue
+  sessions, bridge-backed active session evidence/artifacts, focused queue
+  limits, secondary Source Map refs, session-scoped readiness, stable
+  reproducibility hashes, and a separated frontier-lab UI fixture helper.
 
 ### Changed - Pedagogy Core Facade
 
