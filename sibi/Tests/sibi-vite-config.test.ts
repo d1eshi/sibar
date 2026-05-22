@@ -13,6 +13,35 @@ import sibiViteConfig, {
 
 const pierreDirectiveMessage =
   'Module level directives cause errors when bundled, "use client" in "node_modules/.pnpm/@pierre+trees@1.0.0/node_modules/@pierre/trees/dist/react/FileTree.js" was ignored.';
+const repoRoot = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
+
+test("Sibi public Vercel build emits only the public entry under /sibi", () => {
+  const packageJson = JSON.parse(readFileSync(join(repoRoot, "package.json"), "utf8"));
+  const mainEntry = readFileSync(join(repoRoot, "sibi/src/main.tsx"), "utf8");
+  const publicEntry = readFileSync(join(repoRoot, "sibi/src/PublicSibiEntry.tsx"), "utf8");
+  const sharedEarlyAccessApi = readFileSync(join(repoRoot, "apps/early-access/index.ts"), "utf8");
+  const sharedEarlyAccessModal = readFileSync(join(repoRoot, "apps/early-access/EarlyAccessModal.tsx"), "utf8");
+
+  assert.match(packageJson.scripts["sibi:build:public"], /VITE_SIBI_PUBLIC_ENTRY=true/);
+  assert.match(packageJson.scripts["sibi:build:public"], /--config sibi\/vite\.public\.config\.js/);
+  assert.match(packageJson.scripts["sibi:build:public"], /--base \/sibi\//);
+  assert.match(packageJson.scripts["sibi:build:public"], /--outDir \.\.\/web\/sibi/);
+  assert.equal(packageJson.scripts["vercel:build"], "pnpm run sibi:build:public");
+  assert.match(mainEntry, /VITE_SIBI_PUBLIC_ENTRY/);
+  assert.match(publicEntry, /CapturePrEntryScreen/);
+  assert.match(publicEntry, /\.\.\/\.\.\/apps\/early-access\/index\.ts/);
+  assert.doesNotMatch(publicEntry, /apps\/early-access\/EarlyAccessModal\.tsx/);
+  assert.match(sharedEarlyAccessApi, /EarlyAccessModal/);
+  assert.match(sharedEarlyAccessApi, /EarlyAccessModalCopy/);
+  assert.match(sharedEarlyAccessApi, /EarlyAccessModalProps/);
+  assert.match(sharedEarlyAccessApi, /requestEarlyAccessLead/);
+  assert.match(sharedEarlyAccessApi, /EarlyAccessLeadInput/);
+  assert.match(sharedEarlyAccessApi, /EarlyAccessResult/);
+  assert.match(sharedEarlyAccessModal, /requestEarlyAccessLead/);
+  assert.match(sharedEarlyAccessModal, /xHandle/);
+  assert.match(sharedEarlyAccessModal, /sibarEarlyAccessModal/);
+  assert.doesNotMatch(publicEntry, /workbench=1|OwnershipHarnessPanel|FileTreePanel/);
+});
 
 function getInventoryEndpointMiddleware() {
   const plugin = sibiViteConfig.plugins?.find((entry) => entry.name === "sibi-repo-inventory-endpoint");
