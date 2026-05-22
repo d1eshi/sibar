@@ -788,6 +788,9 @@ release yet.
   (`workspace-data`, `workspace-utils`, `workspace-study-plans`,
   `workspace-contract`, `workspace-session`, `workspace-render`, and
   `workspace-app`) while keeping the facade API and behavior stable.
+- Moved the retained vanilla workspace facade scripts under
+  `apps/sibar-research-workspace/legacy/vanilla-workspace/scripts/` so they no
+  longer read as the primary React/Vite runtime surface.
 
 ### Docs - Deep Ownership Workspace Rust Execution Specs
 

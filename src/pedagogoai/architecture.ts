@@ -47,7 +47,7 @@ export const PEDAGOGOAI_BOUNDARIES: PedagogoAIModuleBoundary[] = [
       "deterministic create-workspace builders and validators",
     ],
     adapters: [
-      "apps/sibar-research-workspace/scripts/workspace-intent-adapter.js",
+      "apps/sibar-research-workspace/legacy/vanilla-workspace/scripts/workspace-intent-adapter.js",
     ],
     track: "core-workspace",
   },
