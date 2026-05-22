@@ -20,6 +20,27 @@ import type {
 
 export const ownershipBoundary: OwnershipBoundary = {
   id: "boundary-01",
+  files: ["src/api/session.ts", "src/api/session.test.ts", "src/runtime/consumer.ts"],
+  responsibility_claim: "The createSession contract must be owned only when caller behavior proves null handling.",
+  evidence: [],
+  open_questions: [
+    "What evidence proves caller behavior is safe when `createSession` returns `null`?",
+    "How does `session.ts` test coverage prove this caller contract under auth failure?",
+    "Which relation path is still missing if this boundary is not traceable across the touched files?",
+  ],
+  risk: {
+    score: 72,
+    relationWeight: 0,
+    missingCallerPenalty: 0,
+    missingDeletionPenalty: 0,
+    blockedPenalty: 0,
+    questionablePenalty: 0,
+  },
+  confidence: "inferred",
+  state_reason_hints: {
+    "src/api/session.ts": "Active boundary: direct contract file without full caller confirmation.",
+    "src/runtime/consumer.ts": "Supporting caller relation requires boundary projection from session fixture.",
+  },
   title: "Session API boundary for absent sessions",
   filePath: "src/api/session.ts",
   startLine: 9,

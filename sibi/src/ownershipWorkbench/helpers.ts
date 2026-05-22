@@ -75,15 +75,22 @@ export function getNodeState(node: TreeNode, fileStates: Record<string, Boundary
   return "owned";
 }
 
-export function getNodeReason(node: TreeNode, fileStates: Record<string, BoundaryState>): string | undefined {
+export function getNodeReason(
+  node: TreeNode,
+  fileStates: Record<string, BoundaryState>,
+  fileStateReasons: Record<string, string> = {},
+): string | undefined {
   if (node.kind === "file") {
-    return fileStates[node.path] === "owned" ? undefined : node.reason;
+    if (fileStates[node.path] === "owned") {
+      return undefined;
+    }
+    return fileStateReasons[node.path] ?? node.reason;
   }
 
   const children = node.children ?? [];
   const firstProblem = children.find((child) => getNodeState(child, fileStates) !== "owned");
   if (!firstProblem) return undefined;
-  return getNodeReason(firstProblem, fileStates);
+  return getNodeReason(firstProblem, fileStates, fileStateReasons);
 }
 
 export function getActiveBoundaryState(

@@ -379,7 +379,8 @@ textarea {
 
 .reviewGuideIntro,
 .reviewCurrentFocus,
-.reviewBoundaryFocus {
+.reviewBoundaryFocus,
+.reviewBoundaryRisk {
   display: grid;
   gap: 6px;
   padding: 14px 18px;
@@ -419,10 +420,39 @@ textarea {
 .reviewStage h3,
 .reviewCurrentFocus h3,
 .reviewQueue h3,
-.reviewBoundaryFocus h3 {
+.reviewBoundaryFocus h3,
+.reviewBoundaryRisk h3 {
   margin: 0;
   color: #2f403f;
   font-size: 13px;
+}
+
+.boundaryRiskGrid {
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.boundaryRiskGrid div {
+  margin: 0;
+  display: grid;
+  gap: 3px;
+}
+
+.boundaryRiskGrid dt {
+  margin: 0;
+  color: #677a7d;
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.boundaryRiskGrid dd {
+  margin: 0;
+  color: #203f42;
+  font-size: 12px;
+  font-weight: 700;
 }
 
 .reviewCurrentFocus dl {

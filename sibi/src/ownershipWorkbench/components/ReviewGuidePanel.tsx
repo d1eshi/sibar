@@ -93,7 +93,35 @@ export function ReviewGuidePanel({
         <p>
           <strong>{boundary.title}</strong>
         </p>
+        <p>
+          Responsibility claim: <strong>{boundary.responsibility_claim}</strong>
+        </p>
         <p>{boundary.whyMatters}</p>
+      </section>
+
+      <section className="reviewBoundaryRisk" aria-label="Highest-risk boundary">
+        <h3>Highest-risk boundary</h3>
+        <p>
+          <strong>{boundary.title}</strong> ranked by policy.
+        </p>
+        <dl className="boundaryRiskGrid">
+          <div>
+            <dt>Risk score</dt>
+            <dd>{boundary.risk.score}</dd>
+          </div>
+          <div>
+            <dt>Relation weight</dt>
+            <dd>{boundary.risk.relationWeight}</dd>
+          </div>
+          <div>
+            <dt>Confidence</dt>
+            <dd>{boundary.confidence}</dd>
+          </div>
+          <div>
+            <dt>Open questions</dt>
+            <dd>{boundary.open_questions.length}</dd>
+          </div>
+        </dl>
       </section>
     </section>
   );
