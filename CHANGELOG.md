@@ -11,6 +11,13 @@ accepted specs and iterations, not by raw commit count.
 Use this section for changes that have landed but are not part of a tagged
 release yet.
 
+### Added - Mission Session Bridge
+
+- Added a deterministic Mission -> Session bridge that normalizes source
+  signal/slice refs, maps free-form session operations into the closed pedagogy
+  operation taxonomy, builds stable source-slice excerpt evidence inventory
+  entries, and emits the existing attempt/readiness loop inputs.
+
 ### Docs - Ownership Workbench Product Research
 
 - Added three research memos:
