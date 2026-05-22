@@ -18,6 +18,13 @@ release yet.
   provider icon in sync with the entered URL.
 - Reworked the Capture PR form sizing with fluid layout variables and responsive
   breakpoints instead of a single fixed-width control cap.
+- Split the Capture PR screen into a reusable public entry that Vercel can build
+  under `/sibi`, opening the existing early access waitlist modal instead of the
+  local ownership workbench.
+- Moved the early access modal to an app-level reusable React component backed
+  by the shared `/api/early-access` Supabase waitlist endpoint.
+- Added a public `apps/early-access` barrel that reexports the modal and lead
+  client API for Sibi and other app entries.
 
 ### Docs - Ownership Workbench Product Research
 
