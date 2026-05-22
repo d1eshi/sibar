@@ -11,6 +11,15 @@ accepted specs and iterations, not by raw commit count.
 Use this section for changes that have landed but are not part of a tagged
 release yet.
 
+### Docs - Ownership Workbench Product Research
+
+- Added three research memos:
+  - `docs/research/2026-05-22-ownership-workbench-moat-comparison.md` (moat/comparative framing for Ownership Workbench positioning),
+  - `docs/research/2026-05-22-cognitive-debt-load-metrics-operationalization.md` (operationalization of cognitive debt/load metrics and reporting),
+  - `docs/research/2026-05-22-jarvis-voice-control-surface-agent-flow.md` (control-surface, voice, and agent-flow alignment for Playwright/manifest execution).
+- Synthesized common themes for product strategy and implementation planning:
+  comparative moat defense, measurable cognitive debt/load signals, and a Playwright/manifest-safe control surface for voice-driven agent flows.
+
 ### Docs - AutoResearch Cognitive Debt Workbench
 
 - Added `docs/research/2026-05-22-cognitive-debt-autoresearch-ownership-workbench.md` as a research memo for AutoResearch framing, translating cognitive debt/ cognitive load/ ownership manifesto into concrete, testable contracts, reproducible evidence definitions, UI reproducibility rules, and pending ownership decisions.
