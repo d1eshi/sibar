@@ -146,7 +146,6 @@ function CapturePrScreen({ onAnalyze }: CapturePrScreenProps): React.ReactElemen
       <section className="routePreview" aria-label="Ownership route preview">
         <header className="routePreviewHeader">
           <h2>Ownership route</h2>
-          <span className="routeStatus ready">Auto guide</span>
         </header>
 
         <div className="routeCanvas">
