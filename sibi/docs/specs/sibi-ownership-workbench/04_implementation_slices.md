@@ -399,6 +399,8 @@ Acceptance:
 
 Goal: add provider evidence extraction only under strict contracts.
 
+Status: implemented.
+
 Deliverables:
 
 - AI SDK provider abstraction with Gemini-first integration;
@@ -412,6 +414,19 @@ Acceptance:
 - inferred claims cannot update ownership facts;
 - model output can propose questions but not readiness.
 - provider output remains tentative until contract-verifiable evidence passes.
+
+Implementation policy for this slice:
+
+- Evidence extraction and verification live in `src/ownershipWorkbench/geminiEvidenceExtractor.ts`
+  as pure functions with deterministic report normalization (`generated_at`, report
+  schema, and sample request derivation).
+- Provider adapters exposed by id (`gemini`, `gemini-first`) with `executionEnabledByDefault`
+  defaulting to disabled to keep live provider calls out-of-band.
+- Unsupported kinds, invalid citations, inferred ownership facts, readiness claims,
+  invented files, or out-of-bounds ranges are rejected or downgraded per contract
+  before any ownership mutation claim is accepted.
+- Gemini diagnostics are rendered in lab mode under `OwnershipHarnessPanel` and
+  are not shown in default workbench mode.
 
 ## Open Questions
 

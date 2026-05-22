@@ -25,6 +25,7 @@ import type {
   CognitiveLoadMetric,
   DailyCognitiveReadout,
 } from "../cognitiveMetrics.ts";
+import type { GeminiEvidenceExtractionResult } from "../geminiEvidenceExtractor.ts";
 
 interface OwnershipLabContext {
   selectedFile: string;
@@ -66,6 +67,7 @@ interface OwnershipHarnessPanelProps {
   cognitiveDebtMetric: CognitiveDebtMetric;
   cognitiveLoadMetric: CognitiveLoadMetric;
   cognitiveDailyReadout: DailyCognitiveReadout;
+  geminiEvidenceExtraction: GeminiEvidenceExtractionResult | null;
   agentFlowManifest: AgentFlowManifest | null;
   agentFlowHappyValidation: AgentActionValidationResult | null;
   agentFlowBlockedValidation: AgentActionValidationResult | null;
@@ -103,6 +105,7 @@ export function OwnershipHarnessPanel({
   cognitiveDebtMetric,
   cognitiveLoadMetric,
   cognitiveDailyReadout,
+  geminiEvidenceExtraction,
   agentFlowManifest,
   agentFlowHappyValidation,
   agentFlowBlockedValidation,
@@ -229,6 +232,54 @@ export function OwnershipHarnessPanel({
             <details>
               <summary>Manifest shape</summary>
               <pre>{JSON.stringify(agentFlowManifest, null, 2)}</pre>
+            </details>
+          </section>
+        ) : null}
+
+        {isLabView && geminiEvidenceExtraction != null ? (
+          <section className="ownershipSection" aria-label="Gemini evidence extraction">
+            <p className="panelSub">LLM evidence extraction</p>
+            <h2>Gemini evidence extraction</h2>
+            <div className="readinessMetrics">
+              <span>Provider: {geminiEvidenceExtraction.providerLabel}</span>
+              <span>Schema: {geminiEvidenceExtraction.schema}</span>
+              <span>Tentative: {geminiEvidenceExtraction.isTentative ? "sí" : "no"}</span>
+            </div>
+            <p>
+              <strong>Overall disposition:</strong> {geminiEvidenceExtraction.overallDisposition}
+            </p>
+            <p>
+              <strong>Generated:</strong> {geminiEvidenceExtraction.reportGeneratedAt}
+            </p>
+            <div className="readinessMetrics">
+              <span>Verified: {geminiEvidenceExtraction.verifiedClaims.length}</span>
+              <span>Downgraded: {geminiEvidenceExtraction.downgradedClaims.length}</span>
+              <span>Rejected: {geminiEvidenceExtraction.rejectedClaims.length}</span>
+              <span>Proposed questions: {geminiEvidenceExtraction.proposedQuestions.length}</span>
+            </div>
+            {geminiEvidenceExtraction.schemaValidationErrors.length > 0 ? (
+              <div className="gapCard">
+                <p>Schema validation errors</p>
+                <ul>
+                  {geminiEvidenceExtraction.schemaValidationErrors.map((error) => (
+                    <li key={error}>{error}</li>
+                  ))}
+                </ul>
+              </div>
+            ) : null}
+            {geminiEvidenceExtraction.proposedQuestions.length > 0 ? (
+              <div className="gapCard">
+                <p>Proposed questions</p>
+                <ul>
+                  {geminiEvidenceExtraction.proposedQuestions.map((question) => (
+                    <li key={question}>{question}</li>
+                  ))}
+                </ul>
+              </div>
+            ) : null}
+            <details>
+              <summary>Provider report verification</summary>
+              <pre>{JSON.stringify(geminiEvidenceExtraction, null, 2)}</pre>
             </details>
           </section>
         ) : null}

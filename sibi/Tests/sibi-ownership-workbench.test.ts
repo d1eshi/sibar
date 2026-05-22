@@ -18,6 +18,7 @@ type OwnershipTransferVerification = typeof import("../src/ownershipWorkbench/tr
 type OwnershipMemory = typeof import("../src/ownershipWorkbench/ownershipMemory.ts");
 type OwnershipCognitiveMetrics = typeof import("../src/ownershipWorkbench/cognitiveMetrics.ts");
 type OwnershipAgentFlowManifest = typeof import("../src/ownershipWorkbench/agentFlowManifest.ts");
+type OwnershipGeminiEvidenceExtractor = typeof import("../src/ownershipWorkbench/geminiEvidenceExtractor.ts");
 
 const EXPECTED_DIFF_FILES = ["src/api/session.ts", "src/api/session.test.ts"] as const;
 const DIRECTORY_PATHS = ["src", "src/api", "src/runtime"] as const;
@@ -35,6 +36,7 @@ let cachedTransferVerification: OwnershipTransferVerification | null = null;
 let cachedOwnershipMemory: OwnershipMemory | null = null;
 let cachedCognitiveMetrics: OwnershipCognitiveMetrics | null = null;
 let cachedAgentFlowManifest: OwnershipAgentFlowManifest | null = null;
+let cachedGeminiEvidenceExtractor: OwnershipGeminiEvidenceExtractor | null = null;
 let fixtureImportConsoleErrors: unknown[] = [];
 
 async function loadFixturesModule(): Promise<OwnershipWorkbenchFixtures> {
@@ -163,6 +165,16 @@ async function loadAgentFlowManifestModule(): Promise<OwnershipAgentFlowManifest
 
   cachedAgentFlowManifest = (await import("../src/ownershipWorkbench/agentFlowManifest.ts")) as OwnershipAgentFlowManifest;
   return cachedAgentFlowManifest;
+}
+
+async function loadGeminiEvidenceExtractorModule(): Promise<OwnershipGeminiEvidenceExtractor> {
+  if (cachedGeminiEvidenceExtractor != null) {
+    return cachedGeminiEvidenceExtractor;
+  }
+
+  cachedGeminiEvidenceExtractor =
+    (await import("../src/ownershipWorkbench/geminiEvidenceExtractor.ts")) as OwnershipGeminiEvidenceExtractor;
+  return cachedGeminiEvidenceExtractor;
 }
 
 test("fixture file tree paths only include leaf file paths", async () => {
@@ -2983,4 +2995,405 @@ test("agent-flow validation rejects stale manifest inputs", async () => {
 
   assert.equal(staleVersionResult.kind, "agent_action_rejected");
   assert.equal(staleVersionResult.reasonCode, "manifest_stale");
+});
+
+test("Gemini evidence extractor verifies citations against fixture files and rejects invented lines", async () => {
+  const fixtures = await loadFixturesModule();
+  const extractor = await loadGeminiEvidenceExtractorModule();
+
+  const report = extractor.buildGeminiEvidenceLabReport({
+    selectedFile: "src/api/session.ts",
+  });
+
+  const tamperedReport: unknown = {
+    ...report,
+    claims: [
+      {
+        ...report.claims[0],
+        citations: [{
+          file_path: "src/api/missing.ts",
+          start_line: 1,
+          end_line: 3,
+          symbol: "createSession",
+        }],
+      },
+      ...report.claims.slice(1),
+    ],
+  };
+
+  const provider = extractor.getGeminiEvidenceProviderAdapter("gemini-first");
+  assert.ok(provider != null);
+
+  const result = extractor.evaluateGeminiEvidenceReport({
+    fileContents: fixtures.fileFixtures,
+    report: tamperedReport,
+    providerAdapter: provider,
+  });
+
+  assert.equal(result.overallDisposition, "rejected");
+  assert.equal(result.isTentative, true);
+  assert.equal(result.rejectedClaims.length >= 1, true);
+  assert.match(result.rejectedClaims[0]!.reasons.join(" "), /Invented file/);
+});
+
+test("Gemini evidence extractor marks inferred ownership facts as downgraded and not readiness facts", async () => {
+  const fixtures = await loadFixturesModule();
+  const extractor = await loadGeminiEvidenceExtractorModule();
+
+  const sessionFile = fixtures.fileFixtures["src/api/session.ts"];
+  assert.ok(sessionFile != null);
+
+  const inferredReport: unknown = {
+    schema: extractor.GEMINI_EVIDENCE_REPORT_SCHEMA,
+    provider_id: "gemini-first",
+    generated_at: "2026-05-22T00:00:00.000Z",
+    claims: [
+      {
+        claim_id: "inferred-claim-01",
+        kind: "ownership_fact",
+        confidence: "inferred",
+        statement: "createSession returns null under 204 and every caller handles it safely.",
+        citations: [
+          {
+            file_path: "src/api/session.ts",
+            start_line: 1,
+            end_line: 3,
+            symbol: "createSession",
+          },
+        ],
+      },
+    ],
+  };
+
+  const provider = extractor.getGeminiEvidenceProviderAdapter("gemini-first");
+  assert.ok(provider != null);
+
+  const result = extractor.evaluateGeminiEvidenceReport({
+    fileContents: {
+      ...(fixtures.fileFixtures as Record<string, string>),
+      "src/api/session.ts": sessionFile,
+    },
+    report: inferredReport,
+    providerAdapter: provider,
+  });
+
+  assert.equal(result.overallDisposition, "downgraded");
+  assert.equal(result.downgradedClaims.length, 1);
+  assert.equal(result.downgradedClaims[0]?.canUpdateOwnershipFacts, false);
+  assert.match(
+    result.downgradedClaims[0]!.reasons.join(" "),
+    /cannot update ownership facts/,
+  );
+});
+
+test("Gemini evidence extractor rejects readiness-kind and preserves proposed questions", async () => {
+  const extractor = await loadGeminiEvidenceExtractorModule();
+  const provider = extractor.getGeminiEvidenceProviderAdapter("gemini-first");
+
+  assert.ok(provider != null);
+
+  const report: unknown = {
+    schema: extractor.GEMINI_EVIDENCE_REPORT_SCHEMA,
+    provider_id: "gemini-first",
+    generated_at: "2026-05-22T00:00:00.000Z",
+    claims: [
+      {
+        claim_id: "ready-01",
+        kind: "readiness",
+        confidence: "observed",
+        statement: "Mark boundary ready if null contract appears stable.",
+        citations: [
+          {
+            file_path: "src/api/session.ts",
+            start_line: 1,
+            end_line: 3,
+            symbol: "createSession",
+          },
+        ],
+      },
+      {
+        claim_id: "q-01",
+        kind: "question",
+        confidence: "unverified",
+        statement: "Which callers still need an explicit guard check?",
+      },
+    ],
+    proposed_questions: ["Do we have proof for the consumer guard path in all flows?"],
+  };
+
+  const result = extractor.evaluateGeminiEvidenceReport({
+    fileContents: {
+      "src/api/session.ts": `export async function createSession() { return null; }`,
+    },
+    report,
+    providerAdapter: provider,
+  });
+
+  assert.equal(result.overallDisposition, "rejected");
+  assert.equal(result.rejectedClaims.length, 1);
+  assert.equal(result.rejectedClaims[0]!.kind, "readiness");
+  assert.equal(result.proposedQuestions.includes("Which callers still need an explicit guard check?"), true);
+  assert.equal(result.proposedQuestions.includes("Do we have proof for the consumer guard path in all flows?"), true);
+});
+
+test("Gemini evidence extractor accepts verified observed ownership facts with valid fixture citations", async () => {
+  const fixtures = await loadFixturesModule();
+  const extractor = await loadGeminiEvidenceExtractorModule();
+
+  const report: unknown = {
+    schema: extractor.GEMINI_EVIDENCE_REPORT_SCHEMA,
+    provider_id: "gemini-first",
+    generated_at: "2026-05-22T00:00:00.000Z",
+    claims: [
+      {
+        claim_id: "verified-01",
+        kind: "ownership_fact",
+        confidence: "observed",
+        statement: "createSession returns null and callers must handle null session state.",
+        citations: [
+          {
+            file_path: "src/api/session.ts",
+            start_line: 1,
+            end_line: 14,
+            symbol: "createSession",
+          },
+        ],
+      },
+    ],
+  };
+
+  const provider = extractor.getGeminiEvidenceProviderAdapter("gemini-first");
+  assert.ok(provider != null);
+
+  const result = extractor.evaluateGeminiEvidenceReport({
+    fileContents: {
+      ...fixtures.fileFixtures,
+    },
+    report,
+    providerAdapter: provider,
+  });
+
+  assert.equal(result.overallDisposition, "verified");
+  assert.equal(result.verifiedClaims.length, 1);
+  assert.equal(result.verifiedClaims[0]?.canUpdateOwnershipFacts, true);
+  assert.equal(result.isTentative, false);
+});
+
+test("Gemini evidence extractor produces deterministic lab report metadata for the same file input", async () => {
+  const extractor = await loadGeminiEvidenceExtractorModule();
+
+  const first = extractor.buildGeminiEvidenceLabReport({ selectedFile: "src/api/session.ts" });
+  const second = extractor.buildGeminiEvidenceLabReport({ selectedFile: "src/api/session.ts" });
+  const differentFile = extractor.buildGeminiEvidenceLabReport({ selectedFile: "src/runtime/consumer.ts" });
+
+  assert.equal(first.generated_at, second.generated_at);
+  assert.equal(first.schema, extractor.GEMINI_EVIDENCE_REPORT_SCHEMA);
+  assert.equal(first.provider_id, "gemini-first");
+  assert.equal(differentFile.generated_at === first.generated_at, false);
+});
+
+test("Gemini evidence extractor downgrades unsupported claim kinds", async () => {
+  const extractor = await loadGeminiEvidenceExtractorModule();
+  const fixtures = await loadFixturesModule();
+
+  const unsupportedReport: unknown = {
+    schema: extractor.GEMINI_EVIDENCE_REPORT_SCHEMA,
+    provider_id: "gemini-first",
+    generated_at: "2026-05-22T00:00:00.000Z",
+    claims: [
+      {
+        claim_id: "unsupported-01",
+        kind: "experimental_metric",
+        confidence: "inferred",
+        statement: "This claim kind is not supported by runtime contracts.",
+        citations: [
+          {
+            file_path: "src/api/session.ts",
+            start_line: 1,
+            end_line: 3,
+            symbol: "createSession",
+          },
+        ],
+      },
+    ],
+  };
+
+  const provider = extractor.getGeminiEvidenceProviderAdapter("gemini-first");
+  assert.ok(provider != null);
+
+  const result = extractor.evaluateGeminiEvidenceReport({
+    fileContents: fixtures.fileFixtures,
+    report: unsupportedReport,
+    providerAdapter: provider,
+  });
+
+  assert.equal(result.overallDisposition, "downgraded");
+  assert.equal(result.downgradedClaims.length, 1);
+  assert.equal(result.isTentative, true);
+  assert.match(
+    result.downgradedClaims[0]!.reasons.join(" "),
+    /Unsupported claim kind/,
+  );
+});
+
+test("Gemini evidence extractor rejects malformed claim fields as schema errors", async () => {
+  const extractor = await loadGeminiEvidenceExtractorModule();
+  const provider = extractor.getGeminiEvidenceProviderAdapter("gemini-first");
+  assert.ok(provider != null);
+
+  const malformedKindReport: unknown = {
+    schema: extractor.GEMINI_EVIDENCE_REPORT_SCHEMA,
+    provider_id: "gemini-first",
+    generated_at: "2026-05-22T00:00:00.000Z",
+    claims: [
+      {
+        claim_id: "bad-kind-01",
+        kind: 123,
+        confidence: "observed",
+        statement: "Kind is malformed.",
+        citations: [
+          {
+            file_path: "src/api/session.ts",
+            start_line: 1,
+            end_line: 14,
+            symbol: "createSession",
+          },
+        ],
+      },
+    ],
+  };
+
+  const malformedConfidenceReport: unknown = {
+    schema: extractor.GEMINI_EVIDENCE_REPORT_SCHEMA,
+    provider_id: "gemini-first",
+    generated_at: "2026-05-22T00:00:00.000Z",
+    claims: [
+      {
+        claim_id: "bad-confidence-01",
+        kind: "ownership_fact",
+        confidence: "high",
+        statement: "Confidence is not allowed.",
+        citations: [
+          {
+            file_path: "src/api/session.ts",
+            start_line: 1,
+            end_line: 14,
+            symbol: "createSession",
+          },
+        ],
+      },
+    ],
+  };
+
+  const badKindResult = extractor.evaluateGeminiEvidenceReport({
+    fileContents: { "src/api/session.ts": "export async function createSession() { return null; }" },
+    report: malformedKindReport,
+    providerAdapter: provider,
+  });
+  assert.equal(badKindResult.overallDisposition, "rejected");
+  assert.equal(badKindResult.schemaValidationErrors.length > 0, true);
+  assert.match(badKindResult.schemaValidationErrors[0]!, /claims\[0\]\.kind/);
+  assert.equal(badKindResult.rejectedClaims[0]!.claimId, "schema");
+
+  const badConfidenceResult = extractor.evaluateGeminiEvidenceReport({
+    fileContents: { "src/api/session.ts": "export async function createSession() { return null; }" },
+    report: malformedConfidenceReport,
+    providerAdapter: provider,
+  });
+  assert.equal(badConfidenceResult.overallDisposition, "rejected");
+  assert.equal(badConfidenceResult.schemaValidationErrors.length > 0, true);
+  assert.match(badConfidenceResult.schemaValidationErrors[0]!, /confidence must be one of/);
+});
+
+test("Gemini evidence extractor rejects claims with out-of-bounds citation ranges", async () => {
+  const fixtures = await loadFixturesModule();
+  const extractor = await loadGeminiEvidenceExtractorModule();
+
+  const outOfBoundsReport: unknown = {
+    schema: extractor.GEMINI_EVIDENCE_REPORT_SCHEMA,
+    provider_id: "gemini-first",
+    generated_at: "2026-05-22T00:00:00.000Z",
+    claims: [
+      {
+        claim_id: "bounds-01",
+        kind: "ownership_fact",
+        confidence: "observed",
+        statement: "This claim points beyond the file.",
+        citations: [
+          {
+            file_path: "src/api/session.ts",
+            start_line: 1000,
+            end_line: 1001,
+            symbol: "createSession",
+          },
+        ],
+      },
+    ],
+  };
+
+  const provider = extractor.getGeminiEvidenceProviderAdapter("gemini-first");
+  assert.ok(provider != null);
+
+  const result = extractor.evaluateGeminiEvidenceReport({
+    fileContents: fixtures.fileFixtures,
+    report: outOfBoundsReport,
+    providerAdapter: provider,
+  });
+
+  assert.equal(result.overallDisposition, "rejected");
+  assert.equal(result.rejectedClaims.length, 1);
+  assert.match(result.rejectedClaims[0]!.reasons.join(" "), /out of bounds/);
+  assert.equal(result.rejectedClaims[0]?.evidenceRefs.length, 0);
+});
+
+test("Gemini evidence extractor rejects out-of-bounds citation and keeps only valid evidence refs", async () => {
+  const fixtures = await loadFixturesModule();
+  const extractor = await loadGeminiEvidenceExtractorModule();
+  const provider = extractor.getGeminiEvidenceProviderAdapter("gemini-first");
+
+  assert.ok(provider != null);
+
+  const mixedCitationsReport: unknown = {
+    schema: extractor.GEMINI_EVIDENCE_REPORT_SCHEMA,
+    provider_id: "gemini-first",
+    generated_at: "2026-05-22T00:00:00.000Z",
+    claims: [
+      {
+        claim_id: "mixed-01",
+        kind: "ownership_fact",
+        confidence: "observed",
+        statement: "One valid and one invalid citation.",
+        citations: [
+          {
+            file_path: "src/api/session.ts",
+            start_line: 1,
+            end_line: 14,
+            symbol: "createSession",
+          },
+          {
+            file_path: "src/api/session.ts",
+            start_line: 1000,
+            end_line: 1001,
+            symbol: "createSession",
+          },
+        ],
+      },
+    ],
+  };
+
+  const result = extractor.evaluateGeminiEvidenceReport({
+    fileContents: fixtures.fileFixtures,
+    report: mixedCitationsReport,
+    providerAdapter: provider,
+  });
+
+  assert.equal(result.overallDisposition, "rejected");
+  assert.equal(result.rejectedClaims.length, 1);
+  assert.equal(result.rejectedClaims[0]!.evidenceRefs.length, 1);
+  assert.match(result.rejectedClaims[0]!.evidenceRefs[0]!.id, /:1-14$/);
+  assert.match(result.rejectedClaims[0]!.evidenceRefs[0]!.id, /mixed-01/);
+  assert.equal(
+    result.rejectedClaims[0]!.evidenceRefs.some((entry) => entry.id.includes("1000-1001")),
+    false,
+  );
 });

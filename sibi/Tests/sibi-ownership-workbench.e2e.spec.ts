@@ -409,3 +409,17 @@ test("agent-flow diagnostics are hidden in default view", async ({ page }) => {
   await expect(page.getByLabel("Agent-flow manifest")).toHaveCount(0);
   await expect(page.getByLabel("Agent action validation")).toHaveCount(0);
 });
+
+test("lab mode renders Gemini evidence extraction panel and hides it in default view", async ({ page }) => {
+  await page.goto("/?view=lab");
+
+  const geminiSection = page.getByLabel("Gemini evidence extraction");
+  await expect(geminiSection).toBeVisible();
+  await expect(geminiSection).toContainText("Gemini evidence extraction");
+  await expect(geminiSection).toContainText("Provider: Gemini-first");
+  await expect(geminiSection).toContainText("Overall disposition:");
+  await expect(geminiSection).toContainText("Verified:");
+
+  await page.goto("/");
+  await expect(page.getByLabel("Gemini evidence extraction")).toHaveCount(0);
+});
