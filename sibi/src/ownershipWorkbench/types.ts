@@ -10,6 +10,32 @@ export type WorkbenchSurfaceMode = "default" | "lab";
 
 export type ReadinessGate = "ready" | "repair-needed" | "blocked";
 
+export type EscalationReason =
+  | "relation-gap-recurrence"
+  | "repeated-low-calibration"
+  | "transfer-failure-after-repair"
+  | "prerequisite-chain-dependency"
+  | "dependency-churn";
+
+export type WorkspaceArtifactSourceKind = "diff" | "pr" | "agent_output" | "code_selection";
+
+export type OwnershipReviewArtifact = {
+  artifact_id: string;
+  created_at: string;
+  source_kind: WorkspaceArtifactSourceKind;
+  review: string;
+  reason: EscalationReason | "manual";
+  evidence_refs: EvidenceRef[];
+  blocking_ids: string[];
+  diff_text_ref?: string;
+  goal_context?: string;
+  areas_touched: string[];
+  required_evidence: EvidenceRef[];
+  read_path: string[];
+  blocked_reasons: string[];
+  suggested_workspace_seed?: string;
+};
+
 export type EvidenceRef = {
   id: string;
   title: string;

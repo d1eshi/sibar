@@ -151,14 +151,16 @@ async function completeReviewSession(page: Page): Promise<void> {
   await page
     .getByLabel("Tu respuesta")
     .fill(
-      "The 204 branch now returns null and callers must treat this as an active-session miss.",
+      "The `src/api/session.ts` contract returns null for 204, and `src/api/session.test.ts` verifies this behavior.",
     );
   await page.getByRole("button", { name: "Submit attempt" }).click();
   await expect(page.getByLabel("Current Sibi question")).toContainText("runtime/consumer.ts");
 
   await page
     .getByLabel("Tu respuesta")
-    .fill("session.test proves null returns now, while no session stays unauthenticated.");
+    .fill(
+      "In `src/runtime/consumer.ts`, `createSession` from `src/api/session.ts` can return null, so the caller must guard and keep auth flow safe.",
+    );
   await page.getByRole("button", { name: "Submit attempt" }).click();
   await expect(page.getByRole("heading", { name: "Session complete", level: 2 })).toBeVisible();
   await expect(page.getByText("Readiness gate: Not yet attempted.")).toBeVisible();
@@ -246,4 +248,50 @@ test("transfer skip keeps boundary non-owned and exposes explicit follow-up task
   await expect(page.locator('[aria-label="Current queue focus"] .stateBadge')).toHaveText("questionable");
   await expect(page.getByText("Recovery tasks")).toBeVisible();
   await expect(page.getByText("Mark this as a local follow-up before ownership is consolidated.")).toBeVisible();
+});
+
+test("repeated transfer failures expose a deterministic workspace handoff candidate and user authorization", async ({ page }) => {
+  await page.goto("/");
+
+  await completeReviewSession(page);
+  await page
+    .getByLabel("Final boundary attempt")
+    .fill(
+      "The createSession branch returns null from 204; callers must guard with `if (!session)` before any privileged request so unauthenticated path stays safe.",
+    );
+  await page.getByLabel("Self confidence").fill("60");
+  await page.getByRole("button", { name: "Submit attempt" }).click();
+  await expect(page.getByText("Readiness gate: ready")).toBeVisible();
+  await expect(page.getByLabel("Workspace handoff candidate")).toHaveCount(0);
+  await expect(page.getByLabel("Workspace handoff artifact")).toHaveCount(0);
+  await expect(page.getByRole("button", { name: "Submit transfer answer" })).toBeVisible();
+
+  await page
+    .getByLabel("Transfer answer")
+    .fill("I cannot map this invariant to the related consumer boundary right now.");
+  await page.getByRole("button", { name: "Submit transfer answer" }).click();
+  await expect(page.getByText(/Transfer outcome: transfer_fail/i)).toBeVisible();
+  await expect(page.getByLabel("Workspace handoff candidate")).toHaveCount(0);
+  await expect(page.getByLabel("Workspace handoff artifact")).toHaveCount(0);
+
+  await page
+    .getByLabel("Transfer answer")
+    .fill("I still cannot justify the same invariant in the consumer boundary.");
+  await page.getByRole("button", { name: "Submit transfer answer" }).click();
+  await expect(page.getByText(/Transfer outcome: transfer_fail/i)).toBeVisible();
+  await expect(page.getByLabel("Workspace handoff candidate")).toBeVisible();
+  await expect(page.getByRole("button", { name: "Authorize workspace handoff" })).toBeEnabled();
+  await expect(page.getByLabel("Workspace handoff artifact")).toHaveCount(0);
+
+  await page.getByRole("button", { name: "Authorize workspace handoff" }).click();
+
+  const handoffArtifact = page.getByLabel("Workspace handoff artifact");
+  await expect(handoffArtifact).toBeVisible();
+  await expect(handoffArtifact.getByText("Workspace handoff artifact")).toBeVisible();
+  await expect(handoffArtifact.getByText("Source: diff")).toBeVisible();
+  await expect(handoffArtifact.getByText("Read path")).toBeVisible();
+  await expect(handoffArtifact.getByText("Required evidence")).toBeVisible();
+  await expect(handoffArtifact.getByText("Blocking IDs")).toBeVisible();
+  await expect(handoffArtifact.getByText("Blocked reasons")).toBeVisible();
+  await expect(handoffArtifact.getByText("Suggested workspace seed:")).toBeVisible();
 });
