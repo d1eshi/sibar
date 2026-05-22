@@ -1,0 +1,397 @@
+import test from "node:test";
+import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
+import { mkdir, mkdtemp, rm, symlink, writeFile } from "node:fs/promises";
+import os from "node:os";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
+import sibiViteConfig, {
+  ALLOWED_PIERRE_USE_CLIENT_REACT_FILES,
+  getPierreReactDistFileId,
+  isPierreModuleLevelDirectiveWarning,
+} from "../vite.config.js";
+
+const pierreDirectiveMessage =
+  'Module level directives cause errors when bundled, "use client" in "node_modules/.pnpm/@pierre+trees@1.0.0/node_modules/@pierre/trees/dist/react/FileTree.js" was ignored.';
+const repoRoot = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
+
+test("Sibi public Vercel build emits only the public entry under /sibi", () => {
+  const packageJson = JSON.parse(readFileSync(join(repoRoot, "package.json"), "utf8"));
+  const mainEntry = readFileSync(join(repoRoot, "sibi/src/main.tsx"), "utf8");
+  const publicEntry = readFileSync(join(repoRoot, "sibi/src/PublicSibiEntry.tsx"), "utf8");
+  const sharedEarlyAccessApi = readFileSync(join(repoRoot, "apps/early-access/index.ts"), "utf8");
+  const sharedEarlyAccessModal = readFileSync(join(repoRoot, "apps/early-access/EarlyAccessModal.tsx"), "utf8");
+
+  assert.match(packageJson.scripts["sibi:build:public"], /VITE_SIBI_PUBLIC_ENTRY=true/);
+  assert.match(packageJson.scripts["sibi:build:public"], /--config sibi\/vite\.public\.config\.js/);
+  assert.match(packageJson.scripts["sibi:build:public"], /--base \/sibi\//);
+  assert.match(packageJson.scripts["sibi:build:public"], /--outDir \.\.\/web\/sibi/);
+  assert.equal(packageJson.scripts["vercel:build"], "pnpm run sibi:build:public");
+  assert.match(mainEntry, /VITE_SIBI_PUBLIC_ENTRY/);
+  assert.match(publicEntry, /CapturePrEntryScreen/);
+  assert.match(publicEntry, /\.\.\/\.\.\/apps\/early-access\/index\.ts/);
+  assert.doesNotMatch(publicEntry, /apps\/early-access\/EarlyAccessModal\.tsx/);
+  assert.match(sharedEarlyAccessApi, /EarlyAccessModal/);
+  assert.match(sharedEarlyAccessApi, /EarlyAccessModalCopy/);
+  assert.match(sharedEarlyAccessApi, /EarlyAccessModalProps/);
+  assert.match(sharedEarlyAccessApi, /requestEarlyAccessLead/);
+  assert.match(sharedEarlyAccessApi, /EarlyAccessLeadInput/);
+  assert.match(sharedEarlyAccessApi, /EarlyAccessResult/);
+  assert.match(sharedEarlyAccessModal, /requestEarlyAccessLead/);
+  assert.match(sharedEarlyAccessModal, /xHandle/);
+  assert.match(sharedEarlyAccessModal, /sibarEarlyAccessModal/);
+  assert.doesNotMatch(publicEntry, /workbench=1|OwnershipHarnessPanel|FileTreePanel/);
+});
+
+function getInventoryEndpointMiddleware() {
+  const plugin = sibiViteConfig.plugins?.find((entry) => entry.name === "sibi-repo-inventory-endpoint");
+  assert.equal(typeof plugin?.configureServer, "function", "expected repo inventory middleware plugin");
+
+  let middleware = null;
+  const app = {
+    middlewares: {
+      use(path, handler) {
+        if (path === "/__sibi/repo-inventory") {
+          middleware = handler;
+        }
+      },
+    },
+  };
+
+  plugin.configureServer(app);
+
+  assert.equal(typeof middleware, "function", "repo inventory middleware should be registered");
+  return middleware;
+}
+
+function getFileContentEndpointMiddleware() {
+  const plugin = sibiViteConfig.plugins?.find((entry) => entry.name === "sibi-file-content-endpoint");
+  assert.equal(typeof plugin?.configureServer, "function", "expected file-content middleware plugin");
+
+  let middleware = null;
+  const app = {
+    middlewares: {
+      use(path, handler) {
+        if (path === "/__sibi/file-content") {
+          middleware = handler;
+        }
+      },
+    },
+  };
+
+  plugin.configureServer(app);
+
+  assert.equal(typeof middleware, "function", "file-content middleware should be registered");
+  return middleware;
+}
+
+async function callFileContentMiddleware(url) {
+  const middleware = getFileContentEndpointMiddleware();
+  const response = {
+    statusCode: 200,
+    headers: {},
+    body: "",
+    setHeader(name, value) {
+      this.headers[name] = value;
+    },
+    end(payload) {
+      if (payload != null) {
+        this.body += String(payload);
+      }
+    },
+  };
+
+  const request = { url };
+  await middleware(request, response);
+  return response;
+}
+
+async function callInventoryMiddleware(url) {
+  const middleware = getInventoryEndpointMiddleware();
+  const response = {
+    statusCode: 200,
+    headers: {},
+    body: "",
+    setHeader(name, value) {
+      this.headers[name] = value;
+    },
+    end(payload) {
+      if (payload != null) {
+        this.body += String(payload);
+      }
+    },
+  };
+
+  const request = { url };
+  await middleware(request, response);
+  return response;
+}
+
+test("Sibi Vite @pierre warning contract allowlist only points at real React 'use client' bundles", () => {
+  const here = dirname(fileURLToPath(import.meta.url));
+  const pierreRoot = join(here, "..", "..", "node_modules", "@pierre");
+
+  for (const fileId of ALLOWED_PIERRE_USE_CLIENT_REACT_FILES) {
+    const match = fileId.match(/^@pierre\/(?<packageName>[^/]+)\/dist\/react\/(?<entry>.+\.js)$/);
+    assert.ok(match?.groups, `Unexpected allowlist entry format: ${fileId}`);
+
+    const filePath = join(pierreRoot, match.groups.packageName, "dist", "react", match.groups.entry);
+    const contents = readFileSync(filePath, "utf8");
+    assert.ok(
+      contents.startsWith("'use client';"),
+      `${fileId} must be a module-level 'use client' bundle (otherwise it should not be filtered)`,
+    );
+  }
+});
+
+test("Sibi Vite warning filter only suppresses the allow-listed @pierre module directives", () => {
+  assert.equal(
+    getPierreReactDistFileId({
+      code: "MODULE_LEVEL_DIRECTIVE",
+      id: "node_modules/.pnpm/@pierre+trees@1.0.0/node_modules/@pierre/trees/dist/react/FileTree.js",
+      message: pierreDirectiveMessage,
+    }),
+    "@pierre/trees/dist/react/FileTree.js",
+  );
+
+  assert.equal(
+    isPierreModuleLevelDirectiveWarning({
+      code: "MODULE_LEVEL_DIRECTIVE",
+      id: "node_modules/.pnpm/@pierre+trees@1.0.0/node_modules/@pierre/trees/dist/react/FileTree.js",
+      message: pierreDirectiveMessage,
+    }),
+    true,
+  );
+
+  assert.equal(
+    isPierreModuleLevelDirectiveWarning({
+      code: "MODULE_LEVEL_DIRECTIVE",
+      id: "node_modules/@pierre/trees/dist/react/SomeNewThing.js",
+      message: pierreDirectiveMessage.replaceAll("FileTree.js", "SomeNewThing.js"),
+    }),
+    false,
+    "unexpected @pierre directive warnings should remain visible",
+  );
+
+  assert.equal(
+    isPierreModuleLevelDirectiveWarning({
+      code: "MODULE_LEVEL_DIRECTIVE",
+      id: "node_modules/some-package/dist/react/FileTree.js",
+      message: pierreDirectiveMessage.replaceAll("@pierre/trees", "some-package"),
+    }),
+    false,
+    "same Rollup directive warning from non-@pierre packages should remain visible",
+  );
+
+  assert.equal(
+    isPierreModuleLevelDirectiveWarning({
+      code: "CHUNK_SIZE",
+      id: "node_modules/@pierre/trees/dist/react/FileTree.js",
+      message: "Some chunks are larger than 500 kB after minification.",
+    }),
+    false,
+    "chunk-size warnings must never be filtered",
+  );
+});
+
+test("Sibi Vite onwarn forwards warnings outside the @pierre directive allowlist", () => {
+  const onwarn = sibiViteConfig.build?.rollupOptions?.onwarn;
+  assert.equal(typeof onwarn, "function");
+
+  const forwardedWarnings: unknown[] = [];
+  onwarn(
+    {
+      code: "CHUNK_SIZE",
+      message: "Some chunks are larger than 500 kB after minification.",
+    },
+    (warning: unknown) => {
+      forwardedWarnings.push(warning);
+    },
+  );
+
+  assert.equal(forwardedWarnings.length, 1);
+
+  onwarn(
+    {
+      code: "MODULE_LEVEL_DIRECTIVE",
+      id: "node_modules/@pierre/diffs/dist/react/CodeView.js",
+      message:
+        'Module level directives cause errors when bundled, "use client" in "node_modules/@pierre/diffs/dist/react/CodeView.js" was ignored.',
+    },
+    (warning: unknown) => {
+      forwardedWarnings.push(warning);
+    },
+  );
+
+  assert.equal(forwardedWarnings.length, 1, "allow-listed @pierre use-client directive warnings should be filtered");
+
+  onwarn(
+    {
+      code: "MODULE_LEVEL_DIRECTIVE",
+      id: "node_modules/@pierre/diffs/dist/react/SomeNewThing.js",
+      message:
+        'Module level directives cause errors when bundled, "use client" in "node_modules/@pierre/diffs/dist/react/SomeNewThing.js" was ignored.',
+    },
+    (warning: unknown) => {
+      forwardedWarnings.push(warning);
+    },
+  );
+
+  assert.equal(
+    forwardedWarnings.length,
+    2,
+    "unexpected @pierre directive warnings must be forwarded so we can tighten boundaries",
+  );
+});
+
+test("Sibi Vite repo-inventory endpoint returns bounded src inventory JSON", async () => {
+  const response = await callInventoryMiddleware("/__sibi/repo-inventory?sourceRoot=src");
+  const payload = JSON.parse(response.body);
+
+  assert.equal(response.statusCode, 200);
+  assert.equal(payload.sourceRoot, "src");
+  assert.equal(Array.isArray(payload.files), true);
+  assert.equal(payload.files.length > 0, true);
+  assert.equal(payload.tree.fileCount, payload.files.length);
+  assert.equal(typeof payload.generatedAt, "string");
+});
+
+test("Sibi Vite repo-inventory endpoint blocks out-of-root sourceRoots", async () => {
+  const response = await callInventoryMiddleware("/__sibi/repo-inventory?sourceRoot=../../../../etc");
+  const payload = JSON.parse(response.body);
+
+  assert.equal(response.statusCode, 400);
+  assert.equal(typeof payload.error, "string");
+  assert.match(payload.error, /inside the Sibi app root/i);
+});
+
+test("Sibi Vite repo-inventory endpoint blocks symlink-based sourceRoot escape", async (t) => {
+  const here = dirname(fileURLToPath(import.meta.url));
+  const appRoot = join(here, "..");
+  const outsideTarget = await mkdtemp(join(os.tmpdir(), "sibi-repo-inventory-outside-"));
+  const linkName = `.repo-inventory-escape-${Date.now()}`;
+  const symlinkPath = join(appRoot, linkName);
+  const linkType = process.platform === "win32" ? "junction" : "dir";
+
+  let skipReason = null;
+
+  try {
+    await symlink(outsideTarget, symlinkPath, linkType);
+    const response = await callInventoryMiddleware(`/__sibi/repo-inventory?sourceRoot=${linkName}`);
+    const payload = JSON.parse(response.body);
+
+    assert.equal(response.statusCode, 400);
+    assert.equal(typeof payload.error, "string");
+    assert.match(payload.error, /inside the Sibi app root/i);
+  } catch (error) {
+    const code = error instanceof Error ? (error as NodeJS.ErrnoException).code : null;
+    if (code === "ENOTSUP" || code === "EPERM" || code === "EEXIST" || code === "EINVAL" || code === "EOPNOTSUPP") {
+      skipReason = code;
+    } else {
+      throw error;
+    }
+  } finally {
+    await rm(symlinkPath, { force: true });
+    await rm(outsideTarget, { force: true, recursive: true });
+  }
+
+  if (skipReason != null) {
+    t.skip(`Symlink test skipped: filesystem does not support symlink creation in this environment (${skipReason})`);
+  }
+});
+
+test("Sibi Vite file-content endpoint returns line-counted file data", async () => {
+  const response = await callFileContentMiddleware(
+    "/__sibi/file-content?sourceRoot=src&path=src/App.tsx",
+  );
+  const payload = JSON.parse(response.body);
+
+  assert.equal(response.statusCode, 200);
+  assert.equal(payload.sourceRoot, "src");
+  assert.equal(payload.path, "src/App.tsx");
+  assert.equal(typeof payload.contents, "string");
+  assert.equal(typeof payload.lineCount, "number");
+  assert.equal(typeof payload.sizeBytes, "number");
+  assert.equal(payload.lineCount >= 1, true);
+});
+
+test("Sibi Vite file-content endpoint blocks out-of-root path and sourceRoot", async () => {
+  const outOfRoot = await callFileContentMiddleware("/__sibi/file-content?sourceRoot=src&path=../../vite.config.js");
+  const outOfSource = await callFileContentMiddleware("/__sibi/file-content?sourceRoot=src&path=/etc/passwd");
+  const missing = await callFileContentMiddleware("/__sibi/file-content?sourceRoot=src&path=src/missing-file.ts");
+
+  for (const response of [outOfRoot, outOfSource]) {
+    const payload = JSON.parse(response.body);
+    assert.equal(response.statusCode, 400);
+    assert.equal(typeof payload.error, "string");
+    assert.match(payload.error, /path|inside the Sibi app root/i);
+  }
+
+  const missingPayload = JSON.parse(missing.body);
+  assert.equal(missing.statusCode, 404);
+  assert.equal(typeof missingPayload.error, "string");
+  assert.match(missingPayload.error, /not found/i);
+});
+
+test("Sibi Vite file-content endpoint rejects sourceRoot traversal values", async () => {
+  const response = await callFileContentMiddleware("/__sibi/file-content?sourceRoot=src/..&path=vite.config.js");
+  const payload = JSON.parse(response.body);
+
+  assert.equal(response.statusCode, 400);
+  assert.equal(typeof payload.error, "string");
+  assert.match(payload.error, /sourceRoot|inside the Sibi app root/i);
+});
+
+test("Sibi Vite file-content endpoint rejects directory targets", async () => {
+  const sourceRootPath = await callFileContentMiddleware("/__sibi/file-content?sourceRoot=src&path=src");
+  const trailingSlashPath = await callFileContentMiddleware("/__sibi/file-content?sourceRoot=src&path=src/");
+  const sourcePathPayload = JSON.parse(sourceRootPath.body);
+  const trailingPathPayload = JSON.parse(trailingSlashPath.body);
+
+  assert.equal(sourceRootPath.statusCode, 400);
+  assert.equal(typeof sourcePathPayload.error, "string");
+  assert.match(sourcePathPayload.error, /regular file/i);
+
+  assert.equal(trailingSlashPath.statusCode, 400);
+  assert.equal(typeof trailingPathPayload.error, "string");
+  assert.match(trailingPathPayload.error, /regular file/i);
+});
+
+test("Sibi Vite file-content endpoint blocks symlink-based file escapes", async (t) => {
+  const here = dirname(fileURLToPath(import.meta.url));
+  const appRoot = join(here, "..");
+  const srcRoot = join(appRoot, "src");
+  const outsideTarget = await mkdtemp(join(os.tmpdir(), "sibi-file-content-outside-"));
+  const outsideFile = join(outsideTarget, "outside.ts");
+  const linkName = `.sibi-file-content-link-${Date.now()}.ts`;
+  const symlinkPath = join(srcRoot, linkName);
+
+  let skipReason = null;
+
+  try {
+    await mkdir(srcRoot, { recursive: true });
+    await writeFile(outsideFile, "export const x = 1;\n");
+    await symlink(outsideFile, symlinkPath, process.platform === "win32" ? "file" : "file");
+
+    const response = await callFileContentMiddleware(`/__sibi/file-content?sourceRoot=src&path=${linkName}`);
+    const payload = JSON.parse(response.body);
+
+    assert.equal(response.statusCode, 400);
+    assert.equal(typeof payload.error, "string");
+    assert.match(payload.error, /inside the selected sourceRoot/i);
+  } catch (error) {
+    const code = error instanceof Error ? (error as NodeJS.ErrnoException).code : null;
+    if (code === "ENOTSUP" || code === "EPERM" || code === "EEXIST" || code === "EINVAL" || code === "EOPNOTSUPP") {
+      skipReason = code;
+    } else {
+      throw error;
+    }
+  } finally {
+    await rm(symlinkPath, { force: true });
+    await rm(outsideTarget, { force: true, recursive: true });
+  }
+
+  if (skipReason != null) {
+    t.skip(`Symlink test skipped: filesystem does not support symlink creation in this environment (${skipReason})`);
+  }
+});

@@ -1,0 +1,36 @@
+{
+  "id": "GC-003",
+  "mastery_check_id": "SC-001-artifact-boundary",
+  "concept_id": "artifact_boundary",
+  "operation": "trace",
+  "answer_class": "partial",
+  "simulated_user_answer": "I know included paths matter, but I mixed whether the include list is validated during session creation or graph generation, so I cannot explain the full sequence end-to-end.",
+  "declared_confidence": "medium",
+  "expected_gap_type": "flow_gap",
+  "expected_layer": 4,
+  "expected_severity": "important",
+  "expected_confidence": "medium",
+  "required_repo_evidence": [
+    {
+      "path": "src/runtime-concept-graph.ts",
+      "rationale": "Shows when inventory and filtering are applied."
+    },
+    {
+      "path": "src/runtime-support.ts",
+      "rationale": "Defines session-level evidence structures used in boundary flow."
+    },
+    {
+      "path": "Tests/concept-graph.test.ts",
+      "rationale": "Shows expected sequence between setup and graph build."
+    }
+  ],
+  "forbidden_claims": [
+    "Treating missing sequencing details as harmless for trace grading.",
+    "Using a single reason as if it proves both include and exclude handling."
+  ],
+  "acceptable_repair_task": "Trace the exact timing boundary check sequence again and connect each phase to repository evidence.",
+  "acceptable_issue_candidate_type": "LearningGap",
+  "expected_readiness": "not ready yet",
+  "notes": "A partial answer should produce a repair that requests complete flow sequencing with citations.",
+  "expected_gap_present": true
+}

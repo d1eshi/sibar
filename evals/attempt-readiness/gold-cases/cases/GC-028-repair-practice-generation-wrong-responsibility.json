@@ -1,0 +1,36 @@
+{
+  "id": "GC-028",
+  "mastery_check_id": "SC-004-repair-practice-generation",
+  "concept_id": "repair_practice_generation",
+  "operation": "modify",
+  "answer_class": "wrong_responsibility",
+  "simulated_user_answer": "Readiness export should pick challenge fields, while repair practice only stores evidence ids and completion state.",
+  "declared_confidence": "high",
+  "expected_gap_type": "responsibility_gap",
+  "expected_layer": 4,
+  "expected_severity": "critical",
+  "expected_confidence": "high",
+  "required_repo_evidence": [
+    {
+      "path": "src/runtime-practice.ts",
+      "rationale": "Defines challenge fields and repair-generation responsibility."
+    },
+    {
+      "path": "src/runtime-gap-detection.ts",
+      "rationale": "Defines the gap object used as the source for practice tasks."
+    },
+    {
+      "path": "Tests/practice-challenges.test.ts",
+      "rationale": "Confirms practice generation ownership and persistence expectations."
+    }
+  ],
+  "forbidden_claims": [
+    "Shifting challenge generation responsibility to readiness generation.",
+    "Dropping `challenge_type` or `due_after` responsibilities."
+  ],
+  "acceptable_repair_task": "Repair responsibility assignment with a narrow practice task tied to a gap and challenge fields.",
+  "acceptable_issue_candidate_type": "LearningGap",
+  "expected_readiness": "not ready yet",
+  "notes": "Responsibility mismatch must be corrected before readiness can progress.",
+  "expected_gap_present": true
+}

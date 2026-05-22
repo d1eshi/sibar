@@ -1,0 +1,89 @@
+{
+  "schema": "SibarEvalSuite",
+  "version": 1,
+  "suite_id": "attempt-readiness",
+  "title": "Attempt readiness loop evals",
+  "purpose": "Show whether a bounded repo slice and simulated user answer can be evaluated into grounded gaps, repair actions, re-evaluation prompts, and scoped readiness labels.",
+  "protects": [
+    "artifact boundary evidence cannot come from out-of-scope paths",
+    "gap detection distinguishes grounded understanding from partial, wrong, overconfident, uncertain, or design-induced confusion",
+    "repair generation and re-evaluation stay tied to the declared mastery checks",
+    "readiness labels are scoped to the evaluated attempt instead of repo-wide mastery"
+  ],
+  "docs": [
+    "evals/attempt-readiness/docs/01_selfhost_boundary.md",
+    "evals/attempt-readiness/docs/02_evaluation_contract.md",
+    "evals/attempt-readiness/docs/04_selfhost_gap_detection_benchmark.md"
+  ],
+  "artifacts": [
+    {
+      "kind": "repo-slice-manifest",
+      "path": "evals/attempt-readiness/manifest.json",
+      "description": "Declares included paths, excluded paths, concepts, and dataset indexes for this readiness slice."
+    },
+    {
+      "kind": "mastery-check-index",
+      "path": "evals/attempt-readiness/mastery-checks/index.json",
+      "description": "Lists the prompts and evidence requirements that define each checked concept."
+    },
+    {
+      "kind": "gold-case-index",
+      "path": "evals/attempt-readiness/gold-cases/index.json",
+      "description": "Lists deterministic simulated answers and expected classifications."
+    },
+    {
+      "kind": "gold-case-fixtures",
+      "path": "evals/attempt-readiness/gold-cases/cases",
+      "description": "Case payloads consumed by deterministic and freeform evaluators."
+    }
+  ],
+  "evaluations": [
+    {
+      "validation": "VAL-EVAL-006-selfhost-pilot",
+      "title": "Attempt readiness manifest and gold case validator",
+      "command": "pnpm eval:selfhost-pilot",
+      "implementation": "src/evals/selfhost-pilot.ts",
+      "llm_execution": "disabled",
+      "inputs": [
+        "evals/attempt-readiness/manifest.json",
+        "evals/attempt-readiness/mastery-checks/index.json",
+        "evals/attempt-readiness/gold-cases/index.json"
+      ],
+      "reports": [
+        "evals/attempt-readiness/reports/VAL-EVAL-006-selfhost-pilot.json"
+      ],
+      "answers": "Are the manifest, mastery checks, gold cases, and scoped evidence requirements internally consistent?"
+    },
+    {
+      "validation": "VAL-EVAL-007-selfhost-benchmark",
+      "title": "Attempt readiness deterministic benchmark",
+      "command": "pnpm eval:selfhost-benchmark",
+      "implementation": "src/evals/selfhost-benchmark.ts",
+      "llm_execution": "disabled",
+      "inputs": [
+        "evals/attempt-readiness/manifest.json",
+        "evals/attempt-readiness/gold-cases/index.json"
+      ],
+      "reports": [
+        "evals/attempt-readiness/reports/VAL-EVAL-007-selfhost-benchmark.json"
+      ],
+      "answers": "Do deterministic gap labels, issue candidates, repair actions, and readiness decisions match the gold cases?"
+    },
+    {
+      "validation": "VAL-EVAL-008-selfhost-freeform",
+      "title": "Attempt readiness freeform evaluator",
+      "command": "pnpm eval:selfhost-freeform",
+      "implementation": "src/evals/selfhost-freeform.ts",
+      "llm_execution": "disabled",
+      "inputs": [
+        "evals/attempt-readiness/manifest.json",
+        "evals/attempt-readiness/mastery-checks/index.json",
+        "evals/attempt-readiness/gold-cases/index.json"
+      ],
+      "reports": [
+        "evals/attempt-readiness/reports/VAL-EVAL-008-selfhost-freeform.json"
+      ],
+      "answers": "Can freeform user answers be scored consistently against expected evidence, gap, repair, and re-evaluation outcomes?"
+    }
+  ]
+}

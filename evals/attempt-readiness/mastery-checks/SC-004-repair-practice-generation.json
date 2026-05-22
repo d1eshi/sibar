@@ -1,0 +1,56 @@
+{
+  "id": "SC-004-repair-practice-generation",
+  "concept_id": "repair_practice_generation",
+  "concept_label": "Repair practice generation",
+  "operation": "modify",
+  "prompt": "Propose a bounded modification to the repair generation path so a missed or contradicted answer produces a useful next action. Include expected challenge fields and why they are evidence-coupled to the gap.",
+  "expected_answer_shape": {
+    "format": "patch_spec",
+    "required_fields": [
+      "trigger_condition",
+      "challenge_type",
+      "challenge_prompt_shape",
+      "expected_evidence_content",
+      "due_after"
+    ],
+    "validation_rule": "Answer must include at least one concrete change and its effect on due_after/difficulty for gap severity."
+  },
+  "required_repo_evidence": [
+    {
+      "path": "src/runtime-practice.ts",
+      "rationale": "Defines `generatePracticeChallengesCommand`, `challengeFromGap`, and the due/difficulty mapping from gap severity."
+    },
+    {
+      "path": "src/runtime-gap-detection.ts",
+      "rationale": "Provides the shape of persisted gap artifacts that practice generation consumes."
+    },
+    {
+      "path": "Tests/practice-challenges.test.ts",
+      "rationale": "Verifies repair challenge persistence, deduplication, due_after, difficulty, and prompt structure for critical/medium gaps."
+    }
+  ],
+  "forbidden_claims": [
+    "Claiming practice challenges can be generated without an associated gap and artifact_session_id.",
+    "Claiming one generic repair prompt works for all gap types.",
+    "Claiming completion is valid without pending challenge evidence."
+  ],
+  "minimum_readiness": "ready to modify with guardrails",
+  "repair_when_failed": {
+    "issue_type": "LearningGap",
+    "required_action": "Require a narrow challenge-generation repair with explicit gap linkage and expected_evidence entries.",
+    "guardrails": [
+      "Do not claim practice generation without severity-based due_after logic.",
+      "Do not claim challenge_type without naming repair context from artifact evidence."
+    ],
+    "must_repair_issue_candidate_types": [
+      "LearningGap",
+      "TestIssue"
+    ]
+  },
+  "reevaluation_prompt": "Modify the same repair case for a critical gap (`severity='critical'`): state the new due_after value and why difficulty must change.",
+  "acceptable_issue_candidate_types": [
+    "LearningGap",
+    "TestIssue",
+    "ProductIssue"
+  ]
+}

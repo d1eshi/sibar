@@ -1,0 +1,36 @@
+{
+  "id": "GC-024",
+  "mastery_check_id": "SC-003-gap-detection",
+  "concept_id": "gap_detection",
+  "operation": "debug",
+  "answer_class": "design_induced_confusion",
+  "simulated_user_answer": "The terminology around `artifact_evidence`, `answer_evidence`, and branches feels overloaded, so I defaulted to broad explanations and skipped exact branch output expectations.",
+  "declared_confidence": "medium",
+  "expected_gap_type": "design_induced_gap",
+  "expected_layer": 4,
+  "expected_severity": "important",
+  "expected_confidence": "medium",
+  "required_repo_evidence": [
+    {
+      "path": "src/runtime-gap-detection.ts",
+      "rationale": "Defines branch output and terminology that should be interpreted in code order."
+    },
+    {
+      "path": "src/runtime-support.ts",
+      "rationale": "Defines explicit evidence fields for artifacts and answers."
+    },
+    {
+      "path": "Tests/gap-detection.test.ts",
+      "rationale": "Validates the naming and branch expectations for confusion-prone cases."
+    }
+  ],
+  "forbidden_claims": [
+    "Turning ambiguous terminology into an excuse for missing specific branch mapping.",
+    "Using generic branch names without output-level examples."
+  ],
+  "acceptable_repair_task": "Add a design-side repair for terminology clarity and require a re-run with one branch-mapped response.",
+  "acceptable_issue_candidate_type": "DesignIssue",
+  "expected_readiness": "not ready yet",
+  "notes": "Expected issue candidate type is design-oriented because confusion is likely induced by naming.",
+  "expected_gap_present": true
+}

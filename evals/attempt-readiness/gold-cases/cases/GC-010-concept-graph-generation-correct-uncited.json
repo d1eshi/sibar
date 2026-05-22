@@ -1,0 +1,36 @@
+{
+  "id": "GC-010",
+  "mastery_check_id": "SC-002-concept-graph-generation",
+  "concept_id": "concept_graph_generation",
+  "operation": "explain",
+  "answer_class": "correct_uncited",
+  "simulated_user_answer": "The flow is inventory -> transform -> persistence and outputs nodes and edges, but I am giving a general answer without anchored file references.",
+  "declared_confidence": "high",
+  "expected_gap_type": "evidence_gap",
+  "expected_layer": 4,
+  "expected_severity": "important",
+  "expected_confidence": "medium",
+  "required_repo_evidence": [
+    {
+      "path": "src/runtime-concept-graph.ts",
+      "rationale": "Proves inventory and graph assembly logic."
+    },
+    {
+      "path": "src/runtime-support.ts",
+      "rationale": "Proves node and edge shapes used by the graph."
+    },
+    {
+      "path": "Tests/concept-graph.test.ts",
+      "rationale": "Provides concrete output expectations for explain and evidence."
+    }
+  ],
+  "forbidden_claims": [
+    "Passing without citing the source path for node or edge creation.",
+    "Claiming stable graph output without evidence-backed steps."
+  ],
+  "acceptable_repair_task": "Request a cited, step-by-step re-explanation using file and line anchors.",
+  "acceptable_issue_candidate_type": "LearningGap",
+  "expected_readiness": "not ready yet",
+  "notes": "Concept is correct but ungrounded by repository citations.",
+  "expected_gap_present": true
+}

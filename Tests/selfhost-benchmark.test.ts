@@ -7,8 +7,8 @@ import assert from "node:assert/strict";
 
 import { runSelfhostBenchmark } from "../src/evals/selfhost-benchmark.ts";
 
-const DEFAULT_MANIFEST_PATH = "sibar.selfhost.manifest.json";
-const DEFAULT_GOLD_CASE_INDEX = "docs/specs/selfhost/pilot/gold-cases/index.json";
+const DEFAULT_MANIFEST_PATH = "evals/attempt-readiness/manifest.json";
+const DEFAULT_GOLD_CASE_INDEX = "evals/attempt-readiness/gold-cases/index.json";
 
 function withMutatedGoldIndex(
   mutator: (args: {
@@ -24,7 +24,7 @@ function withMutatedGoldIndex(
   };
   const workingIndex = structuredClone(rootIndex);
   const tempDir = mkdtempSync(join(tmpdir(), "sibar-selfhost-benchmark-"));
-  const casesSource = resolve("docs/specs/selfhost/pilot/gold-cases/cases");
+  const casesSource = resolve("evals/attempt-readiness/gold-cases/cases");
   const casesDestination = join(tempDir, "cases");
   cpSync(casesSource, casesDestination, { recursive: true });
   const tempPath = join(tempDir, "index.json");
@@ -62,7 +62,8 @@ test("self-hosted benchmark passes all gold cases with no mismatches", () => {
   assert.equal(report.aggregate.gap_recall, 1);
   assert.equal(report.aggregate.gap_type_accuracy, 1);
   assert.equal(report.aggregate.false_confidence_detection_count, 5);
-  assert.equal(report.aggregate.design_issue_detection_count, 5);
+  assert.equal(report.aggregate.design_issue_detection_count, report.aggregate.design_issue_expected_count);
+  assert.equal(report.aggregate.design_issue_expected_count > 0, true);
   assert.equal(report.aggregate.unsupported_readiness_claims, 0);
   assert.equal(report.aggregate.out_of_bound_evidence_rejection_rate, 1);
   assert.equal(report.aggregate.whole_repo_overclaim_count, 0);
@@ -109,6 +110,13 @@ test("freeform benchmark observations are stable across answer_class metadata mu
       mutatedCase.freeform_observation.observed_finding_type,
       targetCase.freeform_observation.observed_finding_type,
     );
+    assert.equal(mutatedCase.observed_gap_present, targetCase.observed_gap_present);
+    assert.equal(mutatedCase.observed_gap_type, targetCase.observed_gap_type);
+    assert.equal(mutatedCase.observed_issue_candidate_type, targetCase.observed_issue_candidate_type);
+    assert.equal(mutatedCase.observed_repair_task_present, targetCase.observed_repair_task_present);
+    assert.equal(mutatedCase.observed_reevaluation_prompt_present, targetCase.observed_reevaluation_prompt_present);
+    assert.equal(mutatedCase.observed_readiness, targetCase.observed_readiness);
+    assert.equal(mutatedCase.evidence_quality_score, targetCase.evidence_quality_score);
     assert.equal(mutatedCase.freeform_observation.derived_from_answer_class, false);
   } finally {
     rmSync(tempDir, { recursive: true, force: true });

@@ -1,0 +1,36 @@
+{
+  "id": "GC-017",
+  "mastery_check_id": "SC-003-gap-detection",
+  "concept_id": "gap_detection",
+  "operation": "debug",
+  "answer_class": "correct_grounded",
+  "simulated_user_answer": "When the answer is verified and linked to artifact evidence, no LearningGap is emitted; I can explain how expected and observed layers align and why the confidence stays high.",
+  "declared_confidence": "high",
+  "expected_gap_type": null,
+  "expected_layer": 4,
+  "expected_severity": "later",
+  "expected_confidence": "high",
+  "required_repo_evidence": [
+    {
+      "path": "src/runtime-gap-detection.ts",
+      "rationale": "Contains detection branches and confirmed/ gap decision logic."
+    },
+    {
+      "path": "src/runtime-support.ts",
+      "rationale": "Defines LearningGap, confidence, and severity contracts."
+    },
+    {
+      "path": "Tests/gap-detection.test.ts",
+      "rationale": "Verifies verified answers do not create open gaps."
+    }
+  ],
+  "forbidden_claims": [
+    "Classifying a verified answer as a gap without reason.",
+    "Ignoring artifact evidence when expected_layer is met."
+  ],
+  "acceptable_repair_task": "No repair task; this is a confirmed state path.",
+  "acceptable_issue_candidate_type": "none",
+  "expected_readiness": "ready to modify with guardrails",
+  "notes": "Positive control case showing normal verified branch behavior.",
+  "expected_gap_present": false
+}

@@ -1,0 +1,85 @@
+{
+  "id": "E01-CORRECT-L4-BOUNDARY",
+  "title": "Evidence-backed applied reasoning answer stays inside the artifact boundary",
+  "case_class": "correct_answer",
+  "artifact_fixture": "fixtures/sibi-runtime-mini",
+  "artifact_boundary": {
+    "root": "fixtures/sibi-runtime-mini",
+    "included_paths": [
+      "src/runtime.ts",
+      "src/runtime-support.ts",
+      "Tests/runtime.test.ts"
+    ],
+    "excluded_paths": [
+      "docs/private-notes.md",
+      "../outside-repo/secrets.md"
+    ]
+  },
+  "learning_goal": "Explain how runtime request routing persists a bounded artifact session.",
+  "concept_under_test": {
+    "id": "artifact-session-routing",
+    "label": "Artifact session command routing and persistence",
+    "layer_target": 4
+  },
+  "user_answer": {
+    "kind": "answer",
+    "text": "The runtime accepts create_artifact_session, normalizes included and excluded paths against the root, rejects paths outside the root, then stores the session so later commands can reload it.",
+    "declared_confidence": "medium"
+  },
+  "llm_fixture_response": null,
+  "expected_layer": {
+    "level": 4,
+    "label": "Applied Reasoning",
+    "rationale": "The answer connects command handling, boundary normalization, rejection, and persistence rather than naming only one symbol."
+  },
+  "expected_gap": null,
+  "expected_misconception": null,
+  "expected_challenge": {
+    "should_create": false,
+    "reason": "No repair challenge is needed when the answer is evidence-backed and meets the target layer."
+  },
+  "expected_readiness": {
+    "claim": "ready to modify with guardrails",
+    "confidence": "medium",
+    "must_cite_evidence": true
+  },
+  "required_evidence": [
+    {
+      "path": "src/runtime.ts",
+      "range": "command handler for create_artifact_session",
+      "expectation": "Accepted evidence must show request routing into artifact session creation."
+    },
+    {
+      "path": "src/runtime-support.ts",
+      "range": "artifact session storage or boundary type",
+      "expectation": "Accepted evidence must show persisted session state or declared boundary fields."
+    }
+  ],
+  "forbidden_evidence": [
+    {
+      "path": "../outside-repo/secrets.md",
+      "reason": "Outside the declared artifact root."
+    }
+  ],
+  "boundary_expectations": {
+    "accepted_evidence_must_be_inside_boundary": true,
+    "reject_forbidden_evidence": true,
+    "expected_rejection_reason": "outside_artifact_boundary"
+  },
+  "gap_readiness_expectations": {
+    "create_gap": false,
+    "create_challenge": false,
+    "persist_declared_uncertainty": false,
+    "allowed_readiness_claims": [
+      "ready to modify with guardrails",
+      "ready to explain"
+    ],
+    "disallowed_readiness_claims": [
+      "ready to own"
+    ]
+  },
+  "validation_notes": [
+    "Covers the positive control for bounded, evidence-cited L4 answers.",
+    "Does not claim L5 ownership from one answer."
+  ]
+}

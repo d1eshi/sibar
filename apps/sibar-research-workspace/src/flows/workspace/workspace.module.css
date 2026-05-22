@@ -1,0 +1,571 @@
+.workspaceFrame {
+  height: 100dvh;
+  min-height: 720px;
+  display: grid;
+  grid-template-columns: clamp(250px, 22vw, 350px) minmax(460px, 1fr) clamp(260px, 24vw, 360px);
+  overflow: hidden;
+  color: var(--surface-ink);
+  background: var(--surface-page);
+}
+
+.studyPathRail,
+.sessionWorkbench,
+.readinessPanel {
+  min-width: 0;
+}
+
+.studyPathRail {
+  height: 100dvh;
+  min-height: 0;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  overflow: auto;
+  border-right: 1px solid var(--divider);
+  background: var(--surface);
+}
+
+.railHeader {
+  padding: 28px 28px 22px;
+  border-bottom: 1px solid var(--divider);
+}
+
+.railTitle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--text-primary);
+  font-size: 16px;
+}
+
+.studyPathGlyph {
+  position: relative;
+  width: 24px;
+  height: 24px;
+  flex: 0 0 auto;
+}
+
+.studyPathGlyph::before,
+.studyPathGlyph::after {
+  content: "";
+  position: absolute;
+  top: 4px;
+  width: 6px;
+  height: 16px;
+  border: 2px solid var(--olive);
+  border-radius: 5px;
+}
+
+.studyPathGlyph::before {
+  left: 2px;
+}
+
+.studyPathGlyph::after {
+  right: 2px;
+}
+
+.railHeader h2 {
+  margin: 34px 0 0;
+  color: var(--text-primary);
+  font-size: 19px;
+  line-height: 1.2;
+}
+
+.kicker {
+  margin: 0;
+  color: var(--olive-muted);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.pathList,
+.miniNodeList {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.pathNode {
+  border-bottom: 1px solid var(--divider);
+}
+
+.pathNodeButton,
+.pathNodeButtonActive {
+  width: 100%;
+  min-height: 78px;
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr);
+  align-items: center;
+  gap: 14px;
+  padding: 0 28px;
+  border: 0;
+  border-radius: 0;
+  color: var(--text-primary);
+  background: transparent;
+  text-align: left;
+}
+
+.pathNodeButtonActive {
+  background: var(--surface-soft);
+}
+
+.pathNodeButton:hover,
+.pathNodeButtonActive:hover {
+  background: var(--surface-soft);
+}
+
+.nodeBadge {
+  width: 28px;
+  height: 28px;
+  display: inline-grid;
+  place-items: center;
+  border: 1px solid var(--divider);
+  border-radius: 50%;
+  color: var(--text-muted);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.pathNode[data-state="complete"] .nodeBadge,
+.pathNode[data-state="ready"] .nodeBadge {
+  border-color: var(--olive);
+  color: var(--surface-panel);
+  background: var(--olive);
+}
+
+.pathNode[data-state="complete"] .nodeBadge {
+  font-size: 0;
+}
+
+.pathNode[data-state="complete"] .nodeBadge::before {
+  content: "";
+  width: 8px;
+  height: 4px;
+  transform: rotate(-45deg);
+  border-left: 2px solid var(--surface-panel);
+  border-bottom: 2px solid var(--surface-panel);
+}
+
+.pathNodeButton strong,
+.pathNodeButtonActive strong {
+  display: block;
+  color: var(--text-primary);
+  font-size: 16px;
+  line-height: 1.15;
+}
+
+.pathNodeButton em,
+.pathNodeButtonActive em {
+  display: block;
+  margin-top: 6px;
+  color: var(--text-muted);
+  font-size: 13px;
+  font-style: normal;
+  line-height: 1.3;
+}
+
+.miniNodeList {
+  position: relative;
+  display: grid;
+  gap: 2px;
+  margin: -2px 10px 14px 42px;
+  padding-left: 24px;
+}
+
+.miniNodeList::before {
+  content: "";
+  position: absolute;
+  top: -4px;
+  bottom: 8px;
+  left: 5px;
+  width: 1px;
+  background: var(--divider-strong);
+}
+
+.miniNodeButton,
+.miniNodeButtonActive {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 38px minmax(0, 1fr);
+  align-items: center;
+  gap: 8px;
+  padding: 12px 14px;
+  border: 0;
+  border-radius: 8px;
+  color: var(--text-secondary);
+  background: transparent;
+  text-align: left;
+}
+
+.miniNodeButtonActive {
+  color: var(--olive);
+  background: var(--surface-soft);
+}
+
+.miniNodeButton:hover,
+.miniNodeButtonActive:hover {
+  background: var(--surface-soft);
+}
+
+.miniNodeButton span,
+.miniNodeButtonActive span {
+  font-size: 13px;
+}
+
+.miniNodeButton strong,
+.miniNodeButtonActive strong {
+  font-size: 14px;
+  font-weight: 650;
+}
+
+.sessionWorkbench {
+  height: 100dvh;
+  min-height: 0;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: 18px;
+  overflow: hidden;
+  padding: 32px clamp(28px, 4vw, 58px) 34px;
+  background: linear-gradient(90deg, var(--surface-panel) 0%, var(--surface-page) 100%);
+}
+
+.sessionHeader {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 24px;
+  align-items: start;
+}
+
+.sessionHeader h1 {
+  max-width: 820px;
+  margin: 12px 0 0;
+  color: var(--surface-ink);
+  font-family: var(--font-serif);
+  font-size: clamp(34px, 3.1vw, 52px);
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: 0;
+}
+
+.sessionHeader p:last-child {
+  max-width: 720px;
+  margin: 10px 0 0;
+  color: var(--text-muted);
+  font-size: 16px;
+  line-height: 1.35;
+}
+
+.sessionMark {
+  width: 44px;
+  height: 44px;
+  margin-top: 2px;
+  border: 1px solid var(--divider);
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 50% 66%, transparent 0 7px, var(--accent) 8px 9px, transparent 10px),
+    var(--surface-panel-warm);
+}
+
+.readerWorkspace {
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(210px, 0.26fr) minmax(0, 1fr);
+  gap: 18px;
+}
+
+.materialTree,
+.readerCanvas {
+  min-height: 0;
+  border: 1px solid var(--divider);
+  border-radius: var(--radius);
+  background: var(--surface-panel);
+}
+
+.materialTree {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: 14px;
+  padding: 18px;
+  overflow: hidden;
+}
+
+.materialTreeList {
+  min-height: 0;
+  display: grid;
+  align-content: start;
+  gap: 8px;
+  overflow: auto;
+}
+
+.materialTreeItem,
+.materialTreeItemActive {
+  width: 100%;
+  display: grid;
+  gap: 5px;
+  padding: 12px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text-secondary);
+  text-align: left;
+}
+
+.materialTreeItemActive {
+  border-color: var(--divider);
+  background: var(--surface-soft);
+}
+
+.materialTreeItem:hover,
+.materialTreeItemActive:hover {
+  background: var(--surface-soft);
+}
+
+.materialTreeItem span,
+.materialTreeItemActive span {
+  color: var(--olive-muted);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.materialTreeItem strong,
+.materialTreeItemActive strong {
+  color: var(--text-primary);
+  font-size: 14px;
+  line-height: 1.2;
+}
+
+.materialTreeItem em,
+.materialTreeItemActive em {
+  color: var(--text-muted);
+  font-size: 12px;
+  font-style: normal;
+  line-height: 1.25;
+}
+
+.readerCanvas {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  overflow: hidden;
+}
+
+.readerHeader {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 18px;
+  align-items: start;
+  padding: 22px 26px 18px;
+  border-bottom: 1px solid var(--divider);
+}
+
+.sourceTypeBadge {
+  height: fit-content;
+  display: inline-grid;
+  align-items: center;
+  padding: 10px 14px;
+  border: 1px solid var(--divider);
+  border-radius: 999px;
+  color: var(--text-secondary);
+  font-size: 13px;
+}
+
+.readerHeader h2 {
+  margin: 12px 0 0;
+  color: var(--text-primary);
+  font-size: clamp(24px, 2.2vw, 34px);
+  line-height: 1.2;
+}
+
+.readerHeader p:last-child {
+  margin: 8px 0 0;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.sourceButton,
+.panelToggle,
+.panelShow {
+  width: auto;
+  border: 1px solid var(--divider);
+  border-radius: 999px;
+  background: transparent;
+  font-size: 13px;
+}
+
+.readerDocument {
+  min-height: 0;
+  overflow: auto;
+  padding: 28px 34px 42px;
+  color: var(--text-primary);
+  font-family: var(--font-serif);
+  font-size: 19px;
+  line-height: 1.55;
+}
+
+.readerDocument p {
+  max-width: 76ch;
+  margin: 0 0 18px;
+}
+
+.codeMaterial {
+  margin: 0;
+  padding: 22px;
+  overflow: auto;
+  border: 1px solid var(--divider);
+  border-radius: 8px;
+  background: var(--surface-panel-warm);
+  color: var(--text-primary);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+.equationMaterial {
+  display: grid;
+  gap: 14px;
+}
+
+.equationMaterial p {
+  max-width: 82ch;
+  display: grid;
+  grid-template-columns: 32px minmax(0, 1fr);
+  gap: 14px;
+  margin: 0;
+  padding: 16px;
+  border: 1px solid var(--divider);
+  border-radius: 8px;
+  background: var(--surface-panel-warm);
+}
+
+.equationMaterial span {
+  color: var(--olive);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 14px;
+}
+
+.readinessPanel {
+  height: 100dvh;
+  min-height: 0;
+  display: grid;
+  align-content: start;
+  gap: 20px;
+  padding: 38px 28px;
+  overflow: auto;
+  border-left: 1px solid var(--divider);
+  background: var(--surface-page);
+}
+
+.readinessPanel h3,
+.readinessPanel p,
+.readinessPanel ul,
+.panelToggle,
+.panelShow {
+  margin: 0;
+}
+
+.readinessPanel h3 {
+  color: var(--text-primary);
+  font-size: 18px;
+  line-height: 1.25;
+}
+
+.readinessPanel p {
+  color: var(--text-muted);
+  line-height: 1.45;
+}
+
+.readinessPanel ul {
+  display: grid;
+  gap: 16px;
+  padding: 24px;
+  border: 1px solid var(--divider);
+  border-radius: 8px;
+  background: var(--surface-panel);
+  list-style: none;
+}
+
+.readinessPanel li {
+  position: relative;
+  padding-left: 24px;
+  color: var(--text-primary);
+  line-height: 1.4;
+}
+
+.readinessPanel li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.45em;
+  width: 9px;
+  height: 9px;
+  border: 2px solid var(--olive);
+  border-radius: 50%;
+}
+
+.panelToggle,
+.panelShow {
+  justify-self: start;
+  padding: 10px 14px;
+  color: var(--text-secondary);
+}
+
+@media (max-width: 1080px) {
+  .workspaceFrame {
+    grid-template-columns: minmax(240px, 30vw) minmax(0, 1fr);
+    overflow: auto;
+  }
+
+  .readinessPanel {
+    grid-column: 1 / -1;
+    height: auto;
+    min-height: auto;
+    border-top: 1px solid var(--divider);
+    border-left: 0;
+  }
+}
+
+@media (max-width: 820px) {
+  .workspaceFrame {
+    grid-template-columns: 1fr;
+  }
+
+  .studyPathRail,
+  .sessionWorkbench,
+  .readinessPanel {
+    height: auto;
+    min-height: auto;
+  }
+
+  .studyPathRail {
+    border-right: 0;
+    border-bottom: 1px solid var(--divider);
+  }
+
+  .sessionWorkbench {
+    padding: 34px 22px;
+    overflow: visible;
+  }
+
+  .sessionHeader {
+    grid-template-columns: 1fr;
+  }
+
+  .sessionMark {
+    display: none;
+  }
+
+  .sessionHeader h1 {
+    font-size: 40px;
+  }
+
+  .readerWorkspace,
+  .readerHeader {
+    grid-template-columns: 1fr;
+  }
+
+  .readerDocument {
+    overflow: visible;
+    padding: 22px;
+  }
+}

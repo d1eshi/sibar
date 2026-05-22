@@ -1,0 +1,89 @@
+{
+  "dataset_id": "sibi-v01-e01-canonical-pilot",
+  "version": "0.1.0",
+  "mission": "evals/pedagogy-layers",
+  "feature": "E01",
+  "validation": [
+    "VAL-EVAL-001",
+    "VAL-EVAL-004"
+  ],
+  "schema": "schema.md",
+  "required_case_classes": [
+    "correct_answer",
+    "partial_answer",
+    "declared_uncertainty",
+    "wrong_misconception",
+    "missing_evidence",
+    "boundary_violation",
+    "overconfident_llm_output"
+  ],
+  "notes": [
+    "This is a canonical pilot contract, not a benchmark-quality corpus.",
+    "Benchmark-size claims require evals/pedagogy-layers/docs/dataset_sizing_research.md and a larger stratified dataset."
+  ],
+  "cases": [
+    {
+      "id": "E01-CORRECT-L4-BOUNDARY",
+      "case_class": "correct_answer",
+      "layer": 4,
+      "file": "cases/E01-CORRECT-L4-BOUNDARY.json",
+      "validations": [
+        "VAL-EVAL-001"
+      ]
+    },
+    {
+      "id": "E01-PARTIAL-L2-GAP",
+      "case_class": "partial_answer",
+      "layer": 2,
+      "file": "cases/E01-PARTIAL-L2-GAP.json",
+      "validations": [
+        "VAL-EVAL-001"
+      ]
+    },
+    {
+      "id": "E01-UNCERTAIN-L1-DECLARED",
+      "case_class": "declared_uncertainty",
+      "layer": 1,
+      "file": "cases/E01-UNCERTAIN-L1-DECLARED.json",
+      "validations": [
+        "VAL-EVAL-001"
+      ]
+    },
+    {
+      "id": "E01-WRONG-L3-MISCONCEPTION",
+      "case_class": "wrong_misconception",
+      "layer": 3,
+      "file": "cases/E01-WRONG-L3-MISCONCEPTION.json",
+      "validations": [
+        "VAL-EVAL-001"
+      ]
+    },
+    {
+      "id": "E01-MISSING-EVIDENCE-L3",
+      "case_class": "missing_evidence",
+      "layer": 3,
+      "file": "cases/E01-MISSING-EVIDENCE-L3.json",
+      "validations": [
+        "VAL-EVAL-001"
+      ]
+    },
+    {
+      "id": "E01-BOUNDARY-VIOLATION-L4",
+      "case_class": "boundary_violation",
+      "layer": 4,
+      "file": "cases/E01-BOUNDARY-VIOLATION-L4.json",
+      "validations": [
+        "VAL-EVAL-001"
+      ]
+    },
+    {
+      "id": "E01-LLM-OVERCONFIDENT-L5",
+      "case_class": "overconfident_llm_output",
+      "layer": 5,
+      "file": "cases/E01-LLM-OVERCONFIDENT-L5.json",
+      "validations": [
+        "VAL-EVAL-001"
+      ]
+    }
+  ]
+}

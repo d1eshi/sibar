@@ -1,0 +1,27 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "Sibar Research Workspace",
+  "version": "0.1.0",
+  "identifier": "com.sibar.research.workspace",
+  "build": {
+    "beforeBuildCommand": "pnpm workspace:build",
+    "beforeDevCommand": "pnpm workspace:dev",
+    "devUrl": "http://127.0.0.1:5173",
+    "beforeBundleCommand": "",
+    "frontendDist": "dist"
+  },
+  "app": {
+    "withGlobalTauri": true,
+    "windows": [
+      {
+        "title": "Sibar Research Workspace",
+        "width": 1500,
+        "height": 940,
+        "minWidth": 1100,
+        "minHeight": 720,
+        "resizable": true,
+        "fullscreen": false
+      }
+    ]
+  }
+}

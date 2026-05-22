@@ -1,0 +1,36 @@
+{
+  "id": "GC-023",
+  "mastery_check_id": "SC-003-gap-detection",
+  "concept_id": "gap_detection",
+  "operation": "debug",
+  "answer_class": "declared_uncertainty",
+  "simulated_user_answer": "I cannot confidently map a specific artifact branch for this answer yet, so I am unsure which suspected misconception should be emitted.",
+  "declared_confidence": "low",
+  "expected_gap_type": "surface_gap",
+  "expected_layer": 4,
+  "expected_severity": "important",
+  "expected_confidence": "medium",
+  "required_repo_evidence": [
+    {
+      "path": "src/runtime-gap-detection.ts",
+      "rationale": "Defines the declared uncertainty branch and output message."
+    },
+    {
+      "path": "src/runtime-support.ts",
+      "rationale": "Defines uncertainty path confidence and severity mapping."
+    },
+    {
+      "path": "Tests/gap-detection.test.ts",
+      "rationale": "Verifies uncertainty branch remains a repairable gap."
+    }
+  ],
+  "forbidden_claims": [
+    "Marking uncertainty as verified.",
+    "Dropping repair requirement because user was non-assertive."
+  ],
+  "acceptable_repair_task": "Repair by asking for a lower-cognitive-step prediction of branch and severity with citations.",
+  "acceptable_issue_candidate_type": "LearningGap",
+  "expected_readiness": "not ready yet",
+  "notes": "Uncertainty class should still produce an explicit openness and repair action.",
+  "expected_gap_present": true
+}

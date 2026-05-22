@@ -1,0 +1,36 @@
+{
+  "id": "GC-013",
+  "mastery_check_id": "SC-002-concept-graph-generation",
+  "concept_id": "concept_graph_generation",
+  "operation": "explain",
+  "answer_class": "wrong_flow",
+  "simulated_user_answer": "The flow is node definitions first, edge definitions after persistence, and evidence gets attached only at the final report stage.",
+  "declared_confidence": "medium",
+  "expected_gap_type": "flow_gap",
+  "expected_layer": 4,
+  "expected_severity": "important",
+  "expected_confidence": "medium",
+  "required_repo_evidence": [
+    {
+      "path": "src/runtime-concept-graph.ts",
+      "rationale": "Shows edges are generated before persistence and evidence is propagated through graph objects."
+    },
+    {
+      "path": "src/runtime-support.ts",
+      "rationale": "Defines graph evidence attached to nodes and edges."
+    },
+    {
+      "path": "Tests/concept-graph.test.ts",
+      "rationale": "Asserts graph shape and evidence ordering in runtime behavior."
+    }
+  ],
+  "forbidden_claims": [
+    "Reversing the event order from implementation.",
+    "Claiming persistence-only evidence attachment."
+  ],
+  "acceptable_repair_task": "Repair by rewriting flow order and citing where evidence is introduced and persisted.",
+  "acceptable_issue_candidate_type": "LearningGap",
+  "expected_readiness": "not ready yet",
+  "notes": "Flow mismatch in answer should be fixed with stage ordering and evidence attachment.",
+  "expected_gap_present": true
+}

@@ -10,10 +10,10 @@ function toRepoRelative(filePath: string): string {
   return rel || ".";
 }
 
-const DEFAULT_GOLD_CASE_INDEX = "docs/specs/selfhost/pilot/gold-cases/index.json";
-const DEFAULT_MASTERY_CHECK_DIR = "docs/specs/selfhost/pilot/mastery-checks";
+const DEFAULT_GOLD_CASE_INDEX = "evals/attempt-readiness/gold-cases/index.json";
+const DEFAULT_MASTERY_CHECK_DIR = "evals/attempt-readiness/mastery-checks";
 const FREEFORM_VALIDATION_ID = "VAL-EVAL-008-selfhost-freeform";
-const DEFAULT_SELFHOST_MANIFEST_PATH = "sibar.selfhost.manifest.json";
+const DEFAULT_SELFHOST_MANIFEST_PATH = "evals/attempt-readiness/manifest.json";
 const EXPECTED_CASE_COUNT = 40;
 
 const ALL_GAP_LABELS = [
@@ -28,6 +28,8 @@ const ALL_GAP_LABELS = [
   "false_confidence_gap",
   "design_induced_gap",
 ] as const;
+
+const REQUIRED_REPRESENTED_GAP_LABELS: readonly (typeof ALL_GAP_LABELS)[number][] = ALL_GAP_LABELS;
 
 const ALL_CONCEPT_IDS = [
   "artifact_boundary",
@@ -597,6 +599,19 @@ function detectBoundaryViolation(answer: string): boolean {
   return false;
 }
 
+function detectTestOracleGap(answer: string): boolean {
+  const lower = answer.toLowerCase();
+  return /(?:test oracle|oracle|assertion|test case|coverage).*(?:missing|unclear|absent|not specified|not mapped|skipped|without|gap)|(?:missing|unclear|absent|not specified|not mapped|skipped|without).*(?:test oracle|oracle|assertion|test case|coverage)/i.test(lower)
+    || /(?:cannot|can't|could not|did not|didn't).*(?:map|tie|connect|verify).*(?:expected behavior|behavior|claim).*(?:test|assertion|oracle)/i.test(lower)
+    || /(?:expected behavior|claim).*(?:cannot|can't|could not|is not|isn't).*(?:verified|constrained|checked).*(?:test|assertion|oracle)/i.test(lower);
+}
+
+function detectProductGap(answer: string): boolean {
+  const lower = answer.toLowerCase();
+  return /(?:product|ui|ux|interface|affordance|workflow|docs?|documentation).*(?:missing|unclear|hidden|absent|does not show|doesn't show|hard to discover|not discoverable|gap).*(?:code|behavior|enforce|enforcement|expected|actual)/i.test(lower)
+    || /(?:code|behavior|enforce|enforcement|expected|actual).*(?:differs|mismatch|gap|not visible|hard to discover).*(?:product|ui|ux|interface|affordance|workflow|docs?|documentation)/i.test(lower);
+}
+
 function detectOverconfidence(answer: string, confidence?: string): boolean {
   const lower = answer.toLowerCase();
   const isHigh = answerHasHighConfidence(confidence);
@@ -1092,8 +1107,6 @@ export function evaluateFreeformOwnershipAnswer(input: FreeformEvaluationInput):
     } else {
       findingType = "responsibility_gap";
     }
-  } else if (detectDesignConfusion(answer)) {
-    findingType = "design_induced_gap";
   } else if (detectOverconfidence(answer, input.declared_confidence)) {
     // False confidence takes priority over other gap types
     findingType = "false_confidence_gap";
@@ -1105,6 +1118,12 @@ export function evaluateFreeformOwnershipAnswer(input: FreeformEvaluationInput):
     findingType = "flow_gap";
   } else if (detectBoundaryViolation(answer)) {
     findingType = "boundary_gap";
+  } else if (detectTestOracleGap(answer)) {
+    findingType = "test_oracle_gap";
+  } else if (detectProductGap(answer)) {
+    findingType = "product_gap";
+  } else if (detectDesignConfusion(answer)) {
+    findingType = "design_induced_gap";
   } else if (!hasRepoCitation && answer.length > 20) {
     // No specific gap detected but answer lacks citations → classify based on content signals
     if (lower.includes("expected_layer") || lower.includes("observed_layer")) {
@@ -1682,6 +1701,16 @@ export function runSelfhostFreeformEval(options: SelfhostFreeformOptions = {}): 
       case_ids: expectedIds,
     };
   });
+
+  for (const entry of gapLabelCoverage) {
+    if (REQUIRED_REPRESENTED_GAP_LABELS.includes(entry.label as (typeof ALL_GAP_LABELS)[number]) && !entry.represented) {
+      recordCaseMismatch(mismatches, "missing_gap_label_coverage", entry.label, "contractual gap label has no represented gold case", {
+        label: entry.label,
+        case_count: entry.case_count,
+      });
+      mismatchCount += 1;
+    }
+  }
 
   const loopSummary: LoopSummary = {
     gaps_with_full_loop: cases.filter((c) => c.loop_status === "reevaluation_prompted").length,

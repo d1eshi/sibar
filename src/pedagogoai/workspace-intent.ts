@@ -1,0 +1,41 @@
+export type {
+  EvidencePlan,
+  EvidenceRequirement,
+  SessionPlan,
+  SourceIntake,
+  SourceIntakeInput,
+  SourceIntakeKind,
+  WorkspaceIntent,
+  WorkspaceIntentFlow,
+  WorkspaceIntentInput,
+  WorkspaceIntentSchema,
+  WorkspaceIntentValidationIssue,
+  WorkspaceIntentValidationResult,
+  WorkspacePlan,
+  WorkspacePlanMiniNode,
+  WorkspacePlanNode,
+  WorkspacePlanNodeResource,
+  WorkspacePlanPreview,
+} from "./workspace-intent-types.ts";
+
+export * as WorkspaceIntentCompiler from "./workspace-intent/index.ts";
+
+export {
+  DEFAULT_WORKSPACE_INTENT_INPUT,
+  WORKSPACE_INTENT_CONTRACT_ORDER,
+  WORKSPACE_INTENT_CONTRACT_VERSION,
+  WORKSPACE_INTENT_GENERATED_AT,
+  buildEvidencePlan,
+  buildSourceIntake,
+  buildWorkspaceIntent,
+  buildWorkspaceIntentFlow,
+  compileWorkspacePlanFromIntent,
+  formatWorkspacePlanPreview,
+  selectFirstSessionPlan,
+  splitList,
+  validateEvidencePlan,
+  validateSessionPlan,
+  validateSourceIntake,
+  validateWorkspaceIntent,
+  validateWorkspacePlan,
+} from "./workspace-intent-runtime.js";

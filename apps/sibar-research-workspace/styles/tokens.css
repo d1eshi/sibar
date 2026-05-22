@@ -1,0 +1,38 @@
+:root {
+  --surface: #f8f3eb;
+  --surface-soft: #eee9df;
+  --surface-raised: #fffdf8;
+  --surface-ink: #151512;
+  --surface-field: #fbf6ec;
+  --surface-page: #fbf8f1;
+  --surface-panel: #fffdf8;
+  --surface-panel-warm: #fffaf3;
+  --text-primary: #25231d;
+  --text-secondary: #4d493e;
+  --text-muted: #6f6a5d;
+  --text-faint: #777165;
+  --divider: #e6ddd0;
+  --divider-strong: #c9bfae;
+  --accent: #a85f38;
+  --accent-bg: #f6e2d6;
+  --accent-strong: #9c4f2f;
+  --olive: #77801c;
+  --olive-soft: #eef0df;
+  --olive-muted: #747023;
+  --sienna: #bd7655;
+  --teal: #77801c;
+  --teal-bg: #eef0df;
+  --blue: #8d4427;
+  --blue-bg: #f2dfd3;
+  --amber: #9b651b;
+  --green: #4f6a34;
+  --green-bg: #edf2de;
+  --red: #9c332d;
+  --radius: 6px;
+  --radius-sm: 4px;
+  --radius-xs: 3px;
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  --font-serif: Georgia, "Times New Roman", serif;
+  --font-mono: "SF Mono", "Fira Code", "Fira Mono", Menlo, monospace;
+  --shadow-lift: 0 10px 22px rgba(61, 50, 35, 0.08);
+}

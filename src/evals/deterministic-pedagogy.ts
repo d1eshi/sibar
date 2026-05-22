@@ -1,5 +1,5 @@
 import { existsSync, mkdirSync, rmSync, writeFileSync } from "node:fs";
-import { dirname, join, resolve } from "node:path";
+import { dirname, join, relative, resolve } from "node:path";
 import { randomUUID } from "node:crypto";
 
 import { loadEvalDataset } from "./deterministic-pedagogy/dataset.ts";
@@ -8,9 +8,14 @@ import type { DeterministicPedagogyEvalReport, RunOptions } from "./deterministi
 
 export type { DeterministicPedagogyEvalReport };
 
-const DEFAULT_INDEX = "docs/missions/sibi-v01-build-to-learn/evals/dataset/index.json";
-const DEFAULT_REPORT = "docs/missions/sibi-v01-build-to-learn/evals/reports/VAL-EVAL-002-deterministic-pedagogy.json";
+const DEFAULT_INDEX = "evals/pedagogy-layers/dataset/index.json";
+const DEFAULT_REPORT = "evals/pedagogy-layers/reports/VAL-EVAL-002-deterministic-pedagogy.json";
 const DEFAULT_TEMP_PREFIX = ".sibi-eval-tmp-runtime-";
+
+function toRepoRelative(filePath: string): string {
+  const rel = relative(process.cwd(), resolve(filePath));
+  return rel || ".";
+}
 
 export function runDeterministicPedagogyEvals(options: RunOptions = {}): DeterministicPedagogyEvalReport {
   const previousRuntimeHome = process.env.SIBI_RUNTIME_HOME;
@@ -24,7 +29,7 @@ export function runDeterministicPedagogyEvals(options: RunOptions = {}): Determi
     const report: DeterministicPedagogyEvalReport = {
       report_id: `VAL-EVAL-002-${new Date().toISOString()}`,
       generated_at: new Date().toISOString(),
-      dataset: { id: index.dataset_id, version: index.version, index_path: indexPath },
+      dataset: { id: index.dataset_id, version: index.version, index_path: toRepoRelative(indexPath) },
       validation: "VAL-EVAL-002",
       no_llm: true,
       aggregate: {

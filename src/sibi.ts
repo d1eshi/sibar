@@ -9,12 +9,14 @@ function printUsage(): void {
   console.log("  node --experimental-strip-types src/sibi.ts start-workspace-session \\");
   console.log("    --goal \"Explain this project A-Z\" --root /path/to/project \\");
   console.log("    [--codex-command auto]");
+  console.log("    [--fixture-model-response-path /path/to/fixture.json]");
 }
 
 type WorkspaceSessionCLIArgs = {
   goal: string;
   rootPath: string;
   codexCommand?: string;
+  fixtureModelResponsePath?: string;
 };
 
 type WorkspaceSessionResult = {
@@ -40,6 +42,7 @@ function parseStartWorkspaceSessionArgs(argv: string[]): WorkspaceSessionCLIArgs
   let goal = "";
   let rootPath = process.cwd();
   let codexCommand: string | undefined;
+  let fixtureModelResponsePath: string | undefined;
 
   for (let index = 0; index < argv.length; index += 1) {
     const arg = argv[index];
@@ -66,6 +69,13 @@ function parseStartWorkspaceSessionArgs(argv: string[]): WorkspaceSessionCLIArgs
       continue;
     }
 
+    if (arg === "--fixture-model-response-path") {
+      if (!value) printJSONError("--fixture-model-response-path requires a value.");
+      fixtureModelResponsePath = value;
+      index += 1;
+      continue;
+    }
+
     printJSONError(`Unknown argument: ${arg}`);
   }
 
@@ -77,6 +87,7 @@ function parseStartWorkspaceSessionArgs(argv: string[]): WorkspaceSessionCLIArgs
     goal: goal.trim(),
     rootPath,
     codexCommand,
+    fixtureModelResponsePath,
   };
 }
 
@@ -88,6 +99,7 @@ function runWorkspaceSessionCommand(rawArgs: string[]): void {
       goal: args.goal,
       root_path: args.rootPath,
       codex_command: args.codexCommand ?? "auto",
+      ...(args.fixtureModelResponsePath ? { fixture_model_response_path: args.fixtureModelResponsePath } : {}),
     },
   };
 

@@ -1,0 +1,108 @@
+{
+  "report_id": "VAL-EVAL-011-workspace-model-io-boundary-2026-05-20T00:00:00.000Z",
+  "generated_at": "2026-05-20T00:00:00.000Z",
+  "validation": "VAL-EVAL-011-workspace-model-io-boundary",
+  "eval_spec_path": "evals/workspace-plan-adapters/workspace-model-io-boundary.eval.json",
+  "no_llm": true,
+  "aggregate": {
+    "total_cases": 6,
+    "passed_cases": 6,
+    "failed_cases": 0,
+    "accepted_parse_cases": 3,
+    "rejected_parse_cases": 2,
+    "rejected_adapter_cases": 1,
+    "total_mismatches": 0
+  },
+  "cases": [
+    {
+      "id": "WMIO-001-DIRECT-JSON-VALID",
+      "title": "Direct provider JSON parses as a valid candidate plan.",
+      "case_class": "direct_json_valid",
+      "passed": true,
+      "observations": {
+        "accepted": true,
+        "objective": "Normalize provider output into a bounded workspace plan.",
+        "error": null,
+        "adapter": null,
+        "runner_status": null,
+        "compiled_by": null
+      },
+      "mismatches": []
+    },
+    {
+      "id": "WMIO-002-CANDIDATE-PLAN-ENVELOPE",
+      "title": "Provider envelope with candidate_plan parses to the nested plan.",
+      "case_class": "candidate_plan_envelope_valid",
+      "passed": true,
+      "observations": {
+        "accepted": true,
+        "objective": "Normalize provider output into a bounded workspace plan.",
+        "error": null,
+        "adapter": null,
+        "runner_status": null,
+        "compiled_by": null
+      },
+      "mismatches": []
+    },
+    {
+      "id": "WMIO-003-STDOUT-CONTAMINATED",
+      "title": "Provider stdout with logs around JSON still extracts the candidate plan.",
+      "case_class": "stdout_contaminated_valid",
+      "passed": true,
+      "observations": {
+        "accepted": true,
+        "objective": "Normalize provider output into a bounded workspace plan.",
+        "error": null,
+        "adapter": null,
+        "runner_status": null,
+        "compiled_by": null
+      },
+      "mismatches": []
+    },
+    {
+      "id": "WMIO-004-MALFORMED-OUTPUT",
+      "title": "Malformed provider output is rejected before plan projection.",
+      "case_class": "malformed_output_rejected",
+      "passed": true,
+      "observations": {
+        "accepted": false,
+        "objective": null,
+        "error": "Rust workspace compiler output does not contain valid JSON.",
+        "adapter": null,
+        "runner_status": null,
+        "compiled_by": null
+      },
+      "mismatches": []
+    },
+    {
+      "id": "WMIO-005-INVALID-CANDIDATE-PLAN",
+      "title": "Invalid candidate_plan envelope is rejected before WorkspacePlan state.",
+      "case_class": "invalid_candidate_plan_rejected",
+      "passed": true,
+      "observations": {
+        "accepted": false,
+        "objective": null,
+        "error": "Rust workspace compiler output is not a valid WorkspacePlan.",
+        "adapter": null,
+        "runner_status": null,
+        "compiled_by": null
+      },
+      "mismatches": []
+    },
+    {
+      "id": "WMIO-006-UNKNOWN-ADAPTER",
+      "title": "Unknown adapter is rejected explicitly without falling back to fixture.",
+      "case_class": "unknown_adapter_rejected",
+      "passed": true,
+      "observations": {
+        "accepted": false,
+        "objective": null,
+        "error": "Unknown workspace compiler adapter: future-provider",
+        "adapter": "future-provider",
+        "runner_status": "failed",
+        "compiled_by": "deterministic-builder"
+      },
+      "mismatches": []
+    }
+  ]
+}

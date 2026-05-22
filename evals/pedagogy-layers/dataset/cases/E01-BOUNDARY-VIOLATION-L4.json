@@ -1,0 +1,100 @@
+{
+  "id": "E01-BOUNDARY-VIOLATION-L4",
+  "title": "Answer cites an excluded file and must be rejected for boundary reasons",
+  "case_class": "boundary_violation",
+  "artifact_fixture": "fixtures/sibi-runtime-mini",
+  "artifact_boundary": {
+    "root": "fixtures/sibi-runtime-mini",
+    "included_paths": [
+      "src/runtime.ts",
+      "src/runtime-support.ts"
+    ],
+    "excluded_paths": [
+      "docs/private-notes.md",
+      "tmp/outside-observation.md"
+    ]
+  },
+  "learning_goal": "Keep pedagogy evidence inside the declared artifact boundary.",
+  "concept_under_test": {
+    "id": "artifact-boundary-enforcement",
+    "label": "Artifact boundary enforcement",
+    "layer_target": 4
+  },
+  "user_answer": {
+    "kind": "answer",
+    "text": "The runtime stores sessions, and docs/private-notes.md says it also reads the user's private planning notes for context.",
+    "declared_confidence": "medium"
+  },
+  "llm_fixture_response": null,
+  "expected_layer": {
+    "level": 4,
+    "label": "Applied Reasoning",
+    "rationale": "The answer attempts to reason from evidence, but one cited source is forbidden and cannot support the claim."
+  },
+  "expected_gap": {
+    "should_create": true,
+    "severity": "critical",
+    "confidence": "high",
+    "observed_layer": 4,
+    "reason": "Boundary-unsafe evidence must create a repairable boundary gap even if the answer structure is otherwise strong."
+  },
+  "expected_misconception": {
+    "should_create": true,
+    "label": "process/tool metadata as mastery proof",
+    "reason": "The answer relies on forbidden context instead of bounded artifact evidence."
+  },
+  "expected_challenge": {
+    "should_create": true,
+    "challenge_type": "boundary_explanation",
+    "expected_evidence": [
+      "allowed runtime citation",
+      "rejected forbidden citation",
+      "boundary rejection reason"
+    ]
+  },
+  "expected_readiness": {
+    "claim": "not ready yet",
+    "confidence": "high",
+    "must_cite_evidence": true
+  },
+  "required_evidence": [
+    {
+      "path": "src/runtime.ts",
+      "range": "artifact session command handling",
+      "expectation": "Allowed evidence may support the session storage portion of the answer."
+    }
+  ],
+  "forbidden_evidence": [
+    {
+      "path": "docs/private-notes.md",
+      "reason": "Explicitly excluded from the artifact boundary."
+    },
+    {
+      "path": "tmp/outside-observation.md",
+      "reason": "Explicitly excluded from the artifact boundary."
+    }
+  ],
+  "boundary_expectations": {
+    "accepted_evidence_must_be_inside_boundary": true,
+    "reject_forbidden_evidence": true,
+    "expected_rejection_reason": "excluded_path"
+  },
+  "gap_readiness_expectations": {
+    "create_gap": true,
+    "create_challenge": true,
+    "persist_declared_uncertainty": false,
+    "allowed_readiness_claims": [
+      "not ready yet"
+    ],
+    "disallowed_readiness_claims": [
+      "ready to inspect",
+      "ready to explain",
+      "ready to modify with guardrails",
+      "ready to own"
+    ]
+  },
+  "validation_notes": [
+    "Covers explicit forbidden evidence rejection.",
+    "A future evaluator should preserve the allowed portion only if it can separate it from the forbidden claim."
+  ]
+}

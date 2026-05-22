@@ -1,0 +1,56 @@
+{
+  "id": "SC-002-concept-graph-generation",
+  "concept_id": "concept_graph_generation",
+  "concept_label": "Concept graph generation",
+  "operation": "explain",
+  "prompt": "Explain how concept nodes and edges are generated from evidence in this slice. Include the evidence source order, the two key intermediate structures, and one required edge relation.",
+  "expected_answer_shape": {
+    "format": "ordered_list",
+    "required_fields": [
+      "input_artifact_session",
+      "file_inventory_step",
+      "node_rules_step",
+      "edge_rules_step",
+      "persistent_graph_output"
+    ],
+    "validation_rule": "Answer must name a concrete source path and tie every stage to a repo file."
+  },
+  "required_repo_evidence": [
+    {
+      "path": "src/runtime-concept-graph.ts",
+      "rationale": "Primary builder for inventory collection, node inference from regex rules, edge inference, and persistence of the final graph."
+    },
+    {
+      "path": "src/runtime-support.ts",
+      "rationale": "Defines node and edge shapes used by concept graph output and downstream validation."
+    },
+    {
+      "path": "Tests/concept-graph.test.ts",
+      "rationale": "Confirms stable graph structure, relation expectations, and citation constraints for generated graph nodes."
+    }
+  ],
+  "forbidden_claims": [
+    "Claiming that graph generation requires no artifact boundary evidence.",
+    "Claiming edges are arbitrary metadata not sourced from file evidence.",
+    "Claiming stable readiness from a one-off list of concept names."
+  ],
+  "minimum_readiness": "ready to explain",
+  "repair_when_failed": {
+    "issue_type": "LearningGap",
+    "required_action": "Re-ask the concept graph flow with a concrete two-step trace: from inventory input to final persisted graph.",
+    "guardrails": [
+      "Require mention of at least one specific function responsible for node/edge creation.",
+      "Require mention of one test asserting node count or citation validity."
+    ],
+    "must_repair_issue_candidate_types": [
+      "LearningGap",
+      "DocsIssue"
+    ]
+  },
+  "reevaluation_prompt": "Transfer this explanation to a different concept-flow question: explain how concept graph generation would change if the concept rule set changes from runtime-focused to ownership-focused rules.",
+  "acceptable_issue_candidate_types": [
+    "LearningGap",
+    "DocsIssue",
+    "TestIssue"
+  ]
+}

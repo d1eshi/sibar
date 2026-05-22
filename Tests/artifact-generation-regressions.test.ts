@@ -15,7 +15,7 @@ import {
   validateArtifactCitations,
 } from "../src/runtime-artifact-generation.ts";
 
-const FIXTURE_PATH = "docs/specs/deep-ownership-workspace/fixtures/sibi-pedagogy-loop.json";
+const FIXTURE_PATH = "evals/deep-ownership-workspace/fixtures/sibi-pedagogy-loop.json";
 
 function loadFixture(): DeepOwnershipFixture {
   return JSON.parse(readFileSync(FIXTURE_PATH, "utf8")) as DeepOwnershipFixture;

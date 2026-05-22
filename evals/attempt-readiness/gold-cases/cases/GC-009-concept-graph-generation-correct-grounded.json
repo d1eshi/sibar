@@ -1,0 +1,36 @@
+{
+  "id": "GC-009",
+  "mastery_check_id": "SC-002-concept-graph-generation",
+  "concept_id": "concept_graph_generation",
+  "operation": "explain",
+  "answer_class": "correct_grounded",
+  "simulated_user_answer": "I would start from the artifact session inventory, then follow `src/runtime-concept-graph.ts` node extraction and edge assembly rules in `runtime-support.ts`, and finish at persisted graph output with boundary-validated evidence citations.",
+  "declared_confidence": "high",
+  "expected_gap_type": null,
+  "expected_layer": 4,
+  "expected_severity": "later",
+  "expected_confidence": "high",
+  "required_repo_evidence": [
+    {
+      "path": "src/runtime-concept-graph.ts",
+      "rationale": "Primary implementation path for inventory, node and edge generation, and persistence."
+    },
+    {
+      "path": "src/runtime-support.ts",
+      "rationale": "Defines concept node and edge schema used by generated graph."
+    },
+    {
+      "path": "Tests/concept-graph.test.ts",
+      "rationale": "Validates required intermediate structures and citation constraints."
+    }
+  ],
+  "forbidden_claims": [
+    "Claiming graph nodes and edges are created without boundary-filtered evidence.",
+    "Omitting persisted graph and edge relation explanation."
+  ],
+  "acceptable_repair_task": "No repair required; this is a fully grounded explain answer.",
+  "acceptable_issue_candidate_type": "none",
+  "expected_readiness": "ready to modify with guardrails",
+  "notes": "Correct grounded answer for concept-graph flow and persistence.",
+  "expected_gap_present": false
+}

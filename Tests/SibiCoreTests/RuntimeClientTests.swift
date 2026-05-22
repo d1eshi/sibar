@@ -281,6 +281,30 @@ final class RuntimeClientTests: XCTestCase {
         XCTAssertEqual(payload["root"] as? String, "/tmp/sibi")
         XCTAssertEqual(payload["root_path"] as? String, "/tmp/sibi")
         XCTAssertEqual(payload["codex_command"] as? String, "auto")
+        XCTAssertNil(payload["fixture_model_response_path"])
+    }
+
+    func testSendsStartWorkspaceSessionCommandWithFixtureModelResponsePath() throws {
+        let runner = StubRunner(result: .init(
+            status: 0,
+            stdout: startWorkspaceSessionEnvelopeJSON,
+            stderr: ""
+        ))
+        let client = RuntimeClient(runner: runner, arguments: ["node", "runtime.js"])
+
+        _ = try client.startWorkspaceSession(.init(
+            goal: "Explain project ownership boundaries.",
+            root: "/tmp/sibi",
+            codex_command: "auto",
+            fixture_model_response_path: "evals/deep-ownership-workspace/fixtures/live-workspace-session.json"
+        ))
+
+        let requestData = try XCTUnwrap(runner.standardInput.data(using: .utf8))
+        let requestObject = try JSONSerialization.jsonObject(with: requestData) as? [String: Any]
+        let payload = try XCTUnwrap(requestObject?["payload"] as? [String: Any])
+
+        XCTAssertEqual(requestObject?["command"] as? String, "start_workspace_session")
+        XCTAssertEqual(payload["fixture_model_response_path"] as? String, "evals/deep-ownership-workspace/fixtures/live-workspace-session.json")
     }
 
     func testSendsSubmitWorkspaceAttemptCommand() throws {
@@ -313,6 +337,87 @@ final class RuntimeClientTests: XCTestCase {
         XCTAssertEqual((payload["selected_evidence"] as? [String]), ["EV-LIVE-1"])
         XCTAssertEqual(payload["declared_confidence"] as? String, "medium")
         XCTAssertEqual((payload["declared_unknowns"] as? [String]), ["I am not sure about edge cases."])
+        XCTAssertEqual(payload["action"] as? String, "submit")
+    }
+
+    func testSendsSubmitWorkspaceAttemptCommandWithExplicitAction() throws {
+        let runner = StubRunner(result: .init(
+            status: 0,
+            stdout: submitWorkspaceAttemptEnvelopeJSON,
+            stderr: ""
+        ))
+        let client = RuntimeClient(runner: runner, arguments: ["node", "runtime.js"])
+
+        let result = try client.submitWorkspaceAttempt(.init(
+            workspace_session_id: "ws-1",
+            answer_text: "I am not sure on purpose.",
+            selected_evidence: [],
+            declared_confidence: "medium",
+            declared_unknowns: [],
+            action: .i_do_not_know
+        ))
+
+        XCTAssertEqual(result.workspace_session.workspace_session_id, "ws-1")
+
+        let requestData = try XCTUnwrap(runner.standardInput.data(using: .utf8))
+        let requestObject = try JSONSerialization.jsonObject(with: requestData) as? [String: Any]
+        let payload = try XCTUnwrap(requestObject?["payload"] as? [String: Any])
+        XCTAssertEqual(payload["action"] as? String, "i_do_not_know")
+    }
+
+    func testStartWorkspaceSessionResponseDecodesLiveWorkspaceContract() throws {
+        let runner = StubRunner(result: .init(
+            status: 0,
+            stdout: startWorkspaceSessionLiveWorkspaceEnvelopeJSON,
+            stderr: ""
+        ))
+        let client = RuntimeClient(runner: runner, arguments: ["node", "runtime.js"])
+
+        let result = try client.startWorkspaceSession(.init(
+            goal: "Understand ownership boundaries.",
+            root: "/tmp/sibi",
+            codex_command: "auto"
+        ))
+
+        let liveSession = try XCTUnwrap(result.workspace_session.live_workspace)
+        XCTAssertEqual(liveSession.session_id, "ws-1")
+        XCTAssertEqual(liveSession.project_label, "Ownership Runtime Slice")
+        XCTAssertEqual(liveSession.phase, "GapOrReady")
+        XCTAssertEqual(liveSession.active_operation?.operation_id, "OP-1")
+        XCTAssertEqual(liveSession.artifact_previews.first?.artifact_id, "TA-1")
+        XCTAssertNil(liveSession.last_attempt_evaluation)
+        XCTAssertNil(liveSession.submitted_attempt)
+        XCTAssertEqual(liveSession.ui_reproduction.test_path, "Tests/workspace-live-session.test.ts")
+        XCTAssertNil(liveSession.ui_reproduction.fixture_path)
+        XCTAssertNil(liveSession.ui_reproduction.demo_path)
+    }
+
+    func testSubmitWorkspaceAttemptResponseDecodesAttemptEvaluationContract() throws {
+        let runner = StubRunner(result: .init(
+            status: 0,
+            stdout: submitWorkspaceAttemptWithEvaluationEnvelopeJSON,
+            stderr: ""
+        ))
+        let client = RuntimeClient(runner: runner, arguments: ["node", "runtime.js"])
+
+        let result = try client.submitWorkspaceAttempt(.init(
+            workspace_session_id: "ws-1",
+            answer_text: "The project routes command through request.command.",
+            selected_evidence: ["EV-1"],
+            declared_confidence: "medium",
+            declared_unknowns: []
+        ))
+
+        let evaluation = try XCTUnwrap(result.workspace_session.live_workspace?.last_attempt_evaluation)
+        XCTAssertEqual(evaluation.attempt_id, "AT-1")
+        XCTAssertEqual(evaluation.evidence_check.result, "confirmed")
+        XCTAssertEqual(evaluation.scoped_readiness.status, "ready")
+        XCTAssertEqual(evaluation.updated_workspace_session?.next_action, "continue")
+        XCTAssertNil(evaluation.repair_action)
+        let submittedAttempt = try XCTUnwrap(result.workspace_session.live_workspace?.submitted_attempt)
+        XCTAssertEqual(submittedAttempt.operation_id, "OP-1")
+        XCTAssertEqual(submittedAttempt.action, "submit")
+        XCTAssertEqual(submittedAttempt.selected_evidence_ids, ["EV-1"])
     }
 
     private func sendStub(_ client: RuntimeClient) throws -> StubResponse {
@@ -380,6 +485,304 @@ private let submitWorkspaceAttemptEnvelopeJSON = #"""
           }],
           "artifact_counterevidence": [],
           "result": "confirmed"
+        }
+      }
+    },
+    "snapshot": null
+  }
+}
+"""#
+
+private let startWorkspaceSessionLiveWorkspaceEnvelopeJSON = #"""
+{
+  "ok": true,
+  "data": {
+    "workspace_session": {
+      "workspace_session_id": "ws-1",
+      "artifact_session_id": "as-1",
+      "runner": {
+        "status": "completed",
+        "accepted_signal_count": 1,
+        "rejected_signal_count": 0
+      },
+      "live_workspace": {
+        "session_id": "ws-1",
+        "repo_root": "/tmp/sibi",
+        "project_label": "Ownership Runtime Slice",
+        "source_control_summary": {
+          "available": true,
+          "branch": "main",
+          "head": null,
+          "status_short": "workspace clean",
+          "diff_stat": "",
+          "diff_name_status": ""
+        },
+        "worktree": {
+          "root_path": "/tmp/sibi",
+          "paths": [
+            "src/runtime.ts",
+            "package.json"
+          ]
+        },
+        "artifact_tree": {
+          "root_path": "/tmp/sibi",
+          "paths": [
+            "src/runtime.ts"
+          ]
+        },
+        "selected": [".", "src"],
+        "excluded": [".git", "dist"],
+        "unknown": [],
+        "artifact_previews": [
+          {
+            "artifact_id": "TA-1",
+            "path": "src/runtime.ts",
+            "title": "runtime.ts",
+            "artifact_type": "code",
+            "language": "ts",
+            "excerpt": "export function start() {}",
+            "slice_content": null,
+            "line_start": 1,
+            "line_end": 1,
+            "preview_fallback_reason": null,
+            "evidence_ids": ["EV-1"]
+          }
+        ],
+        "required_evidence": ["EV-1"],
+        "success_criteria": ["explain request dispatch"],
+        "current_prompt": "Explain runtime ownership for command dispatch.",
+        "phase": "GapOrReady",
+        "next_action": "review readiness and repair if needed",
+        "evidence": [
+          {
+            "evidence_id": "EV-1",
+            "artifact_id": "A-1",
+            "path": "src/runtime.ts",
+            "title": "runtime.ts",
+            "line_range": {
+              "line_start": 1,
+              "line_end": 3
+            },
+            "location": "src/runtime.ts",
+            "label": "implementation",
+            "excerpt": "export function start() {}",
+            "required": true,
+            "optional": false
+          }
+        ],
+        "active_operation": {
+          "operation_id": "OP-1",
+          "slice_id": "CS-1",
+          "operation_kind": "explain",
+          "prompt": "Explain this project boundary.",
+          "required_evidence": ["EV-1"],
+          "success_criteria": ["explain request dispatch"]
+        },
+        "ui_reproduction": {
+          "fixture_path": null,
+          "demo_path": null,
+          "test_path": "Tests/workspace-live-session.test.ts"
+        }
+      }
+    },
+    "snapshot": null
+  }
+}
+"""#
+
+private let submitWorkspaceAttemptWithEvaluationEnvelopeJSON = #"""
+{
+  "ok": true,
+  "data": {
+    "workspace_session": {
+      "workspace_session_id": "ws-1",
+      "artifact_session_id": "as-1",
+      "runner": {
+        "status": "completed",
+        "accepted_signal_count": 1,
+        "rejected_signal_count": 0
+      },
+      "loop": {
+        "goal": "Explain this project",
+        "evidence_inventory": [],
+        "concept_slice": {
+          "id": "CS-1",
+          "label": "request command contract",
+          "domain": "runtime",
+          "operation_target": "explain",
+          "prerequisite_concepts": [],
+          "source_evidence": [],
+          "behavior_evidence": [],
+          "risk_evidence": [],
+          "expected_user_operations": ["explain"]
+        },
+        "thinking_artifacts": [],
+        "active_operation": {
+          "id": "OP-1",
+          "kind": "explain",
+          "prompt": "Explain this project boundary.",
+          "required_evidence": ["EV-1"],
+          "success_criteria": ["explain request dispatch"]
+        },
+        "sample_attempt": {
+          "id": "AT-1",
+          "operation_id": "OP-1",
+          "answer_text": "The project routes command through request.command.",
+          "selected_evidence": ["EV-1"],
+          "declared_confidence": "medium",
+          "declared_unknowns": []
+        },
+        "evidence_check": {
+          "id": "EC-1",
+          "attempt_id": "AT-1",
+          "required_claims": ["explain request dispatch"],
+          "observed_claims": ["explain request dispatch"],
+          "missing_claims": [],
+          "contradicted_claims": [],
+          "unsupported_claims": [],
+          "cited_evidence": [
+            {
+              "evidence_id": "EV-1",
+              "file_path": "src/runtime.ts",
+              "start_line": 1,
+              "end_line": 3,
+              "excerpt": "export function start() {}",
+              "role": "implementation"
+            }
+          ],
+          "artifact_counterevidence": [],
+          "result": "confirmed"
+        }
+      },
+      "live_workspace": {
+        "session_id": "ws-1",
+        "repo_root": "/tmp/sibi",
+        "project_label": "Ownership Runtime Slice",
+        "source_control_summary": {
+          "available": true,
+          "branch": "main",
+          "head": null,
+          "status_short": "workspace clean",
+          "diff_stat": "",
+          "diff_name_status": ""
+        },
+        "worktree": {
+          "root_path": "/tmp/sibi",
+          "paths": [
+            "src/runtime.ts",
+            "package.json"
+          ]
+        },
+        "artifact_tree": {
+          "root_path": "/tmp/sibi",
+          "paths": [
+            "src/runtime.ts"
+          ]
+        },
+        "selected": [".", "src"],
+        "excluded": [".git", "dist"],
+        "unknown": [],
+        "artifact_previews": [
+          {
+            "artifact_id": "TA-1",
+            "path": "src/runtime.ts",
+            "title": "runtime.ts",
+            "artifact_type": "code",
+            "language": "ts",
+            "excerpt": "export function start() {}",
+            "slice_content": null,
+            "line_start": 1,
+            "line_end": 1,
+            "preview_fallback_reason": null,
+            "evidence_ids": ["EV-1"]
+          }
+        ],
+        "required_evidence": ["EV-1"],
+        "success_criteria": ["explain request dispatch"],
+        "current_prompt": "Explain runtime ownership for command dispatch.",
+        "phase": "GapOrReady",
+        "next_action": "continue",
+        "last_attempt_evaluation": {
+          "attempt_id": "AT-1",
+          "evidence_check": {
+            "result": "confirmed",
+            "required_claims": ["explain request dispatch"],
+            "observed_claims": ["explain request dispatch"],
+            "missing_claims": [],
+            "contradicted_claims": [],
+            "unsupported_claims": [],
+            "cited_evidence": [
+              {
+                "evidence_id": "EV-1",
+                "artifact_id": "A-1",
+                "path": "src/runtime.ts",
+                "title": "runtime.ts",
+                "line_range": {
+                  "line_start": 1,
+                  "line_end": 3
+                },
+                "location": "src/runtime.ts",
+                "label": "implementation",
+                "excerpt": "export function start() {}",
+                "required": true,
+                "optional": false
+              }
+            ]
+          },
+          "missing_evidence": [],
+          "detected_gap": null,
+          "repair_action": null,
+          "reattempt_prompt": "Retry with evidence references.",
+          "scoped_readiness": {
+            "status": "ready",
+            "scope": "Attempt confirmed by cited evidence.",
+            "blocked_claims": []
+          },
+          "updated_workspace_session": {
+            "session_id": "ws-1",
+            "phase": "GapOrReady",
+            "next_action": "continue"
+          }
+        },
+        "evidence": [
+          {
+            "evidence_id": "EV-1",
+            "artifact_id": "A-1",
+            "path": "src/runtime.ts",
+            "title": "runtime.ts",
+            "line_range": {
+              "line_start": 1,
+              "line_end": 3
+            },
+            "location": "src/runtime.ts",
+            "label": "implementation",
+            "excerpt": "export function start() {}",
+            "required": true,
+            "optional": false
+          }
+        ],
+        "active_operation": {
+          "operation_id": "OP-1",
+          "slice_id": "CS-1",
+          "operation_kind": "explain",
+          "prompt": "Explain this project boundary.",
+          "required_evidence": ["EV-1"],
+          "success_criteria": ["explain request dispatch"]
+        },
+        "submitted_attempt": {
+          "session_id": "ws-1",
+          "operation_id": "OP-1",
+          "slice_id": "CS-1",
+          "answer_text": "The project routes command through request.command.",
+          "selected_evidence_ids": ["EV-1"],
+          "confidence": "medium",
+          "declared_unknowns": [],
+          "action": "submit"
+        },
+        "ui_reproduction": {
+          "fixture_path": null,
+          "demo_path": null,
+          "test_path": "Tests/workspace-live-session.test.ts"
         }
       }
     },

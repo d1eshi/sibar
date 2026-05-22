@@ -1,0 +1,36 @@
+{
+  "id": "GC-038",
+  "mastery_check_id": "SC-005-readiness-report-generation",
+  "concept_id": "readiness_report_generation",
+  "operation": "transfer",
+  "answer_class": "overconfident_wrong",
+  "simulated_user_answer": "I am sure the report can claim `ready to own` as soon as one concept is confirmed, even with open gaps still present.",
+  "declared_confidence": "high",
+  "expected_gap_type": "false_confidence_gap",
+  "expected_layer": 4,
+  "expected_severity": "critical",
+  "expected_confidence": "high",
+  "required_repo_evidence": [
+    {
+      "path": "src/runtime-readiness.ts",
+      "rationale": "Defines that open gaps keep readiness at not ready yet."
+    },
+    {
+      "path": "src/runtime-memory.ts",
+      "rationale": "Provides open gap state that blocks higher readiness claims."
+    },
+    {
+      "path": "Tests/readiness-report.test.ts",
+      "rationale": "Verifies summary readiness and blocked claims."
+    }
+  ],
+  "forbidden_claims": [
+    "Asserting `ready to own` while open gaps remain.",
+    "Ignoring critical readiness gating by open gaps."
+  ],
+  "acceptable_repair_task": "Repair by linking open gaps to `summary.readiness` and evidence-index requirements.",
+  "acceptable_issue_candidate_type": "LearningGap",
+  "expected_readiness": "not ready yet",
+  "notes": "This class catches high-confidence overclaiming of readiness.",
+  "expected_gap_present": true
+}

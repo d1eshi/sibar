@@ -1,0 +1,366 @@
+{
+  "report_id": "VAL-EVAL-012-pedagogy-coverage-2026-05-20T00:00:00.000Z",
+  "generated_at": "2026-05-20T00:00:00.000Z",
+  "validation": "VAL-EVAL-012-pedagogy-coverage",
+  "eval_spec_path": "evals/pedagogy-layers/eval-suite.json",
+  "dataset": {
+    "id": "sibi-v01-e01-canonical-pilot",
+    "version": "0.1.0",
+    "index_path": "evals/pedagogy-layers/dataset/index.json"
+  },
+  "no_llm": true,
+  "coverage_passed": false,
+  "policy": {
+    "fail_closed_dimensions": [
+      "layers",
+      "operations",
+      "gap_labels",
+      "evidence_conditions",
+      "loop_stages",
+      "answer_classes"
+    ],
+    "note": "Missing semantic coverage in critical dimensions is fail-closed by default; use --allow-coverage-gaps for exploration/reporting."
+  },
+  "aggregate": {
+    "total_cases": 7,
+    "dimensions": 6,
+    "dimensions_with_gaps": 1,
+    "total_missing": 1
+  },
+  "dimensions": [
+    {
+      "dimension": "layers",
+      "required": [
+        "L1",
+        "L2",
+        "L3",
+        "L4",
+        "L5"
+      ],
+      "covered": [
+        "L1",
+        "L2",
+        "L3",
+        "L4",
+        "L5"
+      ],
+      "missing": [],
+      "coverage_ratio": 1
+    },
+    {
+      "dimension": "answer_classes",
+      "required": [
+        "boundary_violation",
+        "correct_answer",
+        "declared_uncertainty",
+        "missing_evidence",
+        "overconfident_llm_output",
+        "partial_answer",
+        "wrong_misconception"
+      ],
+      "covered": [
+        "boundary_violation",
+        "correct_answer",
+        "declared_uncertainty",
+        "missing_evidence",
+        "overconfident_llm_output",
+        "partial_answer",
+        "wrong_misconception"
+      ],
+      "missing": [],
+      "coverage_ratio": 1
+    },
+    {
+      "dimension": "gap_labels",
+      "required": [
+        "no_gap",
+        "gap_important",
+        "gap_critical",
+        "gap_confidence_medium",
+        "gap_confidence_high",
+        "observed_L1_gap",
+        "observed_L2_gap",
+        "observed_L3_gap",
+        "observed_L4_gap",
+        "observed_L5_gap"
+      ],
+      "covered": [
+        "gap_confidence_high",
+        "gap_confidence_medium",
+        "gap_critical",
+        "gap_important",
+        "no_gap",
+        "observed_L1_gap",
+        "observed_L2_gap",
+        "observed_L3_gap",
+        "observed_L4_gap"
+      ],
+      "missing": [
+        "observed_L5_gap"
+      ],
+      "coverage_ratio": 0.9
+    },
+    {
+      "dimension": "operations",
+      "required": [
+        "no_repair_challenge",
+        "boundary_explanation",
+        "explain_the_flow_without_looking",
+        "risk_analysis",
+        "trace_path_across_files",
+        "write_or_adjust_a_test"
+      ],
+      "covered": [
+        "boundary_explanation",
+        "explain_the_flow_without_looking",
+        "no_repair_challenge",
+        "risk_analysis",
+        "trace_path_across_files",
+        "write_or_adjust_a_test"
+      ],
+      "missing": [],
+      "coverage_ratio": 1
+    },
+    {
+      "dimension": "evidence_conditions",
+      "required": [
+        "required_evidence",
+        "forbidden_evidence",
+        "no_forbidden_evidence",
+        "boundary_rejection",
+        "inside_boundary_acceptance",
+        "readiness_requires_evidence",
+        "model_fixture_signal",
+        "missing_or_forbidden_model_citation"
+      ],
+      "covered": [
+        "boundary_rejection",
+        "forbidden_evidence",
+        "inside_boundary_acceptance",
+        "missing_or_forbidden_model_citation",
+        "model_fixture_signal",
+        "no_forbidden_evidence",
+        "readiness_requires_evidence",
+        "required_evidence"
+      ],
+      "missing": [],
+      "coverage_ratio": 1
+    },
+    {
+      "dimension": "loop_stages",
+      "required": [
+        "answer_capture",
+        "layer_classification",
+        "gap_detection",
+        "repair_generation",
+        "readiness_report",
+        "memory_persistence",
+        "boundary_enforcement",
+        "model_fixture_validation"
+      ],
+      "covered": [
+        "answer_capture",
+        "boundary_enforcement",
+        "gap_detection",
+        "layer_classification",
+        "memory_persistence",
+        "model_fixture_validation",
+        "readiness_report",
+        "repair_generation"
+      ],
+      "missing": [],
+      "coverage_ratio": 1
+    }
+  ],
+  "gaps": [
+    {
+      "dimension": "gap_labels",
+      "label": "observed_L5_gap",
+      "severity": "fail_closed"
+    }
+  ],
+  "cases": [
+    {
+      "id": "E01-CORRECT-L4-BOUNDARY",
+      "case_class": "correct_answer",
+      "layers": [
+        "L4"
+      ],
+      "operations": [
+        "no_repair_challenge"
+      ],
+      "evidence_conditions": [
+        "boundary_rejection",
+        "forbidden_evidence",
+        "inside_boundary_acceptance",
+        "readiness_requires_evidence",
+        "required_evidence"
+      ],
+      "loop_stages": [
+        "answer_capture",
+        "boundary_enforcement",
+        "layer_classification",
+        "readiness_report"
+      ]
+    },
+    {
+      "id": "E01-PARTIAL-L2-GAP",
+      "case_class": "partial_answer",
+      "layers": [
+        "L2",
+        "L4"
+      ],
+      "operations": [
+        "trace_path_across_files"
+      ],
+      "evidence_conditions": [
+        "inside_boundary_acceptance",
+        "no_forbidden_evidence",
+        "readiness_requires_evidence",
+        "required_evidence"
+      ],
+      "loop_stages": [
+        "answer_capture",
+        "boundary_enforcement",
+        "gap_detection",
+        "layer_classification",
+        "readiness_report",
+        "repair_generation"
+      ]
+    },
+    {
+      "id": "E01-UNCERTAIN-L1-DECLARED",
+      "case_class": "declared_uncertainty",
+      "layers": [
+        "L1",
+        "L3"
+      ],
+      "operations": [
+        "explain_the_flow_without_looking"
+      ],
+      "evidence_conditions": [
+        "inside_boundary_acceptance",
+        "no_forbidden_evidence",
+        "readiness_requires_evidence",
+        "required_evidence"
+      ],
+      "loop_stages": [
+        "answer_capture",
+        "boundary_enforcement",
+        "gap_detection",
+        "layer_classification",
+        "memory_persistence",
+        "readiness_report",
+        "repair_generation"
+      ]
+    },
+    {
+      "id": "E01-WRONG-L3-MISCONCEPTION",
+      "case_class": "wrong_misconception",
+      "layers": [
+        "L3",
+        "L4"
+      ],
+      "operations": [
+        "trace_path_across_files"
+      ],
+      "evidence_conditions": [
+        "boundary_rejection",
+        "forbidden_evidence",
+        "inside_boundary_acceptance",
+        "readiness_requires_evidence",
+        "required_evidence"
+      ],
+      "loop_stages": [
+        "answer_capture",
+        "boundary_enforcement",
+        "gap_detection",
+        "layer_classification",
+        "memory_persistence",
+        "readiness_report",
+        "repair_generation"
+      ]
+    },
+    {
+      "id": "E01-MISSING-EVIDENCE-L3",
+      "case_class": "missing_evidence",
+      "layers": [
+        "L3",
+        "L4"
+      ],
+      "operations": [
+        "write_or_adjust_a_test"
+      ],
+      "evidence_conditions": [
+        "inside_boundary_acceptance",
+        "no_forbidden_evidence",
+        "readiness_requires_evidence",
+        "required_evidence"
+      ],
+      "loop_stages": [
+        "answer_capture",
+        "boundary_enforcement",
+        "gap_detection",
+        "layer_classification",
+        "readiness_report",
+        "repair_generation"
+      ]
+    },
+    {
+      "id": "E01-BOUNDARY-VIOLATION-L4",
+      "case_class": "boundary_violation",
+      "layers": [
+        "L4"
+      ],
+      "operations": [
+        "boundary_explanation"
+      ],
+      "evidence_conditions": [
+        "boundary_rejection",
+        "forbidden_evidence",
+        "inside_boundary_acceptance",
+        "readiness_requires_evidence",
+        "required_evidence"
+      ],
+      "loop_stages": [
+        "answer_capture",
+        "boundary_enforcement",
+        "gap_detection",
+        "layer_classification",
+        "memory_persistence",
+        "readiness_report",
+        "repair_generation"
+      ]
+    },
+    {
+      "id": "E01-LLM-OVERCONFIDENT-L5",
+      "case_class": "overconfident_llm_output",
+      "layers": [
+        "L1",
+        "L5"
+      ],
+      "operations": [
+        "risk_analysis"
+      ],
+      "evidence_conditions": [
+        "boundary_rejection",
+        "forbidden_evidence",
+        "inside_boundary_acceptance",
+        "missing_or_forbidden_model_citation",
+        "model_fixture_signal",
+        "readiness_requires_evidence",
+        "required_evidence"
+      ],
+      "loop_stages": [
+        "answer_capture",
+        "boundary_enforcement",
+        "gap_detection",
+        "layer_classification",
+        "memory_persistence",
+        "model_fixture_validation",
+        "readiness_report",
+        "repair_generation"
+      ]
+    }
+  ]
+}

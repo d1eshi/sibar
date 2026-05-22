@@ -1,0 +1,36 @@
+{
+  "id": "GC-002",
+  "mastery_check_id": "SC-001-artifact-boundary",
+  "concept_id": "artifact_boundary",
+  "operation": "trace",
+  "answer_class": "correct_uncited",
+  "simulated_user_answer": "Boundary checks are based on manifest paths and should include src and Tests. If I understood correctly, the rest of the repository is out of scope even if it looks relevant.",
+  "declared_confidence": "high",
+  "expected_gap_type": "evidence_gap",
+  "expected_layer": 4,
+  "expected_severity": "important",
+  "expected_confidence": "medium",
+  "required_repo_evidence": [
+    {
+      "path": "src/runtime-concept-graph.ts",
+      "rationale": "Confirms inclusion logic even when answer semantics are otherwise correct."
+    },
+    {
+      "path": "src/runtime-support.ts",
+      "rationale": "Confirms metadata contracts for boundary-aware evidence."
+    },
+    {
+      "path": "Tests/concept-graph.test.ts",
+      "rationale": "Confirms exclusion of unbounded paths by test assertions."
+    }
+  ],
+  "forbidden_claims": [
+    "Passing the case without citing concrete in-scope file paths.",
+    "Using uncited generic reasoning as if it were evidence-backed."
+  ],
+  "acceptable_repair_task": "Request the same boundary explanation with explicit file evidence, including one allowed and one excluded path.",
+  "acceptable_issue_candidate_type": "LearningGap",
+  "expected_readiness": "not ready yet",
+  "notes": "This is a correctness gap caused by missing citation, not by wrong concept logic.",
+  "expected_gap_present": true
+}

@@ -1,0 +1,36 @@
+{
+  "id": "GC-035",
+  "mastery_check_id": "SC-005-readiness-report-generation",
+  "concept_id": "readiness_report_generation",
+  "operation": "transfer",
+  "answer_class": "partial",
+  "simulated_user_answer": "I understand that one open gap blocks readiness, but I missed how `ready_areas`, `open_gaps`, and practice queue all link to specific evidence IDs.",
+  "declared_confidence": "medium",
+  "expected_gap_type": "causal_gap",
+  "expected_layer": 4,
+  "expected_severity": "important",
+  "expected_confidence": "medium",
+  "required_repo_evidence": [
+    {
+      "path": "src/runtime-readiness.ts",
+      "rationale": "Shows causal path for report sections and claim gating."
+    },
+    {
+      "path": "src/runtime-memory.ts",
+      "rationale": "Builds readiness-ready concepts and open gap views."
+    },
+    {
+      "path": "Tests/readiness-report.test.ts",
+      "rationale": "Validates ready, risky, open, and queue sections with evidence IDs."
+    }
+  ],
+  "forbidden_claims": [
+    "Reducing readiness transfer to summary line only.",
+    "Ignoring practice queue and open-gap coupling."
+  ],
+  "acceptable_repair_task": "Repair by explaining the missing section dependencies and evidence id propagation.",
+  "acceptable_issue_candidate_type": "LearningGap",
+  "expected_readiness": "not ready yet",
+  "notes": "Partial answer captures outcome but misses section dependency details.",
+  "expected_gap_present": true
+}

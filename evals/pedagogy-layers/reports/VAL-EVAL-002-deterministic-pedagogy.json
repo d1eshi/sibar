@@ -1,0 +1,374 @@
+{
+  "report_id": "VAL-EVAL-002-2026-05-20T21:31:53.655Z",
+  "generated_at": "2026-05-20T21:31:53.655Z",
+  "dataset": {
+    "id": "sibi-v01-e01-canonical-pilot",
+    "version": "0.1.0",
+    "index_path": "evals/pedagogy-layers/dataset/index.json"
+  },
+  "validation": "VAL-EVAL-002",
+  "no_llm": true,
+  "aggregate": {
+    "total_cases": 7,
+    "passed_cases": 7,
+    "failed_cases": 0,
+    "total_mismatches": 0,
+    "gap_cases": 6,
+    "challenge_cases": 6,
+    "readiness_cases_with_evidence": 7
+  },
+  "cases": [
+    {
+      "id": "E01-CORRECT-L4-BOUNDARY",
+      "title": "Evidence-backed applied reasoning answer stays inside the artifact boundary",
+      "case_class": "correct_answer",
+      "passed": true,
+      "observations": {
+        "expected_layer": 4,
+        "classified_layer": 4,
+        "learning_gap": null,
+        "challenge": null,
+        "readiness": {
+          "readiness": "ready to modify with guardrails",
+          "statement": "1 area(s) have supported readiness claims.",
+          "confidence": "high",
+          "evidence_ids": [
+            "E1",
+            "E2"
+          ]
+        },
+        "memory": {
+          "answer_count": 1,
+          "gap_count": 0,
+          "challenge_count": 0,
+          "uncertainty_persisted": true
+        },
+        "boundary": {
+          "accepted_paths": [
+            "/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-CORRECT-L4-BOUNDARY-c5f08161-410a-4cd9-b484-9dd315ab6899/artifact-root/src/runtime.ts",
+            "/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-CORRECT-L4-BOUNDARY-c5f08161-410a-4cd9-b484-9dd315ab6899/artifact-root/src/runtime-support.ts"
+          ],
+          "rejected_paths": [
+            "../outside-repo/secrets.md"
+          ],
+          "rejection_reasons": [
+            "outside_artifact_boundary"
+          ]
+        },
+        "model_called": false
+      },
+      "mismatches": []
+    },
+    {
+      "id": "E01-PARTIAL-L2-GAP",
+      "title": "Partial isolated explanation creates an important gap and one repair challenge",
+      "case_class": "partial_answer",
+      "passed": true,
+      "observations": {
+        "expected_layer": 2,
+        "classified_layer": 2,
+        "learning_gap": {
+          "created": true,
+          "severity": "important",
+          "confidence": "medium",
+          "observed_layer": 2,
+          "suspected_misconception": "The answer may explain Gap detection to practice challenge flow in isolation but does not yet connect it to the cited artifact evidence, boundary, or change risk.",
+          "artifact_evidence_count": 2,
+          "answer_evidence_count": 2
+        },
+        "challenge": {
+          "created": true,
+          "challenge_type": "trace_path_across_files",
+          "due_after": "24h",
+          "expected_evidence_count": 6
+        },
+        "readiness": {
+          "readiness": "not ready yet",
+          "statement": "1 open gap(s) keep this artifact from being ready to own.",
+          "confidence": "medium",
+          "evidence_ids": [
+            "E1",
+            "E2"
+          ]
+        },
+        "memory": {
+          "answer_count": 1,
+          "gap_count": 1,
+          "challenge_count": 1,
+          "uncertainty_persisted": true
+        },
+        "boundary": {
+          "accepted_paths": [
+            "/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-PARTIAL-L2-GAP-e04d25e4-fc03-493c-9fc5-bc917bd23c73/artifact-root/src/runtime-gap-detection.ts",
+            "/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-PARTIAL-L2-GAP-e04d25e4-fc03-493c-9fc5-bc917bd23c73/artifact-root/src/runtime-practice.ts"
+          ],
+          "rejected_paths": [],
+          "rejection_reasons": []
+        },
+        "model_called": false
+      },
+      "mismatches": []
+    },
+    {
+      "id": "E01-UNCERTAIN-L1-DECLARED",
+      "title": "Declared uncertainty is preserved as evidence instead of treated as failure",
+      "case_class": "declared_uncertainty",
+      "passed": true,
+      "observations": {
+        "expected_layer": 1,
+        "classified_layer": 1,
+        "learning_gap": {
+          "created": true,
+          "severity": "important",
+          "confidence": "medium",
+          "observed_layer": 1,
+          "suspected_misconception": "The user explicitly declared uncertainty about Declared uncertainty as learning evidence; no misconception is assumed beyond the missing mental model.",
+          "artifact_evidence_count": 2,
+          "answer_evidence_count": 2
+        },
+        "challenge": {
+          "created": true,
+          "challenge_type": "explain_flow_without_looking",
+          "due_after": "24h",
+          "expected_evidence_count": 6
+        },
+        "readiness": {
+          "readiness": "not ready yet",
+          "statement": "1 open gap(s) keep this artifact from being ready to own.",
+          "confidence": "medium",
+          "evidence_ids": [
+            "E1",
+            "E2"
+          ]
+        },
+        "memory": {
+          "answer_count": 1,
+          "gap_count": 1,
+          "challenge_count": 1,
+          "uncertainty_persisted": true
+        },
+        "boundary": {
+          "accepted_paths": [
+            "/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-UNCERTAIN-L1-DECLARED-6a01284e-b672-4012-94b2-4b5094613ed8/artifact-root/src/runtime-gap-detection.ts",
+            "/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-UNCERTAIN-L1-DECLARED-6a01284e-b672-4012-94b2-4b5094613ed8/artifact-root/src/runtime-memory.ts"
+          ],
+          "rejected_paths": [],
+          "rejection_reasons": []
+        },
+        "model_called": false
+      },
+      "mismatches": []
+    },
+    {
+      "id": "E01-WRONG-L3-MISCONCEPTION",
+      "title": "Wrong contextual answer records a misconception and immediate repair",
+      "case_class": "wrong_misconception",
+      "passed": true,
+      "observations": {
+        "expected_layer": 3,
+        "classified_layer": 3,
+        "learning_gap": {
+          "created": true,
+          "severity": "critical",
+          "confidence": "high",
+          "observed_layer": 3,
+          "suspected_misconception": "The answer likely maps Runtime lifecycle versus request lifecycle to the wrong responsibility or ignores the behavior shown by the artifact evidence.",
+          "artifact_evidence_count": 2,
+          "answer_evidence_count": 2
+        },
+        "challenge": {
+          "created": true,
+          "challenge_type": "trace_path_across_files",
+          "due_after": "now",
+          "expected_evidence_count": 6
+        },
+        "readiness": {
+          "readiness": "not ready yet",
+          "statement": "1 open gap(s) keep this artifact from being ready to own.",
+          "confidence": "high",
+          "evidence_ids": [
+            "E1",
+            "E2"
+          ]
+        },
+        "memory": {
+          "answer_count": 1,
+          "gap_count": 1,
+          "challenge_count": 1,
+          "uncertainty_persisted": true
+        },
+        "boundary": {
+          "accepted_paths": [
+            "/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-WRONG-L3-MISCONCEPTION-1f8c76ec-8a15-4795-b4df-ad67877de92c/artifact-root/src/runtime-support.ts",
+            "/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-WRONG-L3-MISCONCEPTION-1f8c76ec-8a15-4795-b4df-ad67877de92c/artifact-root/Tests/gap-detection.test.ts"
+          ],
+          "rejected_paths": [
+            "docs/private-notes.md"
+          ],
+          "rejection_reasons": [
+            "excluded_path"
+          ]
+        },
+        "model_called": false
+      },
+      "mismatches": []
+    },
+    {
+      "id": "E01-MISSING-EVIDENCE-L3",
+      "title": "Plausible answer without citations cannot support readiness",
+      "case_class": "missing_evidence",
+      "passed": true,
+      "observations": {
+        "expected_layer": 3,
+        "classified_layer": 3,
+        "learning_gap": {
+          "created": true,
+          "severity": "important",
+          "confidence": "medium",
+          "observed_layer": 3,
+          "suspected_misconception": "The answer may explain Readiness claims cite evidence in isolation but does not yet connect it to the cited artifact evidence, boundary, or change risk.",
+          "artifact_evidence_count": 2,
+          "answer_evidence_count": 2
+        },
+        "challenge": {
+          "created": true,
+          "challenge_type": "write_or_adjust_test",
+          "due_after": "24h",
+          "expected_evidence_count": 6
+        },
+        "readiness": {
+          "readiness": "not ready yet",
+          "statement": "1 open gap(s) keep this artifact from being ready to own.",
+          "confidence": "medium",
+          "evidence_ids": [
+            "E1",
+            "E2"
+          ]
+        },
+        "memory": {
+          "answer_count": 1,
+          "gap_count": 1,
+          "challenge_count": 1,
+          "uncertainty_persisted": true
+        },
+        "boundary": {
+          "accepted_paths": [
+            "/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-MISSING-EVIDENCE-L3-4f2c5239-4b17-4b3f-8ef1-50725786ae6f/artifact-root/src/runtime-readiness.ts",
+            "/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-MISSING-EVIDENCE-L3-4f2c5239-4b17-4b3f-8ef1-50725786ae6f/artifact-root/Tests/readiness-report.test.ts"
+          ],
+          "rejected_paths": [],
+          "rejection_reasons": []
+        },
+        "model_called": false
+      },
+      "mismatches": []
+    },
+    {
+      "id": "E01-BOUNDARY-VIOLATION-L4",
+      "title": "Answer cites an excluded file and must be rejected for boundary reasons",
+      "case_class": "boundary_violation",
+      "passed": true,
+      "observations": {
+        "expected_layer": 4,
+        "classified_layer": 4,
+        "learning_gap": {
+          "created": true,
+          "severity": "critical",
+          "confidence": "high",
+          "observed_layer": 4,
+          "suspected_misconception": "The answer likely maps Artifact boundary enforcement to the wrong responsibility or ignores the behavior shown by the artifact evidence.",
+          "artifact_evidence_count": 1,
+          "answer_evidence_count": 2
+        },
+        "challenge": {
+          "created": true,
+          "challenge_type": "boundary_explanation",
+          "due_after": "now",
+          "expected_evidence_count": 5
+        },
+        "readiness": {
+          "readiness": "not ready yet",
+          "statement": "1 open gap(s) keep this artifact from being ready to own.",
+          "confidence": "high",
+          "evidence_ids": [
+            "E1"
+          ]
+        },
+        "memory": {
+          "answer_count": 1,
+          "gap_count": 1,
+          "challenge_count": 1,
+          "uncertainty_persisted": true
+        },
+        "boundary": {
+          "accepted_paths": [
+            "/Users/d1eshi/.codex/worktrees/10f0/sibar/.sibi-eval-tmp-E01-BOUNDARY-VIOLATION-L4-4592445e-f4da-427e-b9d9-c46f08d98930/artifact-root/src/runtime.ts"
+          ],
+          "rejected_paths": [
+            "docs/private-notes.md",
+            "tmp/outside-observation.md"
+          ],
+          "rejection_reasons": [
+            "excluded_path",
+            "excluded_path"
+          ]
+        },
+        "model_called": false
+      },
+      "mismatches": []
+    },
+    {
+      "id": "E01-LLM-OVERCONFIDENT-L5",
+      "title": "Overconfident model candidate is rejected when it lacks valid citations",
+      "case_class": "overconfident_llm_output",
+      "passed": true,
+      "observations": {
+        "expected_layer": 5,
+        "classified_layer": 5,
+        "learning_gap": {
+          "created": true,
+          "severity": "critical",
+          "confidence": "high",
+          "observed_layer": 1,
+          "suspected_misconception": "LLM decides readiness",
+          "artifact_evidence_count": 0,
+          "answer_evidence_count": 2
+        },
+        "challenge": {
+          "created": true,
+          "challenge_type": "risk_analysis",
+          "due_after": "now",
+          "expected_evidence_count": 2
+        },
+        "readiness": {
+          "readiness": "not ready yet",
+          "statement": "Rejected model fixture signals require bounded deterministic evidence before readiness can be accepted.",
+          "confidence": "high",
+          "evidence_ids": [
+            "missing_or_forbidden_citation",
+            "missing_or_forbidden_citation"
+          ]
+        },
+        "memory": {
+          "answer_count": 0,
+          "gap_count": 1,
+          "challenge_count": 0,
+          "uncertainty_persisted": false
+        },
+        "boundary": {
+          "accepted_paths": [],
+          "rejected_paths": [
+            "docs/private-notes.md",
+            "<missing citation>"
+          ],
+          "rejection_reasons": [
+            "missing_or_forbidden_citation",
+            "missing_or_forbidden_citation"
+          ]
+        },
+        "model_called": false
+      },
+      "mismatches": []
+    }
+  ]
+}

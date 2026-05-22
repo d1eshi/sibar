@@ -1,0 +1,36 @@
+{
+  "id": "GC-029",
+  "mastery_check_id": "SC-004-repair-practice-generation",
+  "concept_id": "repair_practice_generation",
+  "operation": "modify",
+  "answer_class": "wrong_flow",
+  "simulated_user_answer": "I would choose challenge type first, then decide due_after, and check prompt shape afterward, which does not match runtime sequencing.",
+  "declared_confidence": "medium",
+  "expected_gap_type": "flow_gap",
+  "expected_layer": 4,
+  "expected_severity": "important",
+  "expected_confidence": "medium",
+  "required_repo_evidence": [
+    {
+      "path": "src/runtime-practice.ts",
+      "rationale": "Challenge fields are created from gap data and then mapped by helper functions."
+    },
+    {
+      "path": "src/runtime-gap-detection.ts",
+      "rationale": "Provides the gap object before practice generation executes."
+    },
+    {
+      "path": "Tests/practice-challenges.test.ts",
+      "rationale": "Test flow checks challenge creation and persistence order."
+    }
+  ],
+  "forbidden_claims": [
+    "Reversing gap-to-challenge sequencing in explanation.",
+    "Claiming challenge type is independent of severity and observed layer."
+  ],
+  "acceptable_repair_task": "Repair with correct function order and a challenge that reflects mapped gap state.",
+  "acceptable_issue_candidate_type": "LearningGap",
+  "expected_readiness": "not ready yet",
+  "notes": "Flow gap expected due to wrong conceptual ordering.",
+  "expected_gap_present": true
+}

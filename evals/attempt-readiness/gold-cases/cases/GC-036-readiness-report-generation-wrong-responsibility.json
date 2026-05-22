@@ -1,0 +1,36 @@
+{
+  "id": "GC-036",
+  "mastery_check_id": "SC-005-readiness-report-generation",
+  "concept_id": "readiness_report_generation",
+  "operation": "transfer",
+  "answer_class": "wrong_responsibility",
+  "simulated_user_answer": "Readiness should report only gaps; confirmed concepts and evidence are mainly handled by concept graph generation.",
+  "declared_confidence": "high",
+  "expected_gap_type": "responsibility_gap",
+  "expected_layer": 4,
+  "expected_severity": "critical",
+  "expected_confidence": "high",
+  "required_repo_evidence": [
+    {
+      "path": "src/runtime-readiness.ts",
+      "rationale": "Owns confirmed concepts, open gaps, practice queue, and summary calculation."
+    },
+    {
+      "path": "src/runtime-memory.ts",
+      "rationale": "Provides persisted concept and gap states required for report."
+    },
+    {
+      "path": "Tests/readiness-report.test.ts",
+      "rationale": "Shows readiness must include verified and open claim sections."
+    }
+  ],
+  "forbidden_claims": [
+    "Shrinking readiness to gap reporting only.",
+    "Shifting verified concepts or evidence indexing responsibility away from readiness."
+  ],
+  "acceptable_repair_task": "Repair by restoring responsibility boundaries and listing all readiness claim classes.",
+  "acceptable_issue_candidate_type": "LearningGap",
+  "expected_readiness": "not ready yet",
+  "notes": "Wrong responsibility should be corrected to readiness ownership.",
+  "expected_gap_present": true
+}

@@ -1,0 +1,36 @@
+{
+  "id": "GC-006",
+  "mastery_check_id": "SC-001-artifact-boundary",
+  "concept_id": "artifact_boundary",
+  "operation": "trace",
+  "answer_class": "overconfident_wrong",
+  "simulated_user_answer": "I am certain all files under the repo root are in scope unless they are literally impossible to open, so excluded paths do not matter for this slice.",
+  "declared_confidence": "high",
+  "expected_gap_type": "false_confidence_gap",
+  "expected_layer": 4,
+  "expected_severity": "critical",
+  "expected_confidence": "high",
+  "required_repo_evidence": [
+    {
+      "path": "src/runtime-concept-graph.ts",
+      "rationale": "Boundary declaration source for included and excluded paths."
+    },
+    {
+      "path": "src/runtime-concept-graph.ts",
+      "rationale": "Applies boundary filtering during runtime artifact graph build."
+    },
+    {
+      "path": "src/runtime-support.ts",
+      "rationale": "Defines artifact evidence contracts constrained by boundary logic."
+    }
+  ],
+  "forbidden_claims": [
+    "Claiming confidence-level certainty without citing manifest boundaries.",
+    "Ignoring explicit exclusions and treating them as harmless."
+  ],
+  "acceptable_repair_task": "Demand uncertainty reduction by re-grounding every boundary claim to manifest and test-backed evidence.",
+  "acceptable_issue_candidate_type": "LearningGap",
+  "expected_readiness": "not ready yet",
+  "notes": "High-confidence false answer is expected to be blocked as false_confidence_gap.",
+  "expected_gap_present": true
+}

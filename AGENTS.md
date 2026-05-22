@@ -1,111 +1,65 @@
-# Version Control Rules
+# Agent Rules
 
-These rules exist to keep this repository clean when multiple agents or humans
-work in the same tree. Follow them before making code, docs, config, or test
-changes.
+Treat this repository as a shared workspace and keep every change intentional.
 
-## Before Editing
+## Scope
 
-- Run `git status --short` before changing files.
-- Treat every existing change as owned by the user or another agent unless the
-  user explicitly says otherwise.
-- Do not revert, delete, move, reformat, or reorder changes you did not make.
-- If existing changes overlap the requested task, work around them or ask before
-  changing them.
-- Avoid `git add .` unless every changed file is yours and belongs to the same
-  intent.
+- Prefer acting when the request is clear; ask only when ambiguity blocks safe work.
+- Keep scope narrow and solve the requested task before adjacent cleanup.
+- Inspect relevant files and existing patterns before editing.
+- Choose the smallest reversible change that satisfies the task.
+- Prefer Spanish for conversation unless the user, code, or docs call for English.
 
-## While Editing
+## Git
 
-- Keep each work unit focused on one intent.
-- Prefer small, reviewable slices over broad mixed changes.
-- Separate documentation, code behavior, tests, and chores when they can stand
-  alone.
-- For a feature, prefer this order:
-  1. minimal working skeleton
-  2. behavior
-  3. tests
-  4. docs or follow-up cleanup
-- Do not mix unrelated refactors with features or fixes.
-- If a cleanup is needed before a feature, make it a separate `refactor` or
-  `chore` change.
-
-## How To Split Changes
-
-- Split by intent first, not by file.
-- If one file contains changes for multiple intents, use `git add -p` to stage
-  only the hunks that belong together.
-- If a hunk is still too broad, split the edit into smaller edits or use a Git UI
-  that can stage selected lines.
-- Use `git diff` to inspect unstaged changes before staging.
-- Use `git diff --cached` to inspect staged changes before any commit.
-- Use path-specific staging such as `git add docs/README.md` when only one path
-  belongs to the current change.
-- If a branch or task has grown too large, group commits by intent before
-  opening a PR or handing off.
-
-## Commit Types
-
-Use Conventional Commit-style prefixes when committing:
-
-- `docs`: documentation, specs, notes, README files.
-- `feat`: new user-facing or runtime behavior.
-- `fix`: bug fix.
-- `refactor`: code restructuring with no behavior change.
-- `test`: tests only.
-- `chore`: tooling, config, dependency, or cleanup work that does not change
-  product behavior.
-
-Examples:
-
-- `docs: add v0.1 version control rules`
-- `feat(runtime): add artifact session creation`
-- `fix(memory): persist answer evidence`
-- `refactor(runtime): split question policy helpers`
-- `test(runtime): cover declared uncertainty`
-- `chore: add package metadata`
-
-If a change fits more than one type, split it when reasonable.
-
-## Changelog Bridge
-
-Atomic commits are the audit trail. `CHANGELOG.md` is the human product story.
-
-For each completed commit, decide whether it is changelog-worthy:
-
-- Update `CHANGELOG.md` in the same commit when the change affects user-visible
-  behavior, a demo flow, a documented command, a product spec, release
-  readiness, or the public product narrative.
-- Do not update `CHANGELOG.md` for purely mechanical `test`, `refactor`, or
-  `chore` commits unless they change release confidence or explain product
-  progress.
-- Map commit intent to changelog groups:
-  - `feat` -> `Added` or `Changed`
-  - `fix` -> `Fixed`
-  - `docs` -> `Docs`
-  - release-relevant `test`, `refactor`, or `chore` -> `Internal`
-- If one implementation needs both behavior and changelog updates, keep them in
-  the same commit when they describe the same intent.
-- If a change is too large to describe in one changelog bullet, split the work
-  into smaller commits or attach it to a spec/iteration before committing.
-
-## Before Finishing
-
-- Run `git status --short` again.
-- Confirm your final diff contains only files relevant to the requested task.
-- Report any pre-existing changes that remain untouched.
-- If you changed files and the user has asked for implementation, either commit
-  the completed change or clearly state why it is intentionally left uncommitted.
+- Run `git status --short` before editing and before finishing.
+- Treat existing changes as user-owned unless the user says otherwise.
+- Do not revert, delete, move, reformat, or reorder work you did not make.
+- Avoid `git add .` unless every changed file is yours and one intent.
+- Split changes by intent; stage with explicit paths or `git add -p`.
+- Inspect `git diff` before staging and `git diff --cached` before committing.
+- Use Conventional Commit prefixes: `docs`, `feat`, `fix`, `refactor`, `test`, `chore`.
 - Do not push, rebase, squash, or amend unless the user explicitly asks.
-- Do not create hooks, automation, or repo policy files unless requested.
 
-## Current Repo Note
+## Editing
 
-At the time these rules were created, this repo had no commits yet and already
-contained untracked planning files:
+- Separate behavior, tests, docs, config, and chores when they can stand alone.
+- For features, work in order: skeleton, behavior, tests, docs.
+- Follow existing project conventions before adding new structure.
+- Add abstractions only when they remove real complexity or match local patterns.
+- Do not create hooks, automation, policy files, or process files unless requested.
 
-- `agent-chat-1.md`
-- `agent-chat-2.md`
-- `docs/`
+## Agent Harness
 
-Treat those files as existing baseline work, not disposable noise.
+- Use a parent/worker/verifier harness when the user asks or the task merits it.
+- Confirm harness mode and model mix with the user before switching workflows.
+- The parent owns reading, investigating, orchestrating, delegating, reviewing, integrating, staging/committing, and reporting.
+- The parent is not allowed to create or edit code/docs/tests/config files directly. If those files need changes, delegate to implementation workers.
+- In harness mode, the parent can run read-only inspection, validation, git, staging, and commit/reporting commands.
+- Implementation workers own bounded changes and should not revert unrelated user-owned edits.
+- Use default model `gpt-5.3-codex-spark` for implementation workers.
+- Verification workers check output against task, specs, code, and repo rules.
+- Verifier must be `gpt-5.2` with `high` reasoning.
+- If the requested model, tool, or role is unavailable, release threads and retry; use a fallback only after explicit user confirmation.
+- Repeat implement-verify until no blockers remain, the user stops, or input is needed.
+
+## Changelog
+
+- Update `CHANGELOG.md` when behavior, demos, commands, specs, release readiness, or product narrative changes.
+- Skip changelog updates for purely mechanical tests, refactors, or chores.
+- Map `feat` to Added or Changed, `fix` to Fixed, `docs` to Docs, and release-relevant internals to Internal.
+
+## Completion
+
+- Run the smallest meaningful verification command available.
+- For large implementations touching multiple layers/files/dependencies/tests/docs, split by intent (for example runtime/core, endpoint/adapters, UI, tests, docs/changelog, chores) and avoid monolithic commits.
+- Stage paths explicitly per commit and check `git diff --cached` before each commit.
+- Do not mix unrelated pre-existing or untracked changes in the same commit.
+- Confirm the final diff contains only task-relevant changes.
+- Report changed files, verification, remaining uncertainty, and untouched pre-existing changes.
+- Commit completed implementation work, or state why it is intentionally uncommitted.
+- If paused or blocked, leave a handoff with goal, files, done, remaining, verification, and risks.
+
+## Baseline
+
+- Treat pre-existing planning files such as `agent-chat-*.md` and `docs/` as baseline work.

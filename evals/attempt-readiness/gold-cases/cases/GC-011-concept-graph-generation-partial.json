@@ -1,0 +1,36 @@
+{
+  "id": "GC-011",
+  "mastery_check_id": "SC-002-concept-graph-generation",
+  "concept_id": "concept_graph_generation",
+  "operation": "explain",
+  "answer_class": "partial",
+  "simulated_user_answer": "I can describe what nodes are produced, but I skipped how boundary filtering and edge rationale are connected before persistence.",
+  "declared_confidence": "medium",
+  "expected_gap_type": "causal_gap",
+  "expected_layer": 4,
+  "expected_severity": "important",
+  "expected_confidence": "medium",
+  "required_repo_evidence": [
+    {
+      "path": "src/runtime-concept-graph.ts",
+      "rationale": "Contains the causal sequence for node and edge creation."
+    },
+    {
+      "path": "src/runtime-support.ts",
+      "rationale": "Defines edge relation fields used to explain causality."
+    },
+    {
+      "path": "Tests/concept-graph.test.ts",
+      "rationale": "Requires explanation to connect each stage to assertions."
+    }
+  ],
+  "forbidden_claims": [
+    "Claiming nodes and edges are independent and do not trace back to evidence.",
+    "Reducing the answer to naming output shape only."
+  ],
+  "acceptable_repair_task": "Repair should reconnect one missing stage: from inventory evidence to edge relation evidence.",
+  "acceptable_issue_candidate_type": "LearningGap",
+  "expected_readiness": "not ready yet",
+  "notes": "Partial flow explanation missing the evidence-backed transition from nodes to edges.",
+  "expected_gap_present": true
+}

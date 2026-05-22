@@ -11,6 +11,14 @@ import { projectWorkspaceSnapshot } from "./runtime-deep-ownership-snapshot.ts";
 import { buildWorkspaceInventory } from "./runtime-workspace-context.ts";
 import { readState, writeState } from "./runtime-state.ts";
 import {
+  buildAttemptEvaluationContract,
+  buildOwnershipAttemptContract,
+  buildWorkspaceSessionContract,
+  type OwnershipAttemptAction,
+  type OwnershipAttemptContract,
+  type WorkspaceSessionContract,
+} from "./runtime-workspace-session-contracts.ts";
+import {
   asStringArray,
   buildGap,
   buildRepair,
@@ -26,11 +34,22 @@ import {
   MAX_GOAL_LABEL_LENGTH,
 } from "./runtime-workspace-session-constants.ts";
 
+type WorkspaceSessionPayload = RuntimeWorkspaceSession & {
+  live_workspace: WorkspaceSessionContract;
+};
+
 type WorkspaceSessionResponse = {
-  workspace_session: RuntimeWorkspaceSession;
+  workspace_session: WorkspaceSessionPayload;
   snapshot: WorkspaceSnapshot;
   operation_state: { message: string };
 };
+
+function resolveFixtureModelResponsePath(payload: Record<string, unknown>): string | undefined {
+  if (typeof payload.fixture_model_response_path !== "string") return undefined;
+  const value = payload.fixture_model_response_path.trim();
+  if (!value) return undefined;
+  return resolve(value);
+}
 
 function getWorkspaceSession(workspaceSessionID: unknown): RuntimeWorkspaceSession {
   const id = String(workspaceSessionID || "").trim();
@@ -46,6 +65,7 @@ export function startWorkspaceSessionCommand(
 ): RuntimeSuccess<WorkspaceSessionResponse> {
   const goal = String(payload.goal || "").trim();
   const rootPath = resolve(String(payload.root_path || process.cwd()));
+  const fixtureModelResponsePath = resolveFixtureModelResponsePath(payload);
   if (!goal) fail("invalid_payload", "start_workspace_session requires goal.");
   if (!existsSync(rootPath)) fail("missing_artifact_root", `Workspace root ${rootPath} does not exist.`);
 
@@ -73,7 +93,7 @@ export function startWorkspaceSessionCommand(
     model_name: payload.model_name,
     reasoning_effort: payload.reasoning_effort,
     fixture_model_response: payload.fixture_model_response,
-    fixture_model_response_path: payload.fixture_model_response_path,
+    fixture_model_response_path: fixtureModelResponsePath,
   }).data;
 
   const workspaceSessionID = randomUUID();
@@ -88,12 +108,20 @@ export function startWorkspaceSessionCommand(
   const workspaceSession: RuntimeWorkspaceSession = {
     workspace_session_id: workspaceSessionID,
     artifact_session_id: artifactSession.artifact_session_id,
+    project_label: artifactSession.label,
     loop,
+    fixture_model_response_path: fixtureModelResponsePath,
     runner: buildRunnerSummary(agentResult),
     source_control: inventory.context.source_control,
     created_at: timestamp,
     updated_at: timestamp,
   };
+  const live_workspace = buildWorkspaceSessionContract({
+    session: workspaceSession,
+    artifactSessionLabel: artifactSession.label,
+    artifactSessionRootPath: loop.artifact_boundary.root_path,
+    fixtureModelResponsePath,
+  });
 
   const state = readState();
   state.workspace_sessions ??= {};
@@ -103,7 +131,10 @@ export function startWorkspaceSessionCommand(
   return {
     ok: true,
     data: {
-      workspace_session: workspaceSession,
+      workspace_session: {
+        ...workspaceSession,
+        live_workspace,
+      },
       snapshot: projectWorkspaceSnapshot(loop),
       operation_state: toOperationState("Workspace session started from runtime boundary and LLM runner contract."),
     },
@@ -125,13 +156,18 @@ export function submitWorkspaceAttemptCommand(
   if (!answerText) fail("invalid_payload", "submit_workspace_attempt requires answer_text.");
   const selectedEvidence = asStringArray(payload.selected_evidence, []);
   const declaredConfidence = String(payload.declared_confidence || "medium");
+  const declaredUnknowns = asStringArray(payload.declared_unknowns, []);
+  const rawAction = typeof payload.action === "string" ? payload.action : undefined;
+  const action: OwnershipAttemptAction | undefined = rawAction === "submit" || rawAction === "i_do_not_know"
+    ? rawAction
+    : undefined;
   const evaluated = captureAndEvaluate({
     operation,
     artifact,
     answer_text: answerText,
     selected_evidence: selectedEvidence,
     declared_confidence: declaredConfidence === "low" || declaredConfidence === "high" ? declaredConfidence : "medium",
-    declared_unknowns: asStringArray(payload.declared_unknowns, []),
+    declared_unknowns: declaredUnknowns,
     evidenceInventory: loop.evidence_inventory,
   });
   const gap = evaluated.gapKind
@@ -160,6 +196,33 @@ export function submitWorkspaceAttemptCommand(
   loop.loop_entry.current_state = "GapOrReady";
   loop.loop_entry.state_chain = Array.from(new Set([...loop.loop_entry.state_chain, "AttemptStored", "EvidenceChecked", "GapOrReady"]));
 
+  const ownershipAttempt: OwnershipAttemptContract = buildOwnershipAttemptContract({
+    session_id: workspaceSession.workspace_session_id,
+    operation_id: operation.id,
+    slice_id: loop.concept_slice?.id ?? null,
+    answer_text: answerText,
+    selected_evidence_ids: selectedEvidence,
+    confidence: declaredConfidence === "low" || declaredConfidence === "high" ? declaredConfidence : "medium",
+    declared_unknowns: declaredUnknowns,
+    action,
+  });
+  const attemptEvaluation = buildAttemptEvaluationContract({
+    attempt: evaluated.attempt,
+    evidenceCheck: evaluated.evidenceCheck,
+    sessionId: workspaceSession.workspace_session_id,
+    loop,
+    detectedGap: gap,
+    repairAction: repair,
+  });
+  const live_workspace = buildWorkspaceSessionContract({
+    session: workspaceSession,
+    artifactSessionLabel: workspaceSession.project_label ?? `Workspace: ${loop.goal.slice(0, MAX_GOAL_LABEL_LENGTH)}`,
+    artifactSessionRootPath: loop.artifact_boundary.root_path,
+    lastAttemptEvaluation: attemptEvaluation,
+    submittedAttempt: ownershipAttempt,
+    fixtureModelResponsePath: workspaceSession.fixture_model_response_path,
+  });
+
   workspaceSession.updated_at = now();
   const state = readState();
   state.workspace_sessions ??= {};
@@ -169,7 +232,10 @@ export function submitWorkspaceAttemptCommand(
   return {
     ok: true,
     data: {
-      workspace_session: workspaceSession,
+      workspace_session: {
+        ...workspaceSession,
+        live_workspace,
+      },
       snapshot: projectWorkspaceSnapshot(loop),
       operation_state: toOperationState("Workspace attempt evaluated by deterministic evidence checks."),
     },

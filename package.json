@@ -10,19 +10,46 @@
     "cli": "node --experimental-strip-types src/sibi.ts",
     "eval:pedagogy": "node --experimental-strip-types src/evals/deterministic-pedagogy.ts",
     "eval:llm-runtime-trace": "node --experimental-strip-types src/evals/llm-runtime-trace.ts",
+    "eval:workspace-intent": "node --experimental-strip-types src/evals/workspace-intent-compiler.ts",
+    "eval:workspace-runner-adapter": "node --experimental-strip-types src/evals/workspace-runner-adapter.ts",
+    "eval:workspace-model-io-boundary": "node --experimental-strip-types src/evals/workspace-model-io-boundary.ts",
+    "eval:pedagogy-coverage": "node --experimental-strip-types src/evals/pedagogy-coverage.ts",
+    "eval:pedagogy-core-coverage": "node --experimental-strip-types src/evals/pedagogy-core-coverage.ts",
+    "eval:shared-core-boundaries": "node --experimental-strip-types src/evals/shared-core-boundaries.ts",
     "eval:selfhost-pilot": "node --experimental-strip-types src/evals/selfhost-pilot.ts",
     "eval:selfhost-freeform": "node --experimental-strip-types src/evals/selfhost-freeform.ts",
     "eval:selfhost-benchmark": "node --experimental-strip-types src/evals/selfhost-benchmark.ts",
+    "eval:catalog": "node --experimental-strip-types src/evals/catalog.ts",
     "web:dev": "bun --hot scripts/web-dev.mjs",
     "article:workspace": "node --experimental-strip-types src/article-workspace-server.ts",
     "article:vercel:check": "node --test --test-concurrency=1 --experimental-strip-types Tests/article-workspace-vercel.test.ts",
-    "test": "node --test --test-concurrency=1 --experimental-strip-types Tests/**/*.test.ts",
+    "test": "node --test --test-concurrency=1 --experimental-strip-types Tests/**/*.test.ts sibi/Tests/**/*.test.ts",
     "typecheck": "pnpm exec tsc -p tsconfig.json --noEmit",
-    "guard:supply-chain": "node --experimental-strip-types src/scripts/guard-supply-chain.ts"
+    "guard:supply-chain": "node --experimental-strip-types src/scripts/guard-supply-chain.ts",
+    "workspace:dev": "vite apps/sibar-research-workspace --host 127.0.0.1 --strictPort --port 5173",
+    "workspace:build": "vite build apps/sibar-research-workspace",
+    "workspace:preview": "vite preview apps/sibar-research-workspace --host 127.0.0.1 --strictPort --port 4173",
+    "sibi:dev": "vite sibi --host 127.0.0.1 --strictPort --port 5174 --configLoader native",
+    "sibi:build": "vite build sibi --configLoader native",
+    "sibi:build:public": "VITE_SIBI_PUBLIC_ENTRY=true vite build sibi --config sibi/vite.public.config.js --configLoader native --base /sibi/ --outDir ../web/sibi --emptyOutDir",
+    "sibi:e2e": "playwright test sibi/Tests/sibi-ownership-workbench.e2e.spec.ts",
+    "sibi:e2e:ui": "playwright test sibi/Tests/sibi-ownership-workbench.e2e.spec.ts --ui",
+    "sibi:test": "node --test --test-concurrency=1 --experimental-strip-types sibi/Tests/**/*.test.ts",
+    "vercel:build": "pnpm run sibi:build:public"
   },
   "devDependencies": {
+    "@playwright/test": "^1.60.0",
     "@types/node": "^22.15.3",
-    "typescript": "^5.8.3"
+    "@types/react": "^19.1.13",
+    "@types/react-dom": "^19.1.9",
+    "typescript": "^5.8.3",
+    "vite": "^7.1.0"
+  },
+  "dependencies": {
+    "@pierre/diffs": "^1.2.1",
+    "@pierre/trees": "1.0.0-beta.4",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0"
   },
   "packageManager": "pnpm@9.0.0+sha512.b4106707c7225b1748b61595953ccbebff97b54ad05d002aa3635f633b9c53cd666f7ce9b8bc44704f1fa048b9a49b55371ab2d9e9d667d1efe2ef1514bcd513"
 }
