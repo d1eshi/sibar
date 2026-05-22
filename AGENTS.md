@@ -33,13 +33,15 @@ Treat this repository as a shared workspace and keep every change intentional.
 
 - Use a parent/worker/verifier harness when the user asks or the task merits it.
 - Confirm harness mode and model mix with the user before switching workflows.
-- The parent owns orchestration, scope, delegation, review, and final reporting.
-- In harness mode, the parent delegates file edits instead of editing directly.
-- Implementation workers own bounded changes; default model is `gpt-5.3-codex-spark`.
+- The parent owns reading, investigating, orchestrating, delegating, reviewing, integrating, staging/committing, and reporting.
+- The parent is not allowed to create or edit code/docs/tests/config files directly. If those files need changes, delegate to implementation workers.
+- In harness mode, the parent can run read-only inspection, validation, git, staging, and commit/reporting commands.
+- Implementation workers own bounded changes and should not revert unrelated user-owned edits.
+- Use default model `gpt-5.3-codex-spark` for implementation workers.
 - Verification workers check output against task, specs, code, and repo rules.
-- Verification default is `gpt-5.2` with `high` reasoning.
+- Verifier must be `gpt-5.2` with `high` reasoning.
+- If the requested model, tool, or role is unavailable, release threads and retry; use a fallback only after explicit user confirmation.
 - Repeat implement-verify until no blockers remain, the user stops, or input is needed.
-- If a requested model, tool, or role is unavailable, ask before using a fallback.
 
 ## Changelog
 
@@ -50,6 +52,9 @@ Treat this repository as a shared workspace and keep every change intentional.
 ## Completion
 
 - Run the smallest meaningful verification command available.
+- For large implementations touching multiple layers/files/dependencies/tests/docs, split by intent (for example runtime/core, endpoint/adapters, UI, tests, docs/changelog, chores) and avoid monolithic commits.
+- Stage paths explicitly per commit and check `git diff --cached` before each commit.
+- Do not mix unrelated pre-existing or untracked changes in the same commit.
 - Confirm the final diff contains only task-relevant changes.
 - Report changed files, verification, remaining uncertainty, and untouched pre-existing changes.
 - Commit completed implementation work, or state why it is intentionally uncommitted.
