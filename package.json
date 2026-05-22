@@ -31,9 +31,11 @@
     "workspace:preview": "vite preview apps/sibar-research-workspace --host 127.0.0.1 --strictPort --port 4173",
     "sibi:dev": "vite sibi --host 127.0.0.1 --strictPort --port 5174 --configLoader native",
     "sibi:build": "vite build sibi --configLoader native",
+    "sibi:build:public": "VITE_SIBI_PUBLIC_ENTRY=true vite build sibi --config sibi/vite.public.config.js --configLoader native --base /sibi/ --outDir ../web/sibi --emptyOutDir",
     "sibi:e2e": "playwright test sibi/Tests/sibi-ownership-workbench.e2e.spec.ts",
     "sibi:e2e:ui": "playwright test sibi/Tests/sibi-ownership-workbench.e2e.spec.ts --ui",
-    "sibi:test": "node --test --test-concurrency=1 --experimental-strip-types sibi/Tests/**/*.test.ts"
+    "sibi:test": "node --test --test-concurrency=1 --experimental-strip-types sibi/Tests/**/*.test.ts",
+    "vercel:build": "pnpm run sibi:build:public"
   },
   "devDependencies": {
     "@playwright/test": "^1.60.0",
