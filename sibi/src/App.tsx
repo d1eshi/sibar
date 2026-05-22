@@ -43,6 +43,13 @@ import { getWorkbenchSurfaceMode } from "./ownershipWorkbench/surfaceMode";
 import type { ViewMode } from "./ownershipWorkbench/types";
 import { loadFileContentStatus, type FileContentStatus } from "./ownershipWorkbench/fileContentClient.ts";
 import { evaluateOwnershipAttemptReadiness } from "./ownershipWorkbench/attemptReadiness";
+import {
+  evaluateTransferAttempt,
+  integrateTransferReadinessState,
+  makeTransferProbe,
+  makeTransferSkip,
+  type TransferAttemptRecord,
+} from "./ownershipWorkbench/transferVerification.ts";
 
 export default function App() {
   const workbenchSurfaceMode = getWorkbenchSurfaceMode(
@@ -54,8 +61,12 @@ export default function App() {
   const [fileStates, setFileStates] = React.useState<Record<string, BoundaryState>>(initialFileStates);
   const [attemptText, setAttemptText] = React.useState("");
   const [selfConfidence, setSelfConfidence] = React.useState(70);
+  const [transferAnswerText, setTransferAnswerText] = React.useState("");
   const [readinessHistory, setReadinessHistory] = React.useState<OwnershipAttemptReadiness[]>([]);
   const [readinessStartedAt, setReadinessStartedAt] = React.useState<number>(() => Date.now());
+  const [transferHistoryByBoundary, setTransferHistoryByBoundary] = React.useState<
+    Record<string, TransferAttemptRecord[]>
+  >({});
   const [sessionState, setSessionState] = React.useState<OwnershipSessionState>(
     createOwnershipSessionState,
   );
@@ -83,6 +94,10 @@ export default function App() {
   const selectedBoundary = React.useMemo(
     () => selectHighestRiskBoundary(boundaryCandidates),
     [boundaryCandidates],
+  );
+  const transferProbe = React.useMemo(
+    () => makeTransferProbe(selectedBoundary, ownershipReviewQueue),
+    [selectedBoundary],
   );
   const { fileStates: projectedFileStates, fileStateReasons } = React.useMemo(
     () =>
@@ -124,6 +139,28 @@ export default function App() {
     () => readinessHistory[readinessHistory.length - 1] ?? null,
     [readinessHistory],
   );
+  const transferHistory = React.useMemo(
+    () => transferHistoryByBoundary[selectedBoundary.id] ?? [],
+    [selectedBoundary.id, transferHistoryByBoundary],
+  );
+  const latestReadinessWithTransfer = React.useMemo(() => {
+    if (latestReadiness == null) {
+      return null;
+    }
+
+    return integrateTransferReadinessState({
+      boundary: selectedBoundary,
+      reviewQueue: ownershipReviewQueue,
+      readiness: latestReadiness,
+      transferHistory: transferHistory.filter((attempt) => attempt.probeId === transferProbe.id),
+    });
+  }, [latestReadiness, selectedBoundary, transferHistory, transferProbe.id]);
+  const transferHistoryForCurrentProbe = transferHistory.filter(
+    (attempt) => attempt.probeId === transferProbe.id,
+  );
+  const latestTransferAttempt =
+    transferHistoryForCurrentProbe.length === 0 ? null : transferHistoryForCurrentProbe.at(-1) ?? null;
+  const isTransferRequired = latestReadinessWithTransfer?.transfer.required ?? transferProbe.required;
 
   React.useEffect(() => {
     setSelection(null);
@@ -196,11 +233,27 @@ export default function App() {
       startedAt: readinessStartedAt,
       now: () => Date.now(),
     });
+    const projectedAttempt = integrateTransferReadinessState({
+      boundary: selectedBoundary,
+      reviewQueue: ownershipReviewQueue,
+      readiness: attempt,
+      transferHistory: transferHistory.filter((entry) => entry.probeId === transferProbe.id),
+    });
+    const isTransferSatisfied =
+      !isTransferRequired || projectedAttempt.transfer.transferOutcome === "transfer_pass";
+    const nextBoundaryState =
+      projectedAttempt.readiness_gate === "ready" && isTransferSatisfied
+        ? "owned"
+        : projectedAttempt.readiness_gate === "ready"
+          ? "partial"
+          : projectedAttempt.state === "owned"
+            ? "partial"
+            : projectedAttempt.state;
 
-    setReadinessHistory((prev) => [...prev, attempt]);
-    const nextBoundaryState = attempt.readiness_gate === "ready" ? "owned" : attempt.state === "owned" ? "partial" : attempt.state;
+    setReadinessHistory((prev) => [...prev, projectedAttempt]);
     setFileStates((prev) => withBoundaryFileState(prev, selectedBoundary, nextBoundaryState));
     setAttemptText("");
+    setTransferAnswerText("");
     setReadinessStartedAt(Date.now());
   }
 
@@ -224,6 +277,67 @@ export default function App() {
         [result.observation.filePath]: "gap",
       }));
     }
+  }
+
+  function appendTransferAttempt(nextAttempt: TransferAttemptRecord) {
+    setTransferHistoryByBoundary((prev) => {
+      const previousAttempts = prev[selectedBoundary.id] ?? [];
+      return {
+        ...prev,
+        [selectedBoundary.id]: [...previousAttempts, nextAttempt],
+      };
+    });
+  }
+
+  function submitTransferAttempt() {
+    if (latestReadiness == null || latestReadiness.readiness_gate !== "ready") {
+      return;
+    }
+
+    const normalizedTransferAnswer = transferAnswerText.trim();
+    if (!normalizedTransferAnswer.length) {
+      return;
+    }
+
+    const nextAttempt = evaluateTransferAttempt({
+      attemptText: normalizedTransferAnswer,
+      attemptIndex: transferHistoryForCurrentProbe.length + 1,
+      probe: transferProbe,
+      transferHistory: transferHistoryForCurrentProbe,
+      startedAt: readinessStartedAt,
+      now: () => Date.now(),
+    });
+
+    appendTransferAttempt(nextAttempt);
+    setTransferAnswerText("");
+    setReadinessStartedAt(Date.now());
+
+    if (nextAttempt.outcome === "transfer_pass") {
+      setFileStates((prev) => withBoundaryFileState(prev, selectedBoundary, "owned"));
+      return;
+    }
+
+    setFileStates((prev) => withBoundaryFileState(prev, selectedBoundary, "partial"));
+  }
+
+  function submitTransferSkip() {
+    if (latestReadiness == null || latestReadiness.readiness_gate !== "ready") {
+      return;
+    }
+
+    const nextAttempt = makeTransferSkip({
+      attemptText: transferAnswerText.trim(),
+      attemptIndex: transferHistoryForCurrentProbe.length + 1,
+      probe: transferProbe,
+      transferHistory: transferHistoryForCurrentProbe,
+      startedAt: readinessStartedAt,
+      now: () => Date.now(),
+    });
+
+    appendTransferAttempt(nextAttempt);
+    setTransferAnswerText("");
+    setReadinessStartedAt(Date.now());
+    setFileStates((prev) => withBoundaryFileState(prev, selectedBoundary, "partial"));
   }
 
   return (
@@ -263,7 +377,7 @@ export default function App() {
         attemptText={attemptText}
         selfConfidence={selfConfidence}
         onSelfConfidenceChange={setSelfConfidence}
-        latestReadiness={latestReadiness}
+        latestReadiness={latestReadinessWithTransfer}
         onAttemptChange={setAttemptText}
         onSubmitGuidedAttempt={submitGuidedAttempt}
         onSubmitReadinessAttempt={submitReadinessAttempt}
@@ -271,6 +385,13 @@ export default function App() {
           markUnknown();
         }}
         onRetryAttempt={retryOwnershipAttempt}
+        transferQuestion={transferProbe.question}
+        transferAnswerText={transferAnswerText}
+        onTransferAnswerChange={setTransferAnswerText}
+        onSubmitTransferAttempt={submitTransferAttempt}
+        onSkipTransfer={submitTransferSkip}
+        latestTransferAttempt={latestTransferAttempt}
+        showTransferProbe={isTransferRequired && latestReadiness?.readiness_gate === "ready"}
       />
 
       <EvidenceDrawerPanel evidenceGroups={evidenceGroups} />

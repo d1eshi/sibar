@@ -205,7 +205,45 @@ test("repair path exposes fix guidance and allows re-attempt", async ({ page }) 
   await page.getByRole("button", { name: "Submit attempt" }).click();
 
   await expect(page.getByText("Readiness gate: ready")).toBeVisible();
-  const readinessOutput = page.getByLabel("Readiness gate output");
-  await expect(readinessOutput).toContainText(/State\s*owned/);
-  await expect(page.getByText("Attempt ID: attempt-")).toBeVisible();
+  await expect(page.getByText(/Transfer probe required/)).toBeVisible();
+  await expect(
+    page.locator('[aria-label="Current queue focus"] .stateBadge'),
+  ).toHaveText("questionable");
+  await page.getByLabel("Transfer answer").fill("Could be same boundary semantics if needed.");
+  await page.getByRole("button", { name: "Submit transfer answer" }).click();
+  await expect(page.getByText(/Transfer outcome: transfer_fail/i)).toBeVisible();
+  await expect(page.locator('[aria-label="Current queue focus"] .stateBadge')).toHaveText("questionable");
+
+  await page
+    .getByLabel("Transfer answer")
+    .fill(
+      "In consumer.ts, this same guard still holds: if (!session) then return unauthenticated; keep the session-null invariant and privileged branch unchanged.",
+    );
+  await page.getByRole("button", { name: "Submit transfer answer" }).click();
+  await expect(page.getByText(/Transfer outcome: transfer_pass/i)).toBeVisible();
+  await expect(page.getByText("Continuity: 87%")).toBeVisible();
+  await expect(page.getByText("Debt signal: 13%")).toBeVisible();
+  await expect(
+    page.locator('[aria-label="Current queue focus"] .stateBadge'),
+  ).toHaveText("owned");
+});
+
+test("transfer skip keeps boundary non-owned and exposes explicit follow-up tasks", async ({ page }) => {
+  await page.goto("/");
+
+  await completeReviewSession(page);
+  await page
+    .getByLabel("Final boundary attempt")
+    .fill(
+      "The createSession branch can return null; callers must guard with `if (!session)` before any privileged request so unauthenticated path stays safe.",
+    );
+  await page.getByLabel("Self confidence").fill("60");
+  await page.getByRole("button", { name: "Submit attempt" }).click();
+
+  await expect(page.getByText("Readiness gate: ready")).toBeVisible();
+  await page.getByRole("button", { name: "Skip transfer" }).click();
+  await expect(page.getByText(/Transfer outcome: transfer_skip/i)).toBeVisible();
+  await expect(page.locator('[aria-label="Current queue focus"] .stateBadge')).toHaveText("questionable");
+  await expect(page.getByText("Recovery tasks")).toBeVisible();
+  await expect(page.getByText("Mark this as a local follow-up before ownership is consolidated.")).toBeVisible();
 });

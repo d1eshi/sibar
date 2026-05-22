@@ -1063,6 +1063,17 @@ button.secondary {
   color: #607477;
 }
 
+.transferSection {
+  display: grid;
+  gap: 8px;
+}
+
+.transferSection h4 {
+  margin: 0;
+  color: #243534;
+  font-size: 13px;
+}
+
 .readinessSection h3 {
   margin: 0;
   color: #243534;

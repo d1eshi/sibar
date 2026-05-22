@@ -78,6 +78,22 @@ release yet.
 - Simplified the default review guide to a compact current-step flow, while
   keeping the full priority queue and trace detail available in lab mode.
 
+### Added - Slice 6 Transfer Verification
+
+- Added a new pure transfer verification module at
+  `src/ownershipWorkbench/transferVerification.ts` with `TransferProbe` construction,
+  transfer attempt evaluation, skip handling, and continuity/debt projection.
+- Added `transfer` fields to readiness exports in
+  `src/ownershipWorkbench/types.ts` and integrated transfer-aware stabilization
+  behavior in `App` so a boundary does not become owned when a required transfer
+  is still pending or failed.
+- Extended `OwnershipHarnessPanel` to render bounded transfer probes after a ready
+  gate, support `transfer_pass`, `transfer_fail`, and `transfer_skip` outcomes, show
+  recurrence and recovery tasks, and report continuity/debt signal.
+- Added deterministic unit coverage for transfer probe selection, attempt contract
+  outcomes, escalation behavior on repeated failure, and continuity/debt scoring,
+  plus Playwright coverage for fail -> pass and skip transfer paths.
+
 ### Added - Slice 1 Inventory Runtime
 
 - Moved the Slice 1 contract/runtime base for deterministic `repoInventory(sourceRoot)`

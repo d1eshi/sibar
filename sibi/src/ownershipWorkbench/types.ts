@@ -150,6 +150,25 @@ export type OwnershipAttemptReadiness = {
   startedAt: number;
   submittedAt: number;
   elapsedMs: number;
+  transfer?: {
+    required: boolean;
+    transferOutcome: "transfer_pass" | "transfer_fail" | "transfer_skip" | null;
+    transferAttemptCount: number;
+    transferRecurrenceTags: string[];
+    transferFollowUpTasks: string[];
+    transferEscalationCandidate: boolean;
+    readinessContinuity: number;
+    debtSignal: number;
+    transferred: boolean;
+    probe: {
+      id: string;
+      sourceBoundaryFile: string;
+      sourceBoundaryTitle: string;
+      relatedBoundaryFile: string;
+      relatedBoundaryTitle: string;
+      question: string;
+    };
+  };
 };
 
 export type OwnershipSessionQuestion = {
