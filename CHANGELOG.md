@@ -16,6 +16,19 @@ release yet.
 - Added a compact locally persisted study-session notes panel to the research
   workspace for capturing Platzi course entries with date, iteration label,
   note body, and current session/source context.
+- Added app-scoped Vercel deployment config, public runtime storage guardrails,
+  env defaults, and optional Supabase notes schema documentation so the
+  note-taking workspace can ship as a static no-LLM public slice.
+
+### Changed - Sibar Study Workspace
+
+- Simplified the research workspace entry into an active Platzi course study
+  session, with note storage, note metrics, and note creation moved into small
+  runtime modules outside the app/component layer.
+- Reworked the left rail around the current course, selected session/source,
+  compact note outline, and recent notes instead of the previous full study path.
+- Moved the study note composer into the central workspace surface and separated
+  source artifacts/readiness into the right panel.
 
 ### Docs - Ownership Workbench Product Research
 
