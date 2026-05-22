@@ -23,15 +23,14 @@ release yet.
   direction for Sibi cognitive debt.
 - Added the poster-style top navigation with manifesto links, login, and a
   black `Try Sibi` call to action.
-- Replaced the left manifesto rail with a simple hand-drawn ownership flow note:
-  code change -> ownership proof -> debt reduced.
 - Replaced the artifact-card row with a wide Sibi product mockup section for
   the future demo: pasted diff, ownership attempt, and debt-reduction outcome.
 - Added a simple poster-style footer CTA with `Try Sibi free`, `See how it
   works`, and four ownership principles.
-- Added three Sibi landing prototypes (`html`, `html2`, `html3`) exploring a
-  direct diff interaction, an editorial cognitive-debt ledger, and a dark
-  ownership ceremony flow.
+- Added a responsive landing check for mobile, tablet, laptop, and desktop
+  widths.
+- Removed temporary landing prototype pages so the public web keeps a single
+  Sibi manifesto entrypoint.
 - Renamed the landing stylesheet from `reader.css` to `main.css` and made the
   public index use the product-interaction prototype direction.
 - Reframed the public landing around Sibi as an ownership engine for
