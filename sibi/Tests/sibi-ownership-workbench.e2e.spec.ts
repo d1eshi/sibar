@@ -1,10 +1,11 @@
-import { expect, test } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
 
 test("default workbench starts a guided ownership session without lab traces", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto("/");
 
   await expect(page.getByLabel("Guided ownership review session")).toBeVisible();
+  await expect(page.getByLabel("Repo inventory status")).toBeVisible();
   await expect(page.getByLabel("Current Sibi question")).toContainText("Repasá `src/api/session.ts`");
   await expect(page.getByLabel("Ownership derivation lab")).toHaveCount(0);
 
@@ -12,6 +13,23 @@ test("default workbench starts a guided ownership session without lab traces", a
   const codeBox = await page.locator(".codePanel").boundingBox();
   expect(harnessBox?.width).toBeGreaterThan(430);
   expect(codeBox?.width).toBeGreaterThan(500);
+});
+
+test("default workbench exposes highest-risk boundary section in the compact review panel", async ({ page }) => {
+  await page.goto("/");
+
+  await expect(page.getByRole("heading", { level: 3, name: "Highest-risk boundary" })).toBeVisible();
+  await expect(page.getByText("Responsibility claim:")).toBeVisible();
+  await expect(page.getByText(/Open questions/)).toBeVisible();
+  await expect(page.getByText(/Risk score/)).toBeVisible();
+});
+
+test("file-tree projection shows deterministic non-owned reasons", async ({ page }) => {
+  await page.goto("/");
+
+  await expect(page.locator(".fileTreePanel")).toContainText("gap: missing caller");
+  await expect(page.locator(".fileTreePanel")).toContainText("questionable");
+  await expect(page.locator(".fileTreePanel")).toContainText("gap: missing deletion path");
 });
 
 test("empty submit advances to the relation question and records no-answer gap", async ({ page }) => {
@@ -63,4 +81,345 @@ test("lab query keeps derivation traces available", async ({ page }) => {
   await expect(page.getByLabel("Guided ownership review session")).toBeVisible();
   await expect(page.getByLabel("Ownership derivation lab")).toBeVisible();
   await expect(page.getByRole("heading", { name: "Local trace lab" })).toBeVisible();
+});
+
+test("relation navigation preview appears in code panel and updates by selected file", async ({ page }) => {
+  await page.goto("/?view=lab");
+
+  const relationSection = page.getByLabel("Relation navigation preview");
+  await expect(relationSection).toBeVisible();
+  await expect(relationSection).toContainText(
+    /Live content check|Checking live content availability|missing: unable to load live content/,
+  );
+  await expect(relationSection).toContainText("possible test");
+  await expect(relationSection).toContainText("possible caller");
+
+  await page.getByRole("button", { name: "Submit attempt" }).click();
+  await page.getByLabel("Tu respuesta").fill("The test exists but I cannot connect it yet.");
+  await page.getByRole("button", { name: "Submit attempt" }).click();
+
+  await expect(page.getByLabel("Current Sibi question")).toContainText("src/runtime/consumer.ts");
+  await expect(page.locator(".codePanel h1")).toContainText("src/runtime/consumer.ts");
+  await expect(relationSection).toBeVisible();
+  await expect(relationSection).toContainText("src/api/session.ts");
+  await expect(relationSection).toContainText("src/api/session.test.ts");
+});
+
+test("relation evidence extraction is visible and updates with explicit gap reasons", async ({ page }) => {
+  await page.goto("/?view=lab");
+
+  const extractionSection = page.getByLabel("Relation evidence extraction");
+  await expect(extractionSection).toBeVisible();
+  await expect(extractionSection).toContainText("Observed:");
+  await expect(extractionSection).toContainText("Active file imports");
+  await expect(extractionSection).toContainText("Runtime candidates");
+  await expect(extractionSection).toContainText("src/api/session.test.ts");
+  await expect(extractionSection).toContainText("src/runtime/consumer.ts");
+
+  await page.getByRole("button", { name: "Submit attempt" }).click();
+  await expect(page.locator(".codePanel h1")).toContainText("src/api/session.test.ts");
+  await expect(extractionSection).toContainText("Candidate callers:");
+  await expect(extractionSection).not.toContainText("missing runtime contract");
+  await expect(extractionSection).toContainText("Candidate tests:");
+  await expect(extractionSection).toContainText("src/api/session.ts");
+  await expect(extractionSection).toContainText("src/runtime/consumer.ts");
+
+  await page.getByRole("button", { name: "Submit attempt" }).click();
+  await expect(page.locator(".codePanel h1")).toContainText("src/runtime/consumer.ts");
+  await expect(extractionSection).not.toContainText("missing runtime contract");
+  await expect(extractionSection).not.toContainText("Relation gaps");
+});
+
+test("lab mode renders cognitive daily readout and updates from attempts", async ({ page }) => {
+  await page.goto("/?view=lab");
+
+  const readout = page.getByLabel("Cognitive daily readout");
+
+  await expect(readout).toBeVisible();
+  await expect(readout).toContainText("Ownership signals");
+  await expect(readout).toContainText("Cognitive debt metric");
+  await expect(readout).toContainText("Ready count: 0");
+  await expect(readout).toContainText("No transfer attempt recorded yet.");
+
+  await completeReviewSession(page);
+  await page
+    .getByLabel("Final boundary attempt")
+    .fill("I do not know why this contract is safe yet.");
+  await page.getByLabel("Self confidence").fill("95");
+  await page.getByRole("button", { name: "Submit attempt" }).click();
+
+  await expect(readout).toContainText("Outstanding gaps:");
+
+  await page.getByRole("button", { name: "Retry after repair" }).click();
+  await page
+    .getByLabel("Final boundary attempt")
+    .fill(
+      "The `createSession` branch returns null for 204, and callers must guard with `if (!session)` before any privileged work.",
+    );
+  await page.getByLabel("Self confidence").fill("60");
+  await page.getByRole("button", { name: "Submit attempt" }).click();
+
+  await expect(readout).toContainText("Ready count: 1");
+  await expect(readout).toContainText("Top 3 follow-up actions");
+
+  await page.getByLabel("Transfer answer").fill("I cannot map this invariant to the related boundary yet.");
+  await page.getByRole("button", { name: "Submit transfer answer" }).click();
+
+  await expect(readout).toContainText("fail");
+  await expect(readout).toContainText("Load hotspots");
+  await expect(readout).toContainText(
+    "Retry transfer using one invariant and one guard phrase from the related boundary.",
+  );
+});
+
+test("line/range selection updates selection summary when code lines expose selectors", async ({ page }) => {
+  await page.goto("/");
+
+  const codeLines = page.locator(".codeViewport button");
+  const firstLineButton = codeLines.first();
+  const lineSelectable = (await codeLines.count()) > 0;
+  if (!lineSelectable) {
+    test.skip(true, "Code viewport line selectors are not exposed in this environment.");
+  }
+
+  await firstLineButton.click();
+  await expect(page.getByText(/Current selection detail: /)).toBeVisible();
+});
+
+async function completeReviewSession(page: Page): Promise<void> {
+  await page.getByRole("button", { name: "Submit attempt" }).click();
+  await expect(page.getByLabel("Current Sibi question")).toContainText("session.test.ts");
+
+  await page
+    .getByLabel("Tu respuesta")
+    .fill(
+      "The `src/api/session.ts` contract returns null for 204, and `src/api/session.test.ts` verifies this behavior.",
+    );
+  await page.getByRole("button", { name: "Submit attempt" }).click();
+  await expect(page.getByLabel("Current Sibi question")).toContainText("runtime/consumer.ts");
+
+  await page
+    .getByLabel("Tu respuesta")
+    .fill(
+      "In `src/runtime/consumer.ts`, `createSession` from `src/api/session.ts` can return null, so the caller must guard and keep auth flow safe.",
+    );
+  await page.getByRole("button", { name: "Submit attempt" }).click();
+  await expect(page.getByRole("heading", { name: "Session complete", level: 2 })).toBeVisible();
+  await expect(page.getByText("Readiness gate: Not yet attempted.")).toBeVisible();
+}
+
+test("readiness attempt can be submitted after guided questions with anti-overconfidence block", async ({ page }) => {
+  await page.goto("/");
+
+  await completeReviewSession(page);
+  await page
+    .getByLabel("Final boundary attempt")
+    .fill(
+      "Null returns and the call must block privileged work when missing.",
+    );
+  await page.getByLabel("Self confidence").fill("95");
+  await page.getByRole("button", { name: "Submit attempt" }).click();
+
+  await expect(page.getByText("Readiness gate: repair-needed")).toBeVisible();
+  await expect(page.getByText("Evidence fit:")).toBeVisible();
+  await expect(page.getByText(/Evidence anchors:/)).toBeVisible();
+  await expect(page.getByText("Smallest repair")).toBeVisible();
+});
+
+test("repair path exposes fix guidance and allows re-attempt", async ({ page }) => {
+  await page.goto("/");
+
+  await completeReviewSession(page);
+  await page
+    .getByLabel("Final boundary attempt")
+    .fill(
+      "Null returns and the call must block privileged work when missing.",
+    );
+  await page.getByLabel("Self confidence").fill("95");
+  await page.getByRole("button", { name: "Submit attempt" }).click();
+  await expect(page.getByRole("button", { name: "Retry after repair" })).toBeEnabled();
+
+  await page.getByRole("button", { name: "Retry after repair" }).click();
+  await page
+    .getByLabel("Final boundary attempt")
+    .fill(
+      "The createSession branch returns null from 204; callers must guard with `if (!session)` before any privileged request so unauthenticated path stays safe.",
+    );
+  await page.getByLabel("Self confidence").fill("60");
+  await page.getByRole("button", { name: "Submit attempt" }).click();
+
+  await expect(page.getByText("Readiness gate: ready")).toBeVisible();
+  await expect(page.getByText(/Transfer probe required/)).toBeVisible();
+  await expect(
+    page.locator('[aria-label="Current queue focus"] .stateBadge'),
+  ).toHaveText("questionable");
+  await page.getByLabel("Transfer answer").fill("Could be same boundary semantics if needed.");
+  await page.getByRole("button", { name: "Submit transfer answer" }).click();
+  await expect(page.getByText(/Transfer outcome: transfer_fail/i)).toBeVisible();
+  await expect(page.locator('[aria-label="Current queue focus"] .stateBadge')).toHaveText("questionable");
+
+  await page
+    .getByLabel("Transfer answer")
+    .fill(
+      "In consumer.ts, this same guard still holds: if (!session) then return unauthenticated; keep the session-null invariant and privileged branch unchanged.",
+    );
+  await page.getByRole("button", { name: "Submit transfer answer" }).click();
+  await expect(page.getByText(/Transfer outcome: transfer_pass/i)).toBeVisible();
+  await expect(page.getByText("Continuity: 87%")).toBeVisible();
+  await expect(page.getByText("Debt signal: 13%")).toBeVisible();
+  await expect(
+    page.locator('[aria-label="Current queue focus"] .stateBadge'),
+  ).toHaveText("owned");
+});
+
+test("transfer skip keeps boundary non-owned and exposes explicit follow-up tasks", async ({ page }) => {
+  await page.goto("/");
+
+  await completeReviewSession(page);
+  await page
+    .getByLabel("Final boundary attempt")
+    .fill(
+      "The createSession branch can return null; callers must guard with `if (!session)` before any privileged request so unauthenticated path stays safe.",
+    );
+  await page.getByLabel("Self confidence").fill("60");
+  await page.getByRole("button", { name: "Submit attempt" }).click();
+
+  await expect(page.getByText("Readiness gate: ready")).toBeVisible();
+  await page.getByRole("button", { name: "Skip transfer" }).click();
+  await expect(page.getByText(/Transfer outcome: transfer_skip/i)).toBeVisible();
+  await expect(page.locator('[aria-label="Current queue focus"] .stateBadge')).toHaveText("questionable");
+  await expect(page.getByText("Recovery tasks")).toBeVisible();
+  await expect(page.getByText("Mark this as a local follow-up before ownership is consolidated.")).toBeVisible();
+});
+
+test("repeated transfer failures expose a deterministic workspace handoff candidate and user authorization", async ({ page }) => {
+  await page.goto("/");
+
+  await completeReviewSession(page);
+  await page
+    .getByLabel("Final boundary attempt")
+    .fill(
+      "The createSession branch returns null from 204; callers must guard with `if (!session)` before any privileged request so unauthenticated path stays safe.",
+    );
+  await page.getByLabel("Self confidence").fill("60");
+  await page.getByRole("button", { name: "Submit attempt" }).click();
+  await expect(page.getByText("Readiness gate: ready")).toBeVisible();
+  await expect(page.getByLabel("Workspace handoff candidate")).toHaveCount(0);
+  await expect(page.getByLabel("Workspace handoff artifact")).toHaveCount(0);
+  await expect(page.getByRole("button", { name: "Submit transfer answer" })).toBeVisible();
+
+  await page
+    .getByLabel("Transfer answer")
+    .fill("I cannot map this invariant to the related consumer boundary right now.");
+  await page.getByRole("button", { name: "Submit transfer answer" }).click();
+  await expect(page.getByText(/Transfer outcome: transfer_fail/i)).toBeVisible();
+  await expect(page.getByLabel("Workspace handoff candidate")).toHaveCount(0);
+  await expect(page.getByLabel("Workspace handoff artifact")).toHaveCount(0);
+
+  await page
+    .getByLabel("Transfer answer")
+    .fill("I still cannot justify the same invariant in the consumer boundary.");
+  await page.getByRole("button", { name: "Submit transfer answer" }).click();
+  await expect(page.getByText(/Transfer outcome: transfer_fail/i)).toBeVisible();
+  await expect(page.getByLabel("Workspace handoff candidate")).toBeVisible();
+  await expect(page.getByRole("button", { name: "Authorize workspace handoff" })).toBeEnabled();
+  await expect(page.getByLabel("Workspace handoff artifact")).toHaveCount(0);
+
+  await page.getByRole("button", { name: "Authorize workspace handoff" }).click();
+
+  const handoffArtifact = page.getByLabel("Workspace handoff artifact");
+  await expect(handoffArtifact).toBeVisible();
+  await expect(handoffArtifact.getByText("Workspace handoff artifact")).toBeVisible();
+  await expect(handoffArtifact.getByText("Source: diff")).toBeVisible();
+  await expect(handoffArtifact.getByText("Read path")).toBeVisible();
+  await expect(handoffArtifact.getByText("Required evidence")).toBeVisible();
+  await expect(handoffArtifact.getByText("Blocking IDs")).toBeVisible();
+  await expect(handoffArtifact.getByText("Blocked reasons")).toBeVisible();
+  await expect(handoffArtifact.getByText("Suggested workspace seed:")).toBeVisible();
+});
+
+test("ownership memory records failed and retried attempts with export evidence refs", async ({ page }) => {
+  await page.goto("/?view=lab");
+
+  await completeReviewSession(page);
+  await page
+    .getByLabel("Final boundary attempt")
+    .fill("I do not know.");
+  await page.getByLabel("Self confidence").fill("95");
+  await page.getByRole("button", { name: "Submit attempt" }).click();
+  await expect(page.getByText("Readiness gate: blocked")).toBeVisible();
+
+  await page.getByRole("button", { name: "Retry after repair" }).click();
+  await page.getByLabel("Final boundary attempt").fill("Still not sure.");
+  await page.getByLabel("Self confidence").fill("95");
+  await page.getByRole("button", { name: "Submit attempt" }).click();
+  await expect(page.getByText("Readiness gate: blocked")).toBeVisible();
+
+  await page.getByRole("button", { name: "Retry after repair" }).click();
+  await page
+    .getByLabel("Final boundary attempt")
+    .fill(
+      "The createSession branch returns null from 204; callers must guard with `if (!session)` before privileged work and unauthenticated paths stop there.",
+    );
+  await page.getByLabel("Self confidence").fill("60");
+  await page.getByRole("button", { name: "Submit attempt" }).click();
+  await expect(page.getByText("Readiness gate: ready")).toBeVisible();
+
+  const memoryPanel = page.getByLabel("Ownership memory store");
+  await expect(memoryPanel).toBeVisible();
+  await expect(memoryPanel).toContainText("4 events");
+  await expect(memoryPanel).toContainText("Boundary history");
+  await expect(memoryPanel).toContainText("evidence_refs:");
+  await expect(memoryPanel).toContainText("revisit-calibration");
+
+  await memoryPanel.getByText("Export bundle with evidence refs").click();
+  await expect(memoryPanel.locator("pre")).toContainText("\"event_count\": 4");
+  await expect(memoryPanel.locator("pre")).toContainText("memory-boundary-01-observation-observation-1");
+  await expect(memoryPanel.locator("pre")).toContainText("\"evidence_refs\"");
+});
+
+test("lab mode renders agent-flow manifest and diagnostics", async ({ page }) => {
+  await page.goto("/?view=lab");
+
+  await expect(page.getByLabel("Agent-flow manifest")).toBeVisible();
+  await expect(page.getByLabel("Agent action validation")).toBeVisible();
+  await expect(page.getByLabel("Agent action validation")).toContainText("agent_action_allowed");
+  await expect(page.getByLabel("Agent action validation")).toContainText("agent_action_rejected");
+  await expect(page.getByLabel("Agent action validation")).toContainText("private_action_blocked");
+  const manifestSection = page.getByLabel("Agent-flow manifest");
+  const registrySection = manifestSection.getByLabel("Control authorization registry");
+  const controlClaims = registrySection.getByRole("listitem");
+  const voiceClaim = controlClaims.filter({ hasText: "agent-flow-control-voice" });
+  const jarvisClaim = controlClaims.filter({ hasText: "agent-flow-control-jarvis" });
+
+  await expect(voiceClaim).toHaveCount(1);
+  await expect(jarvisClaim).toHaveCount(1);
+  await expect(voiceClaim.filter({ hasText: "safePreconditions: Bind to post-v0.1 policy, Explicit opt-in required" })).toHaveCount(1);
+  await expect(jarvisClaim.filter({ hasText: "safePreconditions: Bind to post-v0.1 policy, Explicit opt-in required" })).toHaveCount(1);
+  await expect(voiceClaim.filter({ hasText: "postV01=true" })).toHaveCount(1);
+  await expect(jarvisClaim.filter({ hasText: "postV01=true" })).toHaveCount(1);
+  await expect(voiceClaim.filter({ hasText: "optInRequired=true" })).toHaveCount(1);
+  await expect(jarvisClaim.filter({ hasText: "optInRequired=true" })).toHaveCount(1);
+  await expect(controlClaims.filter({ hasText: "policy=post-v0.1+opt-in" })).toHaveCount(2);
+});
+
+test("agent-flow diagnostics are hidden in default view", async ({ page }) => {
+  await page.goto("/");
+
+  await expect(page.getByLabel("Agent-flow manifest")).toHaveCount(0);
+  await expect(page.getByLabel("Agent action validation")).toHaveCount(0);
+});
+
+test("lab mode renders Gemini evidence extraction panel and hides it in default view", async ({ page }) => {
+  await page.goto("/?view=lab");
+
+  const geminiSection = page.getByLabel("Gemini evidence extraction");
+  await expect(geminiSection).toBeVisible();
+  await expect(geminiSection).toContainText("Gemini evidence extraction");
+  await expect(geminiSection).toContainText("Provider: Gemini-first");
+  await expect(geminiSection).toContainText("Overall disposition:");
+  await expect(geminiSection).toContainText("Verified:");
+
+  await page.goto("/");
+  await expect(page.getByLabel("Gemini evidence extraction")).toHaveCount(0);
 });

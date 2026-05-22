@@ -143,6 +143,45 @@ The LLM may not:
 - invent files, lines, tests, callers, or specs;
 - treat its explanation as demonstrated user ownership.
 
+## Slice 12 Runtime Evidence Report
+
+`GeminiEvidenceProviderReport` expected by
+`evaluateGeminiEvidenceReport`:
+
+```ts
+type GeminiEvidenceProviderReport = {
+  schema: string; // "sibi-gemini-evidence-report.v1"
+  provider_id: "gemini" | "gemini-first";
+  generated_at: string; // ISO-8601 string
+  run_id?: string;
+  claims: Array<{
+    claim_id: string;
+    kind: string; // ownership_fact | observation | question | readiness (readiness rejected)
+    confidence: "observed" | "inferred" | "unverified" | "conflict";
+    statement: string;
+    citations?: Array<{
+      file_path: string;
+      start_line: number;
+      end_line: number;
+      symbol?: string;
+    }>;
+  }>;
+  proposed_questions?: string[];
+};
+```
+
+Evaluation rules for Slice 12:
+
+- Report schema and provider ids are validated before evaluation.
+- A report with invented files, out-of-range lines, or invalid symbol references is
+  rejected.
+- `inferred` ownership facts and `readiness` claims are never auto-accepted as
+  ownership mutations; they are downgraded or rejected.
+- Unsupported kinds are downgraded when syntax is otherwise valid.
+- Evidence dispositions are `verified` / `downgraded` / `rejected`.
+- An output is tentative while any claim is pending or downgraded; only fully
+  verified evidence can clear tentative status.
+
 ## Later Specialization
 
 Introduce language-specific analyzers only after repeated product failures:

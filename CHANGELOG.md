@@ -11,6 +11,40 @@ accepted specs and iterations, not by raw commit count.
 Use this section for changes that have landed but are not part of a tagged
 release yet.
 
+### Docs - Ownership Workbench Product Research
+
+- Added three research memos:
+  - `docs/research/2026-05-22-ownership-workbench-moat-comparison.md` (moat/comparative framing for Ownership Workbench positioning),
+  - `docs/research/2026-05-22-cognitive-debt-load-metrics-operationalization.md` (operationalization of cognitive debt/load metrics and reporting),
+  - `docs/research/2026-05-22-jarvis-voice-control-surface-agent-flow.md` (control-surface, voice, and agent-flow alignment for Playwright/manifest execution).
+- Synthesized common themes for product strategy and implementation planning:
+  comparative moat defense, measurable cognitive debt/load signals, and a Playwright/manifest-safe control surface for voice-driven agent flows.
+
+### Docs - AutoResearch Cognitive Debt Workbench
+
+- Added `docs/research/2026-05-22-cognitive-debt-autoresearch-ownership-workbench.md` as a research memo for AutoResearch framing, translating cognitive debt/ cognitive load/ ownership manifesto into concrete, testable contracts, reproducible evidence definitions, UI reproducibility rules, and pending ownership decisions.
+
+### Docs - Cognitive Debt Ownership Research
+
+- Added a sourced research memo for Sibi/Sibar cognitive debt, cognitive load,
+  ownership verification, metrics, Playwright/agent-flow implications,
+  Workspace escalation thresholds, and voice interaction guardrails.
+
+### Docs - Ownership Workbench Spec Expansion
+
+- Expanded `sibi/docs/specs/sibi-ownership-workbench/04_implementation_slices.md` into
+  a roadmap that keeps Slice 0/1 as current baseline and adds new product-ready
+  slices for relation-gap evidence, calibration/readiness, transfer verification,
+  workspace escalation, cognitive debt/load metrics, and daily learning readout.
+- Added `sibi/docs/specs/sibi-ownership-workbench/05_agent_flow_manifest.md` to define
+  explicit agent action permissions, manifest constraints, and Playwright-aligned
+  execution policy.
+- Added `sibi/docs/specs/sibi-ownership-workbench/06_cognitive_debt_metrics.md` to
+  define metric formulas, debt/readout derivation, and recurring-gap transfer
+  signals with reproducible scope.
+- Updated `sibi/docs/specs/sibi-ownership-workbench/README.md` to link the new spec
+  contracts and re-frame build sequencing.
+
 ### Changed - Sibi Ownership Workbench Review Guide
 
 - Made the Ownership Harness the primary desktop workspace with a wider
@@ -23,6 +57,26 @@ release yet.
 - Added a step-by-step ownership session where Sibi asks the current
   file/check question, advances on empty, unknown, or inconclusive attempts, and
   records bounded observations for missing evidence.
+
+### Added - Slice 5 Attempt Readiness
+
+- Added deterministic readiness gating after guided session completion through a
+  new attempt assessment flow that captures `attempt_id`, `self_confidence`,
+  `evidence_fit`, `calibration_score`, and `readiness_gate` for each attempt.
+- Added non-UI state contract (`OwnershipAttemptReadiness`) and gap diagnostics
+  (`attemptEvidenceRefs`, `gapDiagnoses`, `smallestRepair`) in
+  `src/ownershipWorkbench/types.ts` and wired those into `App` + readiness output.
+- Added `evaluateOwnershipAttemptReadiness` in `src/ownershipWorkbench/attemptReadiness.ts` as a
+  small deterministic pure module with attempt evidence matching, timing capture,
+  anti-overconfidence block behavior, and repair guidance tied to evidence anchors.
+- Added user-facing readiness gate UI in `OwnershipHarnessPanel` so users can submit
+  a final boundary attempt, set bounded self-confidence, retry after repair, and
+  inspect evidence and gap diagnostics before moving to ready/owned.
+- Extended readiness coverage with fixture-backed unit assertions for anti-overconfidence,
+  evidence fit/calibration, timing, and readiness-state downgrade behavior, plus Playwright
+  scenarios for initial attempt, failed attempt, repair guidance, and re-attempt.
+- Added Slice 5 acceptance-oriented integration in app/tests for deterministic
+  attempt progression while keeping existing guided flow and non-chat behavior.
 - Added relation-focused questions for supporting tests and inferred callers so
   `session.test.ts` and `consumer.ts` ask the user to connect files instead of
   summarizing them in isolation.
@@ -32,6 +86,125 @@ release yet.
   behind explicit local/debug query params: `?view=lab` or `?lab=1`.
 - Simplified the default review guide to a compact current-step flow, while
   keeping the full priority queue and trace detail available in lab mode.
+
+### Added - Slice 6 Transfer Verification
+
+- Added a new pure transfer verification module at
+  `src/ownershipWorkbench/transferVerification.ts` with `TransferProbe` construction,
+  transfer attempt evaluation, skip handling, and continuity/debt projection.
+- Added `transfer` fields to readiness exports in
+  `src/ownershipWorkbench/types.ts` and integrated transfer-aware stabilization
+  behavior in `App` so a boundary does not become owned when a required transfer
+  is still pending or failed.
+- Extended `OwnershipHarnessPanel` to render bounded transfer probes after a ready
+  gate, support `transfer_pass`, `transfer_fail`, and `transfer_skip` outcomes, show
+  recurrence and recovery tasks, and report continuity/debt signal.
+- Added deterministic unit coverage for transfer probe selection, attempt contract
+  outcomes, escalation behavior on repeated failure, and continuity/debt scoring,
+  plus Playwright coverage for fail -> pass and skip transfer paths.
+
+### Added - Slice 7 Workspace Escalation
+
+- Added a deterministic `WorkspaceEscalationDecision` pure path in
+  `src/ownershipWorkbench/workspaceEscalation.ts` to evaluate escalation
+  triggers for:
+  relation-gap recurrence, repeated low calibration, transfer failure despite
+  repeated attempts, prerequisite-chain dependency, and dependency churn.
+- Extended `OwnershipReviewArtifact` contract in
+  `src/ownershipWorkbench/types.ts` and wired neutral handoff artifact generation in
+  `buildOwnershipReviewArtifact` with evidence summary, blocking IDs, source kind, and
+  minimum read-path context.
+- Added user-authorized workspace handoff flow in `OwnershipHarnessPanel` and
+  `App` state: escalation is visible but not automatic, with an explicit
+  "Authorize workspace handoff" action and rendered artifact/lab trace after
+  authorization.
+- Added unit tests for escalation trigger coverage (repeated transfer fail, relation
+  recurrence, low calibration) and artifact shaping, plus a Playwright e2e path that
+  executes repeated transfer failures, validates candidate visibility, and verifies
+  handoff authorization and trace rendering.
+
+### Added - Slice 8 Ownership Memory Store
+
+- Added a pure append-only `ownership-memory` store for guided observations,
+  readiness attempts, transfer attempts, and authorized handoff artifacts, with
+  boundary history, recurring gaps, revisit labels, and export-bundle projections.
+- Wired the workbench to append memory events during guided gaps, readiness
+  submissions, transfer outcomes, and handoff authorization while keeping latest
+  state as a projection rather than mutable durable truth.
+- Added a reproducible memory/export panel that exposes event count, boundary
+  history, recurring gaps, revisit labels, and an export preview with evidence refs.
+- Documented deterministic Slice 8 recurring-gap thresholds, revisit label rules,
+  and manual/daily compaction policy, and added unit/e2e coverage for append-only
+  behavior, evidence-preserving exports, and memory UI replay.
+
+### Added - Slice 9 Cognitive Debt and Cognitive Load Metrics
+
+- Added a pure derivation module at `sibi/src/ownershipWorkbench/cognitiveMetrics.ts`
+  for deterministic `cognitive_debt_metric`, `cognitive_load_metric`, and
+  daily readout derivation from persisted memory state.
+- Integrated metric derivation into `sibi/src/App.tsx` and propagated a lab-facing
+  ownership signal panel into `sibi/src/ownershipWorkbench/components/OwnershipHarnessPanel.tsx`.
+- Added deterministic metric/readout formulas and source-input traceability policy in
+  `sibi/docs/specs/sibi-ownership-workbench/04_implementation_slices.md` and
+  `sibi/docs/specs/sibi-ownership-workbench/06_cognitive_debt_metrics.md`.
+- Added coverage for metric/readout derivation in unit tests and verified daily
+  readout updates and transfer summary rendering in Playwright lab mode.
+
+### Added - Slice 10 Agent-Flow and Playwright Manifest
+
+- Added pure module `src/ownershipWorkbench/agentFlowManifest.ts` with
+  deterministic manifest build and runtime action validation:
+  `AGENT_FLOW_MANIFEST_VERSION`, `AgentFlowManifest`, `ActionDescriptor`,
+  runtime scope derivation, deterministic `manifestId`, `agent_action_allowed`,
+  and `agent_action_rejected` decision outputs.
+- Added runtime-only policy gates in validation:
+  stale scope/version checks, private-action blocking, action/control listing checks,
+  actor-mode checks, payload checks, preconditions/evidence/artifact requirements.
+- Integrated lab-only manifest runtime rendering and validation diagnostics into
+  `src/App.tsx` and `src/ownershipWorkbench/components/OwnershipHarnessPanel.tsx`,
+  keeping default UI unchanged.
+- Added deterministic unit coverage for happy-path acceptance and blocked-path
+  conditions (unlisted/private/payload stale manifest), and Playwright coverage in
+  lab mode for manifest visibility plus allowed/rejected validation diagnostics.
+
+### Added - Slice 11 Control Surface Authorization
+
+- Extended `src/ownershipWorkbench/agentFlowManifest.ts` with an auditable
+  control-surface registry that includes control owner, mode, allowed payloads,
+  safe preconditions, and explicit experimental policy flags.
+- Added explicit policy gating in action validation for `voice` and `Jarvis`:
+  default deny, requiring `post-v0.1` and explicit control opt-in.
+- Added experimental actions for control channel probes with deterministic
+  policy-restricted validation paths plus recovery metadata.
+- Updated lab manifest rendering in `OwnershipHarnessPanel.tsx` to expose control
+  claims and authorization policy status (including `policy=post-v0.1+opt-in`).
+- Added unit coverage for control registry details, experimental-default-deny
+  behavior, and explicit opt-in allow rules in
+  `Tests/sibi-ownership-workbench.test.ts`.
+
+### Added - Slice 12 Gemini Evidence Extractor
+
+- Added `src/ownershipWorkbench/geminiEvidenceExtractor.ts` with Gemini-first
+  provider abstraction (`gemini`, `gemini-first`), deterministic report
+  generation, schema validation, and citation-level verification.
+- Added deterministic verification outcomes for evidence claims with explicit
+  dispositions (`verified`, `downgraded`, `rejected`) and question proposals.
+- Added lab-only evidence diagnostics rendering in
+  `src/ownershipWorkbench/components/OwnershipHarnessPanel.tsx` and wired it from
+  `src/App.tsx` with default-mode hiding.
+- Added unit coverage for invented sources/files, inferred/downgraded claims,
+  readiness rejection, out-of-bounds lines, and report determinism.
+
+### Added - Slice 1 Inventory Runtime
+
+- Moved the Slice 1 contract/runtime base for deterministic `repoInventory(sourceRoot)`
+  to `src/repo-inventory` at the workspace root, with skip rules for
+  `.git`, `node_modules`, build artifacts, and cache directories.
+- Added file metadata for each scanned file (`path`, `extension`, `sizeBytes`,
+  `lineCount`, `role`, `excerpt`) plus deterministic tree rollup fields in the
+  shared contract.
+- Kept the bounded `/__sibi/repo-inventory` endpoint in Sibi so browser code can
+  consume the shared contract from the app-root boundary.
 
 ### Docs - Sibi Ownership Workbench Review Guide
 
@@ -49,6 +222,50 @@ release yet.
   the default ownership UI.
 - Clarified that the default ownership UI shows the current queue step and next
   action, while full queue details live behind `?view=lab` or `?lab=1`.
+
+### Added - Slice 2 File Content + Relations
+
+- Added a bounded `/__sibi/file-content` Vite middleware in `vite.config.js` that
+  serves file contents for a `sourceRoot` + `path` pair after strict path
+  normalization and realpath checks (blocking `..`, absolute paths, symlink
+  escapes, directories, and out-of-root access).
+- Added `src/ownershipWorkbench/fileContentClient.ts` with `loadFileContentStatus`
+  and response payload validation so browser code uses a contract-based runtime
+  status (`ready`/`unavailable`/`loading`) instead of direct filesystem reads.
+- Added relation navigation preview rendering in the code/diff panel with explicit
+  fallback (`missing relation`) and deterministic links derived from review queue
+  and fixture evidence, plus unit + Playwright coverage for selection and preview
+  behavior.
+
+### Added - Slice 3 Relation Evidence Extraction
+
+- Added a deterministic, fixture-backed `extractCodeEvidence` contract in
+  `src/ownershipWorkbench/evidenceExtraction.ts` to emit observed imports/exports/
+  symbol text, nearby test/caller candidates, and relation gaps for missing evidence.
+- Added `CodeEvidence`/relation metadata types to `src/ownershipWorkbench/types.ts`
+  and wired relation evidence extraction into the code panel so it renders under
+  `aria-label="Relation evidence extraction"` with evidence-kind labels and explicit gap
+  reasons.
+
+### Added - Slice 4 Ownership Boundary Builder and Risk Scoring
+
+- Added `OwnershipBoundary` contract fields required for boundary scoring and
+  selection (`files`, `responsibility_claim`, `evidence`, `open_questions`,
+  `risk`, `confidence`) and retained compatibility with existing runtime fields.
+- Added deterministic boundary construction and highest-risk selection in
+  `src/ownershipWorkbench/boundaryBuilder.ts`, with relation-aware risk weighting
+  and capped scoring.
+- Added deterministic file-tree projection for selected boundary flow with
+  explicit reasoned labels for non-owned states:
+  `gap: missing caller`, `gap: missing deletion path`,
+  `blocked: prerequisite`, and `questionable`.
+- Updated harness state flow in `src/App.tsx` to consume the highest-risk boundary
+  candidate and pass reasoned projections into the file tree.
+- Added compact user-facing UI for the selected highest-risk boundary inside
+  `ReviewGuidePanel` and `src/styles.css` (`boundaryRiskGrid` with compact
+  risk summary),
+  plus dedicated unit + Playwright coverage for boundary contracts, selection,
+  and non-owned reason labels.
 
 ### Internal - Sibi Ownership Workbench Review Guide
 

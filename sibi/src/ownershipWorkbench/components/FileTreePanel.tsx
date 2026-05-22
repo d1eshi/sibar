@@ -3,27 +3,24 @@ import { FileTree, useFileTree } from "@pierre/trees/react";
 import type { FileTreeRowDecoration } from "@pierre/trees";
 import type { BoundaryState, TreeNode } from "../types";
 import { getNodeReason, getNodeState, labelForState } from "../helpers";
+import { makeReasonSnippet } from "../fileTreeReasonFormatting.ts";
 
 interface FileTreePanelProps {
   fileTreePaths: string[];
   fileTreeNodeByPath: Record<string, TreeNode>;
   fileStates: Record<string, BoundaryState>;
+  fileStateReasons?: Record<string, string>;
   selectedPath: string;
   onSelectFile: (path: string) => void;
-}
-
-function makeReasonSnippet(reason?: string): string {
-  if (!reason) return "";
-  const trimmed = reason.trim();
-  return trimmed.length > 26 ? `${trimmed.slice(0, 23)}...` : trimmed;
 }
 
 function makeRowDecoration(
   node: TreeNode,
   fileStates: Record<string, BoundaryState>,
+  fileStateReasons?: Record<string, string>,
 ): FileTreeRowDecoration {
   const nodeState = getNodeState(node, fileStates);
-  const reason = getNodeReason(node, fileStates);
+  const reason = getNodeReason(node, fileStates, fileStateReasons ?? {});
 
   if (reason && nodeState !== "owned") {
     return {
@@ -39,6 +36,7 @@ export function FileTreePanel({
   fileTreePaths,
   fileTreeNodeByPath,
   fileStates,
+  fileStateReasons,
   selectedPath,
   onSelectFile,
 }: FileTreePanelProps): React.ReactElement {
@@ -57,7 +55,7 @@ export function FileTreePanel({
       const node = fileTreeNodeByPath[context.item.path];
       if (!node) return null;
 
-      return makeRowDecoration(node, fileStates);
+      return makeRowDecoration(node, fileStates, fileStateReasons);
     },
   });
 
