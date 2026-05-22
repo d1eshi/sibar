@@ -29,7 +29,7 @@ export const WORKSPACE_INTENT_FIXTURE: WorkspaceIntent = {
       },
       {
         ref_id: "SRC-WORKSPACE-SESSION",
-        path: "src/runtime-workspace-session.ts",
+        path: "engine/workspace/session/session.ts",
         role: "intent",
         summary: "Entry point for runtime session commands and contract fields.",
       },

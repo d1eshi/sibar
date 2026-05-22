@@ -16,7 +16,7 @@ export type {
   ArtifactPreviewContract,
   EvidenceContract,
   WorkspaceArtifactKind,
-} from "../runtime-workspace-session-contracts.ts";
+} from "../workspace/session/contracts.ts";
 
 export {
   AUTHORITY_RANK,

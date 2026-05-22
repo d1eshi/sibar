@@ -168,8 +168,8 @@ Adapter-owned:
 
 Known adapter-heavy modules:
 
-1. `engine/runtime-workspace-context.ts`
-2. `engine/runtime-workspace-session*.ts`
+1. `engine/workspace/session/context.ts`
+2. `engine/workspace/session/*`
 3. `engine/runtime-state.ts`
 4. `engine/store.ts`
 5. `engine/runtime-deep-ownership-study-artifacts.ts`

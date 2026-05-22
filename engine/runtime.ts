@@ -32,7 +32,7 @@ import { getStudyPanelStateCommand } from "./runtime-study-panel.ts";
 import {
   startWorkspaceSessionCommand,
   submitWorkspaceAttemptCommand,
-} from "./runtime-workspace-session.ts";
+} from "./workspace/session/session.ts";
 import {
   RuntimeError,
   excerptPrefix,

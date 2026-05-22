@@ -5,7 +5,7 @@ import { existsSync, readFileSync, statSync } from "node:fs";
 import {
   detectWeakGoal,
   routeWeakGoal,
-} from "./runtime-deep-ownership-snapshot.ts";
+} from "../../runtime-deep-ownership-snapshot.ts";
 import type {
   DeepOwnershipLoop,
   EvidenceCheck,
@@ -13,26 +13,26 @@ import type {
   ReadinessClaim,
   RepairAction,
   UserAttempt,
-} from "./pedagogy/core/loop-types.ts";
+} from "../../pedagogy/core/loop-types.ts";
 import type {
   EvidenceRef,
   EvidenceInventoryEntry,
   ThinkingArtifact,
   UserOperation,
-} from "./pedagogy/core/evidence-types.ts";
+} from "../../pedagogy/core/evidence-types.ts";
 import type {
   ArtifactSession,
   EvidenceCitation,
   ModelSignalCandidate,
-} from "./runtime-support.ts";
-import type { WorkspaceInventory } from "./runtime-workspace-context.ts";
-import type { ProjectLearningAgentResult } from "./runtime-agent.ts";
-import { now } from "./runtime-support.ts";
+} from "../../runtime-support.ts";
+import type { WorkspaceInventory } from "./context.ts";
+import type { ProjectLearningAgentResult } from "../../runtime-agent.ts";
+import { now } from "../../runtime-support.ts";
 import {
   MAX_CONCEPT_SLICE_LABEL_LENGTH,
   MAX_OPERATION_CRITERIA,
   MAX_OPERATION_EVIDENCE,
-} from "./runtime-workspace-session-constants.ts";
+} from "./constants.ts";
 
 export type WorkspaceRunnerSummary = {
   status: "completed" | "blocked";

@@ -261,7 +261,7 @@ Do not schedule UI work before the bridge can produce an executable
 15. `engine/runtime-deep-ownership.ts`
 16. `engine/workspace/source-mission/contracts.ts`
 17. `engine/workspace/source-mission/validate.ts`
-18. `engine/runtime-workspace-session-contracts.ts`
+18. `engine/workspace/session/contracts.ts`
 19. `engine/article-workspace.ts`
 20. `engine/article-workspace-server.ts`
 21. `engine/pedagogoai/contracts.ts`

@@ -22,7 +22,7 @@ function expectNoSurfaceImports(modulePath: CoreModulePath): void {
   assert.doesNotMatch(source, /from\s+["'][^"']*web\//);
   assert.doesNotMatch(source, /from\s+["'][^"']*apps\/sibar-research-workspace\//);
   assert.doesNotMatch(source, /from\s+["']\.{1,2}\/(?:runtime-state|store|pedagogoai\/workspace-(?:intent|int(?:ent)?-adapter|compiler-runner))/);
-  assert.doesNotMatch(source, /from\s+["'][^"']*runtime-workspace-(?:context|session)/);
+  assert.doesNotMatch(source, /from\s+["'][^"']*workspace\/session/);
 }
 
 function expectNoSourceMissionPlanningAdapters(modulePath: CoreModulePath): void {

@@ -11,8 +11,8 @@ import type { RuntimeWorkspaceSession } from "../engine/runtime-support.ts";
 import type {
   AttemptEvaluationContract,
   WorkspaceSessionContract,
-} from "../engine/runtime-workspace-session-contracts.ts";
-import { buildWorkspaceSessionContract } from "../engine/runtime-workspace-session-contracts.ts";
+} from "../engine/workspace/session/contracts.ts";
+import { buildWorkspaceSessionContract } from "../engine/workspace/session/contracts.ts";
 
 type Success<T> = { ok: true; data: T };
 const LIVE_WORKSPACE_FIXTURE_PATH = resolve(

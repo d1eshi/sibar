@@ -33,7 +33,7 @@ export const PEDAGOGOAI_BOUNDARIES: PedagogoAIModuleBoundary[] = [
     adapters: [
       "engine/pedagogy/index.ts",
       "engine/runtime-support.ts",
-      "engine/runtime-workspace-session-contracts.ts",
+      "engine/workspace/session/contracts.ts",
     ],
     track: "core-workspace",
   },
@@ -75,7 +75,7 @@ export const PEDAGOGOAI_BOUNDARIES: PedagogoAIModuleBoundary[] = [
     adapters: [
       "engine/runtime-deep-ownership.ts",
       "engine/runtime-artifact-generation.ts",
-      "engine/runtime-workspace-session-contracts.ts",
+      "engine/workspace/session/contracts.ts",
     ],
     track: "core-workspace",
   },
@@ -140,8 +140,8 @@ export const PEDAGOGOAI_BOUNDARIES: PedagogoAIModuleBoundary[] = [
     adapters: [
       "engine/runtime-concept-graph.ts",
       "engine/runtime-autopsy.ts",
-      "engine/runtime-workspace-session.ts",
-      "engine/runtime-workspace-session-logic.ts",
+      "engine/workspace/session/session.ts",
+      "engine/workspace/session/logic.ts",
     ],
     track: "core-workspace",
   },
