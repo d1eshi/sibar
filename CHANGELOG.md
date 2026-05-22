@@ -82,6 +82,20 @@ release yet.
 - Clarified that the default ownership UI shows the current queue step and next
   action, while full queue details live behind `?view=lab` or `?lab=1`.
 
+### Added - Slice 2 File Content + Relations
+
+- Added a bounded `/__sibi/file-content` Vite middleware in `vite.config.js` that
+  serves file contents for a `sourceRoot` + `path` pair after strict path
+  normalization and realpath checks (blocking `..`, absolute paths, symlink
+  escapes, directories, and out-of-root access).
+- Added `src/ownershipWorkbench/fileContentClient.ts` with `loadFileContentStatus`
+  and response payload validation so browser code uses a contract-based runtime
+  status (`ready`/`unavailable`/`loading`) instead of direct filesystem reads.
+- Added relation navigation preview rendering in the code/diff panel with explicit
+  fallback (`missing relation`) and deterministic links derived from review queue
+  and fixture evidence, plus unit + Playwright coverage for selection and preview
+  behavior.
+
 ### Internal - Sibi Ownership Workbench Review Guide
 
 - Added deterministic workbench coverage for review guide rendering order,

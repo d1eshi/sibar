@@ -8,7 +8,9 @@ import type {
 } from "@pierre/diffs";
 import * as React from "react";
 import { noCodeLinePlaceHolder } from "../fixtures";
+import type { FileContentStatus } from "../fileContentClient.ts";
 import type { LineSelection, ViewMode } from "../types";
+import type { RelationNavigationTarget } from "../helpers";
 import type { WorkbenchLineMetadata } from "../types";
 import { PierreCodeView } from "./PierreCodeView";
 
@@ -17,8 +19,10 @@ interface CodeDiffPanelProps {
   mode: ViewMode;
   selection: LineSelection | null;
   selectionSummaryText: string;
+  fileContentStatus: FileContentStatus;
   codeViewFileItem?: CodeViewFileItem<WorkbenchLineMetadata>;
   codeViewDiffItem?: CodeViewDiffItem<WorkbenchLineMetadata>;
+  relationNavigation: RelationNavigationTarget[];
   setMode: (mode: ViewMode) => void;
   onSelectionChange: (selection: LineSelection | null) => void;
 }
@@ -74,8 +78,10 @@ export function CodeDiffPanel({
   mode,
   selection,
   selectionSummaryText,
+  fileContentStatus,
   codeViewFileItem,
   codeViewDiffItem,
+  relationNavigation,
   setMode,
   onSelectionChange,
 }: CodeDiffPanelProps): React.ReactElement {
@@ -86,6 +92,14 @@ export function CodeDiffPanel({
   );
 
   const modeDescription = mode === "code" ? "Stable file line numbers." : "Diff line references from old/new snapshots.";
+  const fileContentDetail =
+    fileContentStatus.kind === "ready"
+      ? `Live content check: ${fileContentStatus.file.lineCount} lines, ${fileContentStatus.file.sizeBytes} bytes.`
+      : fileContentStatus.kind === "unavailable"
+        ? "missing: unable to load live content."
+        : "Checking live content availability...";
+
+  const relationItems = relationNavigation.length > 0 ? relationNavigation : [];
 
   function onSelectedLinesChange(next: CodeViewLineSelection | null): void {
     if (!activeItem || !next || next.id !== activeItem.id) {
@@ -140,6 +154,19 @@ export function CodeDiffPanel({
       ) : (
         <p className="selectionSummary">{emptyMessage}</p>
       )}
+
+      <section className="relationPreview" aria-label="Relation navigation preview">
+        <p className="relationHeader">Relation navigation preview</p>
+        <p className="selectionSummary">{fileContentDetail}</p>
+        <ul className="relationList">
+          {relationItems.map((item) => (
+            <li key={`${item.path}-${item.source}`} className="relationListItem">
+              <span className="relationPill">{item.kind}</span>
+              <span className="relationPath">{item.path}</span>
+            </li>
+          ))}
+        </ul>
+      </section>
 
       {selection?.startLine != null && selection?.endLine != null && selectedLines?.range && (
         <p className="selectionSummary">

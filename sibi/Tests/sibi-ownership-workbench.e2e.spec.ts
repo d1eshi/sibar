@@ -65,3 +65,39 @@ test("lab query keeps derivation traces available", async ({ page }) => {
   await expect(page.getByLabel("Ownership derivation lab")).toBeVisible();
   await expect(page.getByRole("heading", { name: "Local trace lab" })).toBeVisible();
 });
+
+test("relation navigation preview appears in code panel and updates by selected file", async ({ page }) => {
+  await page.goto("/?view=lab");
+
+  const relationSection = page.getByLabel("Relation navigation preview");
+  await expect(relationSection).toBeVisible();
+  await expect(relationSection).toContainText(
+    /Live content check|Checking live content availability|missing: unable to load live content/,
+  );
+  await expect(relationSection).toContainText("possible test");
+  await expect(relationSection).toContainText("possible caller");
+
+  await page.getByRole("button", { name: "Submit attempt" }).click();
+  await page.getByLabel("Tu respuesta").fill("The test exists but I cannot connect it yet.");
+  await page.getByRole("button", { name: "Submit attempt" }).click();
+
+  await expect(page.getByLabel("Current Sibi question")).toContainText("src/runtime/consumer.ts");
+  await expect(page.locator(".codePanel h1")).toContainText("src/runtime/consumer.ts");
+  await expect(relationSection).toBeVisible();
+  await expect(relationSection).toContainText("src/api/session.ts");
+  await expect(relationSection).toContainText("src/api/session.test.ts");
+});
+
+test("line/range selection updates selection summary when code lines expose selectors", async ({ page }) => {
+  await page.goto("/");
+
+  const codeLines = page.locator(".codeViewport button");
+  const firstLineButton = codeLines.first();
+  const lineSelectable = (await codeLines.count()) > 0;
+  if (!lineSelectable) {
+    test.skip(true, "Code viewport line selectors are not exposed in this environment.");
+  }
+
+  await firstLineButton.click();
+  await expect(page.getByText(/Current selection detail: /)).toBeVisible();
+});

@@ -359,6 +359,34 @@ test("evidenceForSelection returns evidence overlapping the selected range", asy
   );
 });
 
+test("relation navigation derives possible test/caller/doc links for touched file", async () => {
+  const fixtures = await loadFixturesModule();
+  const helpers = await loadHelpersModule();
+
+  const links = helpers.getRelationNavigationTargets(
+    "src/api/session.ts",
+    fixtures.ownershipReviewQueue,
+    fixtures.fixtureEvidence,
+  );
+  const kinds = links.map((link) => link.kind);
+  const paths = links.map((link) => link.path);
+
+  assert.equal(kinds.includes("possible test"), true, "session.ts should suggest a possible test relation");
+  assert.equal(kinds.includes("possible caller"), true, "session.ts should suggest a possible caller relation");
+  assert.equal(paths.includes("src/api/session.test.ts"), true);
+  assert.equal(paths.includes("src/runtime/consumer.ts"), true);
+  assert.equal(links.some((link) => link.source === "fallback"), false);
+});
+
+test("relation navigation falls back to explicit missing relation", async () => {
+  const helpers = await loadHelpersModule();
+  const links = helpers.getRelationNavigationTargets("src/unknown.ts", [], []);
+
+  assert.equal(links.length, 1);
+  assert.equal(links[0].kind, "missing relation");
+  assert.equal(links[0].path, "missing relation");
+});
+
 test("ReviewGuidePanel defines a first-run review sequence without free chat language", () => {
   const guideSource = readFileSync(
     new URL("../src/ownershipWorkbench/components/ReviewGuidePanel.tsx", import.meta.url),

@@ -167,6 +167,54 @@ textarea {
   font-size: 12px;
 }
 
+.relationPreview {
+  margin: 8px 14px 12px;
+  padding: 8px;
+  border: 1px solid #dfe6e8;
+  border-radius: 8px;
+  background: #f9fcfd;
+}
+
+.relationHeader {
+  margin: 0 0 6px;
+  font-size: 11px;
+  color: #54676a;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.relationList {
+  margin: 0;
+  padding-left: 0;
+  list-style: none;
+  display: grid;
+  gap: 6px;
+}
+
+.relationListItem {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.relationPill {
+  border: 1px solid #cfdcde;
+  border-radius: 999px;
+  background: #eef5f5;
+  color: #25413f;
+  font-size: 10px;
+  font-weight: 800;
+  padding: 2px 6px;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.relationPath {
+  color: #213433;
+  font-size: 12px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
 .codeViewport,
 .treeHost {
   overflow: auto;
