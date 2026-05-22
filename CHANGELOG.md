@@ -11,6 +11,21 @@ accepted specs and iterations, not by raw commit count.
 Use this section for changes that have landed but are not part of a tagged
 release yet.
 
+### Changed - Capture PR Entry
+
+- Added a provider selector for PR ingestion so the Capture PR screen can switch
+  between GitHub and GitLab examples, detect pasted provider URLs, and keep the
+  provider icon in sync with the entered URL.
+- Reworked the Capture PR form sizing with fluid layout variables and responsive
+  breakpoints instead of a single fixed-width control cap.
+- Split the Capture PR screen into a reusable public entry that Vercel can build
+  under `/sibi`, opening the existing early access waitlist modal instead of the
+  local ownership workbench.
+- Moved the early access modal to an app-level reusable React component backed
+  by the shared `/api/early-access` Supabase waitlist endpoint.
+- Added a public `apps/early-access` barrel that reexports the modal and lead
+  client API for Sibi and other app entries.
+
 ### Docs - Ownership Workbench Product Research
 
 - Added three research memos:

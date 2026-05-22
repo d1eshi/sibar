@@ -90,11 +90,17 @@ import {
   getGeminiEvidenceProviderAdapter,
   type GeminiEvidenceExtractionResult,
 } from "./ownershipWorkbench/geminiEvidenceExtractor.ts";
+import { CapturePrEntryScreen } from "./capturePr/CapturePrEntryScreen";
 
 export default function App() {
   const workbenchSurfaceMode = getWorkbenchSurfaceMode(
     typeof window === "undefined" ? "" : window.location.search,
   );
+  const [showWorkbench, setShowWorkbench] = React.useState(() => {
+    if (typeof window === "undefined") return true;
+    const params = new URLSearchParams(window.location.search);
+    return workbenchSurfaceMode === "lab" || params.get("workbench") === "1";
+  });
   const [selectedFile, setSelectedFile] = React.useState(initialFile);
   const [viewMode, setViewMode] = React.useState<ViewMode>("diff");
   const [selection, setSelection] = React.useState<LineSelection | null>(null);
@@ -571,6 +577,19 @@ export default function App() {
     setTransferAnswerText("");
     setReadinessStartedAt(Date.now());
     setFileStates((prev) => withBoundaryFileState(prev, selectedBoundary, "partial"));
+  }
+
+  if (!showWorkbench && workbenchSurfaceMode !== "lab") {
+    return (
+      <CapturePrEntryScreen
+        onAnalyze={() => {
+          setShowWorkbench(true);
+          if (typeof window !== "undefined") {
+            window.history.pushState({}, "", "?workbench=1");
+          }
+        }}
+      />
+    );
   }
 
   return (

@@ -1,7 +1,14 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": null,
-  "installCommand": "",
-  "buildCommand": null,
-  "outputDirectory": "web"
+  "installCommand": "pnpm install --frozen-lockfile",
+  "buildCommand": "pnpm run vercel:build",
+  "outputDirectory": "web",
+  "cleanUrls": true,
+  "rewrites": [
+    {
+      "source": "/sibi",
+      "destination": "/sibi/index.html"
+    }
+  ]
 }
