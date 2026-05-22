@@ -4,8 +4,8 @@ import assert from "node:assert/strict";
 import {
   createOwnershipGap,
   createRepairAction,
-} from "../../engine/runtime-pedagogy-loop.ts";
-import { evaluateAttempt } from "../../engine/runtime-attempt-evaluation.ts";
+} from "../../engine/pedagogy/core/loop.ts";
+import { evaluateAttempt } from "../../engine/pedagogy/core/attempt-evaluation.ts";
 import {
   RECOGNIZED_OPERATION_KINDS,
   type OwnershipGap,

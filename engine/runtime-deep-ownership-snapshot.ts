@@ -4,8 +4,8 @@ import type {
   LoopState,
   WeakGoalRoute,
   WorkspaceSnapshot,
-} from "./runtime-deep-ownership-loop-types.ts";
-import type { ThinkingArtifact } from "./runtime-deep-ownership-evidence-types.ts";
+} from "./pedagogy/core/loop-types.ts";
+import type { ThinkingArtifact } from "./pedagogy/core/evidence-types.ts";
 
 const WEAK_GOAL_PATTERNS: RegExp[] = [
   /^(understand|teach|learn|explain|study|master)\s+(this|the)\s+(repo|repository|project|codebase)[.]?$/i,

@@ -1,15 +1,15 @@
-import type { EvidenceCheck, OwnershipGapKind, UserAttempt } from "../runtime-deep-ownership.ts";
+import type { EvidenceCheck, OwnershipGapKind, UserAttempt } from "../loop-types.ts";
 import { createAttempt } from "./attempt-capture.ts";
 import { evaluateAttempt } from "./evaluate-attempt.ts";
 
 export function captureAndEvaluate(input: {
-  operation: import("../runtime-deep-ownership.ts").UserOperation;
-  artifact: import("../runtime-deep-ownership.ts").ThinkingArtifact;
+  operation: import("../loop-types.ts").UserOperation;
+  artifact: import("../loop-types.ts").ThinkingArtifact;
   answer_text: string;
   selected_evidence: string[];
   declared_confidence: "low" | "medium" | "high";
   declared_unknowns: string[];
-  evidenceInventory?: import("../runtime-deep-ownership.ts").EvidenceInventoryEntry[];
+  evidenceInventory?: import("../loop-types.ts").EvidenceInventoryEntry[];
 }): {
   attempt: UserAttempt;
   evidenceCheck: EvidenceCheck;

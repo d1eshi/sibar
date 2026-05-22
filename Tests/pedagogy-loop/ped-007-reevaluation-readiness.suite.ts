@@ -4,8 +4,8 @@ import assert from "node:assert/strict";
 import {
   advanceReadinessAfterReevaluation,
   createReadinessClaim,
-} from "../../engine/runtime-pedagogy-loop.ts";
-import { createAttempt, evaluateAttempt } from "../../engine/runtime-attempt-evaluation.ts";
+} from "../../engine/pedagogy/core/loop.ts";
+import { createAttempt, evaluateAttempt } from "../../engine/pedagogy/core/attempt-evaluation.ts";
 import { makeArtifact, makeConceptSlice, makeOperation } from "./fixtures.ts";
 
 function makeCriteriaSatisfyingAttempt() {

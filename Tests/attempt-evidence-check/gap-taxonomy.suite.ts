@@ -5,7 +5,7 @@ import {
   createAttempt,
   evaluateAttempt,
   classifyGapTaxonomy,
-} from "../../engine/runtime-attempt-evaluation.ts";
+} from "../../engine/pedagogy/core/attempt-evaluation.ts";
 import type { EvidenceCheck, UserAttempt } from "../../engine/runtime-deep-ownership.ts";
 import { makeArtifact, makeEvidenceRef, makeOperation } from "./fixtures.ts";
 

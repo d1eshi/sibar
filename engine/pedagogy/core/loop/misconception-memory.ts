@@ -1,4 +1,4 @@
-import type { EvidenceRef, OwnershipGap } from "../runtime-deep-ownership.ts";
+import type { EvidenceRef, OwnershipGap } from "../loop-types.ts";
 import type { MisconceptionMemory } from "./types.ts";
 import { now, uniqueId } from "./shared.ts";
 

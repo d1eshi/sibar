@@ -1,8 +1,8 @@
 import test, { describe } from "node:test";
 import assert from "node:assert/strict";
 
-import { trackMisconception } from "../../engine/runtime-pedagogy-loop.ts";
-import type { MisconceptionMemory } from "../../engine/runtime-pedagogy-loop.ts";
+import { trackMisconception } from "../../engine/pedagogy/core/loop.ts";
+import type { MisconceptionMemory } from "../../engine/pedagogy/core/loop.ts";
 import type { OwnershipGap } from "../../engine/runtime-deep-ownership.ts";
 import { makeEvidenceRef } from "./fixtures.ts";
 

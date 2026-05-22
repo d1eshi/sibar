@@ -9,7 +9,7 @@ import {
   writeFileSync,
 } from "node:fs";
 
-import type { EvidenceRef } from "./runtime-deep-ownership-evidence-types.ts";
+import type { EvidenceRef } from "./pedagogy/core/evidence-types.ts";
 import type { StudyArtifactWriteResult } from "./runtime-deep-ownership-intelligence-types.ts";
 
 export type StudyArtifactWriteInput = {

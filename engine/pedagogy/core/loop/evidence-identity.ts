@@ -7,7 +7,7 @@ import type {
   OwnershipGap,
   RepairAction,
   ReadinessClaim,
-} from "../runtime-deep-ownership.ts";
+} from "../loop-types.ts";
 import type { PrerequisiteRoute, ReevaluationPrompt } from "./types.ts";
 
 export function validateEvidenceIdentity(input: {

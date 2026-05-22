@@ -13,13 +13,13 @@ import type {
   ReadinessClaim,
   RepairAction,
   UserAttempt,
-} from "./runtime-deep-ownership-loop-types.ts";
+} from "./pedagogy/core/loop-types.ts";
 import type {
   EvidenceRef,
   EvidenceInventoryEntry,
   ThinkingArtifact,
   UserOperation,
-} from "./runtime-deep-ownership-evidence-types.ts";
+} from "./pedagogy/core/evidence-types.ts";
 import type {
   ArtifactSession,
   EvidenceCitation,

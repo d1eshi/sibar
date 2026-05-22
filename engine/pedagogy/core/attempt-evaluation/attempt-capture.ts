@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 
-import type { UserAttempt } from "../runtime-deep-ownership.ts";
+import type { UserAttempt } from "../loop-types.ts";
 import type { CreateAttemptInput } from "./types.ts";
 
 export function createAttempt(input: CreateAttemptInput): UserAttempt {

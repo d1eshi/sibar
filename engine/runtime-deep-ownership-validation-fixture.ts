@@ -1,11 +1,11 @@
 import { existsSync, readFileSync } from "node:fs";
 
-import { RECOGNIZED_OPERATION_KINDS } from "./runtime-deep-ownership-evidence-types.ts";
+import { RECOGNIZED_OPERATION_KINDS } from "./pedagogy/core/evidence-types.ts";
 import type {
   DeepOwnershipFixture,
   ValidationIssue,
   ValidationResult,
-} from "./runtime-deep-ownership-loop-types.ts";
+} from "./pedagogy/core/loop-types.ts";
 import { validateBoundaryEnforcement } from "./runtime-deep-ownership-boundary.ts";
 import {
   issue,

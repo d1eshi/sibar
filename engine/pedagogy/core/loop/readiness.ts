@@ -5,7 +5,7 @@ import type {
   UserAttempt,
   ConceptSlice,
   UserOperation,
-} from "../runtime-deep-ownership.ts";
+} from "../loop-types.ts";
 import type { MemoryAnswerEntry } from "./types.ts";
 import { now, uniqueId } from "./shared.ts";
 

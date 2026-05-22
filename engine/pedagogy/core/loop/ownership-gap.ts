@@ -4,8 +4,8 @@ import type {
   OwnershipGapKind,
   ThinkingArtifact,
   UserAttempt,
-} from "../runtime-deep-ownership.ts";
-import type { EvaluateAttemptOutput } from "../runtime-attempt-evaluation.ts";
+} from "../loop-types.ts";
+import type { EvaluateAttemptOutput } from "../attempt-evaluation.ts";
 import { now, uniqueId } from "./shared.ts";
 
 const DEFAULT_GAP_SEVERITY: Record<string, "critical" | "important" | "later"> = {

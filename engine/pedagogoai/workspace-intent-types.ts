@@ -1,4 +1,4 @@
-import type { ValidationIssue, ValidationResult } from "../runtime-deep-ownership-loop-types.ts";
+import type { ValidationIssue, ValidationResult } from "../pedagogy/core/loop-types.ts";
 
 export type WorkspaceIntentSchema =
   | "WorkspaceIntent"

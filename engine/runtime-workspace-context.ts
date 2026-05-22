@@ -16,7 +16,7 @@ import type {
   EvidenceSourceType,
   SkipRecord,
   UnknownZone,
-} from "./runtime-deep-ownership-evidence-types.ts";
+} from "./pedagogy/core/evidence-types.ts";
 import {
   now,
   type ArtifactSession,

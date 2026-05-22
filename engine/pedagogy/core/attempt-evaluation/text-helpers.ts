@@ -1,4 +1,4 @@
-import type { ThinkingArtifact, UserOperation } from "../runtime-deep-ownership.ts";
+import type { ThinkingArtifact, UserOperation } from "../loop-types.ts";
 
 const STOP_WORDS = new Set([
   "the",

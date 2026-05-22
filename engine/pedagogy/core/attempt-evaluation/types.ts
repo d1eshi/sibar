@@ -5,7 +5,7 @@ import type {
   EvidenceCheck,
   OwnershipGapKind,
   EvidenceInventoryEntry,
-} from "../runtime-deep-ownership.ts";
+} from "../loop-types.ts";
 
 export type CreateAttemptInput = {
   operation_id: string;

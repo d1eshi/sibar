@@ -8,7 +8,7 @@ import type {
   EvidenceInventoryEntry,
   SkipRecord,
   UnknownZone,
-} from "./runtime-deep-ownership-evidence-types.ts";
+} from "./pedagogy/core/evidence-types.ts";
 import type {
   BoundaryExpansionRoute,
   OutOfScopeEvidenceRecord,
@@ -17,7 +17,7 @@ import type {
   WorkspaceSignal,
   WorkspaceSignalKind,
 } from "./runtime-deep-ownership-intelligence-types.ts";
-import type { ValidationIssue } from "./runtime-deep-ownership-loop-types.ts";
+import type { ValidationIssue } from "./pedagogy/core/loop-types.ts";
 
 export type ProgressiveInventoryInput = {
   artifact_boundary: ArtifactBoundary;

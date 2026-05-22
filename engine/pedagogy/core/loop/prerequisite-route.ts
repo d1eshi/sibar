@@ -3,7 +3,7 @@ import type {
   OwnershipGapKind,
   ConceptSlice,
   UserOperation,
-} from "../runtime-deep-ownership.ts";
+} from "../loop-types.ts";
 import type {
   PrerequisiteRoute,
   PrerequisiteRouteOption,

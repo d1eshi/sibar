@@ -2,8 +2,8 @@ import {
   RECOGNIZED_EVIDENCE_ROLES,
   type EvidenceInventoryEntry,
   type EvidenceRole,
-} from "./runtime-deep-ownership-evidence-types.ts";
-import type { ValidationIssue } from "./runtime-deep-ownership-loop-types.ts";
+} from "./pedagogy/core/evidence-types.ts";
+import type { ValidationIssue } from "./pedagogy/core/loop-types.ts";
 
 export function issue(field: string, message: string): ValidationIssue {
   return { field, message, severity: "error" };

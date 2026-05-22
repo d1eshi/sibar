@@ -8,13 +8,25 @@ import type {
   UnknownZone,
   UserOperation,
   UserOperationKind,
-} from "./runtime-deep-ownership-evidence-types.ts";
+} from "./evidence-types.ts";
 import type {
   BoundaryExpansionRoute,
   OutOfScopeEvidenceRecord,
   ResearchToConstructionBridge,
   WorkspaceSignal,
-} from "./runtime-deep-ownership-intelligence-types.ts";
+} from "../../runtime-deep-ownership-intelligence-types.ts";
+
+export type {
+  ArtifactBoundary,
+  ConceptSlice,
+  EvidenceInventoryEntry,
+  EvidenceRef,
+  SkipRecord,
+  ThinkingArtifact,
+  UnknownZone,
+  UserOperation,
+  UserOperationKind,
+} from "./evidence-types.ts";
 
 // ── Attempt & Evidence Check ──────────────────────────────────────────
 

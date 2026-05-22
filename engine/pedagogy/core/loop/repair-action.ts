@@ -4,7 +4,7 @@ import type {
   RepairAction,
   UserOperationKind,
   ConceptSlice,
-} from "../runtime-deep-ownership.ts";
+} from "../loop-types.ts";
 import { now, uniqueId } from "./shared.ts";
 
 const REPAIR_TEMPLATES: Record<OwnershipGapKind, {

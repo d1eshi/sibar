@@ -1,8 +1,8 @@
 import test, { describe } from "node:test";
 import assert from "node:assert/strict";
 
-import { evaluateFullLoop } from "../../engine/runtime-pedagogy-loop.ts";
-import { createAttempt, evaluateAttempt } from "../../engine/runtime-attempt-evaluation.ts";
+import { evaluateFullLoop } from "../../engine/pedagogy/core/loop.ts";
+import { createAttempt, evaluateAttempt } from "../../engine/pedagogy/core/attempt-evaluation.ts";
 import {
   makeShallowAttempt,
   makeOperation,

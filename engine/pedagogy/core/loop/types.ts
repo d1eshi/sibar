@@ -9,8 +9,8 @@ import type {
   UserOperation,
   ThinkingArtifact,
   ConceptSlice,
-} from "../runtime-deep-ownership.ts";
-import type { EvaluateAttemptOutput } from "../runtime-attempt-evaluation.ts";
+} from "../loop-types.ts";
+import type { EvaluateAttemptOutput } from "../attempt-evaluation.ts";
 
 export type PrerequisiteRouteLevel =
   | "basic"

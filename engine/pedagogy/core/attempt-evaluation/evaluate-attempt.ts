@@ -5,7 +5,7 @@ import type {
   EvidenceCheckResult,
   EvidenceInventoryEntry,
   EvidenceRef,
-} from "../runtime-deep-ownership.ts";
+} from "../loop-types.ts";
 import { classifyGapTaxonomy } from "./gap-taxonomy.ts";
 import { extractArtifactTerminology, extractKeywords, isTechnicalTerm, scoreKeywordMatch } from "./text-helpers.ts";
 import type { EvaluateAttemptInput, EvaluateAttemptOutput } from "./types.ts";
