@@ -4,7 +4,7 @@ import {
   compileWorkspacePlanFromIntent,
   formatWorkspacePlanPreview,
   validateWorkspacePlan,
-} from "../../../src/pedagogoai/workspace-intent-runtime.js";
+} from "../../../../../src/pedagogoai/workspace-intent-runtime.js";
 import { ANTI_OVERLOAD, ARC_ID, MISSION_ID } from "./workspace-data.js";
 
 export const WORKSPACE_INTENT_ADAPTER_KIND = "workspace-intent-ui-adapter";

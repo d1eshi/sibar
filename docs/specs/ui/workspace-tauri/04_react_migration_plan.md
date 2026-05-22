@@ -18,11 +18,11 @@ Legacy prototype files:
 2. `apps/sibar-research-workspace/styles/tokens.css`
 3. `apps/sibar-research-workspace/styles/base.css`
 4. `apps/sibar-research-workspace/styles/workspace.css`
-5. `apps/sibar-research-workspace/scripts/research-workspace.js`
-6. `apps/sibar-research-workspace/scripts/workspace-app.js`
-7. `apps/sibar-research-workspace/scripts/workspace-render.js`
-8. `apps/sibar-research-workspace/scripts/workspace-session.js`
-9. `apps/sibar-research-workspace/scripts/workspace-intent-adapter.js`
+5. `apps/sibar-research-workspace/legacy/vanilla-workspace/scripts/research-workspace.js`
+6. `apps/sibar-research-workspace/legacy/vanilla-workspace/scripts/workspace-app.js`
+7. `apps/sibar-research-workspace/legacy/vanilla-workspace/scripts/workspace-render.js`
+8. `apps/sibar-research-workspace/legacy/vanilla-workspace/scripts/workspace-session.js`
+9. `apps/sibar-research-workspace/legacy/vanilla-workspace/scripts/workspace-intent-adapter.js`
 
 The migration should preserve fixture behavior while replacing DOM mutation with
 typed React components, reducers, and explicit UI projections.

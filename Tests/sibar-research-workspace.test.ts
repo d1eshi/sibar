@@ -6,17 +6,21 @@ import test from "node:test";
 
 const root = process.cwd();
 const appRoot = join(root, "apps", "sibar-research-workspace");
+const legacyScriptsRoot = join(appRoot, "legacy", "vanilla-workspace", "scripts");
 
 const workspaceHtml = readFileSync(join(appRoot, "index.html"), "utf8");
 const workspaceCss = readFileSync(join(appRoot, "styles", "workspace.css"), "utf8");
 const workspaceBaseCss = readFileSync(join(appRoot, "styles", "base.css"), "utf8");
-const workspaceScript = readFileSync(join(appRoot, "scripts", "research-workspace.js"), "utf8");
+const workspaceScript = readFileSync(join(legacyScriptsRoot, "research-workspace.js"), "utf8");
+const workspaceAppScript = readFileSync(join(legacyScriptsRoot, "workspace-app.js"), "utf8");
+const workspaceRenderScript = readFileSync(join(legacyScriptsRoot, "workspace-render.js"), "utf8");
+const workspaceStudyPlansScript = readFileSync(join(legacyScriptsRoot, "workspace-study-plans.js"), "utf8");
 const tauriConfig = JSON.parse(readFileSync(join(appRoot, "src-tauri", "tauri.conf.json"), "utf8"));
 const tauriCargo = readFileSync(join(appRoot, "src-tauri", "Cargo.toml"), "utf8");
 const tauriMain = readFileSync(join(appRoot, "src-tauri", "src", "main.rs"), "utf8");
 const currentSpecPath = join(root, "docs", "specs", "deep-ownership-workspace", "00_current_north_star.md");
 
-const moduleUrl = pathToFileURL(join(appRoot, "scripts", "research-workspace.js")).href;
+const moduleUrl = pathToFileURL(join(legacyScriptsRoot, "research-workspace.js")).href;
 const LM_MODES = ["/map", "/read", "/explain", "/test", "/critic", "/repair", "/build", "/publish"];
 const META_COPY_CANDIDATES = [
   /Ambition\s*→\s*Roadmap/,
@@ -224,29 +228,18 @@ const productTerms = [
   "TODAY",
 ];
 
-test("second app exposes the research workspace screen contract", () => {
-  assert.match(workspaceHtml, /<strong>Sibar<\/strong>/);
-  assert.match(workspaceHtml, /Today/);
-  assert.match(workspaceHtml, /Backpropagation/);
-  assert.match(workspaceHtml, /Discussion/);
-  assert.match(workspaceHtml, /Learning tree focus/);
-  assert.match(workspaceHtml, /Artifacts \/ Evidence/);
-  assert.match(workspaceHtml, /Read/);
-  assert.match(workspaceHtml, /Code/);
-  assert.match(workspaceHtml, /Explain/);
-  assert.match(workspaceHtml, /Compile source to roadmap/);
-  assert.match(workspaceHtml, /Generate compiler contract payload/);
-  assert.match(workspaceHtml, /Apply generated artifact/);
-  assert.match(workspaceHtml, /Apply validated sample artifact/);
-  assert.match(workspaceHtml, /Attempt reconstruction first/);
-  assert.match(workspaceHtml, /Create Workspace/);
-  assert.match(workspaceHtml, /What are you trying to build or understand\?/);
-  assert.match(workspaceHtml, /Generate workspace/);
-  assert.doesNotMatch(workspaceHtml, /Run Codex runner/);
-  assert.match(workspaceHtml, /Proposed Workspace/);
-  assert.match(workspaceHtml, /Ask/);
-  assert.match(workspaceHtml, /Key insight/);
-  assert.doesNotMatch(workspaceHtml, /LM GUIDE/);
+test("second app uses the React entry while retaining the legacy workspace facade", () => {
+  assert.match(workspaceHtml, /<script type="module" src="\/src\/main\.tsx"><\/script>/);
+  assert.doesNotMatch(workspaceHtml, /research-workspace\.js/);
+  assert.doesNotMatch(workspaceHtml, /legacy\/vanilla-workspace/);
+
+  assert.match(workspaceScript, /research-workspace\.js is the public façade/);
+  assert.match(workspaceScript, /initResearchWorkspace/);
+  assert.match(workspaceAppScript, /generateWorkspace/);
+  assert.match(workspaceRenderScript, /studyChoiceNow/);
+  assert.match(workspaceStudyPlansScript, /Backpropagation/);
+  assert.doesNotMatch(workspaceScript + workspaceAppScript + workspaceRenderScript, /Run Codex runner/);
+  assert.doesNotMatch(workspaceScript + workspaceAppScript + workspaceRenderScript, /LM GUIDE/);
   assert.doesNotMatch(workspaceHtml, /Slash command/i);
   assert.doesNotMatch(workspaceHtml, /data-mode="\/map"/);
 });
@@ -492,9 +485,12 @@ test("create workspace intent does not call the web compiler without a native ho
 });
 
 test("next actions are declared and wired to read, code, and explain actions", async () => {
-  assert.match(workspaceHtml, /id="studyChoiceNow"[^>]*data-study-choice="read"/);
-  assert.match(workspaceHtml, /id="studyChoiceBuild"[^>]*data-study-choice="build"[^>]*data-action-mode="\/build"/);
-  assert.match(workspaceHtml, /id="studyChoiceExplain"[^>]*data-study-choice="explain"[^>]*data-action-mode="\/explain"/);
+  assert.match(workspaceRenderScript, /studyChoiceNow: document\.getElementById\("studyChoiceNow"\)/);
+  assert.match(workspaceRenderScript, /studyChoiceBuild: document\.getElementById\("studyChoiceBuild"\)/);
+  assert.match(workspaceRenderScript, /studyChoiceExplain: document\.getElementById\("studyChoiceExplain"\)/);
+  assert.match(workspaceAppScript, /root\.studyChoiceNow\?\.addEventListener/);
+  assert.match(workspaceAppScript, /root\.studyChoiceBuild\?\.dataset\?\.actionMode \|\| "\/build"/);
+  assert.match(workspaceAppScript, /root\.studyChoiceExplain\?\.dataset\?\.actionMode \|\| "\/explain"/);
 
   const workspaceModule = await import(moduleUrl);
   const modeButtons = LM_MODES.map((mode) => makeInteractiveNode({ mode }));
@@ -635,10 +631,10 @@ test("workspace copy is work-surface oriented", () => {
   for (const matcher of META_COPY_CANDIDATES) {
     assert.doesNotMatch(workspaceHtml, matcher);
   }
-  assert.match(workspaceHtml, /Scope: Selected fragment in "Backpropagation"/);
-  assert.match(workspaceHtml, /Session output/);
-  assert.match(workspaceHtml, /Context notes/);
-  assert.match(workspaceHtml, /Ask about the selected fragment/);
+  assert.match(workspaceHtml, /src\/main\.tsx/);
+  assert.doesNotMatch(workspaceHtml, /research-workspace\.js/);
+  assert.match(workspaceScript, /formatAttempt/);
+  assert.match(workspaceRenderScript, /readerInstruction/);
 });
 
 test("source-to-roadmap compiler updates roadmap and emits source card payload", async () => {
@@ -1431,7 +1427,7 @@ test("discussion panel replaces the visible command mode grid", async () => {
   const markupModes = [...workspaceHtml.matchAll(/<button[^>]*data-mode="([^"]+)"[^>]*>/g)].map((match) => match[1]);
   assert.equal(markupModes.length, 0);
   assert.doesNotMatch(workspaceHtml, /id="lmModes"/);
-  assert.match(workspaceHtml, /id="modeActionLog"/);
+  assert.match(workspaceRenderScript, /modeActionLog: document\.getElementById\("modeActionLog"\)/);
 
   const scriptModesMatch = workspaceScript.match(/const LM_MODES\s*=\s*\[(.*?)\];/s);
   assert.ok(scriptModesMatch);
@@ -1537,9 +1533,9 @@ test("optional discussion action controls do not synthesize a slash command grid
 });
 
 test("Tauri config and shell scaffold target the workspace frontend", () => {
-  assert.equal(tauriConfig.build.beforeBuildCommand, "");
-  assert.equal(tauriConfig.build.beforeDevCommand, "");
-  assert.equal(tauriConfig.build.frontendDist, "../");
+  assert.equal(tauriConfig.build.beforeBuildCommand, "pnpm workspace:build");
+  assert.equal(tauriConfig.build.beforeDevCommand, "pnpm workspace:dev");
+  assert.equal(tauriConfig.build.frontendDist, "dist");
   assert.equal(tauriConfig.productName, "Sibar Research Workspace");
   assert.equal(tauriConfig.version, "0.1.0");
   assert.equal(tauriConfig.app.windows[0].title, "Sibar Research Workspace");

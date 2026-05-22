@@ -174,7 +174,7 @@ Known adapter-heavy modules:
 4. `src/store.ts`
 5. `src/runtime-deep-ownership-study-artifacts.ts`
 6. `src/pedagogoai/workspace-compiler-runner.ts`
-7. `apps/sibar-research-workspace/scripts/workspace-intent-adapter.js`
+7. `apps/sibar-research-workspace/legacy/vanilla-workspace/scripts/workspace-intent-adapter.js`
 
 These modules may consume core, but they must not define the shared core
 taxonomy.
@@ -314,7 +314,7 @@ stable:
 5. `src/runtime-state.ts`
 6. `src/store.ts`
 7. `src/pedagogoai/index.ts`
-8. `apps/sibar-research-workspace/scripts/workspace-intent-adapter.js`
+8. `apps/sibar-research-workspace/legacy/vanilla-workspace/scripts/workspace-intent-adapter.js`
 
 The first goal is to make ownership, pedagogy, and memory boundaries explicit.
 Poda comes after imports prove the boundaries are real.
