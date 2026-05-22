@@ -146,111 +146,84 @@ function CapturePrScreen({ onAnalyze }: CapturePrScreenProps): React.ReactElemen
       <section className="routePreview" aria-label="Ownership route preview">
         <header className="routePreviewHeader">
           <h2>Ownership route</h2>
-          <span className="routeStatus ready">Ready</span>
+          <span className="routeStatus ready">Auto guide</span>
         </header>
 
         <div className="routeCanvas">
-          <ol className="routeSteps">
-            <li className="routeStep">
-              <span className="stepIndex">1</span>
-              <strong>GitHub PR</strong>
-            </li>
-            <li className="routeStep">
-              <span className="stepIndex">2</span>
-              <strong>Read diff</strong>
-            </li>
-            <li className="routeStep">
-              <span className="stepIndex">3</span>
-              <strong>Analyze ownership</strong>
-            </li>
-            <li className="routeStep">
-              <span className="stepIndex">4</span>
-              <strong>Ownership route</strong>
-            </li>
-          </ol>
-
-          <div className="routeCards">
-            <article className="routeCard prCard" aria-label="GitHub PR card">
-              <div className="prAvatar" aria-hidden="true" />
-              <div className="prNumber"><span aria-hidden="true">⌘</span> #18</div>
-              <h3>Sibi ownership workbench slices</h3>
-              <div className="prAuthor">
-                <span className="authorAvatar" aria-hidden="true" />
-                <p><strong>d1eshi</strong><small>updated 2 hours ago</small></p>
-              </div>
-              <div className="prStats">
-                <span className="added">+142</span>
-                <span className="removed">-27</span>
-                <span className="filesGlyph" aria-hidden="true">⌑</span>
-                <span>8 files</span>
+          <div className="routeSlideDeck" aria-label="Automatic ownership route guide">
+            <article className="routeSlide slideOne" aria-label="Step 1 Capture PR">
+              <span className="slideStep">1. Capture PR</span>
+              <h3>Start with the GitHub pull request.</h3>
+              <p>Paste the PR URL or a diff. Sibi keeps the capture focused on the change under review.</p>
+              <div className="slidePreview prMini" aria-hidden="true">
+                <span className="prAvatar" />
+                <strong>#18</strong>
+                <small>+142 -27 · 8 files</small>
               </div>
             </article>
-
-            <span className="routeArrow" aria-hidden="true">→</span>
-
-            <article className="routeCard diffCard" aria-label="Read diff card">
-              <span className="fileGlyph" aria-hidden="true">&lt;/&gt;</span>
-              <div className="diffLines">
+            <article className="routeSlide slideTwo" aria-label="Step 2 Sibi reads the diff">
+              <span className="slideStep">2. Sibi reads the diff</span>
+              <h3>The changed lines become the working context.</h3>
+              <p>Sibi pulls out touched files, callers, tests, and relation hints before asking anything.</p>
+              <div className="slidePreview diffMini" aria-hidden="true">
                 <span />
                 <span />
                 <span />
               </div>
             </article>
-
-            <span className="routeArrow" aria-hidden="true">→</span>
-
-            <article className="routeCard analysisCard" aria-label="Analyze ownership card">
-              <div className="analysisGraph">
+            <article className="routeSlide slideThree" aria-label="Step 3 You prove the boundary">
+              <span className="slideStep">3. You prove the boundary</span>
+              <h3>Answer the smallest ownership question.</h3>
+              <p>You show which team owns the change, what evidence proves it, and where gaps remain.</p>
+              <div className="slidePreview graphMini" aria-hidden="true">
                 <span className="node green" />
                 <span className="node green lower" />
                 <span className="node amber" />
                 <span className="node red" />
-                <span className="graphLine one" />
-                <span className="graphLine two" />
               </div>
-              <div className="magnifier" aria-hidden="true" />
             </article>
-
-            <span className="routeArrow" aria-hidden="true">→</span>
-
-            <article className="routeCard ownershipArtifact" aria-label="Ownership artifact preview">
-              <div className="artifactRow">
-                <span className="artifactDot owned" />
-                <p>Payment API Team</p>
-                <strong>Owns</strong>
-              </div>
-              <div className="artifactRow">
-                <span className="artifactDot support" />
-                <p>Platform Team</p>
-                <strong>Supports</strong>
-              </div>
-              <div className="artifactRow">
-                <span className="artifactDot gap" />
-                <p>Risk &amp; Compliance</p>
-                <strong>Gap</strong>
-              </div>
-              <div className="artifactRow">
-                <span className="artifactDot gapRed" />
-                <p>Data Governance</p>
-                <strong>Gap</strong>
+            <article className="routeSlide slideFour" aria-label="Step 4 Ownership artifact">
+              <span className="slideStep">4. Ownership artifact</span>
+              <h3>Leave with a reviewable artifact.</h3>
+              <p>The workbench turns your answers into owned, supported, and unresolved boundaries.</p>
+              <div className="slidePreview artifactMini" aria-hidden="true">
+                <span>Owns</span>
+                <span>Supports</span>
+                <span>Gap</span>
               </div>
             </article>
           </div>
 
-          <div className="routeProgress" aria-hidden="true">
-            <span className="solid" />
-            <span className="dot one" />
-            <span className="dot two" />
-            <span className="dot three" />
-            <span className="dot final" />
-          </div>
-
-          <div className="routeStateLabels">
-            <span className="routeStatus ready">Ready</span>
-            <span className="routeStatus ready">Ready</span>
-            <span className="routeStatus ready">Ready</span>
-            <span className="routeStatus gap">Gap</span>
-          </div>
+          <ol className="routeTimeline" aria-label="Ownership route steps">
+            <li>
+              <span className="stepIndex">1</span>
+              <div>
+                <strong>GitHub PR</strong>
+                <p>Capture PR</p>
+              </div>
+            </li>
+            <li>
+              <span className="stepIndex">2</span>
+              <div>
+                <strong>Read diff</strong>
+                <p>Sibi reads the diff</p>
+              </div>
+            </li>
+            <li>
+              <span className="stepIndex">3</span>
+              <div>
+                <strong>Analyze ownership</strong>
+                <p>You prove the boundary</p>
+              </div>
+            </li>
+            <li>
+              <span className="stepIndex">4</span>
+              <div>
+                <strong>Ownership route</strong>
+                <p>Ownership artifact</p>
+              </div>
+            </li>
+          </ol>
         </div>
       </section>
     </main>
