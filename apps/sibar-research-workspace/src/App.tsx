@@ -8,24 +8,35 @@ import { SessionWorkbench } from "./flows/workspace/SessionWorkbench";
 import { StudyPathRail } from "./flows/workspace/StudyPathRail";
 import stylesWorkspace from "./flows/workspace/workspace.module.css";
 import {
+  buildWorkspaceHomeProjectionFromMission,
+  buildWorkspaceSessionFixtureFromMission,
   createInitialWorkspaceStateFromFixture,
   frontierLabMissionUiProjection,
   frontierLabWorkspaceSessionFixture,
-  workspaceHomeProjection,
   projectWorkspaceSession,
 } from "./state/workspaceProjection";
 import { workspaceSessionReducer } from "./state/workspaceReducer";
+import type { MissionUiProjection } from "../../../src/runtime-source-mission-ui-projection.ts";
 
 export default function App() {
   type AppFlowStep = "home" | "onboarding" | "overview" | "session";
   const [flowStep, setFlowStep] = React.useState<AppFlowStep>("home");
+  const [activeMissionProjection, setActiveMissionProjection] =
+    React.useState<MissionUiProjection>(frontierLabMissionUiProjection);
+  const [activeSessionFixture, setActiveSessionFixture] = React.useState(
+    frontierLabWorkspaceSessionFixture,
+  );
   const [workspaceState, dispatchWorkspace] = React.useReducer(
     workspaceSessionReducer,
     createInitialWorkspaceStateFromFixture(frontierLabWorkspaceSessionFixture),
   );
+  const activeHomeProjection = React.useMemo(
+    () => buildWorkspaceHomeProjectionFromMission(activeMissionProjection),
+    [activeMissionProjection],
+  );
   const workspaceProjection = projectWorkspaceSession(
     workspaceState,
-    frontierLabWorkspaceSessionFixture,
+    activeSessionFixture,
   );
 
   function openFlowStep(nextStep: AppFlowStep) {
@@ -33,20 +44,32 @@ export default function App() {
     window.requestAnimationFrame(() => window.scrollTo({ top: 0, left: 0 }));
   }
 
+  function openCompiledMission(missionProjection: MissionUiProjection) {
+    const nextSessionFixture = buildWorkspaceSessionFixtureFromMission(missionProjection);
+
+    setActiveMissionProjection(missionProjection);
+    setActiveSessionFixture(nextSessionFixture);
+    dispatchWorkspace({
+      type: "reset",
+      state: createInitialWorkspaceStateFromFixture(nextSessionFixture),
+    });
+    openFlowStep("overview");
+  }
+
   return (
     <main className={styles.researchShell} data-component="research-workspace-root">
       <WorkspaceShell mode={flowStep}>
         {flowStep === "home" ? (
           <WorkspaceHome
-            projection={workspaceHomeProjection}
+            projection={activeHomeProjection}
             onNewWorkspace={() => openFlowStep("onboarding")}
             onOpenWorkspace={(workspace) => openFlowStep(workspace.openTarget)}
           />
         ) : flowStep === "onboarding" ? (
-          <OnboardingFlow onOpenWorkspace={() => openFlowStep("overview")} />
+          <OnboardingFlow onOpenWorkspace={openCompiledMission} />
         ) : flowStep === "overview" ? (
           <MissionOverview
-            mission={frontierLabMissionUiProjection}
+            mission={activeMissionProjection}
             projection={workspaceProjection}
             state={workspaceState}
             dispatch={dispatchWorkspace}

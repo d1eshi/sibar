@@ -32,6 +32,10 @@ release yet.
   supported blog URL intent, canonicalizes URL variants, clones the static source
   facts into validated mission output, and rejects unsupported URLs without
   inventing source signals.
+- Added the frontier-lab compiler to the New Mission UI so supported source URLs
+  and required user reasons produce the active Mission Brief, derived Home
+  projection, and session fixture while unsupported URLs stay blocked with
+  diagnostics.
 
 ### Changed - Pedagogy Core Facade
 

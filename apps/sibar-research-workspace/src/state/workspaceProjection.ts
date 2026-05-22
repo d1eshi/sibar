@@ -197,16 +197,19 @@ export function buildWorkspaceHomeProjectionFromMission(
   const nextSession =
     missionProjection.focused_queue.visible_sessions.find((session) => session.status === "now") ??
     missionProjection.focused_queue.visible_sessions[0];
+  const userGoal =
+    missionProjection.mission_brief.source_context.user_reason.trim() ||
+    missionProjection.mission_brief.user_goal;
 
   return {
     workspaces: [
       {
         id: missionProjection.mission_brief.mission_id,
         title: missionProjection.mission_brief.title,
-        objective: missionProjection.mission_brief.user_goal,
+        objective: userGoal,
         sourceBoundary: missionProjection.mission_brief.source_context.summary,
         sourceOriginUrl: missionProjection.mission_brief.source_context.canonical_url ?? undefined,
-        userGoal: missionProjection.mission_brief.user_goal,
+        userGoal,
         whyMissionExists: missionProjection.mission_brief.rationale,
         progress: queueProgressLabel(missionProjection),
         nextNode: nextSession?.title ?? missionProjection.active_session.title,
