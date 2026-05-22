@@ -16,12 +16,12 @@ import type {
   EvidenceSourceType,
   SkipRecord,
   UnknownZone,
-} from "./pedagogy/core/evidence-types.ts";
+} from "../../pedagogy/core/evidence-types.ts";
 import {
   now,
   type ArtifactSession,
   type RuntimeWorkspaceSession,
-} from "./runtime-support.ts";
+} from "../../runtime-support.ts";
 
 const DEFAULT_SKIP_DIRS = new Set([
   ".git",

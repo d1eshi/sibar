@@ -63,9 +63,9 @@ export type {
   OwnershipAttemptContract,
   ScopedReadinessContract,
   WorkspaceSessionContract,
-} from "../runtime-workspace-session-contracts.ts";
+} from "../workspace/session/contracts.ts";
 
-export { buildWorkspaceSessionContract } from "../runtime-workspace-session-contracts.ts";
+export { buildWorkspaceSessionContract } from "../workspace/session/contracts.ts";
 
 export {
   buildRustWorkspaceCompilerCommand,

@@ -2,14 +2,14 @@ import { randomUUID } from "node:crypto";
 import { existsSync } from "node:fs";
 import { resolve } from "node:path";
 
-import { createArtifactSessionCommand } from "./runtime-artifact-session.ts";
-import { captureAndEvaluate } from "./pedagogy/core/attempt-evaluation/capture-and-evaluate.ts";
+import { createArtifactSessionCommand } from "../../runtime-artifact-session.ts";
+import { captureAndEvaluate } from "../../pedagogy/core/attempt-evaluation/capture-and-evaluate.ts";
 import type {
   WorkspaceSnapshot,
-} from "./pedagogy/core/loop-types.ts";
-import { projectWorkspaceSnapshot } from "./runtime-deep-ownership-snapshot.ts";
-import { buildWorkspaceInventory } from "./runtime-workspace-context.ts";
-import { readState, writeState } from "./runtime-state.ts";
+} from "../../pedagogy/core/loop-types.ts";
+import { projectWorkspaceSnapshot } from "../../runtime-deep-ownership-snapshot.ts";
+import { buildWorkspaceInventory } from "./context.ts";
+import { readState, writeState } from "../../runtime-state.ts";
 import {
   buildAttemptEvaluationContract,
   buildOwnershipAttemptContract,
@@ -17,7 +17,7 @@ import {
   type OwnershipAttemptAction,
   type OwnershipAttemptContract,
   type WorkspaceSessionContract,
-} from "./runtime-workspace-session-contracts.ts";
+} from "./contracts.ts";
 import {
   asStringArray,
   buildGap,
@@ -26,13 +26,13 @@ import {
   buildWorkspaceLoop,
   makeReadinessClaim,
   resolveDefaultExcludedPaths,
-} from "./runtime-workspace-session-logic.ts";
-import { fail, now, toOperationState, type RuntimeSuccess, type RuntimeWorkspaceSession } from "./runtime-support.ts";
-import { runProjectLearningAgentCommand as runAgent } from "./runtime-agent.ts";
+} from "./logic.ts";
+import { fail, now, toOperationState, type RuntimeSuccess, type RuntimeWorkspaceSession } from "../../runtime-support.ts";
+import { runProjectLearningAgentCommand as runAgent } from "../../runtime-agent.ts";
 import {
   DEFAULT_EXCLUDED_PATHS,
   MAX_GOAL_LABEL_LENGTH,
-} from "./runtime-workspace-session-constants.ts";
+} from "./constants.ts";
 
 type WorkspaceSessionPayload = RuntimeWorkspaceSession & {
   live_workspace: WorkspaceSessionContract;

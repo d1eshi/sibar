@@ -52,6 +52,8 @@ release yet.
 - Split the source-driven workspace mission modules under
   `engine/workspace/source-mission/` and moved source-mission workspace traces
   under `engine/workspace/traces/source-mission/`.
+- Grouped live workspace session runtime, contracts, context, constants, and
+  logic under `engine/workspace/session/`.
 - Expanded `engine/pedagogy-core/index.ts` to expose the mission
   attempt/evidence/readiness contracts and closed operation/artifact/evidence
   taxonomies without re-exporting the adapter-heavy deep ownership runtime

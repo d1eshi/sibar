@@ -108,8 +108,7 @@ const CORE_FORBIDDEN_IMPORTS: ForbiddenImportRule[] = [
   repoPathPattern(/^engine\/pedagogoai\/workspace-intent/, "WorkspaceIntent belongs outside shared core"),
   repoPathPattern(/^engine\/runtime-state/, "runtime state is adapter-owned"),
   repoPathPattern(/^engine\/store/, "persistence store is adapter-owned"),
-  repoPathPattern(/^engine\/runtime-workspace-session/, "workspace sessions are adapter-owned"),
-  repoPathPattern(/^engine\/runtime-workspace-context/, "workspace context is adapter-owned"),
+  repoPathPattern(/^engine\/workspace\/session\//, "workspace sessions are adapter-owned"),
   repoPathPattern(/^engine\/runtime-deep-ownership-study-artifacts/, "study artifact projection is adapter-owned"),
 ];
 
