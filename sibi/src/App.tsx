@@ -95,8 +95,54 @@ interface CapturePrScreenProps {
   onAnalyze: () => void;
 }
 
+const prProviders = {
+  github: {
+    label: "GitHub",
+    host: "github.com",
+    placeholder: "https://github.com/org/repo/pull/123",
+    sampleUrl: "https://github.com/d1eshi/sibar/pull/18",
+  },
+  gitlab: {
+    label: "GitLab",
+    host: "gitlab.com",
+    placeholder: "https://gitlab.com/org/repo/-/merge_requests/123",
+    sampleUrl: "https://gitlab.com/d1eshi/sibar/-/merge_requests/18",
+  },
+} as const;
+
+type PrProvider = keyof typeof prProviders;
+
+function detectPrProvider(url: string): PrProvider | null {
+  const normalizedUrl = url.trim().toLowerCase();
+  const providerMatch = Object.entries(prProviders).find(([, config]) => normalizedUrl.includes(config.host));
+  if (providerMatch) return providerMatch[0] as PrProvider;
+  return null;
+}
+
 function CapturePrScreen({ onAnalyze }: CapturePrScreenProps): React.ReactElement {
-  const [prUrl, setPrUrl] = React.useState("https://github.com/d1eshi/sibar/pull/18");
+  const [selectedProvider, setSelectedProvider] = React.useState<PrProvider>("github");
+  const [prUrl, setPrUrl] = React.useState(prProviders.github.sampleUrl);
+  const visibleProvider = detectPrProvider(prUrl) ?? selectedProvider;
+
+  function changePrUrl(event: React.ChangeEvent<HTMLInputElement>): void {
+    const nextUrl = event.target.value;
+    const detectedProvider = detectPrProvider(nextUrl);
+    setPrUrl(nextUrl);
+
+    if (detectedProvider !== null && detectedProvider !== selectedProvider) {
+      setSelectedProvider(detectedProvider);
+    }
+  }
+
+  function changeProvider(event: React.ChangeEvent<HTMLSelectElement>): void {
+    const nextProvider = event.target.value as PrProvider;
+    const currentProvider = detectPrProvider(prUrl);
+    setSelectedProvider(nextProvider);
+
+    if (prUrl.trim() === "" || currentProvider !== null) {
+      setPrUrl(prProviders[nextProvider].sampleUrl);
+    }
+  }
 
   function submitCapture(event: React.FormEvent<HTMLFormElement>): void {
     event.preventDefault();
@@ -112,18 +158,35 @@ function CapturePrScreen({ onAnalyze }: CapturePrScreenProps): React.ReactElemen
           <p>Capture a GitHub pull request and turn it into an ownership artifact.</p>
         </section>
 
-        <label className="captureInput">
-          <span>Pull request URL</span>
+        <div className="captureInput">
+          <label htmlFor="capturePrUrl">Pull request URL</label>
           <div className="captureInputControl">
-            <span className="githubGlyph" aria-hidden="true" />
+            <span
+              className={`providerGlyph ${visibleProvider}Glyph`}
+              aria-label={`${prProviders[visibleProvider].label} provider`}
+              role="img"
+            />
+            <select
+              value={selectedProvider}
+              onChange={changeProvider}
+              aria-label="Pull request provider"
+              className="providerSelect"
+            >
+              {Object.entries(prProviders).map(([provider, config]) => (
+                <option key={provider} value={provider}>
+                  {config.label}
+                </option>
+              ))}
+            </select>
             <input
+              id="capturePrUrl"
               value={prUrl}
-              onChange={(event) => setPrUrl(event.target.value)}
-              placeholder="https://github.com/org/repo/pull/123"
+              onChange={changePrUrl}
+              placeholder={prProviders[selectedProvider].placeholder}
             />
             <span className="captureCheck" aria-hidden="true">✓</span>
           </div>
-        </label>
+        </div>
 
         <div className="captureDivider">
           <span />
