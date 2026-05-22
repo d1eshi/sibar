@@ -11,6 +11,12 @@ accepted specs and iterations, not by raw commit count.
 Use this section for changes that have landed but are not part of a tagged
 release yet.
 
+### Docs - Cognitive Debt Ownership Research
+
+- Added a sourced research memo for Sibi/Sibar cognitive debt, cognitive load,
+  ownership verification, metrics, Playwright/agent-flow implications,
+  Workspace escalation thresholds, and voice interaction guardrails.
+
 ### Changed - Sibi Ownership Workbench Review Guide
 
 - Made the Ownership Harness the primary desktop workspace with a wider
