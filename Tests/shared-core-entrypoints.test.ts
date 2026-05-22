@@ -4,11 +4,11 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import test from "node:test";
 
-import * as ownershipCore from "../src/ownership-core/index.ts";
-import * as pedagogyCore from "../src/pedagogy-core/index.ts";
-import * as memoryCore from "../src/memory-core/index.ts";
+import * as ownershipCore from "../engine/ownership-core/index.ts";
+import * as pedagogyCore from "../engine/pedagogy-core/index.ts";
+import * as memoryCore from "../engine/memory-core/index.ts";
 
-type CoreModulePath = "../src/ownership-core/index.ts" | "../src/pedagogy-core/index.ts" | "../src/memory-core/index.ts";
+type CoreModulePath = "../engine/ownership-core/index.ts" | "../engine/pedagogy-core/index.ts" | "../engine/memory-core/index.ts";
 
 const TEST_DIR = dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = join(TEST_DIR, "..");
@@ -67,10 +67,10 @@ test("shared core entrypoints exist and are deterministic boundary facades", () 
   assert.equal(memoryCore.MEMORY_CORE_VERSION, "0.1.0");
   assert.equal(memoryCore.MEMORY_CORE_STORE_VERSION, "memory-core@0.1.0");
 
-  expectNoSurfaceImports("../src/ownership-core/index.ts");
-  expectNoSurfaceImports("../src/pedagogy-core/index.ts");
-  expectNoSurfaceImports("../src/memory-core/index.ts");
-  expectNoSourceMissionPlanningAdapters("../src/pedagogy-core/index.ts");
+  expectNoSurfaceImports("../engine/ownership-core/index.ts");
+  expectNoSurfaceImports("../engine/pedagogy-core/index.ts");
+  expectNoSurfaceImports("../engine/memory-core/index.ts");
+  expectNoSourceMissionPlanningAdapters("../engine/pedagogy-core/index.ts");
 });
 
 test("memory core starts empty and append helpers are non-mutating", () => {

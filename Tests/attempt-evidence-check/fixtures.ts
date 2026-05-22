@@ -3,7 +3,7 @@ import type {
   ThinkingArtifact,
   EvidenceRef,
   EvidenceInventoryEntry,
-} from "../../src/runtime-deep-ownership.ts";
+} from "../../engine/runtime-deep-ownership.ts";
 
 export function makeOperation(overrides?: Partial<UserOperation>): UserOperation {
   return {

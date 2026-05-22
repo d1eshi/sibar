@@ -104,7 +104,7 @@ function roleForPath(relativePath: string): { role: EvidenceRole; source_type: E
   if (/(package\.json|tsconfig\.json|bun\.lock|pnpm-lock\.yaml|vercel\.json)$/.test(lower)) {
     return { role: "interface", source_type: "interface" };
   }
-  if (/(src\/|scripts\/|web\/)/.test(lower) || /\.(ts|tsx|js|jsx|mjs|swift|html|css)$/.test(lower)) {
+  if (/(engine\/|src\/|scripts\/|web\/)/.test(lower) || /\.(ts|tsx|js|jsx|mjs|swift|html|css)$/.test(lower)) {
     return { role: "implementation", source_type: "implementation" };
   }
   return { role: "unknown", source_type: "implementation" };
@@ -122,12 +122,13 @@ function excerpt(content: string): string {
 
 function evidencePriority(entry: EvidenceInventoryEntry): number {
   if (entry.path === "package.json" || entry.path === "README.md" || entry.path === "AGENTS.md") return 0;
-  if (entry.path.startsWith("src/")) return 1;
-  if (entry.role === "behavior_oracle") return 2;
-  if (entry.path.startsWith("web/")) return 3;
-  if (entry.path.startsWith("scripts/")) return 4;
-  if (entry.path.startsWith("docs/")) return 5;
-  if (entry.role === "interface") return 6;
+  if (entry.path.startsWith("engine/")) return 1;
+  if (entry.path.startsWith("src/")) return 2;
+  if (entry.role === "behavior_oracle") return 3;
+  if (entry.path.startsWith("web/")) return 4;
+  if (entry.path.startsWith("scripts/")) return 5;
+  if (entry.path.startsWith("docs/")) return 6;
+  if (entry.role === "interface") return 7;
   return 9;
 }
 

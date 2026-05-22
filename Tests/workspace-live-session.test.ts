@@ -5,14 +5,14 @@ import { mkdirSync, mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 
-import { handleRequest } from "../src/runtime.ts";
-import { resolveModelRunnerConfig } from "../src/runtime-agent-runner.ts";
-import type { RuntimeWorkspaceSession } from "../src/runtime-support.ts";
+import { handleRequest } from "../engine/runtime.ts";
+import { resolveModelRunnerConfig } from "../engine/runtime-agent-runner.ts";
+import type { RuntimeWorkspaceSession } from "../engine/runtime-support.ts";
 import type {
   AttemptEvaluationContract,
   WorkspaceSessionContract,
-} from "../src/runtime-workspace-session-contracts.ts";
-import { buildWorkspaceSessionContract } from "../src/runtime-workspace-session-contracts.ts";
+} from "../engine/runtime-workspace-session-contracts.ts";
+import { buildWorkspaceSessionContract } from "../engine/runtime-workspace-session-contracts.ts";
 
 type Success<T> = { ok: true; data: T };
 const LIVE_WORKSPACE_FIXTURE_PATH = resolve(
@@ -497,7 +497,7 @@ test("start-workspace-session CLI starts a live workspace session and outputs JS
     [
       "--no-warnings",
       "--experimental-strip-types",
-      resolve("src/sibi.ts"),
+      resolve("engine/sibi.ts"),
       "start-workspace-session",
       "--goal",
       "Explain this project A-Z",
@@ -538,7 +538,7 @@ test("explain CLI starts a live workspace session from a positional goal", () =>
     [
       "--no-warnings",
       "--experimental-strip-types",
-      resolve("src/sibi.ts"),
+      resolve("engine/sibi.ts"),
       "explain",
       "Explain this project A-Z",
       "--root",
@@ -573,7 +573,7 @@ test("start-workspace-session CLI requires goal", () => {
     [
       "--no-warnings",
       "--experimental-strip-types",
-      resolve("src/sibi.ts"),
+      resolve("engine/sibi.ts"),
       "start-workspace-session",
       "--root",
       root,

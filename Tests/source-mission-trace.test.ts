@@ -1,25 +1,25 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import type { SourceIntentInput } from "../src/runtime-source-mission-contracts.ts";
-import { SOURCE_MISSION_SCHEMA_VERSION } from "../src/runtime-source-mission-contracts.ts";
+import type { SourceIntentInput } from "../engine/runtime-source-mission-contracts.ts";
+import { SOURCE_MISSION_SCHEMA_VERSION } from "../engine/runtime-source-mission-contracts.ts";
 import {
   compileFrontierLabMissionFromIntent,
-} from "../src/runtime-source-mission-frontier-lab-compiler.ts";
-import type { FrontierLabMissionCompileResult } from "../src/runtime-source-mission-frontier-lab-compiler.ts";
+} from "../engine/runtime-source-mission-frontier-lab-compiler.ts";
+import type { FrontierLabMissionCompileResult } from "../engine/runtime-source-mission-frontier-lab-compiler.ts";
 import {
   FRONTIER_LAB_BLOG_URL,
   frontierLabMissionPreview,
   frontierLabSourceIntent,
-} from "../src/runtime-source-mission-frontier-lab-fixture.ts";
+} from "../engine/runtime-source-mission-frontier-lab-fixture.ts";
 import {
   buildSourceMissionTraceRecord,
   buildSourceMissionTraceRecordFromCompileResult,
   buildSourceMissionTraceRecordResult,
   SOURCE_MISSION_TRACE_DIAGNOSTIC_LIMIT,
   SOURCE_MISSION_TRACE_QUEUE_ID_LIMIT,
-} from "../src/runtime-source-mission-trace.ts";
-import type { SourceMissionTraceBuildResult, SourceMissionTraceInput } from "../src/runtime-source-mission-trace.ts";
+} from "../engine/runtime-source-mission-trace.ts";
+import type { SourceMissionTraceBuildResult, SourceMissionTraceInput } from "../engine/runtime-source-mission-trace.ts";
 
 function makeIntent(overrides: Partial<SourceIntentInput> = {}): SourceIntentInput {
   return {

@@ -4,16 +4,16 @@ import { mkdirSync, mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
-import { handleRequest } from "../src/runtime.ts";
-import type { RuntimeCodeSelection } from "../src/code-selection.ts";
-import { readState, writeState } from "../src/runtime-state.ts";
+import { handleRequest } from "../engine/runtime.ts";
+import type { RuntimeCodeSelection } from "../engine/code-selection.ts";
+import { readState, writeState } from "../engine/runtime-state.ts";
 import type {
   AutopsyStep,
   ConceptGraph,
   LearningGap,
   PracticeChallenge,
-} from "../src/runtime-support.ts";
-import type { StudyPanelSnapshot } from "../src/runtime-study-panel.ts";
+} from "../engine/runtime-support.ts";
+import type { StudyPanelSnapshot } from "../engine/runtime-study-panel.ts";
 
 type Success<T> = { ok: true; data: T };
 

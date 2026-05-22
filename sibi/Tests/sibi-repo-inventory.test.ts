@@ -9,7 +9,7 @@ import {
   classifyRepoInventoryRole,
   DETERMINISTIC_GENERATED_AT,
   repoInventory,
-} from "../../src/repo-inventory/repo-inventory.js";
+} from "../../engine/repo-inventory/repo-inventory.js";
 
 const THIS_DIR = dirname(fileURLToPath(import.meta.url));
 const SOURCE_ROOT = join(THIS_DIR, "..", "src");

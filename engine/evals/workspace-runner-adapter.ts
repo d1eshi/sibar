@@ -88,7 +88,7 @@ const SAMPLE_INPUT = {
   userAmbition: "Entender de forma acotada el flujo de arranque del runtime.",
   workspaceTitle: "Runtime Compiler Eval",
   tryingToBuildOrUnderstand: "Entender cómo arranca la ejecución de una petición.",
-  sourceInput: "src/runtime.ts",
+  sourceInput: "engine/runtime.ts",
   whyItMatters: "Quiero practicar sin inventar contexto.",
   alreadyKnow: "TypeScript, CLI commands",
   notKnowYet: "runtime boundaries, compiler runner behavior",

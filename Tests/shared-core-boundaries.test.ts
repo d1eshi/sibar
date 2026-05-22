@@ -8,7 +8,7 @@ import {
   runSharedCoreBoundariesEval,
   SHARED_CORE_BOUNDARIES_EVAL_GENERATED_AT,
   type SharedCoreBoundariesReport,
-} from "../src/evals/shared-core-boundaries.ts";
+} from "../engine/evals/shared-core-boundaries.ts";
 
 const VALID_SHARED_CORE_SPEC = `# 04: Shared Core Boundaries
 
@@ -68,10 +68,10 @@ test("shared core boundaries eval fails closed against temp repo violations", ()
   const rootDir = mkdtempSync(join(tmpdir(), "sibar-shared-core-boundaries-fixture-"));
 
   try {
-    writeFixture(rootDir, "src/ownership-core/index.ts", "import { readFileSync } from 'node:fs';\n");
-    writeFixture(rootDir, "src/pedagogy-core/index.ts", "export const ok = true;\n");
-    writeFixture(rootDir, "src/memory-core/index.ts", "import '../runtime-state.ts';\n");
-    writeFixture(rootDir, "sibi/src/ownershipReview.ts", "import type { WorkspaceIntent } from '../../src/pedagogoai/workspace-intent.ts';\n");
+    writeFixture(rootDir, "engine/ownership-core/index.ts", "import { readFileSync } from 'node:fs';\n");
+    writeFixture(rootDir, "engine/pedagogy-core/index.ts", "export const ok = true;\n");
+    writeFixture(rootDir, "engine/memory-core/index.ts", "import '../runtime-state.ts';\n");
+    writeFixture(rootDir, "sibi/src/ownershipReview.ts", "import type { WorkspaceIntent } from '../../engine/pedagogoai/workspace-intent.ts';\n");
     writeFixture(rootDir, "docs/specs/deep-ownership-workspace/04_shared_core_boundaries.md", "# Missing gates\n");
 
     const report = runSharedCoreBoundariesEval({ rootDir, reportPath: "reports/shared-core.json" });
@@ -98,9 +98,9 @@ test("shared core boundaries eval passes clean temp repo fixtures", () => {
   const rootDir = mkdtempSync(join(tmpdir(), "sibar-shared-core-boundaries-clean-"));
 
   try {
-    writeFixture(rootDir, "src/ownership-core/index.ts", "export const ownershipCore = true;\n");
-    writeFixture(rootDir, "src/pedagogy-core/index.ts", "export { ownershipCore } from '../ownership-core/index.ts';\n");
-    writeFixture(rootDir, "src/memory-core/index.ts", "export type MemoryCoreMarker = { readonly appendOnly: true };\n");
+    writeFixture(rootDir, "engine/ownership-core/index.ts", "export const ownershipCore = true;\n");
+    writeFixture(rootDir, "engine/pedagogy-core/index.ts", "export { ownershipCore } from '../ownership-core/index.ts';\n");
+    writeFixture(rootDir, "engine/memory-core/index.ts", "export type MemoryCoreMarker = { readonly appendOnly: true };\n");
     writeFixture(rootDir, "sibi/src/ownershipReview.ts", "export const reviewOwnership = () => 'ready';\n");
     writeFixture(rootDir, "docs/specs/deep-ownership-workspace/04_shared_core_boundaries.md", VALID_SHARED_CORE_SPEC);
 

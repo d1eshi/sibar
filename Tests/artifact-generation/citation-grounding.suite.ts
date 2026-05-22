@@ -5,7 +5,7 @@ import {
   type ThinkingArtifact,
   RECOGNIZED_EVIDENCE_ROLES,
   RECOGNIZED_OPERATION_KINDS,
-} from "../../src/runtime-deep-ownership.ts";
+} from "../../engine/runtime-deep-ownership.ts";
 
 import {
   generateCodeSliceArtifact,
@@ -16,7 +16,7 @@ import {
   type ArtifactClaim,
   type GeneratedNode,
   type GeneratedEdge,
-} from "../../src/runtime-artifact-generation.ts";
+} from "../../engine/runtime-artifact-generation.ts";
 import { loadFixture } from "./helpers.ts";
 
 describe("VAL-ARTIFACT-002: Artifact Citation Grounding", () => {

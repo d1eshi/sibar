@@ -80,17 +80,17 @@ const CORE_DIRS = [
   {
     id: "SCB-001-OWNERSHIP-CORE-IMPORTS" as const,
     title: "ownership-core stays free of host, surface, and adapter imports.",
-    path: "src/ownership-core",
+    path: "engine/ownership-core",
   },
   {
     id: "SCB-002-PEDAGOGY-CORE-IMPORTS" as const,
     title: "pedagogy-core stays free of host, surface, and adapter imports.",
-    path: "src/pedagogy-core",
+    path: "engine/pedagogy-core",
   },
   {
     id: "SCB-003-MEMORY-CORE-IMPORTS" as const,
     title: "memory-core stays free of host, surface, and adapter imports.",
-    path: "src/memory-core",
+    path: "engine/memory-core",
   },
 ];
 
@@ -104,17 +104,17 @@ const CORE_FORBIDDEN_IMPORTS: ForbiddenImportRule[] = [
   repoPathPattern(/^sibi\//, "Sibi is a surface and must not be imported by shared core"),
   repoPathPattern(/^web\//, "web is a surface and must not be imported by shared core"),
   repoPathPattern(/^apps\/sibar-research-workspace\//, "workspace UI is a surface"),
-  repoPathPattern(/^src\/pedagogoai\/workspace-compiler-runner/, "workspace compiler runners are adapters"),
-  repoPathPattern(/^src\/pedagogoai\/workspace-intent/, "WorkspaceIntent belongs outside shared core"),
-  repoPathPattern(/^src\/runtime-state/, "runtime state is adapter-owned"),
-  repoPathPattern(/^src\/store/, "persistence store is adapter-owned"),
-  repoPathPattern(/^src\/runtime-workspace-session/, "workspace sessions are adapter-owned"),
-  repoPathPattern(/^src\/runtime-workspace-context/, "workspace context is adapter-owned"),
-  repoPathPattern(/^src\/runtime-deep-ownership-study-artifacts/, "study artifact projection is adapter-owned"),
+  repoPathPattern(/^engine\/pedagogoai\/workspace-compiler-runner/, "workspace compiler runners are adapters"),
+  repoPathPattern(/^engine\/pedagogoai\/workspace-intent/, "WorkspaceIntent belongs outside shared core"),
+  repoPathPattern(/^engine\/runtime-state/, "runtime state is adapter-owned"),
+  repoPathPattern(/^engine\/store/, "persistence store is adapter-owned"),
+  repoPathPattern(/^engine\/runtime-workspace-session/, "workspace sessions are adapter-owned"),
+  repoPathPattern(/^engine\/runtime-workspace-context/, "workspace context is adapter-owned"),
+  repoPathPattern(/^engine\/runtime-deep-ownership-study-artifacts/, "study artifact projection is adapter-owned"),
 ];
 
 const SIBI_FORBIDDEN_IMPORTS: ForbiddenImportRule[] = [
-  repoPathPattern(/^src\/pedagogoai(?:\/|$)/, "Sibi must not import PedagogoAI workspace contracts or adapters"),
+  repoPathPattern(/^engine\/pedagogoai(?:\/|$)/, "Sibi must not import PedagogoAI workspace contracts or adapters"),
   repoPathPattern(/^apps\/sibar-research-workspace\//, "Sibi must not import the Sibar Workspace UI"),
   moduleTextPattern(/\bWorkspaceIntent\b/, "Sibi handoff must not import WorkspaceIntent"),
   modulePattern(/workspace-(?:intent-)?adapter|workspace-compiler-runner/, "Sibi must not import workspace adapters"),
@@ -276,7 +276,7 @@ function resolveImportToRepoPath(moduleSpecifier: string, absoluteFile: string, 
     return toRepoPath(rootDir, resolve(dirname(absoluteFile), moduleSpecifier));
   }
   if (
-    moduleSpecifier.startsWith("src/")
+    moduleSpecifier.startsWith("engine/")
     || moduleSpecifier.startsWith("sibi/")
     || moduleSpecifier.startsWith("apps/")
     || moduleSpecifier.startsWith("web/")

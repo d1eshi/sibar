@@ -5,8 +5,8 @@ import type {
   ThinkingArtifact,
   UserAttempt,
   UserOperation,
-} from "../../src/runtime-deep-ownership.ts";
-import { createAttempt, evaluateAttempt } from "../../src/runtime-attempt-evaluation.ts";
+} from "../../engine/runtime-deep-ownership.ts";
+import { createAttempt, evaluateAttempt } from "../../engine/runtime-attempt-evaluation.ts";
 
 export function makeEvidenceRef(overrides?: Partial<EvidenceRef>): EvidenceRef {
   return {

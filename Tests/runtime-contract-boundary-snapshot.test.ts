@@ -11,7 +11,7 @@ import {
   type ArtifactBoundary,
   type DeepOwnershipFixture,
   type DeepOwnershipLoop,
-} from "../src/runtime-deep-ownership.ts";
+} from "../engine/runtime-deep-ownership.ts";
 
 const ROOT = resolve(process.cwd());
 const FIXTURE_PATH = "evals/deep-ownership-workspace/fixtures/sibi-pedagogy-loop.json";

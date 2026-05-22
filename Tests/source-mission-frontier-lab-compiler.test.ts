@@ -1,20 +1,20 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import type { SourceIntentInput } from "../src/runtime-source-mission-contracts.ts";
-import { SOURCE_MISSION_SCHEMA_VERSION } from "../src/runtime-source-mission-contracts.ts";
+import type { SourceIntentInput } from "../engine/runtime-source-mission-contracts.ts";
+import { SOURCE_MISSION_SCHEMA_VERSION } from "../engine/runtime-source-mission-contracts.ts";
 import {
   compileFrontierLabMissionFromIntent,
-} from "../src/runtime-source-mission-frontier-lab-compiler.ts";
+} from "../engine/runtime-source-mission-frontier-lab-compiler.ts";
 import {
   FRONTIER_LAB_BLOG_URL,
   frontierLabMissionPreview,
   frontierLabSourceIntent,
   frontierLabSourceSignals,
   frontierLabSourceSlices,
-} from "../src/runtime-source-mission-frontier-lab-fixture.ts";
-import { buildFrontierLabMissionUiProjection } from "../src/runtime-source-mission-frontier-lab-ui-projection.ts";
-import { validateSourceMissionMVPFlow } from "../src/runtime-source-mission-validate.ts";
+} from "../engine/runtime-source-mission-frontier-lab-fixture.ts";
+import { buildFrontierLabMissionUiProjection } from "../engine/runtime-source-mission-frontier-lab-ui-projection.ts";
+import { validateSourceMissionMVPFlow } from "../engine/runtime-source-mission-validate.ts";
 
 function makeIntent(overrides: Partial<SourceIntentInput> = {}): SourceIntentInput {
   return {

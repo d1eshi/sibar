@@ -25,16 +25,16 @@
       "validation": "VAL-EVAL-014-shared-core-boundaries",
       "title": "Shared core boundary guardrail",
       "command": "pnpm eval:shared-core-boundaries",
-      "implementation": "src/evals/shared-core-boundaries.ts",
+      "implementation": "engine/evals/shared-core-boundaries.ts",
       "llm_execution": "disabled",
       "inputs": [
         "sibi/src"
       ],
       "documented_inputs": [
         "docs/specs/deep-ownership-workspace/04_shared_core_boundaries.md",
-        "src/ownership-core",
-        "src/pedagogy-core",
-        "src/memory-core"
+        "engine/ownership-core",
+        "engine/pedagogy-core",
+        "engine/memory-core"
       ],
       "reports": [
         "evals/shared-core-boundaries/reports/VAL-EVAL-014-shared-core-boundaries.json"

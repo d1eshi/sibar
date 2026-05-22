@@ -8,7 +8,7 @@ import {
   PEDAGOGY_CORE_COVERAGE_EVAL_GENERATED_AT,
   runPedagogyCoreCoverageEval,
   type PedagogyCoreCoverageReport,
-} from "../src/evals/pedagogy-core-coverage.ts";
+} from "../engine/evals/pedagogy-core-coverage.ts";
 
 test("pedagogy core coverage eval exercises layers, questions, signals, and pipeline directly", () => {
   const outputDir = mkdtempSync(join(tmpdir(), "sibar-pedagogy-core-coverage-eval-"));

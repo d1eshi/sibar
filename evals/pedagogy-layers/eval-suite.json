@@ -32,7 +32,7 @@
       "validation": "VAL-EVAL-002",
       "title": "Deterministic pedagogy evals",
       "command": "pnpm eval:pedagogy",
-      "implementation": "src/evals/deterministic-pedagogy.ts",
+      "implementation": "engine/evals/deterministic-pedagogy.ts",
       "llm_execution": "disabled",
       "inputs": [
         "evals/pedagogy-layers/dataset/index.json"
@@ -46,7 +46,7 @@
       "validation": "VAL-EVAL-012-pedagogy-coverage",
       "title": "Pedagogy coverage eval",
       "command": "pnpm eval:pedagogy-coverage",
-      "implementation": "src/evals/pedagogy-coverage.ts",
+      "implementation": "engine/evals/pedagogy-coverage.ts",
       "llm_execution": "disabled",
       "inputs": [
         "evals/pedagogy-layers/dataset/index.json"
@@ -60,14 +60,14 @@
       "validation": "VAL-EVAL-013-pedagogy-core-coverage",
       "title": "Pedagogy core coverage eval",
       "command": "pnpm eval:pedagogy-core-coverage",
-      "implementation": "src/evals/pedagogy-core-coverage.ts",
+      "implementation": "engine/evals/pedagogy-core-coverage.ts",
       "llm_execution": "disabled",
       "inputs": [
-        "src/pedagogy/index.ts",
-        "src/pedagogy/layers.ts",
-        "src/pedagogy/questions.ts",
-        "src/pedagogy/signals.ts",
-        "src/pedagogy/pipeline.ts"
+        "engine/pedagogy/index.ts",
+        "engine/pedagogy/layers.ts",
+        "engine/pedagogy/questions.ts",
+        "engine/pedagogy/signals.ts",
+        "engine/pedagogy/pipeline.ts"
       ],
       "reports": [
         "evals/pedagogy-layers/reports/VAL-EVAL-013-pedagogy-core-coverage.json"
@@ -78,7 +78,7 @@
       "validation": "VAL-EVAL-003",
       "title": "Pedagogy runtime trace eval",
       "command": "pnpm eval:llm-runtime-trace",
-      "implementation": "src/evals/llm-runtime-trace.ts",
+      "implementation": "engine/evals/llm-runtime-trace.ts",
       "llm_execution": "disabled",
       "inputs": [
         "evals/pedagogy-layers/dataset/index.json"

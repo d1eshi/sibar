@@ -5,7 +5,7 @@ import { mkdirSync, mkdtempSync, realpathSync, symlinkSync, writeFileSync } from
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 
-import { handleRequest } from "../src/runtime.ts";
+import { handleRequest } from "../engine/runtime.ts";
 
 function withTempHome(): void {
   process.env.SIBI_RUNTIME_HOME = mkdtempSync(join(tmpdir(), "sibar-runtime-"));

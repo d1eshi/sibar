@@ -4,14 +4,14 @@ import { mkdirSync, mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
-import { handleRequest } from "../src/runtime.ts";
+import { handleRequest } from "../engine/runtime.ts";
 import type {
   AutopsyStep,
   ConceptGraph,
   LearningGap,
   PracticeChallenge,
   UnderstandingMemory,
-} from "../src/runtime-support.ts";
+} from "../engine/runtime-support.ts";
 
 type Success<T> = { ok: true; data: T };
 

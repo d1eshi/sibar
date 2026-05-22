@@ -4,8 +4,8 @@ import { mkdirSync, mkdtempSync, realpathSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
-import { handleRequest } from "../src/runtime.ts";
-import type { AutopsyStep, ConceptGraph, EvidenceCitation } from "../src/runtime-support.ts";
+import { handleRequest } from "../engine/runtime.ts";
+import type { AutopsyStep, ConceptGraph, EvidenceCitation } from "../engine/runtime-support.ts";
 
 type Success<T> = { ok: true; data: T };
 
@@ -61,7 +61,7 @@ function createAutopsyFixture(): { root: string; src: string; tests: string; exc
   writeFileSync(join(tests, "runtime.test.ts"), [
     "import test from 'node:test';",
     "import assert from 'node:assert/strict';",
-    "import { handleRequest } from '../src/runtime.ts';",
+    "import { handleRequest } from '../engine/runtime.ts';",
     "test('runtime command boundary', () => {",
     "  assert.equal(handleRequest({ command: 'build_concept_graph', payload: {} }), undefined);",
     "});",

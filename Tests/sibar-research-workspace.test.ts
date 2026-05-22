@@ -253,8 +253,8 @@ test("second app exposes the research workspace screen contract", () => {
 
 test("create workspace intent compiles a core WorkspacePlan before opening the session", async () => {
   const workspaceModule = await import(moduleUrl);
-  assert.equal(workspaceModule.WORKSPACE_INTENT_CORE_ENTRYPOINT, "src/pedagogoai/workspace-intent.ts");
-  assert.equal(workspaceModule.WORKSPACE_INTENT_RUNNER_ENTRYPOINT, "src/pedagogoai/workspace-compiler-runner.ts");
+  assert.equal(workspaceModule.WORKSPACE_INTENT_CORE_ENTRYPOINT, "engine/pedagogoai/workspace-intent.ts");
+  assert.equal(workspaceModule.WORKSPACE_INTENT_RUNNER_ENTRYPOINT, "engine/pedagogoai/workspace-compiler-runner.ts");
   assert.equal(workspaceModule.WORKSPACE_INTENT_ADAPTER_KIND, "workspace-intent-ui-adapter");
   assert.equal(typeof workspaceModule.compileWorkspaceIntentWithRunner, "function");
 

@@ -8,7 +8,7 @@ import {
   runWorkspaceModelIOBoundaryEval,
   type WorkspaceModelIOBoundaryEvalReport,
   WORKSPACE_MODEL_IO_BOUNDARY_EVAL_GENERATED_AT,
-} from "../src/evals/workspace-model-io-boundary.ts";
+} from "../engine/evals/workspace-model-io-boundary.ts";
 
 test("Workspace model IO boundary eval covers provider-neutral parser and adapter rejection", () => {
   const outputDir = mkdtempSync(join(tmpdir(), "sibar-workspace-model-io-boundary-eval-"));

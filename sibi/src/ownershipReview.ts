@@ -1,1 +1,1 @@
-export * from "../../src/ownership-core/diff-review.ts";
+export * from "../../engine/ownership-core/diff-review.ts";

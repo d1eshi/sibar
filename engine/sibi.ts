@@ -3,10 +3,10 @@ import type { RuntimeRequest, RuntimeResponse } from "./runtime-support.ts";
 
 function printUsage(): void {
   console.log("Usage:");
-  console.log("  node --experimental-strip-types src/sibi.ts runtime < request.json");
-  console.log("  node --experimental-strip-types src/sibi.ts command '{\"command\":\"get_session_summary\",\"payload\":{}}'");
-  console.log("  node --experimental-strip-types src/sibi.ts explain \"Explain this project A-Z\" [--root /path/to/project]");
-  console.log("  node --experimental-strip-types src/sibi.ts start-workspace-session \\");
+  console.log("  node --experimental-strip-types engine/sibi.ts runtime < request.json");
+  console.log("  node --experimental-strip-types engine/sibi.ts command '{\"command\":\"get_session_summary\",\"payload\":{}}'");
+  console.log("  node --experimental-strip-types engine/sibi.ts explain \"Explain this project A-Z\" [--root /path/to/project]");
+  console.log("  node --experimental-strip-types engine/sibi.ts start-workspace-session \\");
   console.log("    --goal \"Explain this project A-Z\" --root /path/to/project \\");
   console.log("    [--codex-command auto]");
   console.log("    [--fixture-model-response-path /path/to/fixture.json]");

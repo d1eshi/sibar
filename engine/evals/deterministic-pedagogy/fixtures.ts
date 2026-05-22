@@ -52,7 +52,7 @@ export function materializeFixture(testCase: EvalCase): MaterializedFixture {
 export function evidenceFor(testCase: EvalCase, root: string): EvidenceCitation[] {
   const source = testCase.required_evidence.length > 0
     ? testCase.required_evidence
-    : [{ path: testCase.artifact_boundary.included_paths[0] ?? "src/runtime.ts", range: "fixture", expectation: "fixture" }];
+    : [{ path: testCase.artifact_boundary.included_paths[0] ?? "engine/runtime.ts", range: "fixture", expectation: "fixture" }];
   return source.slice(0, 3).map((entry, index) => ({
     file_path: resolve(root, entry.path),
     start_line: index + 1,

@@ -4,12 +4,12 @@ import {
   compileWorkspacePlanFromIntent,
   formatWorkspacePlanPreview,
   validateWorkspacePlan,
-} from "../../../src/pedagogoai/workspace-intent-runtime.js";
+} from "../../../engine/pedagogoai/workspace-intent-runtime.js";
 import { ANTI_OVERLOAD, ARC_ID, MISSION_ID } from "./workspace-data.js";
 
 export const WORKSPACE_INTENT_ADAPTER_KIND = "workspace-intent-ui-adapter";
-export const WORKSPACE_INTENT_CORE_ENTRYPOINT = "src/pedagogoai/workspace-intent.ts";
-export const WORKSPACE_INTENT_RUNNER_ENTRYPOINT = "src/pedagogoai/workspace-compiler-runner.ts";
+export const WORKSPACE_INTENT_CORE_ENTRYPOINT = "engine/pedagogoai/workspace-intent.ts";
+export const WORKSPACE_INTENT_RUNNER_ENTRYPOINT = "engine/pedagogoai/workspace-compiler-runner.ts";
 const WORKSPACE_COMPILER_ENDPOINT = "/api/workspace-intent/compiler";
 const DEFAULT_COMPILER_ADAPTER = "codex-exec";
 const FALLBACK_COMPILER_RUNNER = {
