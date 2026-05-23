@@ -16,7 +16,37 @@ import {
   projectWorkspaceSession,
 } from "./state/workspaceProjection";
 import { workspaceSessionReducer } from "./state/workspaceReducer";
-import type { MissionUiProjection } from "../../../engine/workspace/source-mission/ui-projection.ts";
+import type {
+  ActiveSessionProjection,
+  MissionUiProjection,
+} from "../../../engine/workspace/source-mission/ui-projection.ts";
+
+function listPreview(values: readonly string[], fallback: string): string {
+  if (values.length === 0) {
+    return fallback;
+  }
+
+  return values.slice(0, 3).join(", ");
+}
+
+function readinessPendingCopy(activeSession: ActiveSessionProjection) {
+  const artifactScope =
+    activeSession.artifacts.length > 0
+      ? activeSession.artifacts.map((artifact) => `${artifact.title} (${artifact.kind})`)
+      : activeSession.readiness_scope.required_artifacts;
+  const evidenceScope =
+    activeSession.operation.required_evidence.length > 0
+      ? activeSession.operation.required_evidence
+      : activeSession.readiness_scope.required_evidence;
+
+  return {
+    operation: `${activeSession.operation.kind}: ${activeSession.operation.prompt}`,
+    artifacts: listPreview(artifactScope, "No required Artifact declared yet"),
+    evidence: listPreview(evidenceScope, "No required Evidence declared yet"),
+    pending:
+      "Readiness pending: submit an Artifact/Evidence attempt for this Session operation before any readiness claim.",
+  };
+}
 
 export default function App() {
   type AppFlowStep = "home" | "onboarding" | "overview" | "session";
@@ -38,6 +68,7 @@ export default function App() {
     workspaceState,
     activeSessionFixture,
   );
+  const activeReadinessCopy = readinessPendingCopy(activeMissionProjection.active_session);
 
   function openFlowStep(nextStep: AppFlowStep) {
     setFlowStep(nextStep);
@@ -93,12 +124,13 @@ export default function App() {
             />
             {workspaceState.isReadinessPanelVisible ? (
               <aside className={stylesWorkspace.readinessPanel}>
-                <p className={stylesWorkspace.kicker}>Guide / readiness</p>
-                <h3>{workspaceProjection.selectedSource.title}</h3>
-                <p>{workspaceProjection.sessionHint}</p>
+                <p className={stylesWorkspace.kicker}>Session guide</p>
+                <h3>{activeMissionProjection.active_session.title}</h3>
+                <p>{activeReadinessCopy.pending}</p>
                 <ul>
-                  <li>One concrete artifact from the current mini-node.</li>
-                  <li>One evidence-backed conclusion.</li>
+                  <li>Operation scope: {activeReadinessCopy.operation}</li>
+                  <li>Artifact scope: {activeReadinessCopy.artifacts}</li>
+                  <li>Evidence scope: {activeReadinessCopy.evidence}</li>
                   <li>{workspaceProjection.recallStatus}</li>
                   <li>{workspaceProjection.readinessLabel}</li>
                 </ul>
@@ -112,7 +144,7 @@ export default function App() {
               </aside>
             ) : (
               <aside className={stylesWorkspace.readinessPanel}>
-                <p className={stylesWorkspace.kicker}>Guide / readiness</p>
+                <p className={stylesWorkspace.kicker}>Session guide</p>
                 <button
                   type="button"
                   className={stylesWorkspace.panelShow}

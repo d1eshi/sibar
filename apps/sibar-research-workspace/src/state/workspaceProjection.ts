@@ -79,9 +79,9 @@ export type WorkspaceHomeWorkspace = {
   whyMissionExists?: string;
   progress: string;
   nextNode: string;
-  readinessHint: string;
-  readinessPercent: number;
-  readinessLevel: string;
+  reviewConfidenceHint: string;
+  reviewConfidencePercent: number;
+  reviewConfidenceLevel: string;
   lastActivity: string;
   icon: "cluster" | "document" | "code";
   status: "active" | "ready" | "draft" | "blocked";
@@ -213,9 +213,9 @@ export function buildWorkspaceHomeProjectionFromMission(
         whyMissionExists: missionProjection.mission_brief.rationale,
         progress: queueProgressLabel(missionProjection),
         nextNode: nextSession?.title ?? missionProjection.active_session.title,
-        readinessHint: missionProjection.active_session.readiness_scope.label,
-        readinessPercent: missionProjection.mission_brief.confidence === "high" ? 72 : 48,
-        readinessLevel: missionProjection.mission_brief.confidence === "high" ? "Ready" : "Needs review",
+        reviewConfidenceHint: `Source review status from mission fixture: ${missionProjection.active_session.readiness_scope.label}. Artifact readiness is pending an attempt.`,
+        reviewConfidencePercent: missionProjection.mission_brief.confidence === "high" ? 72 : 48,
+        reviewConfidenceLevel: missionProjection.mission_brief.confidence === "high" ? "High confidence" : "Needs review",
         lastActivity: "Today",
         icon: "code",
         status: "active",
@@ -535,7 +535,7 @@ export function projectWorkspaceSession(
     nodes: fixture.nodes,
     sources: fixture.sources,
     sourceCount: fixture.sources.length,
-    readinessLabel: "Ready to mark readiness once a source claim is evidenced and one artifact is produced.",
+    readinessLabel: "Readiness is pending until an artifact or evidence attempt is submitted for this Session operation.",
     recallStatus: getRecallStatus(selectedSource.type),
   };
 }

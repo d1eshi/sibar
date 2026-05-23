@@ -83,10 +83,10 @@ export function WorkspaceHome({
                   </div>
                 </dl>
                 <div className={styles.readinessLine}>
-                  <ReadinessMeter workspace={workspace} />
+                  <ReviewConfidenceMeter workspace={workspace} />
                   <p>
-                    <strong>{workspace.readinessLevel} readiness</strong>
-                    <span>{workspace.readinessHint}</span>
+                    <strong>{workspace.reviewConfidenceLevel} source review</strong>
+                    <span>{workspace.reviewConfidenceHint}</span>
                   </p>
                 </div>
               </article>
@@ -126,8 +126,8 @@ export function WorkspaceHome({
                 </dl>
               </div>
               <div className={styles.rowReadiness}>
-                <p className={styles.kicker}>Readiness</p>
-                <ReadinessMeter workspace={workspace} />
+                <p className={styles.kicker}>Source confidence</p>
+                <ReviewConfidenceMeter workspace={workspace} />
               </div>
               <div className={styles.rowAction}>
                 <button type="button" onClick={() => onOpenWorkspace(workspace)}>
@@ -154,9 +154,12 @@ export function WorkspaceHome({
   );
 }
 
-function ReadinessMeter({ workspace }: { workspace: WorkspaceHomeWorkspace }) {
+function ReviewConfidenceMeter({ workspace }: { workspace: WorkspaceHomeWorkspace }) {
   return (
-    <span className={styles.readinessMeter} aria-label={`${workspace.readinessPercent}% readiness`}>
+    <span
+      className={styles.readinessMeter}
+      aria-label={`${workspace.reviewConfidencePercent}% source confidence`}
+    >
       <svg viewBox="0 0 40 40" aria-hidden="true">
         <circle cx="20" cy="20" r="16" />
         <circle
@@ -164,11 +167,11 @@ function ReadinessMeter({ workspace }: { workspace: WorkspaceHomeWorkspace }) {
           cy="20"
           r="16"
           pathLength={100}
-          strokeDasharray={`${workspace.readinessPercent} ${100 - workspace.readinessPercent}`}
+          strokeDasharray={`${workspace.reviewConfidencePercent} ${100 - workspace.reviewConfidencePercent}`}
         />
       </svg>
-      <strong>{workspace.readinessPercent}%</strong>
-      <em>{workspace.readinessLevel}</em>
+      <strong>{workspace.reviewConfidencePercent}%</strong>
+      <em>{workspace.reviewConfidenceLevel}</em>
     </span>
   );
 }
