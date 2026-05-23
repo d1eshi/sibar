@@ -49,6 +49,13 @@ function stringifyStore(store: WorkspaceTraceStore): string {
   return JSON.stringify(store);
 }
 
+const frontierLabPastedText = [
+  "JAX tutorials and the Scaling Book anchor the first pass.",
+  "The transformer build uses JAX, Flax, and Optax.",
+  "Chinchilla and MoE work stays deferred.",
+  "Pallas and ragged_dot define the later systems target.",
+].join(" ");
+
 test("happy path frontier-lab append records attempt, intake, compiler decision, and mission snapshot", () => {
   const input = makeIntent();
   const compiled = compileOrThrow(input);
@@ -103,6 +110,49 @@ test("unsupported URL failure is preserved as an attempt and rejected compiler d
   assert.equal(store.compiler_decisions[0].mission_id, null);
   assert.equal(store.compiler_decisions[0].reproducibility_hash, null);
   assert.equal(store.mission_snapshots.length, 0);
+});
+
+test("pasted frontier-lab text trace preserves source kind without canonical URL or raw text", () => {
+  const input = makeIntent({
+    id: "INTENT-FRONTIER-LAB-TRACE-STORE-PASTED",
+    source_input: {
+      kind: "pasted_text",
+      value: frontierLabPastedText,
+    },
+  });
+  const compiled = compileOrThrow(input);
+  const traceResult = buildSourceMissionTraceRecordFromCompileResult(compiled);
+  const store = appendSourceMissionCompileTrace(createWorkspaceTraceStore(), input, compiled, traceResult);
+  const serialized = stringifyStore(store);
+
+  assert.equal(store.intent_attempts[0].source.kind, "pasted_text");
+  assert.equal(store.intent_attempts[0].source.url, null);
+  assert.equal(store.intent_attempts[0].source.redacted_text_character_count, frontierLabPastedText.length);
+  assert.equal(store.intent_attempts[0].canonical_url, null);
+  assert.equal(store.source_intake_results[0].source_kind, "pasted_text");
+  assert.equal(store.source_intake_results[0].canonical_url, null);
+  assert.equal(serialized.includes(frontierLabPastedText), false);
+});
+
+test("insufficient pasted frontier-lab text failure records no URL fallback", () => {
+  const rawSourceText = "JAX tutorials alone are not enough.";
+  const input = makeIntent({
+    id: "INTENT-FRONTIER-LAB-TRACE-STORE-INSUFFICIENT-PASTED",
+    source_input: {
+      kind: "pasted_text",
+      value: rawSourceText,
+    },
+  });
+  const compiled = compileFrontierLabMissionFromIntent(input);
+  const store = appendSourceMissionCompileTrace(createWorkspaceTraceStore(), input, compiled);
+
+  assert.equal(compiled.ok, false);
+  assert.equal(store.intent_attempts[0].source.url, null);
+  assert.equal(store.intent_attempts[0].canonical_url, null);
+  assert.equal(
+    store.intent_attempts[0].diagnostic_codes.includes("frontier_lab.insufficient_source_markers"),
+    true,
+  );
 });
 
 test("trace build failure after compile success is retained as blocked rejected decision without throwing", () => {

@@ -2,7 +2,7 @@ import * as React from "react";
 import shellStyles from "../../App.module.css";
 import styles from "./onboarding.module.css";
 import {
-  compileFrontierLabMissionFromUrl,
+  compileFrontierLabMissionFromSource,
   type FrontierLabMissionCompileDiagnostic,
   type FrontierLabMissionCompileResult,
 } from "../../../../../engine/workspace/source-mission/frontier-lab-compiler.ts";
@@ -23,7 +23,7 @@ const fieldDefaults = {
 const onboardingCopy = {
   eyebrow: "New mission",
   heading: "What source should become a mission?",
-  intro: "Compile a supported source URL and your reason into a focused Mission Brief.",
+  intro: "Compile a supported source URL or pasted text and your reason into a focused Mission Brief.",
   cta: "Review mission",
   sectionLabel: "Mission preview",
   optionalLabel: "Optional background",
@@ -31,11 +31,11 @@ const onboardingCopy = {
   knownLabel: "What do you already know?",
   unknownLabel: "What do you not know yet?",
   desiredOutputLabel: "Desired output",
-  sourceLabel: "Source URL",
+  sourceLabel: "Source URL or pasted text",
   intentLabel: "Reason or goal",
   constraintLabel: "Constraint or reason",
   statusReady: "Mission preview is compiled from the supported frontier-lab source.",
-  statusWaiting: "Enter a source URL and reason, then review the mission.",
+  statusWaiting: "Enter a source URL or pasted text and reason, then review the mission.",
 };
 
 type FieldName = keyof typeof fieldDefaults;
@@ -187,8 +187,8 @@ function reducer(state: FlowState, action: FlowAction): FlowState {
     const values = { ...state.fields };
     const userReason = normalizeText(values.intent);
     const result = userReason
-      ? compileFrontierLabMissionFromUrl({
-          url: normalizeText(values.source),
+      ? compileFrontierLabMissionFromSource({
+          source: normalizeText(values.source),
           user_reason: userReason,
           optional_goal: normalizeText(values.desiredOutput) || undefined,
           optional_constraints: [values.constraint, values.known, values.unknown]
