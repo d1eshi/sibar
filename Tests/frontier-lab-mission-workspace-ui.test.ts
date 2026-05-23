@@ -187,6 +187,17 @@ test("Home treats mission fixture confidence as source review, not pre-attempt r
 });
 
 test("Session guide declares attempt-first pending readiness scoped to active operation evidence", () => {
+  assert.match(appSource, /from "..\/..\/..\/engine\/pedagogy-core\/index\.ts"/);
+  assert.match(appSource, /evaluateAttempt/);
+  assert.match(appSource, /attemptToReadiness/);
+  assert.match(appSource, /createAttempt/);
+  assert.match(appSource, /submitArtifactEvidenceAttempt/);
+  assert.match(appSource, /Artifact\/Evidence attempt/);
+  assert.match(appSource, /Check scoped readiness/);
+  assert.match(appSource, /Attempt-first result/);
+  assert.match(appSource, /Evidence check/);
+  assert.match(appSource, /Scoped readiness/);
+  assert.match(appSource, /Gap or repair/);
   assert.match(appSource, /Readiness pending: submit an Artifact\/Evidence attempt/);
   assert.match(appSource, /Session operation before any readiness claim/);
   assert.match(appSource, /Operation scope:/);

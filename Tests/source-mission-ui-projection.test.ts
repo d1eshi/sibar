@@ -14,6 +14,11 @@ import {
   frontierLabSourceSignals,
   frontierLabSourceSlices,
 } from "../engine/workspace/source-mission/frontier-lab-fixture.ts";
+import {
+  attemptToReadiness,
+  evaluateAttempt,
+} from "../engine/pedagogy-core/index.ts";
+import type { UserAttempt } from "../engine/pedagogy-core/index.ts";
 
 function serializedProjectionText(value: unknown): string {
   return JSON.stringify(value).toLowerCase();
@@ -230,17 +235,65 @@ test("active session uses bridge output with required evidence and one to three 
   assert.equal(projection.active_session.required_evidence.length > 0, true);
   assert.equal(projection.active_session.artifacts.length >= 1, true);
   assert.equal(projection.active_session.artifacts.length <= 3, true);
+  assert.equal(projection.active_session.concept_slice.id.length > 0, true);
+  assert.deepEqual(
+    projection.active_session.concept_slice.source_evidence,
+    projection.active_session.required_evidence,
+  );
 
   for (const evidenceId of projection.active_session.required_evidence) {
     assert.equal(inventoryIds.has(evidenceId), true);
   }
   for (const artifact of projection.active_session.artifacts) {
     assert.equal(artifact.evidence_refs.length > 0, true);
+    assert.equal(artifact.user_operation.id, projection.active_session.operation.id);
+    assert.equal(artifact.concept_slice_id, projection.active_session.concept_slice.id);
     assert.deepEqual(artifact.required_evidence, projection.active_session.required_evidence);
     for (const evidenceRef of artifact.evidence_refs) {
       assert.equal(inventoryIds.has(evidenceRef.evidence_id), true);
     }
   }
+});
+
+test("frontier-lab active session projection evaluates through public pedagogy-core facade", () => {
+  const projection = buildFrontierLabMissionUiProjection();
+  const activeSession = projection.active_session;
+  const artifact = activeSession.artifacts[0];
+  const attempt: UserAttempt = {
+    id: "ATT-FRONTIER-UI-STATIC",
+    operation_id: activeSession.operation.id,
+    answer_text: [
+      ...activeSession.operation.success_criteria,
+      ...activeSession.evidence_inventory.map((entry) => entry.excerpt),
+    ].join(" "),
+    selected_evidence: activeSession.operation.required_evidence,
+    declared_confidence: "medium",
+    declared_unknowns: [],
+    created_at: "1970-01-01T00:00:00.000Z",
+  };
+
+  const evalOutput = evaluateAttempt({
+    attempt,
+    operation: activeSession.operation,
+    artifact,
+    evidenceInventory: activeSession.evidence_inventory,
+  });
+  const readiness = attemptToReadiness({
+    loopId: `${activeSession.id}-projection-test-loop`,
+    attempt,
+    evalOutput,
+    operation: activeSession.operation,
+    artifact,
+    conceptSlice: activeSession.concept_slice,
+    evidenceInventory: activeSession.evidence_inventory,
+  });
+
+  assert.equal(readiness.evidenceStable, true);
+  assert.equal(readiness.readinessClaim.operation_id, activeSession.operation.id);
+  assert.equal(readiness.readinessClaim.concept_slice_id, activeSession.concept_slice.id);
+  assert.match(readiness.readinessClaim.scope, /declared artifact boundary/);
+  assert.doesNotMatch(readiness.readinessClaim.scope, /mission readiness/i);
+  assert.equal(activeSession.readiness_scope.scope, "active_session_operation");
 });
 
 test("next actions are two or three", () => {

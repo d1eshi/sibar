@@ -1,8 +1,10 @@
 import type {
+  ConceptSlice,
   EvidenceInventoryEntry,
   EvidenceRef,
   ThinkingArtifact,
   ThinkingArtifactKind,
+  UserOperation,
   UserOperationKind,
 } from "../../deep-ownership/index.ts";
 import { buildMissionSessionBridge } from "./bridge.ts";
@@ -117,13 +119,8 @@ export type ActiveSessionProjection = {
   track_id: string;
   title: string;
   status: ProposedSessionStatus;
-  operation: {
-    id: string;
-    kind: UserOperationKind;
-    prompt: string;
-    required_evidence: string[];
-    success_criteria: string[];
-  };
+  concept_slice: ConceptSlice;
+  operation: UserOperation;
   readiness_scope: {
     scope: "active_session_operation";
     label: string;
@@ -144,9 +141,16 @@ export type MissionArtifactProjection = {
   kind: ThinkingArtifactKind;
   title: string;
   purpose: string;
+  concept_slice_id: string;
   required_evidence: string[];
   evidence_refs: EvidenceRef[];
+  source_evidence: EvidenceRef[];
+  hidden_solution_evidence: EvidenceRef[];
+  user_operation: UserOperation;
+  renderer: ThinkingArtifactKind;
+  payload: Record<string, unknown>;
   success_criteria: string[];
+  created_at: string;
 };
 
 export type MissionSourceMapProjection = {
@@ -418,13 +422,8 @@ function buildActiveSession(input: MissionUiProjectionInput): ActiveSessionProje
     track_id: proposedSession.track_id,
     title: proposedSession.title,
     status: proposedSession.status,
-    operation: {
-      id: bridge.user_operation.id,
-      kind: bridge.user_operation.kind,
-      prompt: bridge.user_operation.prompt,
-      required_evidence: [...bridge.user_operation.required_evidence],
-      success_criteria: [...bridge.user_operation.success_criteria],
-    },
+    concept_slice: bridge.concept_slice,
+    operation: bridge.user_operation,
     readiness_scope: {
       scope: "active_session_operation",
       label: `${proposedSession.title}: ${bridge.user_operation.kind}`,
@@ -441,9 +440,16 @@ function buildActiveSession(input: MissionUiProjectionInput): ActiveSessionProje
       kind: artifact.kind,
       title: artifact.title,
       purpose: artifact.purpose,
+      concept_slice_id: artifact.concept_slice_id,
       required_evidence: [...artifact.user_operation.required_evidence],
       evidence_refs: artifact.source_evidence,
+      source_evidence: artifact.source_evidence,
+      hidden_solution_evidence: artifact.hidden_solution_evidence,
+      user_operation: artifact.user_operation,
+      renderer: artifact.renderer,
+      payload: artifact.payload,
       success_criteria: [...artifact.success_criteria],
+      created_at: artifact.created_at,
     })),
     bridge_diagnostics: bridge.diagnostics,
   };

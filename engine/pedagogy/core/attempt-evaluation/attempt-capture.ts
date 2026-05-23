@@ -1,6 +1,5 @@
-import { randomUUID } from "node:crypto";
-
 import type { UserAttempt } from "../loop-types.ts";
+import { localRandomIdSegment } from "./id.ts";
 import type { CreateAttemptInput } from "./types.ts";
 
 export function createAttempt(input: CreateAttemptInput): UserAttempt {
@@ -15,7 +14,7 @@ export function createAttempt(input: CreateAttemptInput): UserAttempt {
   }
 
   return {
-    id: `ATT-${randomUUID().slice(0, 8)}`,
+    id: `ATT-${localRandomIdSegment()}`,
     operation_id: input.operation_id,
     answer_text: input.answer_text,
     selected_evidence: Array.isArray(input.selected_evidence) ? input.selected_evidence : [],
