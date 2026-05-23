@@ -18,7 +18,7 @@ import {
   getArtifactSessionCommand,
   resolveArtifactSessionFromPayload,
 } from "./artifacts/session.ts";
-import { runProjectLearningAgentCommand } from "./runtime-agent.ts";
+import { runProjectLearningAgentCommand } from "./agent/project-learning-agent.ts";
 import { prepareAutopsyStepCommand } from "./runtime-autopsy.ts";
 import { buildConceptGraphCommand } from "./runtime-concept-graph.ts";
 import { detectLearningGapFromAnswer, persistGapDetectionResult } from "./runtime-gap-detection.ts";

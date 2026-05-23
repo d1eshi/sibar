@@ -1,13 +1,13 @@
 import { readFileSync } from "node:fs";
 
-import { assertArtifactAllowsPath } from "./artifacts/session.ts";
+import { assertArtifactAllowsPath } from "../artifacts/session.ts";
 import {
   type ArtifactSession,
   type EvidenceCitation,
   type ModelSignalCandidate,
   type ModelSignalValidation,
   type RejectedModelSignal,
-} from "./runtime-support.ts";
+} from "../runtime-support.ts";
 
 const ALLOWED_SIGNAL_TYPES = new Set([
   "concept",

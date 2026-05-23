@@ -26,7 +26,7 @@ import type {
   ModelSignalCandidate,
 } from "../../runtime-support.ts";
 import type { WorkspaceInventory } from "./context.ts";
-import type { ProjectLearningAgentResult } from "../../runtime-agent.ts";
+import type { ProjectLearningAgentResult } from "../../agent/project-learning-agent.ts";
 import { now } from "../../runtime-support.ts";
 import {
   MAX_CONCEPT_SLICE_LABEL_LENGTH,

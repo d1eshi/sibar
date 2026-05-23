@@ -4,15 +4,15 @@ import { spawnSync } from "node:child_process";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 
-import { normalizeCitation } from "./runtime-agent-validation.ts";
+import { normalizeCitation } from "./validation.ts";
 import {
   fail,
   type ArtifactSession,
   type ModelSignalCandidate,
-} from "./runtime-support.ts";
+} from "../runtime-support.ts";
 
 const AUTO_CODEX_COMMAND = "__sibi_codex_cli_auto__";
-const OUTPUT_SCHEMA_PATH = join(import.meta.dirname, "runtime-agent-output.schema.json");
+const OUTPUT_SCHEMA_PATH = join(import.meta.dirname, "output.schema.json");
 
 export type ModelRunnerConfig = {
   command: string | null;

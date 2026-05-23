@@ -6,7 +6,7 @@ import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 
 import { handleRequest } from "../engine/runtime.ts";
-import { resolveModelRunnerConfig } from "../engine/runtime-agent-runner.ts";
+import { resolveModelRunnerConfig } from "../engine/agent/runner.ts";
 import type { RuntimeWorkspaceSession } from "../engine/runtime-support.ts";
 import type {
   AttemptEvaluationContract,
