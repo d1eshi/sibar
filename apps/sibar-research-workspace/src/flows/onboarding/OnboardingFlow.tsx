@@ -51,9 +51,24 @@ type OnboardingIntent = {
 
 type MissionPlanPreview = {
   title: string;
-  nextSession: string;
-  outputs: readonly string[];
-  sourceSignals: readonly string[];
+  sourceTitle: string;
+  sourceKind: string;
+  canonicalUrl: string | null;
+  userReason: string;
+  contextMessage: string;
+  sourceSignals: readonly {
+    label: string;
+    status: string;
+  }[];
+  tracks: readonly {
+    title: string;
+    status: string;
+  }[];
+  focusedQueue: readonly {
+    title: string;
+    status: string;
+    artifactHints: readonly string[];
+  }[];
 };
 
 type FlowState = {
@@ -114,15 +129,39 @@ function compileDiagnosticsForEmptyReason(): FrontierLabMissionCompileDiagnostic
   ];
 }
 
+function formatSourceKind(value: MissionUiProjection["mission_brief"]["source_context"]["source_kind"]): string {
+  return value === "url" ? "Blog URL" : value.replaceAll("_", " ");
+}
+
 function buildPreviewFromProjection(uiProjection: MissionUiProjection): MissionPlanPreview {
-  const outputTitles = uiProjection.active_session.artifacts.map((artifact) => artifact.title);
-  const sourceSignals = uiProjection.source_map.signals.map((signal) => signal.label);
+  const sourceContext = uiProjection.mission_brief.source_context;
+  const focusedSessions = [
+    ...uiProjection.focused_queue.visible_sessions,
+    ...uiProjection.focused_queue.deferred_sessions,
+    ...uiProjection.focused_queue.locked_sessions,
+  ];
 
   return {
     title: uiProjection.mission_brief.title,
-    nextSession: uiProjection.active_session.title,
-    outputs: outputTitles.length > 0 ? outputTitles : sourceSignals.slice(0, 3),
-    sourceSignals: sourceSignals.slice(0, 3),
+    sourceTitle: sourceContext.title ?? "Untitled source",
+    sourceKind: formatSourceKind(sourceContext.source_kind),
+    canonicalUrl: sourceContext.canonical_url,
+    userReason: sourceContext.user_reason,
+    contextMessage:
+      "This preview comes from the blog source plus your reason. It is a compact Mission Brief, not a long curriculum.",
+    sourceSignals: uiProjection.source_map.signals.slice(0, 3).map((signal) => ({
+      label: signal.label,
+      status: signal.confidence,
+    })),
+    tracks: uiProjection.mission_brief.tracks.slice(0, 3).map((track) => ({
+      title: track.title,
+      status: track.status,
+    })),
+    focusedQueue: focusedSessions.slice(0, 3).map((session) => ({
+      title: session.title,
+      status: session.status,
+      artifactHints: session.artifacts.slice(0, 3).map((artifact) => artifact.title),
+    })),
   };
 }
 
@@ -327,16 +366,75 @@ function IntentPreview({
     <aside className={shellStyles.intentPreview} aria-live="polite">
       <p className={shellStyles.sectionKicker}>{onboardingCopy.sectionLabel}</p>
       <h2>{state.preview?.title ?? "No mission preview yet"}</h2>
-      <div className={shellStyles.firstSessionCallout}>
-        <span>Next session</span>
-        <strong>{state.preview?.nextSession ?? "Compile a supported source to preview the mission."}</strong>
-      </div>
-      <p className={shellStyles.muted}>Mission outputs and source signals:</p>
-      <ul className={shellStyles.itemList}>
-        {(state.preview?.outputs ?? state.preview?.sourceSignals ?? []).map((output) => (
-          <li key={output}>{output}</li>
-        ))}
-      </ul>
+      {state.preview ? (
+        <>
+          <p className={shellStyles.muted}>{state.preview.contextMessage}</p>
+          <dl className={styles.previewMeta} aria-label="Source origin">
+            <div>
+              <dt>Source title</dt>
+              <dd>{state.preview.sourceTitle}</dd>
+            </div>
+            <div>
+              <dt>Source</dt>
+              <dd>{state.preview.sourceKind}</dd>
+            </div>
+            <div>
+              <dt>Canonical URL</dt>
+              <dd>{state.preview.canonicalUrl ?? "No canonical URL supplied."}</dd>
+            </div>
+            <div>
+              <dt>User reason</dt>
+              <dd>{state.preview.userReason}</dd>
+            </div>
+          </dl>
+
+          <div className={styles.previewGrid}>
+            <section className={styles.previewSection} aria-label="Source signals">
+              <h3>Detected signals</h3>
+              <ul>
+                {state.preview.sourceSignals.map((signal) => (
+                  <li key={signal.label}>
+                    <span>{signal.label}</span>
+                    <small>{signal.status}</small>
+                  </li>
+                ))}
+              </ul>
+            </section>
+
+            <section className={styles.previewSection} aria-label="Tracks">
+              <h3>Tracks</h3>
+              <ul>
+                {state.preview.tracks.map((track) => (
+                  <li key={track.title}>
+                    <span>{track.title}</span>
+                    <small>{track.status}</small>
+                  </li>
+                ))}
+              </ul>
+            </section>
+
+            <section className={styles.previewSection} aria-label="Focused Queue">
+              <h3>Focused Queue</h3>
+              <ul>
+                {state.preview.focusedQueue.map((session) => (
+                  <li key={session.title}>
+                    <span>{session.title}</span>
+                    <small>{session.status}</small>
+                    {session.artifactHints.length > 0 ? (
+                      <em>Artifact hints: {session.artifactHints.join(", ")}</em>
+                    ) : null}
+                  </li>
+                ))}
+              </ul>
+            </section>
+          </div>
+        </>
+      ) : (
+        <div className={shellStyles.firstSessionCallout}>
+          <span>Mission context</span>
+          <strong>Compile a supported source to preview the Mission, Tracks, Sessions, and Artifacts.</strong>
+        </div>
+      )}
       <p className={`${styles.contractStatus} ${reviewReady ? styles.sessionReady : ""}`} role="status" aria-live="polite">
         {statusMessage}
       </p>

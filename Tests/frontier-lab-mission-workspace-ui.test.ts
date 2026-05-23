@@ -81,13 +81,33 @@ test("New mission flow uses the frontier-lab compiler instead of generic preview
   assert.match(onboardingSource, /user_reason: userReason/);
   assert.match(onboardingSource, /buildPreviewFromProjection/);
   assert.match(onboardingSource, /uiProjection\.mission_brief\.title/);
-  assert.match(onboardingSource, /uiProjection\.active_session\.title/);
-  assert.match(onboardingSource, /uiProjection\.active_session\.artifacts/);
+  assert.match(onboardingSource, /sourceContext\.canonical_url/);
+  assert.match(onboardingSource, /sourceContext\.user_reason/);
+  assert.match(onboardingSource, /uiProjection\.source_map\.signals\.slice\(0, 3\)/);
+  assert.match(onboardingSource, /uiProjection\.mission_brief\.tracks\.slice\(0, 3\)/);
+  assert.match(onboardingSource, /focusedSessions\.slice\(0, 3\)/);
+  assert.match(onboardingSource, /session\.artifacts\.slice\(0, 3\)/);
   assert.match(onboardingSource, /source_intent_input_user_reason/);
   assert.match(onboardingSource, /onOpenWorkspace: \(missionProjection: MissionUiProjection\) => void/);
   assert.match(onboardingSource, /state\.reviewedSignature !== null && state\.compileResult\?\.ok === true && Boolean\(state\.compileResult\.ui_projection\)/);
   assert.doesNotMatch(onboardingSource, /function makeWorkspacePreview/);
   assert.doesNotMatch(onboardingSource, /One focused session/);
+});
+
+test("New mission preview exposes bounded source context before Mission Brief opens", () => {
+  assert.match(onboardingSource, /Source origin/);
+  assert.match(onboardingSource, /Source title/);
+  assert.match(onboardingSource, /Canonical URL/);
+  assert.match(onboardingSource, /User reason/);
+  assert.match(onboardingSource, /This preview comes from the blog source plus your reason/);
+  assert.match(onboardingSource, /not a long curriculum/);
+  assert.match(onboardingSource, /Detected signals/);
+  assert.match(onboardingSource, /Tracks/);
+  assert.match(onboardingSource, /Focused Queue/);
+  assert.match(onboardingSource, /Artifact hints/);
+  assert.match(onboardingSource, /Open Mission Brief/);
+  assert.doesNotMatch(onboardingSource, /Advanced Source Map/);
+  assert.doesNotMatch(onboardingSource, /workspace inside workspace/i);
 });
 
 test("compiled custom mission reason drives UI projection, Home, and session fixture", () => {
