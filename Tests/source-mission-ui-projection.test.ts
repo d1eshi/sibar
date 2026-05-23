@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { readdirSync, readFileSync } from "node:fs";
+import { join } from "node:path";
 import test from "node:test";
 
 import { buildFrontierLabMissionUiProjection } from "../engine/workspace/source-mission/frontier-lab-ui-projection.ts";
@@ -222,6 +223,20 @@ test("generic Mission UI projection module does not import the frontier-lab fixt
 
   assert.equal(source.includes("frontier-lab-fixture"), false);
   assert.equal(source.includes("buildFrontierLabMissionUiProjection"), false);
+});
+
+test("source-mission pedagogy contracts import through public pedagogy-core facade", () => {
+  const sourceMissionDir = join(process.cwd(), "engine/workspace/source-mission");
+  const violations = readdirSync(sourceMissionDir, { withFileTypes: true })
+    .filter((entry) => entry.isFile() && entry.name.endsWith(".ts"))
+    .flatMap((entry) => {
+      const filePath = join(sourceMissionDir, entry.name);
+      const source = readFileSync(filePath, "utf8");
+      const matches = source.match(/\.\.\/\.\.\/(?:pedagogy\/core|deep-ownership)\b/g) ?? [];
+      return matches.map((match) => `${entry.name}: ${match}`);
+    });
+
+  assert.deepEqual(violations, []);
 });
 
 test("active session uses bridge output with required evidence and one to three artifacts", () => {

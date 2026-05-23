@@ -1,12 +1,12 @@
 import type {
+  ConceptSlice,
   EvidenceInventoryEntry,
   EvidenceRef,
   ThinkingArtifact,
   ThinkingArtifactKind,
   UserOperation,
   UserOperationKind,
-  ConceptSlice,
-} from "../../deep-ownership/index.ts";
+} from "../../pedagogy-core/index.ts";
 import type {
   MissionPreview,
   PedagogyInput,

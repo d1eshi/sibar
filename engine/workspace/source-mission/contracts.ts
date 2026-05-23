@@ -140,7 +140,7 @@ export type SessionSeed = {
   track_id: string;
   source_signal_ids: string[];
   source_slice_refs: string[];
-  operation: import("../../pedagogy/core/evidence-types.ts").UserOperationKind;
+  operation: import("../../pedagogy-core/index.ts").UserOperationKind;
   required_artifacts: string[];
   required_evidence: string[];
   success_criteria: string[];
@@ -150,7 +150,7 @@ export type SessionSeed = {
 
 export type PedagogyInput = {
   session_seed: SessionSeed;
-  user_attempt: import("../../pedagogy/core/loop-types.ts").UserAttempt | null;
+  user_attempt: import("../../pedagogy-core/index.ts").UserAttempt | null;
   cited_evidence: string[];
-  existing_memory?: import("../../pedagogy/core/loop/types.ts").DeepOwnershipMemory;
+  existing_memory?: import("../../pedagogy-core/index.ts").DeepOwnershipMemory;
 };
