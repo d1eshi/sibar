@@ -36,6 +36,9 @@ release yet.
   and required user reasons produce the active Mission Brief, derived Home
   projection, and session fixture while unsupported URLs stay blocked with
   diagnostics.
+- Added deterministic pasted-text support for the frontier-lab New Mission
+  compiler when the source text includes all explicit fixture markers, while
+  preserving pasted/selected source kinds and leaving ambiguous text blocked.
 - Added a bounded New Mission review preview that shows source origin, user
   reason, detected signals, Tracks, Focused Queue Sessions, and Artifact hints
   before opening the Mission Brief.

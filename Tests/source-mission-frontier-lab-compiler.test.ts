@@ -5,6 +5,7 @@ import type { SourceIntentInput } from "../engine/workspace/source-mission/contr
 import { SOURCE_MISSION_SCHEMA_VERSION } from "../engine/workspace/source-mission/contracts.ts";
 import {
   compileFrontierLabMissionFromIntent,
+  compileFrontierLabMissionFromSource,
 } from "../engine/workspace/source-mission/frontier-lab-compiler.ts";
 import {
   FRONTIER_LAB_BLOG_URL,
@@ -37,6 +38,14 @@ function assertFailureHasNoResultFields(result: ReturnType<typeof compileFrontie
   assert.equal(Object.hasOwn(result, "mission_preview"), false);
   assert.equal(Object.hasOwn(result, "ui_projection"), false);
 }
+
+const frontierLabPastedText = `
+  Practical next steps for a frontier lab loop:
+  start with the JAX tutorials and the Scaling Book.
+  Then implement a small transformer with JAX, Flax, and Optax.
+  Later derive Chinchilla dense-vs-MoE tradeoffs.
+  Finally, write a Pallas kernel that can beat ragged_dot when F is greater than D.
+`;
 
 test("canonical frontier-lab URL compiles and validates as an MVP flow", () => {
   const intent = makeIntent();
@@ -102,11 +111,85 @@ test("unsupported URL returns diagnostics without result fields", () => {
   assert.equal(result.diagnostics.some((diagnostic) => diagnostic.code === "frontier_lab.unsupported_url"), true);
 });
 
-test("non-url intent returns diagnostics without result fields", () => {
+test("pasted frontier-lab text with explicit markers compiles without inventing a canonical URL", () => {
+  const intent = makeIntent({
+    source_input: {
+      kind: "pasted_text",
+      value: frontierLabPastedText,
+    },
+  });
+  const result = compileFrontierLabMissionFromIntent(intent);
+
+  assert.equal(result.ok, true);
+  if (!result.ok) throw new Error(result.diagnostics.map((diagnostic) => diagnostic.code).join(", "));
+
+  assert.equal(result.source_intent_input.source_input.kind, "pasted_text");
+  assert.equal(result.source_intent_input.source_input.value, frontierLabPastedText);
+  assert.equal(result.source_intake_result.source_kind, "pasted_text");
+  assert.equal(result.source_intake_result.canonical_url, undefined);
+  assert.equal(result.diagnostics.some((diagnostic) => diagnostic.code === "frontier_lab.static_text_adapter"), true);
+  assert.equal(
+    result.source_intake_result.diagnostics.some((diagnostic) => diagnostic.code === "fixture.static_text_markers"),
+    true,
+  );
+});
+
+test("selected frontier-lab text with explicit markers preserves selected_text source kind", () => {
+  const result = compileFrontierLabMissionFromIntent(makeIntent({
+    source_input: {
+      kind: "selected_text",
+      value: frontierLabPastedText,
+    },
+  }));
+
+  assert.equal(result.ok, true);
+  if (!result.ok) throw new Error(result.diagnostics.map((diagnostic) => diagnostic.code).join(", "));
+
+  assert.equal(result.source_intent_input.source_input.kind, "selected_text");
+  assert.equal(result.source_intake_result.source_kind, "selected_text");
+  assert.equal(result.source_intake_result.canonical_url, undefined);
+});
+
+test("source helper infers URL and pasted frontier-lab text inputs", () => {
+  const urlResult = compileFrontierLabMissionFromSource({
+    source: `${FRONTIER_LAB_BLOG_URL}?utm_source=test`,
+    user_reason: "Use this source to build a compact frontier-lab mission.",
+  });
+  const pastedResult = compileFrontierLabMissionFromSource({
+    source: frontierLabPastedText,
+    user_reason: "Use this pasted source to build a compact frontier-lab mission.",
+  });
+
+  assert.equal(urlResult.ok, true);
+  assert.equal(pastedResult.ok, true);
+  if (!urlResult.ok || !pastedResult.ok) throw new Error("Expected both source-helper inputs to compile.");
+
+  assert.equal(urlResult.source_intent_input.source_input.kind, "url");
+  assert.equal(urlResult.source_intent_input.source_input.value, FRONTIER_LAB_BLOG_URL);
+  assert.equal(pastedResult.source_intent_input.source_input.kind, "pasted_text");
+  assert.equal(pastedResult.source_intake_result.canonical_url, undefined);
+});
+
+test("pasted text without enough frontier-lab markers returns diagnostics without result fields", () => {
   const result = compileFrontierLabMissionFromIntent(makeIntent({
     source_input: {
       kind: "pasted_text",
       value: "How to land a job at a frontier lab",
+    },
+  }));
+
+  assertFailureHasNoResultFields(result);
+  assert.equal(
+    result.diagnostics.some((diagnostic) => diagnostic.code === "frontier_lab.insufficient_source_markers"),
+    true,
+  );
+});
+
+test("file intent remains unsupported by the frontier-lab compiler", () => {
+  const result = compileFrontierLabMissionFromIntent(makeIntent({
+    source_input: {
+      kind: "file",
+      value: "frontier-lab.md",
     },
   }));
 

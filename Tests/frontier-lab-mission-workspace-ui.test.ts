@@ -10,6 +10,7 @@ import {
   workspaceHomeProjection,
 } from "../apps/sibar-research-workspace/src/state/workspaceProjection.ts";
 import {
+  compileFrontierLabMissionFromSource,
   compileFrontierLabMissionFromUrl,
 } from "../engine/workspace/source-mission/frontier-lab-compiler.ts";
 import { FRONTIER_LAB_BLOG_URL } from "../engine/workspace/source-mission/frontier-lab-fixture.ts";
@@ -33,6 +34,12 @@ const missionOverviewSource = readFileSync(
   "utf8",
 );
 const webWorkspaceHtml = readFileSync(join(root, "web/workspace.html"), "utf8");
+const frontierLabPastedText = [
+  "The practical path starts with JAX tutorials and the Scaling Book.",
+  "Build a small transformer with JAX, Flax, and Optax.",
+  "Keep Chinchilla dense-vs-MoE derivations visible.",
+  "Later write a Pallas kernel that beats ragged_dot.",
+].join(" ");
 
 test("Home uses the frontier-lab blog mission as primary instead of embeddings", () => {
   const home = buildWorkspaceHomeProjectionFromMission(frontierLabMissionUiProjection);
@@ -76,8 +83,11 @@ test("App opens Home and routes workspace opens to Mission Brief before Session"
 });
 
 test("New mission flow uses the frontier-lab compiler instead of generic preview fabrication", () => {
-  assert.match(onboardingSource, /compileFrontierLabMissionFromUrl/);
+  assert.match(onboardingSource, /compileFrontierLabMissionFromSource/);
+  assert.doesNotMatch(onboardingSource, /compileFrontierLabMissionFromUrl/);
   assert.match(onboardingSource, /FRONTIER_LAB_BLOG_URL/);
+  assert.match(onboardingSource, /Source URL or pasted text/);
+  assert.match(onboardingSource, /source: normalizeText\(values\.source\)/);
   assert.match(onboardingSource, /user_reason: userReason/);
   assert.match(onboardingSource, /buildPreviewFromProjection/);
   assert.match(onboardingSource, /uiProjection\.mission_brief\.title/);
@@ -92,6 +102,25 @@ test("New mission flow uses the frontier-lab compiler instead of generic preview
   assert.match(onboardingSource, /state\.reviewedSignature !== null && state\.compileResult\?\.ok === true && Boolean\(state\.compileResult\.ui_projection\)/);
   assert.doesNotMatch(onboardingSource, /function makeWorkspacePreview/);
   assert.doesNotMatch(onboardingSource, /One focused session/);
+});
+
+test("New mission source helper accepts pasted frontier-lab text while preserving bounded preview inputs", () => {
+  const result = compileFrontierLabMissionFromSource({
+    source: frontierLabPastedText,
+    user_reason: "Build a source-backed frontier-lab preparation plan from pasted notes.",
+  });
+
+  assert.equal(result.ok, true);
+  if (!result.ok || !result.ui_projection) {
+    throw new Error(result.diagnostics.map((diagnostic) => diagnostic.code).join(", "));
+  }
+
+  assert.equal(result.source_intent_input.source_input.kind, "pasted_text");
+  assert.equal(result.source_intake_result.source_kind, "pasted_text");
+  assert.equal(result.ui_projection.mission_brief.source_context.source_kind, "pasted_text");
+  assert.equal(result.ui_projection.mission_brief.source_context.canonical_url, null);
+  assert.equal(result.ui_projection.source_map.signals.length <= 5, true);
+  assert.equal(result.ui_projection.focused_queue.visible_sessions.length <= 3, true);
 });
 
 test("New mission preview exposes bounded source context before Mission Brief opens", () => {

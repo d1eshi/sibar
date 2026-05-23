@@ -3,6 +3,7 @@ import type {
   SourceIntentInput,
   SourceIntakeDiagnosticSeverity,
   SourceIntakeResult,
+  SourceInputKind,
   SourceSignal,
   SourceSlice,
 } from "./contracts.ts";
@@ -21,8 +22,8 @@ import type { MissionUiProjection } from "./ui-projection.ts";
 import type { validateSourceMissionMVPFlow } from "./validate.ts";
 
 type ValidateSourceMissionMVPFlow = typeof validateSourceMissionMVPFlow;
-type SourceMissionMVPFlowPayload = Parameters<ValidateSourceMissionMVPFlow>[0];
 type SourceMissionMVPFlowValidation = ReturnType<ValidateSourceMissionMVPFlow>;
+type SourceMissionMVPFlowPayload = NonNullable<SourceMissionMVPFlowValidation["value"]>;
 
 export type FrontierLabMissionCompileDiagnostic = {
   code: string;
@@ -59,6 +60,14 @@ export type FrontierLabMissionUrlInput = {
   created_at?: string;
 };
 
+export type FrontierLabMissionSourceInput = {
+  source: string;
+  user_reason: string;
+  optional_goal?: string;
+  optional_constraints?: string[];
+  created_at?: string;
+};
+
 function cloneData<T>(value: T): T {
   return JSON.parse(JSON.stringify(value)) as T;
 }
@@ -84,6 +93,31 @@ function canonicalFrontierLabBlogUrl(input: string): string | null {
   }
 
   return FRONTIER_LAB_BLOG_URL;
+}
+
+function inferSourceInputKind(source: string): "url" | "pasted_text" {
+  try {
+    const parsed = new URL(source);
+    if (parsed.protocol === "http:" || parsed.protocol === "https:") return "url";
+  } catch {
+    return "pasted_text";
+  }
+
+  return "pasted_text";
+}
+
+const frontierLabPastedTextMarkerGroups = [
+  [/jax\s+tutorials?/i],
+  [/scaling\s+book/i],
+  [/transformers?/i, /\bjax\b/i, /\bflax\b/i, /\boptax\b/i],
+  [/chinchilla/i, /\bmoe\b|mixture[-\s]?of[-\s]?experts/i],
+  [/\bpallas\b/i, /ragged_dot|ragged\s+dot/i],
+] as const;
+
+function hasFrontierLabSourceMarkers(value: string): boolean {
+  return frontierLabPastedTextMarkerGroups.every((group) =>
+    group.every((marker) => marker.test(value))
+  );
 }
 
 function compileDiagnosticsFromValidation(
@@ -154,13 +188,14 @@ function validateCompiledFlow(payload: SourceMissionMVPFlowPayload): SourceMissi
 export function compileFrontierLabMissionFromIntent(
   input: SourceIntentInput,
 ): FrontierLabMissionCompileResult {
-  if (input.source_input.kind !== "url") {
+  const sourceInputKind = input.source_input.kind;
+  if (sourceInputKind !== "url" && sourceInputKind !== "pasted_text" && sourceInputKind !== "selected_text") {
     return {
       ok: false,
       diagnostics: [
         {
           code: "frontier_lab.unsupported_source_kind",
-          message: `Frontier lab compiler only supports url inputs; received ${input.source_input.kind}.`,
+          message: `Frontier lab compiler only supports url, pasted_text, or selected_text inputs; received ${input.source_input.kind}.`,
           severity: "error",
           path: "source_input.kind",
         },
@@ -168,8 +203,10 @@ export function compileFrontierLabMissionFromIntent(
     };
   }
 
-  const canonicalUrl = canonicalFrontierLabBlogUrl(input.source_input.value);
-  if (!canonicalUrl) {
+  const canonicalUrl = sourceInputKind === "url"
+    ? canonicalFrontierLabBlogUrl(input.source_input.value)
+    : null;
+  if (sourceInputKind === "url" && !canonicalUrl) {
     return {
       ok: false,
       diagnostics: [
@@ -182,18 +219,58 @@ export function compileFrontierLabMissionFromIntent(
       ],
     };
   }
+  if ((sourceInputKind === "pasted_text" || sourceInputKind === "selected_text")
+    && !hasFrontierLabSourceMarkers(input.source_input.value)
+  ) {
+    return {
+      ok: false,
+      diagnostics: [
+        {
+          code: "frontier_lab.insufficient_source_markers",
+          message:
+            "Pasted frontier-lab source text must include explicit JAX tutorials, Scaling Book, transformer/JAX/Flax/Optax, Chinchilla/MoE, and Pallas/ragged_dot markers.",
+          severity: "error",
+          path: "source_input.value",
+        },
+      ],
+    };
+  }
 
   const sourceIntentInput: SourceIntentInput = {
     ...cloneData(input),
     source_input: {
-      kind: "url",
-      value: canonicalUrl,
+      kind: sourceInputKind,
+      value: canonicalUrl ?? input.source_input.value,
     },
   };
+  const baseSourceIntake = cloneData(frontierLabSourceIntake);
+  const sourceIntakeCanonicalUrl: Pick<SourceIntakeResult, "canonical_url"> =
+    canonicalUrl ? { canonical_url: canonicalUrl } : {};
   const sourceIntakeResult: SourceIntakeResult = {
-    ...cloneData(frontierLabSourceIntake),
-    canonical_url: canonicalUrl,
+    schema: baseSourceIntake.schema,
+    version: baseSourceIntake.version,
+    id: baseSourceIntake.id,
+    source_id: baseSourceIntake.source_id,
+    title: baseSourceIntake.title,
+    author: baseSourceIntake.author,
+    published_at: baseSourceIntake.published_at,
+    fetched_at: baseSourceIntake.fetched_at,
+    raw_text_ref: baseSourceIntake.raw_text_ref,
+    readable_text_ref: baseSourceIntake.readable_text_ref,
+    extraction_status: baseSourceIntake.extraction_status,
+    ...sourceIntakeCanonicalUrl,
+    source_kind: sourceInputKind,
     source_intent_id: sourceIntentInput.id,
+    diagnostics: [
+      {
+        code: sourceInputKind === "url" ? "fixture.source_static" : "fixture.static_text_markers",
+        message: sourceInputKind === "url"
+          ? "Static fixture built from Practical Next Steps source facts."
+          : `Static fixture accepted from ${sourceInputKind} because all frontier-lab source markers were present.`,
+        severity: "info",
+        source_ref: "frontier-lab-blog#practical-next-steps",
+      },
+    ],
   };
   const sourceSignals = cloneData(frontierLabSourceSignals);
   const sourceSlices = cloneData(frontierLabSourceSlices).map((slice) => ({
@@ -227,8 +304,10 @@ export function compileFrontierLabMissionFromIntent(
     ok: true,
     diagnostics: [
       {
-        code: "frontier_lab.static_adapter",
-        message: "Compiled deterministic frontier-lab mission from supported URL and static source facts.",
+        code: sourceInputKind === "url" ? "frontier_lab.static_adapter" : "frontier_lab.static_text_adapter",
+        message: sourceInputKind === "url"
+          ? "Compiled deterministic frontier-lab mission from supported URL and static source facts."
+          : `Compiled deterministic frontier-lab mission from ${sourceInputKind} markers and static source facts.`,
         severity: "info",
       },
     ],
@@ -239,6 +318,26 @@ export function compileFrontierLabMissionFromIntent(
     mission_preview: missionPreview,
     ui_projection: uiProjection,
   };
+}
+
+export function compileFrontierLabMissionFromSource(
+  input: FrontierLabMissionSourceInput,
+): FrontierLabMissionCompileResult {
+  const sourceInputKind: SourceInputKind = inferSourceInputKind(input.source);
+
+  return compileFrontierLabMissionFromIntent({
+    schema: "SourceIntentInput",
+    version: SOURCE_MISSION_SCHEMA_VERSION,
+    id: "INTENT-FRONTIER-LAB-BLOG-COMPILED",
+    created_at: input.created_at ?? new Date(0).toISOString(),
+    source_input: {
+      kind: sourceInputKind,
+      value: input.source,
+    },
+    user_reason: input.user_reason,
+    optional_goal: input.optional_goal,
+    optional_constraints: input.optional_constraints,
+  });
 }
 
 export function compileFrontierLabMissionFromUrl(
