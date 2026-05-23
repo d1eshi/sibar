@@ -83,6 +83,9 @@ release yet.
 - Locked the source-mission bridge tests to the public `engine/pedagogy-core`
   facade, including frontier-lab readiness coverage scoped to the active
   operation instead of the full mission.
+- Locked source-mission pedagogy contract imports to the public
+  `engine/pedagogy-core` facade, covering bridge, UI projection, and inline
+  contract types instead of direct `pedagogy/core` or `deep-ownership` imports.
 - Updated the frontier-lab React workspace UI so source fixture confidence is
   shown as source review confidence, while readiness remains pending until a
   scoped Artifact/Evidence attempt exists.

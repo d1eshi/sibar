@@ -6,7 +6,7 @@ import type {
   ThinkingArtifactKind,
   UserOperation,
   UserOperationKind,
-} from "../../deep-ownership/index.ts";
+} from "../../pedagogy-core/index.ts";
 import { buildMissionSessionBridge } from "./bridge.ts";
 import type { MissionSessionBridgeDiagnostic, MissionSessionBridgeOutput } from "./bridge.ts";
 import type {
