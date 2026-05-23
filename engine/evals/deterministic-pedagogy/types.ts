@@ -1,4 +1,4 @@
-import type { ReadinessReport } from "../../runtime-readiness.ts";
+import type { ReadinessReport } from "../../study/readiness.ts";
 
 export type EvalDatasetIndex = {
   dataset_id: string;

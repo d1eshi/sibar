@@ -1,8 +1,8 @@
 import { rmSync } from "node:fs";
 
 import { handleRequest } from "../../runtime.ts";
-import type { ArtifactSession, LearningGap, PracticeChallenge } from "../../runtime-support.ts";
-import type { ReadinessReport } from "../../runtime-readiness.ts";
+import type { ArtifactSession, LearningGap, PracticeChallenge } from "../../runtime/contracts.ts";
+import type { ReadinessReport } from "../../study/readiness.ts";
 import { classifyLayer, qualityFor } from "./classifier.ts";
 import { createBoundaryObservation, evidenceFor, materializeFixture } from "./fixtures.ts";
 import { validateModelFixture } from "./model-fixture.ts";

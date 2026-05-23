@@ -1,4 +1,4 @@
-import type { LearningGap, PracticeChallenge } from "../../runtime-support.ts";
+import type { LearningGap, PracticeChallenge } from "../../runtime/contracts.ts";
 import type { CaseObservation, CaseResult, EvalCase } from "./types.ts";
 
 export function mismatch(list: CaseResult["mismatches"], field: string, expected: unknown, actual: unknown): void {

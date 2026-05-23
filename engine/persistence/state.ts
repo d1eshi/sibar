@@ -8,7 +8,7 @@ import {
   type RuntimeSession,
   type RuntimeSessionSummary,
   type RuntimeState,
-} from "../runtime-support.ts";
+} from "../runtime/contracts.ts";
 
 export function runtimeHome(): string {
   return process.env.SIBI_RUNTIME_HOME || join(homedir(), ".sibar");

@@ -7,7 +7,7 @@ import { join, resolve } from "node:path";
 
 import { handleRequest } from "../engine/runtime.ts";
 import { resolveModelRunnerConfig } from "../engine/agent/runner.ts";
-import type { RuntimeWorkspaceSession } from "../engine/runtime-support.ts";
+import type { RuntimeWorkspaceSession } from "../engine/runtime/contracts.ts";
 import type {
   AttemptEvaluationContract,
   WorkspaceSessionContract,

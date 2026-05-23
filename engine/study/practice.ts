@@ -9,8 +9,8 @@ import {
   type PracticeChallengeDueAfter,
   type PracticeChallengeType,
   type RuntimeSuccess,
-} from "./runtime-support.ts";
-import { getArtifactSession, readState, writeState } from "./persistence/state.ts";
+} from "../runtime/contracts.ts";
+import { getArtifactSession, readState, writeState } from "../persistence/state.ts";
 
 function dueAfterFor(gap: LearningGap): PracticeChallengeDueAfter {
   switch (gap.severity) {

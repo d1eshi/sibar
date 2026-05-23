@@ -3,7 +3,7 @@ import { dirname, join, relative, resolve } from "node:path";
 import { randomUUID } from "node:crypto";
 
 import { handleRequest } from "../runtime.ts";
-import type { ModelSignalCandidate, PedagogyTrace } from "../runtime-support.ts";
+import type { ModelSignalCandidate, PedagogyTrace } from "../runtime/contracts.ts";
 import { loadEvalDataset } from "./deterministic-pedagogy/dataset.ts";
 import { materializeFixture } from "./deterministic-pedagogy/fixtures.ts";
 import type { EvalCase } from "./deterministic-pedagogy/types.ts";

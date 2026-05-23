@@ -11,7 +11,7 @@ import {
   type UnderstandingMemoryAnswer,
   type UnderstandingMemoryConcept,
   type UnderstandingMemoryReview,
-} from "../runtime-support.ts";
+} from "../runtime/contracts.ts";
 import { getArtifactSession, readState } from "../persistence/state.ts";
 
 function answerFromEvidence(answerEvidence: string[]): string {

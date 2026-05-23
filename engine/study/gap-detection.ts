@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 
-import type { AnswerQuality } from "./pedagogy/index.ts";
+import type { AnswerQuality } from "../pedagogy/index.ts";
 import {
   now,
   type ArtifactSession,
@@ -14,7 +14,7 @@ import {
   type RuntimeQuestion,
   type RuntimeSession,
   type RuntimeState,
-} from "./runtime-support.ts";
+} from "../runtime/contracts.ts";
 
 type ArtifactAnswerContext = {
   artifactSession: ArtifactSession;

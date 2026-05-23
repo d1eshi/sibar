@@ -24,10 +24,10 @@ import type {
   ArtifactSession,
   EvidenceCitation,
   ModelSignalCandidate,
-} from "../../runtime-support.ts";
+} from "../../runtime/contracts.ts";
 import type { WorkspaceInventory } from "./context.ts";
 import type { ProjectLearningAgentResult } from "../../agent/project-learning-agent.ts";
-import { now } from "../../runtime-support.ts";
+import { now } from "../../runtime/contracts.ts";
 import {
   MAX_CONCEPT_SLICE_LABEL_LENGTH,
   MAX_OPERATION_CRITERIA,

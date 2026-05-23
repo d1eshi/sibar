@@ -5,9 +5,9 @@ import type {
   LearningSignal,
   OwnershipQuestion,
   TaskType,
-} from "./pedagogy/index.ts";
-import type { RuntimeCodeSelection } from "./code-selection.ts";
-import type { DeepOwnershipLoop } from "./pedagogy/core/loop-types.ts";
+} from "../pedagogy/index.ts";
+import type { RuntimeCodeSelection } from "../code-selection.ts";
+import type { DeepOwnershipLoop } from "../pedagogy/core/loop-types.ts";
 
 export type RuntimeCommand =
   | "create_artifact_session"
@@ -280,7 +280,7 @@ export type ArtifactSession = {
   learning_gaps?: LearningGap[];
   practice_challenges?: PracticeChallenge[];
   concept_states?: Record<string, ConceptUnderstandingState>;
-  readiness_reports?: import("./runtime-readiness.ts").ReadinessReport[];
+  readiness_reports?: import("../study/readiness.ts").ReadinessReport[];
   pedagogy_traces?: PedagogyTrace[];
 };
 

@@ -11,7 +11,7 @@ import {
   type ArtifactSession,
   type RuntimeState,
   type RuntimeSuccess,
-} from "../runtime-support.ts";
+} from "../runtime/contracts.ts";
 
 function ensureArtifactSessionMap(state: RuntimeState): Record<string, ArtifactSession> {
   state.artifact_sessions ??= {};

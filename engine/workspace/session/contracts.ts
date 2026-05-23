@@ -11,7 +11,7 @@ import type {
   EvidenceRef,
   ThinkingArtifact,
 } from "../../pedagogy/core/evidence-types.ts";
-import type { RuntimeWorkspaceSession } from "../../runtime-support.ts";
+import type { RuntimeWorkspaceSession } from "../../runtime/contracts.ts";
 
 export type WorkspaceArtifactKind =
   | "code"

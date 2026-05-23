@@ -46,7 +46,7 @@ test("PedagogoAI facade reexports existing runtime pieces through stable subdoma
 
   const gapRepair = boundariesForCapability("gap-repair");
   assert.equal(gapRepair.length, 1);
-  assert.ok(gapRepair[0].adapters.includes("engine/runtime-gap-detection.ts"));
+  assert.ok(gapRepair[0].adapters.includes("engine/study/gap-detection.ts"));
   assert.ok(gapRepair[0].adapters.includes("engine/pedagogy/core/attempt-evaluation.ts"));
   assert.ok(gapRepair[0].adapters.includes("engine/pedagogy/core/loop.ts"));
 

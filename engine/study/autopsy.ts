@@ -1,8 +1,8 @@
 import { randomUUID } from "node:crypto";
 import { basename } from "node:path";
 
-import { createPreparedQuestionSession } from "./runtime-prepared-question.ts";
-import { getArtifactSession, readState, writeState } from "./persistence/state.ts";
+import { createPreparedQuestionSession } from "./prepared-question.ts";
+import { getArtifactSession, readState, writeState } from "../persistence/state.ts";
 import {
   excerptPrefix,
   fail,
@@ -15,7 +15,7 @@ import {
   type ConceptNode,
   type EvidenceCitation,
   type RuntimeSuccess,
-} from "./runtime-support.ts";
+} from "../runtime/contracts.ts";
 
 const MAX_AUTOPSY_EVIDENCE = 3;
 

@@ -12,8 +12,8 @@ import type {
   ConceptGraph,
   LearningGap,
   PracticeChallenge,
-} from "../engine/runtime-support.ts";
-import type { StudyPanelSnapshot } from "../engine/runtime-study-panel.ts";
+} from "../engine/runtime/contracts.ts";
+import type { StudyPanelSnapshot } from "../engine/study/panel.ts";
 
 type Success<T> = { ok: true; data: T };
 

@@ -9,7 +9,7 @@ import {
   fail,
   type ArtifactSession,
   type ModelSignalCandidate,
-} from "../runtime-support.ts";
+} from "../runtime/contracts.ts";
 
 const AUTO_CODEX_COMMAND = "__sibi_codex_cli_auto__";
 const OUTPUT_SCHEMA_PATH = join(import.meta.dirname, "output.schema.json");

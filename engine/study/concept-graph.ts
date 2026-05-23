@@ -1,7 +1,7 @@
 import { existsSync, readdirSync, readFileSync, realpathSync, statSync } from "node:fs";
 import { basename, extname, relative } from "node:path";
 
-import { getArtifactSession, readState, writeState } from "./persistence/state.ts";
+import { getArtifactSession, readState, writeState } from "../persistence/state.ts";
 import {
   fail,
   now,
@@ -14,7 +14,7 @@ import {
   type ConceptNodeKind,
   type EvidenceCitation,
   type RuntimeSuccess,
-} from "./runtime-support.ts";
+} from "../runtime/contracts.ts";
 
 type FileEvidence = {
   path: string;

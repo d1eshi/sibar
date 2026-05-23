@@ -8,9 +8,9 @@ import {
   type DeclaredWorkIntent,
   type DetectedGap,
   type LearningSignal,
-} from "./pedagogy/index.ts";
-import { getConceptMap, recordSignal } from "./persistence/signal-store.ts";
-import { getArtifactSession, getSession, readState, writeState } from "./persistence/state.ts";
+} from "../pedagogy/index.ts";
+import { getConceptMap, recordSignal } from "../persistence/signal-store.ts";
+import { getArtifactSession, getSession, readState, writeState } from "../persistence/state.ts";
 import {
   excerptPrefix,
   fail,
@@ -25,7 +25,7 @@ import {
   type RuntimeSession,
   type RuntimeState,
   type RuntimeSuccess,
-} from "./runtime-support.ts";
+} from "../runtime/contracts.ts";
 
 const MAX_IMMEDIATE_QUESTIONS = 3;
 const MAX_EVIDENCE_ITEMS = 3;

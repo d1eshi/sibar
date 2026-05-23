@@ -32,7 +32,7 @@ export const PEDAGOGOAI_BOUNDARIES: PedagogoAIModuleBoundary[] = [
     ],
     adapters: [
       "engine/pedagogy/index.ts",
-      "engine/runtime-support.ts",
+      "engine/runtime/contracts.ts",
       "engine/workspace/session/contracts.ts",
     ],
     track: "core-workspace",
@@ -89,7 +89,7 @@ export const PEDAGOGOAI_BOUNDARIES: PedagogoAIModuleBoundary[] = [
       "readiness reports",
     ],
     adapters: [
-      "engine/runtime-readiness.ts",
+      "engine/study/readiness.ts",
       "engine/pedagogy/core/loop.ts",
       "engine/deep-ownership/index.ts",
     ],
@@ -106,7 +106,7 @@ export const PEDAGOGOAI_BOUNDARIES: PedagogoAIModuleBoundary[] = [
       "reevaluation prompts",
     ],
     adapters: [
-      "engine/runtime-gap-detection.ts",
+      "engine/study/gap-detection.ts",
       "engine/pedagogy/core/attempt-evaluation.ts",
       "engine/pedagogy/core/loop.ts",
     ],
@@ -123,7 +123,7 @@ export const PEDAGOGOAI_BOUNDARIES: PedagogoAIModuleBoundary[] = [
     ],
     adapters: [
       "engine/memory/understanding-memory.ts",
-      "engine/runtime-practice.ts",
+      "engine/study/practice.ts",
       "engine/pedagogy/core/loop.ts",
     ],
     track: "core-workspace",
@@ -138,8 +138,8 @@ export const PEDAGOGOAI_BOUNDARIES: PedagogoAIModuleBoundary[] = [
       "live workspace session compilation",
     ],
     adapters: [
-      "engine/runtime-concept-graph.ts",
-      "engine/runtime-autopsy.ts",
+      "engine/study/concept-graph.ts",
+      "engine/study/autopsy.ts",
       "engine/workspace/session/session.ts",
       "engine/workspace/session/logic.ts",
     ],

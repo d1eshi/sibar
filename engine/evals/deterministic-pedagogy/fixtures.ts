@@ -3,7 +3,7 @@ import { dirname, join, resolve } from "node:path";
 import { randomUUID } from "node:crypto";
 
 import { assertArtifactAllowsPath } from "../../artifacts/session.ts";
-import { RuntimeError, type ArtifactSession, type EvidenceCitation } from "../../runtime-support.ts";
+import { RuntimeError, type ArtifactSession, type EvidenceCitation } from "../../runtime/contracts.ts";
 import type { BoundaryObservation, EvalCase } from "./types.ts";
 
 export type MaterializedFixture = {

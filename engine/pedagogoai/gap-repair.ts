@@ -1,4 +1,4 @@
-export type { GapDetectionResult } from "../runtime-gap-detection.ts";
+export type { GapDetectionResult } from "../study/gap-detection.ts";
 export type {
   MisconceptionMemory,
   OwnershipGap,
@@ -23,7 +23,7 @@ export {
 export {
   detectLearningGapFromAnswer,
   persistGapDetectionResult,
-} from "../runtime-gap-detection.ts";
+} from "../study/gap-detection.ts";
 export {
   captureAndEvaluate,
   classifyGapTaxonomy,

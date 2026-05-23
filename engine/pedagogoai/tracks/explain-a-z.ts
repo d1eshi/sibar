@@ -26,4 +26,4 @@ export type {
   RuntimeQuestion,
   RuntimeSession,
   RuntimeSessionSummary,
-} from "../../runtime-support.ts";
+} from "../../runtime/contracts.ts";

@@ -21,7 +21,7 @@ import {
   now,
   type ArtifactSession,
   type RuntimeWorkspaceSession,
-} from "../../runtime-support.ts";
+} from "../../runtime/contracts.ts";
 
 const DEFAULT_SKIP_DIRS = new Set([
   ".git",

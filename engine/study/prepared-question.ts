@@ -1,10 +1,10 @@
 import { randomUUID } from "node:crypto";
 
-import { Layer, type DeclaredWorkIntent, type LearningSignal } from "./pedagogy/index.ts";
-import { recordSignal } from "./persistence/signal-store.ts";
-import type { RuntimeCodeSelection } from "./code-selection.ts";
-import { readState, writeState } from "./persistence/state.ts";
-import { now, type RuntimeQuestion, type RuntimeSession, type RuntimeState } from "./runtime-support.ts";
+import { Layer, type DeclaredWorkIntent, type LearningSignal } from "../pedagogy/index.ts";
+import { recordSignal } from "../persistence/signal-store.ts";
+import type { RuntimeCodeSelection } from "../code-selection.ts";
+import { readState, writeState } from "../persistence/state.ts";
+import { now, type RuntimeQuestion, type RuntimeSession, type RuntimeState } from "../runtime/contracts.ts";
 
 export function createPreparedQuestionSession(input: {
   projectLabel: string;

@@ -60,6 +60,8 @@ release yet.
 - Grouped deep-ownership contracts, evidence, readiness, mutation, snapshot,
   validation, and study artifact modules under `engine/deep-ownership/`,
   replacing the previous flat runtime deep-ownership module naming.
+- Grouped study command adapters under `engine/study/` and shared runtime contracts
+  under `engine/runtime/contracts.ts`, leaving `engine/runtime.ts` as the dispatcher.
 - Split persisted runtime state and signal storage under `engine/persistence/`
   and moved understanding-memory orchestration under `engine/memory/`.
 - Expanded `engine/pedagogy-core/index.ts` to expose the mission

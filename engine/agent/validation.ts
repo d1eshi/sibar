@@ -7,7 +7,7 @@ import {
   type ModelSignalCandidate,
   type ModelSignalValidation,
   type RejectedModelSignal,
-} from "../runtime-support.ts";
+} from "../runtime/contracts.ts";
 
 const ALLOWED_SIGNAL_TYPES = new Set([
   "concept",
