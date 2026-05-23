@@ -9,7 +9,7 @@ import { createAttempt, evaluateAttempt } from "../../engine/pedagogy/core/attem
 import type {
   MemoryAnswerEntry,
 } from "../../engine/pedagogy/core/loop.ts";
-import type { OwnershipGap, UserOperationKind } from "../../engine/runtime-deep-ownership.ts";
+import type { OwnershipGap, UserOperationKind } from "../../engine/deep-ownership/index.ts";
 import {
   makeConceptSlice,
   makeEvidenceRef,

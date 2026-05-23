@@ -4,7 +4,7 @@ import type {
   ThinkingArtifact,
   ThinkingArtifactKind,
   UserOperationKind,
-} from "../../runtime-deep-ownership.ts";
+} from "../../deep-ownership/index.ts";
 import { buildMissionSessionBridge } from "./bridge.ts";
 import type { MissionSessionBridgeDiagnostic, MissionSessionBridgeOutput } from "./bridge.ts";
 import type {

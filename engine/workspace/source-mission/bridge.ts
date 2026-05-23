@@ -6,7 +6,7 @@ import type {
   UserOperation,
   UserOperationKind,
   ConceptSlice,
-} from "../../runtime-deep-ownership.ts";
+} from "../../deep-ownership/index.ts";
 import type {
   MissionPreview,
   PedagogyInput,

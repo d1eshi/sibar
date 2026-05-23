@@ -5,7 +5,7 @@ import { existsSync, readFileSync, statSync } from "node:fs";
 import {
   detectWeakGoal,
   routeWeakGoal,
-} from "../../runtime-deep-ownership-snapshot.ts";
+} from "../../deep-ownership/snapshot.ts";
 import type {
   DeepOwnershipLoop,
   EvidenceCheck,

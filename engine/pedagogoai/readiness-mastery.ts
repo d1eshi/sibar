@@ -17,4 +17,4 @@ export {
   createReadinessClaim,
   isRepeatedUnsupportedAnswer,
 } from "../pedagogy/core/loop.ts";
-export { validateReadinessClaim } from "../runtime-deep-ownership.ts";
+export { validateReadinessClaim } from "../deep-ownership/index.ts";

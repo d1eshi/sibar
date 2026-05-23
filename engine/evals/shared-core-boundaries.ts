@@ -109,7 +109,7 @@ const CORE_FORBIDDEN_IMPORTS: ForbiddenImportRule[] = [
   repoPathPattern(/^engine\/persistence\//, "persistence is adapter-owned"),
   repoPathPattern(/^engine\/memory\//, "understanding memory is a separate memory layer"),
   repoPathPattern(/^engine\/workspace\/session\//, "workspace sessions are adapter-owned"),
-  repoPathPattern(/^engine\/runtime-deep-ownership-study-artifacts/, "study artifact projection is adapter-owned"),
+  repoPathPattern(/^engine\/deep-ownership\/study-artifacts/, "study artifact projection is adapter-owned"),
 ];
 
 const SIBI_FORBIDDEN_IMPORTS: ForbiddenImportRule[] = [

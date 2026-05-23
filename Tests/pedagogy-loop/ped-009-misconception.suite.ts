@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 
 import { trackMisconception } from "../../engine/pedagogy/core/loop.ts";
 import type { MisconceptionMemory } from "../../engine/pedagogy/core/loop.ts";
-import type { OwnershipGap } from "../../engine/runtime-deep-ownership.ts";
+import type { OwnershipGap } from "../../engine/deep-ownership/index.ts";
 import { makeEvidenceRef } from "./fixtures.ts";
 
 describe("VAL-PED-009: Misconception memory is durable", () => {

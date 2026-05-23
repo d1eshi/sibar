@@ -10,7 +10,7 @@ import {
   RECOGNIZED_OPERATION_KINDS,
   type OwnershipGap,
   type OwnershipGapKind,
-} from "../../engine/runtime-deep-ownership.ts";
+} from "../../engine/deep-ownership/index.ts";
 import {
   evaluateShallowAttempt,
   makeConceptSlice,

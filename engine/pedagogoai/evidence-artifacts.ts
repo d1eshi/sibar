@@ -11,7 +11,7 @@ export type {
   EvidenceRef,
   EvidenceRole,
   ThinkingArtifact,
-} from "../runtime-deep-ownership.ts";
+} from "../deep-ownership/index.ts";
 export type {
   ArtifactPreviewContract,
   EvidenceContract,
@@ -36,4 +36,4 @@ export {
   validateEvidenceRef,
   validateSkipRecord,
   validateUnknownZone,
-} from "../runtime-deep-ownership.ts";
+} from "../deep-ownership/index.ts";

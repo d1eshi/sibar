@@ -73,7 +73,7 @@ export const PEDAGOGOAI_BOUNDARIES: PedagogoAIModuleBoundary[] = [
       "workspace evidence previews",
     ],
     adapters: [
-      "engine/runtime-deep-ownership.ts",
+      "engine/deep-ownership/index.ts",
       "engine/artifacts/generation.ts",
       "engine/workspace/session/contracts.ts",
     ],
@@ -91,7 +91,7 @@ export const PEDAGOGOAI_BOUNDARIES: PedagogoAIModuleBoundary[] = [
     adapters: [
       "engine/runtime-readiness.ts",
       "engine/pedagogy/core/loop.ts",
-      "engine/runtime-deep-ownership.ts",
+      "engine/deep-ownership/index.ts",
     ],
     track: "core-workspace",
   },

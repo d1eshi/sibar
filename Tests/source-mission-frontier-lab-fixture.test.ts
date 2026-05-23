@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import { evaluateAttempt } from "../engine/pedagogy/core/attempt-evaluation.ts";
-import type { UserAttempt } from "../engine/runtime-deep-ownership.ts";
+import type { UserAttempt } from "../engine/deep-ownership/index.ts";
 import { attemptToReadiness } from "../engine/pedagogy/core/loop.ts";
 import { buildMissionSessionBridge } from "../engine/workspace/source-mission/bridge.ts";
 import {

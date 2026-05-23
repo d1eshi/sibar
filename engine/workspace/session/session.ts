@@ -7,7 +7,7 @@ import { captureAndEvaluate } from "../../pedagogy/core/attempt-evaluation/captu
 import type {
   WorkspaceSnapshot,
 } from "../../pedagogy/core/loop-types.ts";
-import { projectWorkspaceSnapshot } from "../../runtime-deep-ownership-snapshot.ts";
+import { projectWorkspaceSnapshot } from "../../deep-ownership/snapshot.ts";
 import { buildWorkspaceInventory } from "./context.ts";
 import { readState, writeState } from "../../persistence/state.ts";
 import {

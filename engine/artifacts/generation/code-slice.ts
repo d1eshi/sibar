@@ -4,7 +4,7 @@ import type {
   EvidenceRef,
   ThinkingArtifact,
   UserOperationKind,
-} from "../../runtime-deep-ownership.ts";
+} from "../../deep-ownership/index.ts";
 import { detectEvidenceRoleConflicts } from "./authority.ts";
 import { resolveCreatedAt } from "./deterministic-clock.ts";
 import {

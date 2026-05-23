@@ -258,7 +258,7 @@ Do not schedule UI work before the bridge can produce an executable
 12. `engine/pedagogy/core/loop/types.ts`
 13. `engine/pedagogy/core/loop/pipeline.ts`
 14. `engine/pedagogy/core/attempt-evaluation.ts`
-15. `engine/runtime-deep-ownership.ts`
+15. `engine/deep-ownership/index.ts`
 16. `engine/workspace/source-mission/contracts.ts`
 17. `engine/workspace/source-mission/validate.ts`
 18. `engine/workspace/session/contracts.ts`

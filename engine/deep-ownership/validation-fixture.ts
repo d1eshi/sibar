@@ -1,12 +1,12 @@
 import { existsSync, readFileSync } from "node:fs";
 
-import { RECOGNIZED_OPERATION_KINDS } from "./pedagogy/core/evidence-types.ts";
+import { RECOGNIZED_OPERATION_KINDS } from "../pedagogy/core/evidence-types.ts";
 import type {
   DeepOwnershipFixture,
   ValidationIssue,
   ValidationResult,
-} from "./pedagogy/core/loop-types.ts";
-import { validateBoundaryEnforcement } from "./runtime-deep-ownership-boundary.ts";
+} from "../pedagogy/core/loop-types.ts";
+import { validateBoundaryEnforcement } from "./boundary.ts";
 import {
   issue,
   validateEvidenceEntry,
@@ -14,12 +14,12 @@ import {
   validateSkipRecord,
   validateUnknownZone,
   warning,
-} from "./runtime-deep-ownership-validation-evidence.ts";
+} from "./validation-evidence.ts";
 import {
   validateConceptSlice,
   validateReadinessClaim,
   validateThinkingArtifact,
-} from "./runtime-deep-ownership-validation-structure.ts";
+} from "./validation-structure.ts";
 
 /**
  * Comprehensive fixture validation.

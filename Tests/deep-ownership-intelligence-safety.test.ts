@@ -12,7 +12,7 @@ import {
   type ConceptSlice,
   type EvidenceInventoryEntry,
   type EvidenceRef,
-} from "../engine/runtime-deep-ownership.ts";
+} from "../engine/deep-ownership/index.ts";
 
 function makeBoundary(): ArtifactBoundary {
   return {

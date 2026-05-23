@@ -1,7 +1,7 @@
 import test, { describe } from "node:test";
 import assert from "node:assert/strict";
 
-import type { ThinkingArtifact } from "../../engine/runtime-deep-ownership.ts";
+import type { ThinkingArtifact } from "../../engine/deep-ownership/index.ts";
 import {
   generateCodeSliceArtifact,
   generateDeterministicArtifacts,

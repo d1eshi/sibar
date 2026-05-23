@@ -3,9 +3,9 @@ import {
   RECOGNIZED_OPERATION_KINDS,
   type ConceptSlice,
   type ThinkingArtifact,
-} from "./pedagogy/core/evidence-types.ts";
-import type { ReadinessClaim, ValidationIssue } from "./pedagogy/core/loop-types.ts";
-import { issue, warning } from "./runtime-deep-ownership-validation-evidence.ts";
+} from "../pedagogy/core/evidence-types.ts";
+import type { ReadinessClaim, ValidationIssue } from "../pedagogy/core/loop-types.ts";
+import { issue, warning } from "./validation-evidence.ts";
 
 /**
  * Validate the concept slice has operation-bearing structure.

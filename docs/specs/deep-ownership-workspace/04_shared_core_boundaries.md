@@ -32,8 +32,12 @@ ownership gap with evidence, scope, and a next action.
    UI code.
 4. Sibar Workspace may consume ownership, pedagogy, and memory cores through
    adapters that project them into Mission, Track, Session, and Artifact UI.
-5. Existing `runtime-*` entrypoints remain compatibility shims until imports and
-   tests have moved. No destructive rename is allowed before a shim exists.
+5. Existing `runtime-*` legacy entrypoints remain compatibility shims only when
+   there are external consumers or published compatibility contracts to protect.
+   If internal imports and tests have already moved and no external consumer is
+   identified, a layer rename or move may remove the shim in the same validated
+   slice. Do not create new shims by inertia when they would perpetuate
+   incorrect naming.
 6. New core entrypoints should re-export or wrap existing contracts first. Do
    not create a second gap, readiness, evidence, or artifact taxonomy.
 
@@ -94,8 +98,8 @@ Current code already contains most of this logic:
 4. pure deep-ownership contracts in
    `engine/pedagogy/core/evidence-types.ts`,
    `engine/pedagogy/core/loop-types.ts`,
-   `engine/runtime-deep-ownership-boundary.ts`, and
-   `engine/runtime-deep-ownership-intelligence.ts`
+   `engine/deep-ownership/boundary.ts`, and
+   `engine/deep-ownership/intelligence.ts`
 
 The first implementation should create `engine/pedagogy-core/` as an API boundary
 over existing logic. It should not introduce new versions of gap kinds,
@@ -172,7 +176,7 @@ Known adapter-heavy modules:
 2. `engine/workspace/session/*`
 3. `engine/persistence/state.ts`
 4. `engine/persistence/signal-store.ts`
-5. `engine/runtime-deep-ownership-study-artifacts.ts`
+5. `engine/deep-ownership/study-artifacts.ts`
 6. `engine/pedagogoai/workspace-compiler-runner.ts`
 7. `apps/sibar-research-workspace/scripts/workspace-intent-adapter.js`
 
@@ -307,7 +311,7 @@ pnpm test -- Tests/source-mission-contracts.test.ts
 Do not prune these until the corresponding core entrypoint, shim, and tests are
 stable:
 
-1. `engine/runtime-deep-ownership.ts`
+1. `engine/deep-ownership/index.ts`
 2. `engine/pedagogy/core/loop.ts`
 3. `engine/pedagogy/core/attempt-evaluation.ts`
 4. `engine/memory/understanding-memory.ts`

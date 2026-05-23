@@ -11,9 +11,9 @@ export const DEEP_OWNERSHIP_TRACK = {
   ],
 } as const;
 
-export * from "../../runtime-deep-ownership.ts";
-export * from "../../runtime-deep-ownership-command-safety.ts";
-export * from "../../runtime-deep-ownership-intelligence.ts";
-export * from "../../runtime-deep-ownership-mutation-editor.ts";
-export * from "../../runtime-deep-ownership-snapshot.ts";
+export * from "../../deep-ownership/index.ts";
+export * from "../../deep-ownership/command-safety.ts";
+export * from "../../deep-ownership/intelligence.ts";
+export * from "../../deep-ownership/mutation-editor.ts";
+export * from "../../deep-ownership/snapshot.ts";
 export * from "../../pedagogy/core/loop.ts";
