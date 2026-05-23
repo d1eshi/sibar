@@ -424,7 +424,7 @@ release yet.
 ### Added - Slice Final Sibi Ownership-Review Wedge
 
 - Converted `sibi/src/ownershipReview.ts` into a direct re-export shim of
-  `src/ownership-core/diff-review.ts` to keep Sibi and core review contracts in
+  `engine/ownership-core/diff-review.ts` to keep Sibi and core review contracts in
   parity by default.
 - Updated `sibi/README.md` and added `sibi/docs/ownership-wedge.md` to document
   the wedge flow (input, goal, gaps, evidence/tests, read path, status),
@@ -458,11 +458,11 @@ release yet.
 
 ### Added - Slice 2 Shared Core Entrypoints
 
-- Added `src/ownership-core/index.ts` as a minimal ownership boundary shim with
+- Added `engine/ownership-core/index.ts` as a minimal ownership boundary shim with
   copyable contract types and explicit extraction-ownership metadata.
-- Added `src/pedagogy-core/index.ts` as a deterministic facade over existing
+- Added `engine/pedagogy-core/index.ts` as a deterministic facade over existing
   pedagogy runtime contracts and functions.
-- Added `src/memory-core/index.ts` with an append-only `MemoryStore`, subject and
+- Added `engine/memory-core/index.ts` with an append-only `MemoryStore`, subject and
   evidence/attempt/gap/repair/review/transfer/artifact/event structures, and pure
   helper functions for immutable updates.
 - Added `Tests/shared-core-entrypoints.test.ts` to validate entrypoint availability,
@@ -470,7 +470,7 @@ release yet.
 
 ### Added - Slice 3 Memory Core Invariants
 
-- Added pure consistency checks for `MemoryStore` in `src/memory-core/index.ts`
+- Added pure consistency checks for `MemoryStore` in `engine/memory-core/index.ts`
   (`getMemoryStoreProblems` + `validateMemoryStore`), including subject,
   attempt, gap, and transfer reference invariants.
 - Added `Tests/memory-core.test.ts` with happy-path, missing-subject, missing-
@@ -481,9 +481,9 @@ release yet.
 ### Added - Slice 4 Ownership Review Deterministic Core Extraction
 
 - Extracted `sibi/src/ownershipReview.ts` heuristics into
-  `src/ownership-core/diff-review.ts` as a deterministic, import-safe core module
+  `engine/ownership-core/diff-review.ts` as a deterministic, import-safe core module
   with unchanged `reviewOwnership` behavior and typed outputs.
-- Added ownership review exports to `src/ownership-core/index.ts` and updated
+- Added ownership review exports to `engine/ownership-core/index.ts` and updated
   `OWNERSHIP_REVIEW_EXTRACTION_STATE.status` to `available`, with `ownedBySlice`
   set to `slice-4`.
 - Added `Tests/ownership-core.test.ts` and updated `sibi/Tests/sibi-ownership-review.test.ts`

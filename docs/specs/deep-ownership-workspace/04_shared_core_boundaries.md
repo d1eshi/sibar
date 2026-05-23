@@ -66,7 +66,7 @@ Current source of truth to promote first:
 2. `sibi/Tests/sibi-ownership-review.test.ts`
 
 The first extraction should move this deterministic review logic into
-`src/ownership-core/` and leave `sibi/src/ownershipReview.ts` as a shim. Do not
+`engine/ownership-core/` and leave `sibi/src/ownershipReview.ts` as a shim. Do not
 merge it immediately with deep-ownership `EvidenceRef` or `ArtifactBoundary`;
 those contracts belong to the deeper loop and can be bridged later.
 
@@ -236,7 +236,7 @@ output must preserve these gates:
 
 Create core entrypoints as wrappers or re-exports:
 
-1. `src/ownership-core/index.ts`
+1. `engine/ownership-core/index.ts`
 2. `engine/pedagogy-core/index.ts`
 
 Do not move logic yet. Do not delete legacy runtime entrypoints.
@@ -253,7 +253,7 @@ Add a small import-boundary test before relying on the new entrypoints.
 
 ### Slice 2: Ownership Review Extraction
 
-Move deterministic Sibi ownership review logic into `src/ownership-core/` and
+Move deterministic Sibi ownership review logic into `engine/ownership-core/` and
 leave `sibi/src/ownershipReview.ts` as a compatibility shim.
 
 Coordinate this slice with any active agent touching `sibi/`.
@@ -280,7 +280,7 @@ pnpm eval:pedagogy-core-coverage
 
 ### Slice 4: Memory Core Contract
 
-Add `src/memory-core/` with event types, append helpers, and mappers from current
+Add `engine/memory-core/` with event types, append helpers, and mappers from current
 runtime structures. Do not change public commands in this slice.
 
 Verification:
