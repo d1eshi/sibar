@@ -4,16 +4,16 @@ import {
   loadFixtureModelOutput,
   resolveModelRunnerConfig,
   runConfiguredCodexRunner,
-} from "./runtime-agent-runner.ts";
-import { validateModelSignalCandidates } from "./runtime-agent-validation.ts";
-import { getArtifactSession, readState, writeState } from "./persistence/state.ts";
+} from "./runner.ts";
+import { validateModelSignalCandidates } from "./validation.ts";
+import { getArtifactSession, readState, writeState } from "../persistence/state.ts";
 import {
   now,
   toOperationState,
   type ArtifactSession,
   type PedagogyTrace,
   type RuntimeSuccess,
-} from "./runtime-support.ts";
+} from "../runtime-support.ts";
 
 export type ProjectLearningAgentResult = {
   status: "completed" | "blocked";

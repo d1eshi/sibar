@@ -56,6 +56,7 @@ release yet.
   logic under `engine/workspace/session/`.
 - Grouped artifact session and deterministic artifact generation modules under
   `engine/artifacts/`, replacing the flat `runtime-artifact-*` runtime naming.
+- Grouped project learning agent runner and validation modules under `engine/agent/`.
 - Grouped deep-ownership contracts, evidence, readiness, mutation, snapshot,
   validation, and study artifact modules under `engine/deep-ownership/`,
   replacing the previous flat runtime deep-ownership module naming.
