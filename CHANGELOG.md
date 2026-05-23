@@ -49,12 +49,18 @@ release yet.
 - Added a pure append-only workspace trace store for source-mission compile
   attempts, preserving completed, blocked, and failed source-intent attempts with
   bounded intake summaries, compiler decisions, and mission snapshots.
+- Added the first deterministic React Session -> Artifact/Evidence attempt ->
+  scoped readiness loop for the frontier-lab active session, backed by the public
+  `pedagogy-core` facade and bridge-projected concept slice data.
 
 ### Changed - Pedagogy Core Facade
 
 - Renamed the top-level TypeScript runtime tree from `src/` to `engine/` and
   updated runtime scripts, imports, Swift lookup, and eval metadata to use the
   new engine root.
+- Removed Node-only `crypto` imports from attempt capture/evaluation and loop
+  readiness IDs so the public pedagogy facade can be imported by the Vite React
+  workspace without adding browser polyfills.
 - Split the source-driven workspace mission modules under
   `engine/workspace/source-mission/` and moved source-mission workspace traces
   under `engine/workspace/traces/source-mission/`.

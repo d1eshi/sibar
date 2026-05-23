@@ -1,5 +1,3 @@
-import { randomUUID } from "node:crypto";
-
 import type {
   EvidenceCheck,
   EvidenceCheckResult,
@@ -7,6 +5,7 @@ import type {
   EvidenceRef,
 } from "../loop-types.ts";
 import { classifyGapTaxonomy } from "./gap-taxonomy.ts";
+import { localRandomIdSegment } from "./id.ts";
 import { extractArtifactTerminology, extractKeywords, isTechnicalTerm, scoreKeywordMatch } from "./text-helpers.ts";
 import type { EvaluateAttemptInput, EvaluateAttemptOutput } from "./types.ts";
 
@@ -106,7 +105,7 @@ export function evaluateAttempt(input: EvaluateAttemptInput): EvaluateAttemptOut
   ];
 
   const evidenceCheck: EvidenceCheck = {
-    id: `EC-${randomUUID().slice(0, 8)}`,
+    id: `EC-${localRandomIdSegment()}`,
     attempt_id: attempt.id,
     required_claims: criteria,
     observed_claims: observedClaims,
