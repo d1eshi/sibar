@@ -2,7 +2,7 @@
  * Deterministic Thinking Artifact Generation
  *
  * Split into cohesive modules to keep artifact generation maintainable while
- * preserving the public runtime-artifact-generation API surface.
+ * preserving the public artifacts/generation API surface.
  */
 
 export type {
@@ -12,32 +12,32 @@ export type {
   GeneratedNode,
   GeneratedEdge,
   ArtifactGenerationOptions,
-} from "./runtime-artifact-generation/types.ts";
+} from "./generation/types.ts";
 
 export {
   AUTHORITY_RANK,
   resolveEvidenceAuthority,
   detectEvidenceRoleConflicts,
-} from "./runtime-artifact-generation/authority.ts";
+} from "./generation/authority.ts";
 
 export {
   isClaimUncited,
   markInferred,
   markUnknown,
-} from "./runtime-artifact-generation/claim-helpers.ts";
+} from "./generation/claim-helpers.ts";
 
 export {
   validateArtifactCitations,
-} from "./runtime-artifact-generation/citation-validation.ts";
+} from "./generation/citation-validation.ts";
 
 export {
   generateCodeSliceArtifact,
-} from "./runtime-artifact-generation/code-slice.ts";
+} from "./generation/code-slice.ts";
 
 export {
   generateFlowDiagramArtifact,
-} from "./runtime-artifact-generation/flow-diagram.ts";
+} from "./generation/flow-diagram.ts";
 
 export {
   generateDeterministicArtifacts,
-} from "./runtime-artifact-generation/generate-deterministic-artifacts.ts";
+} from "./generation/generate-deterministic-artifacts.ts";

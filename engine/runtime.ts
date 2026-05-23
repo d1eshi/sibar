@@ -17,7 +17,7 @@ import {
   createArtifactSessionCommand,
   getArtifactSessionCommand,
   resolveArtifactSessionFromPayload,
-} from "./runtime-artifact-session.ts";
+} from "./artifacts/session.ts";
 import { runProjectLearningAgentCommand } from "./runtime-agent.ts";
 import { prepareAutopsyStepCommand } from "./runtime-autopsy.ts";
 import { buildConceptGraphCommand } from "./runtime-concept-graph.ts";

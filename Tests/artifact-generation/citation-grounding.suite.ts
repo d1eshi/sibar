@@ -16,7 +16,7 @@ import {
   type ArtifactClaim,
   type GeneratedNode,
   type GeneratedEdge,
-} from "../../engine/runtime-artifact-generation.ts";
+} from "../../engine/artifacts/generation.ts";
 import { loadFixture } from "./helpers.ts";
 
 describe("VAL-ARTIFACT-002: Artifact Citation Grounding", () => {

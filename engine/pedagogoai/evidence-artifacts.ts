@@ -5,7 +5,7 @@ export type {
   CitationValidationResult,
   GeneratedEdge,
   GeneratedNode,
-} from "../runtime-artifact-generation.ts";
+} from "../artifacts/generation.ts";
 export type {
   EvidenceInventoryEntry,
   EvidenceRef,
@@ -29,7 +29,7 @@ export {
   markUnknown,
   resolveEvidenceAuthority,
   validateArtifactCitations,
-} from "../runtime-artifact-generation.ts";
+} from "../artifacts/generation.ts";
 export {
   validateEvidenceEntry,
   validateEvidenceId,

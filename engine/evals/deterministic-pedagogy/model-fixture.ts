@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto";
-import { assertArtifactAllowsPath } from "../../runtime-artifact-session.ts";
+import { assertArtifactAllowsPath } from "../../artifacts/session.ts";
 import type { ArtifactSession, LearningGap } from "../../runtime-support.ts";
 import type { BoundaryObservation, EvalCase } from "./types.ts";
 

@@ -2,7 +2,7 @@ import type {
   EvidenceInventoryEntry,
   EvidenceRef,
   ThinkingArtifact,
-} from "../runtime-deep-ownership.ts";
+} from "../../runtime-deep-ownership.ts";
 import type { CitationValidationResult } from "./types.ts";
 
 type PayloadCitationCarrier = {

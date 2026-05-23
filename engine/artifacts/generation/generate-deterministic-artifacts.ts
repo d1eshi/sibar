@@ -1,4 +1,4 @@
-import type { DeepOwnershipFixture, ThinkingArtifact } from "../runtime-deep-ownership.ts";
+import type { DeepOwnershipFixture, ThinkingArtifact } from "../../runtime-deep-ownership.ts";
 import type { ArtifactGenerationOptions } from "./types.ts";
 import { generateCodeSliceArtifact } from "./code-slice.ts";
 import { generateFlowDiagramArtifact } from "./flow-diagram.ts";

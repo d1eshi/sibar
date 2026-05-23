@@ -13,7 +13,7 @@ import {
   generateCodeSliceArtifact,
   generateDeterministicArtifacts,
   validateArtifactCitations,
-} from "../engine/runtime-artifact-generation.ts";
+} from "../engine/artifacts/generation.ts";
 
 const FIXTURE_PATH = "evals/deep-ownership-workspace/fixtures/sibi-pedagogy-loop.json";
 
