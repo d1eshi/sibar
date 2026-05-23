@@ -8,9 +8,9 @@ import {
   type PracticeChallenge,
   type RuntimeSuccess,
   type UnderstandingMemoryConcept,
-} from "./runtime-support.ts";
-import { buildUnderstandingMemory } from "./memory/understanding-memory.ts";
-import { getArtifactSession, readState, writeState } from "./persistence/state.ts";
+} from "../runtime/contracts.ts";
+import { buildUnderstandingMemory } from "../memory/understanding-memory.ts";
+import { getArtifactSession, readState, writeState } from "../persistence/state.ts";
 
 type ReadinessLevel =
   | "ready to inspect"

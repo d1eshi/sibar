@@ -1,7 +1,7 @@
-import { buildUnderstandingMemory } from "./memory/understanding-memory.ts";
-import { buildReadinessReport, type ReadinessReport } from "./runtime-readiness.ts";
-import { getArtifactSession, readState } from "./persistence/state.ts";
-import type { RuntimeCodeSelection } from "./code-selection.ts";
+import { buildUnderstandingMemory } from "../memory/understanding-memory.ts";
+import { buildReadinessReport, type ReadinessReport } from "./readiness.ts";
+import { getArtifactSession, readState } from "../persistence/state.ts";
+import type { RuntimeCodeSelection } from "../code-selection.ts";
 import {
   now,
   toOperationState,
@@ -15,7 +15,7 @@ import {
   type RuntimeState,
   type RuntimeSuccess,
   type UnderstandingMemory,
-} from "./runtime-support.ts";
+} from "../runtime/contracts.ts";
 
 export type StudyPanelEvidenceEntry = EvidenceCitation & {
   evidence_id: string;

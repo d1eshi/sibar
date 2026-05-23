@@ -5,8 +5,8 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 
 import { handleRequest } from "../engine/runtime.ts";
-import type { AutopsyStep, ConceptGraph, LearningGap, PracticeChallenge } from "../engine/runtime-support.ts";
-import type { ReadinessReport } from "../engine/runtime-readiness.ts";
+import type { AutopsyStep, ConceptGraph, LearningGap, PracticeChallenge } from "../engine/runtime/contracts.ts";
+import type { ReadinessReport } from "../engine/study/readiness.ts";
 
 type Success<T> = { ok: true; data: T };
 

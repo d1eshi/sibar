@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { assertArtifactAllowsPath } from "../../artifacts/session.ts";
-import type { ArtifactSession, LearningGap } from "../../runtime-support.ts";
+import type { ArtifactSession, LearningGap } from "../../runtime/contracts.ts";
 import type { BoundaryObservation, EvalCase } from "./types.ts";
 
 export function validateModelFixture(testCase: EvalCase, artifactSession: ArtifactSession): {

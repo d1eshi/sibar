@@ -2,7 +2,7 @@ import { randomUUID } from "node:crypto";
 import { join } from "node:path";
 
 import { readState, writeState } from "../../persistence/state.ts";
-import type { AutopsyStep, ConceptGraph, EvidenceCitation, RuntimeQuestion, RuntimeSession } from "../../runtime-support.ts";
+import type { AutopsyStep, ConceptGraph, EvidenceCitation, RuntimeQuestion, RuntimeSession } from "../../runtime/contracts.ts";
 import { classifyLayer } from "./classifier.ts";
 import type { EvalCase } from "./types.ts";
 

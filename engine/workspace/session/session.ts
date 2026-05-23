@@ -27,7 +27,7 @@ import {
   makeReadinessClaim,
   resolveDefaultExcludedPaths,
 } from "./logic.ts";
-import { fail, now, toOperationState, type RuntimeSuccess, type RuntimeWorkspaceSession } from "../../runtime-support.ts";
+import { fail, now, toOperationState, type RuntimeSuccess, type RuntimeWorkspaceSession } from "../../runtime/contracts.ts";
 import { runProjectLearningAgentCommand as runAgent } from "../../agent/project-learning-agent.ts";
 import {
   DEFAULT_EXCLUDED_PATHS,

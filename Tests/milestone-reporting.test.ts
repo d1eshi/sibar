@@ -3,7 +3,7 @@ import { mkdirSync, mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import test from "node:test";
-import { buildMissionMilestoneReports } from "../engine/runtime-milestone-reporting.ts";
+import { buildMissionMilestoneReports } from "../engine/workspace/milestones/reporting.ts";
 
 function writeJson(path: string, value: unknown) {
   writeFileSync(path, `${JSON.stringify(value, null, 2)}\n`);

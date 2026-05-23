@@ -56,7 +56,7 @@ export type {
   RuntimeQuestion,
   RuntimeSession,
   UnderstandingMemory,
-} from "../runtime-support.ts";
+} from "../runtime/contracts.ts";
 export type {
   AttemptEvaluationContract,
   EvidenceContract,

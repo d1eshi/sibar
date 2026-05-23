@@ -13,7 +13,7 @@ import {
   type ArtifactSession,
   type PedagogyTrace,
   type RuntimeSuccess,
-} from "../runtime-support.ts";
+} from "../runtime/contracts.ts";
 
 export type ProjectLearningAgentResult = {
   status: "completed" | "blocked";

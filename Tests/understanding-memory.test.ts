@@ -11,7 +11,7 @@ import type {
   LearningGap,
   PracticeChallenge,
   UnderstandingMemory,
-} from "../engine/runtime-support.ts";
+} from "../engine/runtime/contracts.ts";
 
 type Success<T> = { ok: true; data: T };
 

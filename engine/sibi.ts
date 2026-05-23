@@ -1,5 +1,5 @@
 import { handleRequest, runFromSTDIO } from "./runtime.ts";
-import type { RuntimeRequest, RuntimeResponse } from "./runtime-support.ts";
+import type { RuntimeRequest, RuntimeResponse } from "./runtime/contracts.ts";
 
 function printUsage(): void {
   console.log("Usage:");

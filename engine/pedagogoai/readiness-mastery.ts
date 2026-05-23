@@ -1,4 +1,4 @@
-export type { ReadinessReport } from "../runtime-readiness.ts";
+export type { ReadinessReport } from "../study/readiness.ts";
 export type {
   DeepOwnershipMemory,
   MemoryAnswerEntry,
@@ -9,7 +9,7 @@ export type {
 export {
   buildReadinessReport,
   readinessReportCommand,
-} from "../runtime-readiness.ts";
+} from "../study/readiness.ts";
 export {
   advanceReadinessAfterReevaluation,
   attemptToReadiness,

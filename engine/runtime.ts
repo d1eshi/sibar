@@ -19,16 +19,16 @@ import {
   resolveArtifactSessionFromPayload,
 } from "./artifacts/session.ts";
 import { runProjectLearningAgentCommand } from "./agent/project-learning-agent.ts";
-import { prepareAutopsyStepCommand } from "./runtime-autopsy.ts";
-import { buildConceptGraphCommand } from "./runtime-concept-graph.ts";
-import { detectLearningGapFromAnswer, persistGapDetectionResult } from "./runtime-gap-detection.ts";
+import { prepareAutopsyStepCommand } from "./study/autopsy.ts";
+import { buildConceptGraphCommand } from "./study/concept-graph.ts";
+import { detectLearningGapFromAnswer, persistGapDetectionResult } from "./study/gap-detection.ts";
 import { getUnderstandingMemoryCommand } from "./memory/understanding-memory.ts";
-import { generatePracticeChallengesCommand } from "./runtime-practice.ts";
-import { createPreparedQuestionSession } from "./runtime-prepared-question.ts";
-import { generateQuestionsCommand } from "./runtime-questions.ts";
-import { readinessReportCommand } from "./runtime-readiness.ts";
+import { generatePracticeChallengesCommand } from "./study/practice.ts";
+import { createPreparedQuestionSession } from "./study/prepared-question.ts";
+import { generateQuestionsCommand } from "./study/questions.ts";
+import { readinessReportCommand } from "./study/readiness.ts";
 import { getSession, readState, toSummary, writeState } from "./persistence/state.ts";
-import { getStudyPanelStateCommand } from "./runtime-study-panel.ts";
+import { getStudyPanelStateCommand } from "./study/panel.ts";
 import {
   startWorkspaceSessionCommand,
   submitWorkspaceAttemptCommand,
@@ -45,7 +45,7 @@ import {
   type RuntimeRequest,
   type RuntimeResponse,
   type RuntimeSuccess,
-} from "./runtime-support.ts";
+} from "./runtime/contracts.ts";
 
 function inferTaskType(desiredHelp: string): TaskType {
   switch (desiredHelp) {

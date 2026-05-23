@@ -26,7 +26,7 @@ Pedagogy-related source currently splits across these areas:
 
 1. `pedagogy-core` is named as the core but does not yet export the older
    `engine/pedagogy/*` layer/question policy that still drives
-   `runtime-questions`, `runtime-support`, `store`, and the coverage eval.
+   `engine/study/questions.ts`, `engine/runtime/contracts.ts`, `store`, and the coverage eval.
 2. `engine/pedagogy/*` is called "Sibi Pedagogy Layer Module" but mixes generic
    layer detection with runtime-facing `DeclaredWorkIntent`,
    `OwnershipQuestion`, and session summary contracts.
@@ -276,8 +276,8 @@ Do not schedule UI work before the bridge can produce an executable
 30. `engine/pedagogoai/readiness-mastery.ts`
 31. `engine/pedagogoai/gap-repair.ts`
 32. `engine/persistence/signal-store.ts`
-33. `engine/runtime-support.ts`
-34. `engine/runtime-questions.ts`
+33. `engine/runtime/contracts.ts`
+34. `engine/study/questions.ts`
 35. `engine/evals/pedagogy-core-coverage.ts`
 36. `engine/evals/pedagogy-coverage.ts`
 37. `engine/evals/shared-core-boundaries.ts`

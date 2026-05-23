@@ -5,7 +5,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 
 import { handleRequest } from "../engine/runtime.ts";
-import type { AutopsyStep, ConceptGraph, EvidenceCitation } from "../engine/runtime-support.ts";
+import type { AutopsyStep, ConceptGraph, EvidenceCitation } from "../engine/runtime/contracts.ts";
 
 type Success<T> = { ok: true; data: T };
 
