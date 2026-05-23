@@ -68,6 +68,9 @@ release yet.
   attempt/evidence/readiness contracts and closed operation/artifact/evidence
   taxonomies without re-exporting the adapter-heavy deep ownership runtime
   entrypoint.
+- Locked the source-mission bridge tests to the public `engine/pedagogy-core`
+  facade, including frontier-lab readiness coverage scoped to the active
+  operation instead of the full mission.
 - Moved attempt evaluation, pedagogy loop, and pure evidence/loop contract files
   under `engine/pedagogy/core/` while keeping `engine/pedagogy-core/index.ts`
   as the public facade.
