@@ -70,7 +70,7 @@ test("shared core boundaries eval fails closed against temp repo violations", ()
   try {
     writeFixture(rootDir, "engine/ownership-core/index.ts", "import { readFileSync } from 'node:fs';\n");
     writeFixture(rootDir, "engine/pedagogy-core/index.ts", "export const ok = true;\n");
-    writeFixture(rootDir, "engine/memory-core/index.ts", "import '../runtime-state.ts';\n");
+    writeFixture(rootDir, "engine/memory-core/index.ts", "import '../memory/understanding-memory.ts';\n");
     writeFixture(rootDir, "sibi/src/ownershipReview.ts", "import type { WorkspaceIntent } from '../../engine/pedagogoai/workspace-intent.ts';\n");
     writeFixture(rootDir, "docs/specs/deep-ownership-workspace/04_shared_core_boundaries.md", "# Missing gates\n");
 

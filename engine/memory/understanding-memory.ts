@@ -11,8 +11,8 @@ import {
   type UnderstandingMemoryAnswer,
   type UnderstandingMemoryConcept,
   type UnderstandingMemoryReview,
-} from "./runtime-support.ts";
-import { getArtifactSession, readState } from "./runtime-state.ts";
+} from "../runtime-support.ts";
+import { getArtifactSession, readState } from "../persistence/state.ts";
 
 function answerFromEvidence(answerEvidence: string[]): string {
   const entry = answerEvidence.find((candidate) => candidate.startsWith("answer="));

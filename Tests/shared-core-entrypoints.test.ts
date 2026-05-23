@@ -21,7 +21,7 @@ function expectNoSurfaceImports(modulePath: CoreModulePath): void {
   assert.doesNotMatch(source, /from\s+["'][^"']*sibi\//);
   assert.doesNotMatch(source, /from\s+["'][^"']*web\//);
   assert.doesNotMatch(source, /from\s+["'][^"']*apps\/sibar-research-workspace\//);
-  assert.doesNotMatch(source, /from\s+["']\.{1,2}\/(?:runtime-state|store|pedagogoai\/workspace-(?:intent|int(?:ent)?-adapter|compiler-runner))/);
+  assert.doesNotMatch(source, /from\s+["'][^"']*(?:persistence\/|memory\/|pedagogoai\/workspace-(?:intent|int(?:ent)?-adapter|compiler-runner))/);
   assert.doesNotMatch(source, /from\s+["'][^"']*workspace\/session/);
 }
 

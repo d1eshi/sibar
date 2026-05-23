@@ -2,7 +2,7 @@ import { randomUUID } from "node:crypto";
 import { existsSync, realpathSync, statSync } from "node:fs";
 import { isAbsolute, resolve } from "node:path";
 
-import { getArtifactSession, readState, writeState } from "./runtime-state.ts";
+import { getArtifactSession, readState, writeState } from "./persistence/state.ts";
 import {
   fail,
   now,

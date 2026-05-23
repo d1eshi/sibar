@@ -170,8 +170,8 @@ Known adapter-heavy modules:
 
 1. `engine/workspace/session/context.ts`
 2. `engine/workspace/session/*`
-3. `engine/runtime-state.ts`
-4. `engine/store.ts`
+3. `engine/persistence/state.ts`
+4. `engine/persistence/signal-store.ts`
 5. `engine/runtime-deep-ownership-study-artifacts.ts`
 6. `engine/pedagogoai/workspace-compiler-runner.ts`
 7. `apps/sibar-research-workspace/scripts/workspace-intent-adapter.js`
@@ -310,9 +310,9 @@ stable:
 1. `engine/runtime-deep-ownership.ts`
 2. `engine/pedagogy/core/loop.ts`
 3. `engine/pedagogy/core/attempt-evaluation.ts`
-4. `engine/runtime-memory.ts`
-5. `engine/runtime-state.ts`
-6. `engine/store.ts`
+4. `engine/memory/understanding-memory.ts`
+5. `engine/persistence/state.ts`
+6. `engine/persistence/signal-store.ts`
 7. `engine/pedagogoai/index.ts`
 8. `apps/sibar-research-workspace/scripts/workspace-intent-adapter.js`
 

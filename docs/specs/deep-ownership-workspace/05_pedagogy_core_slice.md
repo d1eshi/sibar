@@ -65,7 +65,7 @@ It should leave outside core:
    and model runners,
 2. Mission/Track/Session UI projection and source-intent compilation,
 3. `pedagogoai` track facades and Rust/compiler adapters,
-4. persistence details such as `engine/store.ts`, `engine/runtime-state.ts`, and
+4. persistence details such as `engine/persistence/signal-store.ts`, `engine/persistence/state.ts`, and
    workspace session commands.
 
 Legacy entrypoints, if reintroduced for compatibility, should remain thin
@@ -275,7 +275,7 @@ Do not schedule UI work before the bridge can produce an executable
 29. `engine/pedagogoai/workspace-intent/fixtures.ts`
 30. `engine/pedagogoai/readiness-mastery.ts`
 31. `engine/pedagogoai/gap-repair.ts`
-32. `engine/store.ts`
+32. `engine/persistence/signal-store.ts`
 33. `engine/runtime-support.ts`
 34. `engine/runtime-questions.ts`
 35. `engine/evals/pedagogy-core-coverage.ts`

@@ -106,8 +106,8 @@ const CORE_FORBIDDEN_IMPORTS: ForbiddenImportRule[] = [
   repoPathPattern(/^apps\/sibar-research-workspace\//, "workspace UI is a surface"),
   repoPathPattern(/^engine\/pedagogoai\/workspace-compiler-runner/, "workspace compiler runners are adapters"),
   repoPathPattern(/^engine\/pedagogoai\/workspace-intent/, "WorkspaceIntent belongs outside shared core"),
-  repoPathPattern(/^engine\/runtime-state/, "runtime state is adapter-owned"),
-  repoPathPattern(/^engine\/store/, "persistence store is adapter-owned"),
+  repoPathPattern(/^engine\/persistence\//, "persistence is adapter-owned"),
+  repoPathPattern(/^engine\/memory\//, "understanding memory is a separate memory layer"),
   repoPathPattern(/^engine\/workspace\/session\//, "workspace sessions are adapter-owned"),
   repoPathPattern(/^engine\/runtime-deep-ownership-study-artifacts/, "study artifact projection is adapter-owned"),
 ];
