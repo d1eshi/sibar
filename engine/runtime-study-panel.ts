@@ -1,6 +1,6 @@
-import { buildUnderstandingMemory } from "./runtime-memory.ts";
+import { buildUnderstandingMemory } from "./memory/understanding-memory.ts";
 import { buildReadinessReport, type ReadinessReport } from "./runtime-readiness.ts";
-import { getArtifactSession, readState } from "./runtime-state.ts";
+import { getArtifactSession, readState } from "./persistence/state.ts";
 import type { RuntimeCodeSelection } from "./code-selection.ts";
 import {
   now,

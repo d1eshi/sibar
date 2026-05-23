@@ -16,5 +16,5 @@ export {
   buildDeepOwnershipMemory,
   trackMisconception,
 } from "../pedagogy/core/loop.ts";
-export { buildUnderstandingMemory, getUnderstandingMemoryCommand } from "../runtime-memory.ts";
+export { buildUnderstandingMemory, getUnderstandingMemoryCommand } from "../memory/understanding-memory.ts";
 export { generatePracticeChallengesCommand } from "../runtime-practice.ts";

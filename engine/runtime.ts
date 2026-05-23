@@ -10,7 +10,7 @@ import {
   type LearningSignal,
   type TaskType,
 } from "./pedagogy/index.ts";
-import { recordSignal } from "./store.ts";
+import { recordSignal } from "./persistence/signal-store.ts";
 import { CodeSelectionError, readCodeSelection, type RuntimeCodeSelection } from "./code-selection.ts";
 import {
   assertArtifactAllowsPath,
@@ -22,12 +22,12 @@ import { runProjectLearningAgentCommand } from "./runtime-agent.ts";
 import { prepareAutopsyStepCommand } from "./runtime-autopsy.ts";
 import { buildConceptGraphCommand } from "./runtime-concept-graph.ts";
 import { detectLearningGapFromAnswer, persistGapDetectionResult } from "./runtime-gap-detection.ts";
-import { getUnderstandingMemoryCommand } from "./runtime-memory.ts";
+import { getUnderstandingMemoryCommand } from "./memory/understanding-memory.ts";
 import { generatePracticeChallengesCommand } from "./runtime-practice.ts";
 import { createPreparedQuestionSession } from "./runtime-prepared-question.ts";
 import { generateQuestionsCommand } from "./runtime-questions.ts";
 import { readinessReportCommand } from "./runtime-readiness.ts";
-import { getSession, readState, toSummary, writeState } from "./runtime-state.ts";
+import { getSession, readState, toSummary, writeState } from "./persistence/state.ts";
 import { getStudyPanelStateCommand } from "./runtime-study-panel.ts";
 import {
   startWorkspaceSessionCommand,

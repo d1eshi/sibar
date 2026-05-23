@@ -2,7 +2,7 @@ import { randomUUID } from "node:crypto";
 import { basename } from "node:path";
 
 import { createPreparedQuestionSession } from "./runtime-prepared-question.ts";
-import { getArtifactSession, readState, writeState } from "./runtime-state.ts";
+import { getArtifactSession, readState, writeState } from "./persistence/state.ts";
 import {
   excerptPrefix,
   fail,

@@ -54,6 +54,8 @@ release yet.
   under `engine/workspace/traces/source-mission/`.
 - Grouped live workspace session runtime, contracts, context, constants, and
   logic under `engine/workspace/session/`.
+- Split persisted runtime state and signal storage under `engine/persistence/`
+  and moved understanding-memory orchestration under `engine/memory/`.
 - Expanded `engine/pedagogy-core/index.ts` to expose the mission
   attempt/evidence/readiness contracts and closed operation/artifact/evidence
   taxonomies without re-exporting the adapter-heavy deep ownership runtime

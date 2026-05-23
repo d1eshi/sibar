@@ -122,7 +122,7 @@ export const PEDAGOGOAI_BOUNDARIES: PedagogoAIModuleBoundary[] = [
       "misconception memory",
     ],
     adapters: [
-      "engine/runtime-memory.ts",
+      "engine/memory/understanding-memory.ts",
       "engine/runtime-practice.ts",
       "engine/pedagogy/core/loop.ts",
     ],

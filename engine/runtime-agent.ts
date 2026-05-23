@@ -6,7 +6,7 @@ import {
   runConfiguredCodexRunner,
 } from "./runtime-agent-runner.ts";
 import { validateModelSignalCandidates } from "./runtime-agent-validation.ts";
-import { getArtifactSession, readState, writeState } from "./runtime-state.ts";
+import { getArtifactSession, readState, writeState } from "./persistence/state.ts";
 import {
   now,
   toOperationState,

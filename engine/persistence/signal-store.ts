@@ -2,8 +2,8 @@ import { appendFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } fr
 import { homedir } from "node:os";
 import { join } from "node:path";
 
-import type { Confidence, Layer } from "./pedagogy/index.ts";
-import type { EvidenceSource } from "./pedagogy/signals.ts";
+import type { Confidence, Layer } from "../pedagogy/index.ts";
+import type { EvidenceSource } from "../pedagogy/signals.ts";
 
 function getSibarDir(): string {
   return process.env.SIBI_RUNTIME_HOME || join(homedir(), ".sibar");

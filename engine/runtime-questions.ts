@@ -9,8 +9,8 @@ import {
   type DetectedGap,
   type LearningSignal,
 } from "./pedagogy/index.ts";
-import { getConceptMap, recordSignal } from "./store.ts";
-import { getArtifactSession, getSession, readState, writeState } from "./runtime-state.ts";
+import { getConceptMap, recordSignal } from "./persistence/signal-store.ts";
+import { getArtifactSession, getSession, readState, writeState } from "./persistence/state.ts";
 import {
   excerptPrefix,
   fail,

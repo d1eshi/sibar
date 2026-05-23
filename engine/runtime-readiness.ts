@@ -9,8 +9,8 @@ import {
   type RuntimeSuccess,
   type UnderstandingMemoryConcept,
 } from "./runtime-support.ts";
-import { buildUnderstandingMemory } from "./runtime-memory.ts";
-import { getArtifactSession, readState, writeState } from "./runtime-state.ts";
+import { buildUnderstandingMemory } from "./memory/understanding-memory.ts";
+import { getArtifactSession, readState, writeState } from "./persistence/state.ts";
 
 type ReadinessLevel =
   | "ready to inspect"
