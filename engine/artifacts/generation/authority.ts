@@ -1,4 +1,4 @@
-import type { EvidenceRef, EvidenceRole } from "../../runtime-deep-ownership.ts";
+import type { EvidenceRef, EvidenceRole } from "../../deep-ownership/index.ts";
 import type { AuthorityCheckResult } from "./types.ts";
 
 /**

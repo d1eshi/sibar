@@ -2,7 +2,7 @@ import type {
   ConceptSlice,
   EvidenceInventoryEntry,
   EvidenceRef,
-} from "../../runtime-deep-ownership.ts";
+} from "../../deep-ownership/index.ts";
 
 export function findEvidenceById(
   inventory: EvidenceInventoryEntry[],

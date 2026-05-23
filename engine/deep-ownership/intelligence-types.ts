@@ -2,7 +2,7 @@ import type {
   EvidenceRef,
   EvidenceRole,
   UserOperation,
-} from "./pedagogy/core/evidence-types.ts";
+} from "../pedagogy/core/evidence-types.ts";
 
 export type ResearchBridgeMissingSide =
   | "research"

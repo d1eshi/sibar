@@ -1,14 +1,14 @@
 import { createHash, randomUUID } from "node:crypto";
 
-import { checkBoundaryEscape } from "./runtime-deep-ownership-boundary.ts";
-import type { ArtifactBoundary } from "./pedagogy/core/evidence-types.ts";
+import { checkBoundaryEscape } from "./boundary.ts";
+import type { ArtifactBoundary } from "../pedagogy/core/evidence-types.ts";
 import type {
   ReadOnlyCommandEvidenceRecord,
   ReadOnlyCommandMutationAssessment,
   WorkspaceCommandPreview,
   WorkspaceCommandSafetyLevel,
   WorkspaceCommandWriteScope,
-} from "./runtime-deep-ownership-intelligence-types.ts";
+} from "./intelligence-types.ts";
 
 export type WorkspaceCommandPreviewInput = {
   id?: string;

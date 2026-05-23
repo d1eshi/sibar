@@ -14,7 +14,7 @@ import type {
   OutOfScopeEvidenceRecord,
   ResearchToConstructionBridge,
   WorkspaceSignal,
-} from "../../runtime-deep-ownership-intelligence-types.ts";
+} from "../../deep-ownership/intelligence-types.ts";
 
 export type {
   ArtifactBoundary,

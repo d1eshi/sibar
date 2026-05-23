@@ -7,7 +7,7 @@ import {
   evaluateFullLoop,
 } from "../../engine/pedagogy/core/loop.ts";
 import { createAttempt, evaluateAttempt } from "../../engine/pedagogy/core/attempt-evaluation.ts";
-import type { OwnershipGap } from "../../engine/runtime-deep-ownership.ts";
+import type { OwnershipGap } from "../../engine/deep-ownership/index.ts";
 import {
   evaluateShallowAttempt,
   makeConceptSlice,

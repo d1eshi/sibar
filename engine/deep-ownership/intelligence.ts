@@ -1,14 +1,14 @@
 import {
   checkBoundaryEscape,
   isPathInBoundary,
-} from "./runtime-deep-ownership-boundary.ts";
+} from "./boundary.ts";
 import type {
   ArtifactBoundary,
   ConceptSlice,
   EvidenceInventoryEntry,
   SkipRecord,
   UnknownZone,
-} from "./pedagogy/core/evidence-types.ts";
+} from "../pedagogy/core/evidence-types.ts";
 import type {
   BoundaryExpansionRoute,
   OutOfScopeEvidenceRecord,
@@ -16,8 +16,8 @@ import type {
   ResearchToConstructionBridge,
   WorkspaceSignal,
   WorkspaceSignalKind,
-} from "./runtime-deep-ownership-intelligence-types.ts";
-import type { ValidationIssue } from "./pedagogy/core/loop-types.ts";
+} from "./intelligence-types.ts";
+import type { ValidationIssue } from "../pedagogy/core/loop-types.ts";
 
 export type ProgressiveInventoryInput = {
   artifact_boundary: ArtifactBoundary;

@@ -1,11 +1,11 @@
 import { basename, isAbsolute, relative, resolve } from "node:path";
 
-import type { EvidenceRef } from "./pedagogy/core/evidence-types.ts";
+import type { EvidenceRef } from "../pedagogy/core/evidence-types.ts";
 import type {
   MutationAllowedAction,
   OpenInEditorCitationPayload,
   ProductMutationGate,
-} from "./runtime-deep-ownership-intelligence-types.ts";
+} from "./intelligence-types.ts";
 
 export type ProductMutationGateInput = {
   id?: string;

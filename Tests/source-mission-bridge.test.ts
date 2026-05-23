@@ -11,7 +11,7 @@ import type {
   SourceSignal,
   SourceSlice,
 } from "../engine/workspace/source-mission/contracts.ts";
-import type { UserAttempt } from "../engine/runtime-deep-ownership.ts";
+import type { UserAttempt } from "../engine/deep-ownership/index.ts";
 
 const sourceIntake: SourceIntakeResult = {
   schema: "SourceIntakeResult",

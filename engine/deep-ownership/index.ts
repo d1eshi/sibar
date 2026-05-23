@@ -1,13 +1,13 @@
 /**
- * Deep Ownership Workspace — runtime contracts, schema, and boundary enforcement.
+ * Deep Ownership Workspace — contracts, schema, and boundary enforcement.
  *
- * This entrypoint now re-exports cohesive modules so runtime contracts,
+ * This entrypoint re-exports cohesive modules so contracts,
  * validation, boundary safety, and snapshot projection remain maintainable.
  */
 
-export * from "./pedagogy/core/evidence-types.ts";
-export * from "./runtime-deep-ownership-intelligence-types.ts";
-export * from "./pedagogy/core/loop-types.ts";
+export * from "../pedagogy/core/evidence-types.ts";
+export * from "./intelligence-types.ts";
+export * from "../pedagogy/core/loop-types.ts";
 
 export {
   validateEvidenceRef,
@@ -15,31 +15,31 @@ export {
   validateEvidenceEntry,
   validateSkipRecord,
   validateUnknownZone,
-} from "./runtime-deep-ownership-validation-evidence.ts";
+} from "./validation-evidence.ts";
 
 export {
   validateConceptSlice,
   validateThinkingArtifact,
   validateReadinessClaim,
-} from "./runtime-deep-ownership-validation-structure.ts";
+} from "./validation-structure.ts";
 
 export {
   validateDeepOwnershipFixture,
   loadAndValidateFixture,
-} from "./runtime-deep-ownership-validation-fixture.ts";
+} from "./validation-fixture.ts";
 
 export {
   isPathInBoundary,
   validateBoundaryEnforcement,
   checkBoundaryEscape,
-} from "./runtime-deep-ownership-boundary.ts";
+} from "./boundary.ts";
 
 export {
   detectWeakGoal,
   routeWeakGoal,
   projectWorkspaceSnapshot,
   projectWorkspaceSnapshotFromFixture,
-} from "./runtime-deep-ownership-snapshot.ts";
+} from "./snapshot.ts";
 
 export {
   summarizeProgressiveInventory,
@@ -48,7 +48,7 @@ export {
   storeWorkspaceSignal,
   evaluateSignalOwnershipStrength,
   routeOutOfBoundEvidenceToBoundaryExpansion,
-} from "./runtime-deep-ownership-intelligence.ts";
+} from "./intelligence.ts";
 
 export {
   previewWorkspaceCommand,
@@ -57,4 +57,4 @@ export {
   writeStudyArtifact,
   createProductMutationGate,
   createOpenInEditorCitationPayload,
-} from "./runtime-deep-ownership-command-safety.ts";
+} from "./command-safety.ts";

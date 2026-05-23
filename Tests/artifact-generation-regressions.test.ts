@@ -7,7 +7,7 @@ import {
   type ThinkingArtifact,
   type ConceptSlice,
   type EvidenceInventoryEntry,
-} from "../engine/runtime-deep-ownership.ts";
+} from "../engine/deep-ownership/index.ts";
 
 import {
   generateCodeSliceArtifact,

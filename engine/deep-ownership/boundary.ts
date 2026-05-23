@@ -2,11 +2,11 @@ import { isAbsolute, normalize, relative, resolve } from "node:path";
 
 import type {
   ArtifactBoundary,
-} from "./pedagogy/core/evidence-types.ts";
+} from "../pedagogy/core/evidence-types.ts";
 import type {
   DeepOwnershipFixture,
   ValidationIssue,
-} from "./pedagogy/core/loop-types.ts";
+} from "../pedagogy/core/loop-types.ts";
 
 function issue(field: string, message: string): ValidationIssue {
   return { field, message, severity: "error" };

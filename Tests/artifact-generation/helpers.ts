@@ -4,7 +4,7 @@ import type {
   DeepOwnershipFixture,
   EvidenceInventoryEntry,
   ConceptSlice,
-} from "../../engine/runtime-deep-ownership.ts";
+} from "../../engine/deep-ownership/index.ts";
 
 const FIXTURE_PATH = "evals/deep-ownership-workspace/fixtures/sibi-pedagogy-loop.json";
 

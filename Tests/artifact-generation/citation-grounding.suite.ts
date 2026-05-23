@@ -5,7 +5,7 @@ import {
   type ThinkingArtifact,
   RECOGNIZED_EVIDENCE_ROLES,
   RECOGNIZED_OPERATION_KINDS,
-} from "../../engine/runtime-deep-ownership.ts";
+} from "../../engine/deep-ownership/index.ts";
 
 import {
   generateCodeSliceArtifact,

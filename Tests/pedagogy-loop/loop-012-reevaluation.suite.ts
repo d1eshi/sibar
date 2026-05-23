@@ -6,7 +6,7 @@ import {
   generateReevaluation,
 } from "../../engine/pedagogy/core/loop.ts";
 import { evaluateAttempt } from "../../engine/pedagogy/core/attempt-evaluation.ts";
-import { RECOGNIZED_OPERATION_KINDS } from "../../engine/runtime-deep-ownership.ts";
+import { RECOGNIZED_OPERATION_KINDS } from "../../engine/deep-ownership/index.ts";
 import {
   evaluateShallowAttempt,
   makeConceptSlice,

@@ -56,6 +56,9 @@ release yet.
   logic under `engine/workspace/session/`.
 - Grouped artifact session and deterministic artifact generation modules under
   `engine/artifacts/`, replacing the flat `runtime-artifact-*` runtime naming.
+- Grouped deep-ownership contracts, evidence, readiness, mutation, snapshot,
+  validation, and study artifact modules under `engine/deep-ownership/`,
+  replacing the previous flat runtime deep-ownership module naming.
 - Split persisted runtime state and signal storage under `engine/persistence/`
   and moved understanding-memory orchestration under `engine/memory/`.
 - Expanded `engine/pedagogy-core/index.ts` to expose the mission
@@ -941,7 +944,7 @@ release yet.
 - Created the first deterministic Deep Ownership fixture (`sibi-pedagogy-loop.json`)
   describing one scoped loop over the Sibi pedagogy runtime: gap detection,
   practice generation, memory, and readiness.
-- Added runtime type contracts and schema validation (`src/runtime-deep-ownership.ts`)
+- Added runtime type contracts and schema validation (`engine/deep-ownership/index.ts`)
   for evidence identity, role classification, boundary enforcement, unknown zones,
   skip records, thinking artifacts, and scoped readiness claims.
 - Added focused fixture/schema tests (`Tests/deep-ownership-fixture.test.ts`)

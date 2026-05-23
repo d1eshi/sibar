@@ -9,8 +9,8 @@ import {
   writeFileSync,
 } from "node:fs";
 
-import type { EvidenceRef } from "./pedagogy/core/evidence-types.ts";
-import type { StudyArtifactWriteResult } from "./runtime-deep-ownership-intelligence-types.ts";
+import type { EvidenceRef } from "../pedagogy/core/evidence-types.ts";
+import type { StudyArtifactWriteResult } from "./intelligence-types.ts";
 
 export type StudyArtifactWriteInput = {
   id?: string;
