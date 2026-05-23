@@ -73,10 +73,10 @@ export function MissionOverview({
           <h1>{mission.mission_brief.title}</h1>
           <p>{mission.mission_brief.rationale}</p>
         </div>
-        <aside className={styles.readinessCard} aria-label="Progress and readiness">
+        <aside className={styles.readinessCard} aria-label="Progress and source review">
           <span>{mission.mission_brief.confidence}</span>
           <strong>{projection.nodes.length} focused sessions</strong>
-          <p>{mission.active_session.readiness_scope.label}</p>
+          <p>Readiness pending an Artifact/Evidence attempt for {mission.active_session.readiness_scope.label}.</p>
         </aside>
       </header>
 

@@ -33,6 +33,10 @@ const missionOverviewSource = readFileSync(
   join(root, "apps/sibar-research-workspace/src/flows/workspace/MissionOverview.tsx"),
   "utf8",
 );
+const workspaceHomeSource = readFileSync(
+  join(root, "apps/sibar-research-workspace/src/flows/workspace/WorkspaceHome.tsx"),
+  "utf8",
+);
 const webWorkspaceHtml = readFileSync(join(root, "web/workspace.html"), "utf8");
 const frontierLabPastedText = [
   "The practical path starts with JAX tutorials and the Scaling Book.",
@@ -162,6 +166,37 @@ test("compiled custom mission reason drives UI projection, Home, and session fix
   assert.equal(fixture.title, result.ui_projection.mission_brief.title);
   assert.equal(fixture.sessionHint, result.ui_projection.active_session.operation.prompt);
   assert.equal(fixture.sources.length > 0, true);
+});
+
+test("Home treats mission fixture confidence as source review, not pre-attempt readiness", () => {
+  const home = buildWorkspaceHomeProjectionFromMission(frontierLabMissionUiProjection);
+  const primary = home.workspaces[0];
+
+  assert.equal(typeof primary.reviewConfidencePercent, "number");
+  assert.match(primary.reviewConfidenceLevel, /confidence|review/i);
+  assert.match(primary.reviewConfidenceHint, /Source review status/i);
+  assert.match(primary.reviewConfidenceHint, /Artifact readiness is pending an attempt/i);
+  assert.equal("readinessPercent" in primary, false);
+  assert.equal("readinessLevel" in primary, false);
+  assert.equal("readinessHint" in primary, false);
+  assert.match(workspaceHomeSource, /Source confidence/);
+  assert.match(workspaceHomeSource, /source confidence/);
+  assert.match(workspaceHomeSource, /source review/);
+  assert.doesNotMatch(workspaceHomeSource, /readinessLevel\} readiness/);
+  assert.doesNotMatch(workspaceHomeSource, /% readiness/);
+});
+
+test("Session guide declares attempt-first pending readiness scoped to active operation evidence", () => {
+  assert.match(appSource, /Readiness pending: submit an Artifact\/Evidence attempt/);
+  assert.match(appSource, /Session operation before any readiness claim/);
+  assert.match(appSource, /Operation scope:/);
+  assert.match(appSource, /Artifact scope:/);
+  assert.match(appSource, /Evidence scope:/);
+  assert.match(appSource, /activeMissionProjection\.active_session/);
+  assert.match(workspaceProjectionSource, /Readiness is pending until an artifact or evidence attempt/);
+  assert.match(missionOverviewSource, /Readiness pending an Artifact\/Evidence attempt/);
+  assert.doesNotMatch(appSource, /whole mission readiness/i);
+  assert.doesNotMatch(appSource, /Good readiness|Ready readiness/i);
 });
 
 test("unsupported New mission URL keeps the open action blocked by diagnostics", () => {

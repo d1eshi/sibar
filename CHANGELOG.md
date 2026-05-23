@@ -77,6 +77,9 @@ release yet.
 - Locked the source-mission bridge tests to the public `engine/pedagogy-core`
   facade, including frontier-lab readiness coverage scoped to the active
   operation instead of the full mission.
+- Updated the frontier-lab React workspace UI so source fixture confidence is
+  shown as source review confidence, while readiness remains pending until a
+  scoped Artifact/Evidence attempt exists.
 - Moved attempt evaluation, pedagogy loop, and pure evidence/loop contract files
   under `engine/pedagogy/core/` while keeping `engine/pedagogy-core/index.ts`
   as the public facade.

@@ -244,12 +244,12 @@ export function WorkspaceOverview({
         </section>
 
         <section className={styles.readinessCard}>
-          <h2>Readiness</h2>
+          <h2>Source confidence</h2>
           <div>
             <span className={styles.readinessMeter}>78%</span>
             <span>
-              <strong>Good readiness</strong>
-              <p>Open the selected learning node to continue this study material.</p>
+              <strong>High source review confidence</strong>
+              <p>Readiness stays pending until a focused Artifact/Evidence attempt is submitted.</p>
             </span>
           </div>
         </section>
