@@ -2,7 +2,7 @@ import { mkdirSync, writeFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { randomUUID } from "node:crypto";
 
-import { assertArtifactAllowsPath } from "../../runtime-artifact-session.ts";
+import { assertArtifactAllowsPath } from "../../artifacts/session.ts";
 import { RuntimeError, type ArtifactSession, type EvidenceCitation } from "../../runtime-support.ts";
 import type { BoundaryObservation, EvalCase } from "./types.ts";
 

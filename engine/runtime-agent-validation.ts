@@ -1,6 +1,6 @@
 import { readFileSync } from "node:fs";
 
-import { assertArtifactAllowsPath } from "./runtime-artifact-session.ts";
+import { assertArtifactAllowsPath } from "./artifacts/session.ts";
 import {
   type ArtifactSession,
   type EvidenceCitation,

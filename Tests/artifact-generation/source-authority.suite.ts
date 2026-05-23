@@ -10,7 +10,7 @@ import {
   resolveEvidenceAuthority,
   validateArtifactCitations,
   type GeneratedNode,
-} from "../../engine/runtime-artifact-generation.ts";
+} from "../../engine/artifacts/generation.ts";
 import { loadFixture, makeConceptSlice, makeEvidenceEntry } from "./helpers.ts";
 
 describe("VAL-INTEL-004: Source Authority Handling", () => {

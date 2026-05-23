@@ -74,7 +74,7 @@ export const PEDAGOGOAI_BOUNDARIES: PedagogoAIModuleBoundary[] = [
     ],
     adapters: [
       "engine/runtime-deep-ownership.ts",
-      "engine/runtime-artifact-generation.ts",
+      "engine/artifacts/generation.ts",
       "engine/workspace/session/contracts.ts",
     ],
     track: "core-workspace",

@@ -2,7 +2,7 @@ import { randomUUID } from "node:crypto";
 import { existsSync, realpathSync, statSync } from "node:fs";
 import { isAbsolute, resolve } from "node:path";
 
-import { getArtifactSession, readState, writeState } from "./persistence/state.ts";
+import { getArtifactSession, readState, writeState } from "../persistence/state.ts";
 import {
   fail,
   now,
@@ -11,7 +11,7 @@ import {
   type ArtifactSession,
   type RuntimeState,
   type RuntimeSuccess,
-} from "./runtime-support.ts";
+} from "../runtime-support.ts";
 
 function ensureArtifactSessionMap(state: RuntimeState): Record<string, ArtifactSession> {
   state.artifact_sessions ??= {};

@@ -54,6 +54,8 @@ release yet.
   under `engine/workspace/traces/source-mission/`.
 - Grouped live workspace session runtime, contracts, context, constants, and
   logic under `engine/workspace/session/`.
+- Grouped artifact session and deterministic artifact generation modules under
+  `engine/artifacts/`, replacing the flat `runtime-artifact-*` runtime naming.
 - Split persisted runtime state and signal storage under `engine/persistence/`
   and moved understanding-memory orchestration under `engine/memory/`.
 - Expanded `engine/pedagogy-core/index.ts` to expose the mission

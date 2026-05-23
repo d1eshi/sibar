@@ -7,7 +7,7 @@ import {
   generateDeterministicArtifacts,
   generateFlowDiagramArtifact,
   validateArtifactCitations,
-} from "../../engine/runtime-artifact-generation.ts";
+} from "../../engine/artifacts/generation.ts";
 import { loadFixture, makeConceptSlice, makeEvidenceEntry } from "./helpers.ts";
 
 describe("Hidden Solution & Fail-Closed Behavior", () => {

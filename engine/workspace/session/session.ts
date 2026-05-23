@@ -2,7 +2,7 @@ import { randomUUID } from "node:crypto";
 import { existsSync } from "node:fs";
 import { resolve } from "node:path";
 
-import { createArtifactSessionCommand } from "../../runtime-artifact-session.ts";
+import { createArtifactSessionCommand } from "../../artifacts/session.ts";
 import { captureAndEvaluate } from "../../pedagogy/core/attempt-evaluation/capture-and-evaluate.ts";
 import type {
   WorkspaceSnapshot,
