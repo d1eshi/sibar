@@ -1,8 +1,8 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { evaluateAttempt } from "../engine/pedagogy/core/attempt-evaluation.ts";
-import { attemptToReadiness } from "../engine/pedagogy/core/loop.ts";
+import { evaluateAttempt, attemptToReadiness } from "../engine/pedagogy-core/index.ts";
+import type { UserAttempt } from "../engine/pedagogy-core/index.ts";
 import { buildMissionSessionBridge } from "../engine/workspace/source-mission/bridge.ts";
 import type {
   MissionPreview,
@@ -11,7 +11,7 @@ import type {
   SourceSignal,
   SourceSlice,
 } from "../engine/workspace/source-mission/contracts.ts";
-import type { UserAttempt } from "../engine/deep-ownership/index.ts";
+import { buildFrontierLabMissionSessionBridge } from "../engine/workspace/source-mission/frontier-lab-fixture.ts";
 
 const sourceIntake: SourceIntakeResult = {
   schema: "SourceIntakeResult",
@@ -329,4 +329,65 @@ test("happy path bridge output runs through attempt evaluation and readiness", (
 
   assert.equal(evalOutput.evidenceCheck.result, "confirmed");
   assert.equal(readiness.evidenceStable, true);
+});
+
+test("frontier-lab bridge output runs through the public pedagogy-core facade with operation-scoped readiness", () => {
+  const output = buildFrontierLabMissionSessionBridge();
+  const artifact = output.thinking_artifacts[0];
+  const attempt: UserAttempt = {
+    id: "ATTEMPT-FRONTIER-LAB-001",
+    operation_id: output.user_operation.id,
+    answer_text: output.user_operation.success_criteria.join(". "),
+    selected_evidence: output.evidence_inventory.map((entry) => entry.id),
+    declared_confidence: "high",
+    declared_unknowns: [],
+    created_at: "2026-05-22T12:00:00.000Z",
+  };
+
+  const evalOutput = evaluateAttempt({
+    attempt,
+    operation: output.user_operation,
+    artifact,
+    evidenceInventory: output.evidence_inventory,
+  });
+
+  const readiness = attemptToReadiness({
+    loopId: output.session_seed.session_id,
+    attempt,
+    evalOutput,
+    operation: output.user_operation,
+    artifact,
+    conceptSlice: output.concept_slice,
+    evidenceInventory: output.evidence_inventory,
+  });
+
+  assert.deepEqual(output.session_seed.source_slice_refs, ["SLICE-FRONTIER-JAX-SCALING-FOUNDATIONS"]);
+  assert.deepEqual(output.session_seed.source_signal_ids, [
+    "SIG-FRONTIER-JAX-TUTORIALS",
+    "SIG-FRONTIER-SCALING-BOOK",
+  ]);
+  assert.deepEqual(
+    output.evidence_inventory.map((entry) => ({
+      path: entry.path,
+      excerpt: entry.excerpt,
+    })),
+    [
+      {
+        path: "frontier-lab-blog#slice-jax-scaling-foundations",
+        excerpt:
+          "The Practical Next Steps section points readers first to JAX tutorials and the Scaling Book before deeper implementation work.",
+      },
+    ],
+  );
+  assert.equal(evalOutput.evidenceCheck.result, "confirmed");
+  assert.equal(readiness.evidenceStable, true);
+  assert.equal(readiness.readinessClaim.status, "ready");
+  assert.equal(readiness.readinessClaim.operation_id, output.user_operation.id);
+  assert.equal(readiness.readinessClaim.concept_slice_id, output.concept_slice.id);
+  assert.equal(
+    readiness.readinessClaim.scope,
+    "Operation 'explain' on concept slice 'Map the JAX and Scaling Book starting points' within the declared artifact boundary",
+  );
+  assert.equal(readiness.readinessClaim.scope.includes("Frontier lab practical next steps"), false);
+  assert.equal(readiness.readinessClaim.scope.includes("career goal"), false);
 });
