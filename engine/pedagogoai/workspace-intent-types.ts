@@ -1,4 +1,4 @@
-import type { ValidationIssue, ValidationResult } from "../pedagogy/core/loop-types.ts";
+import type { ValidationIssue, ValidationResult } from "../pedagogy-core/index.ts";
 
 export type WorkspaceIntentSchema =
   | "WorkspaceIntent"

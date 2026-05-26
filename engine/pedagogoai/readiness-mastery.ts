@@ -4,7 +4,7 @@ export type {
   MemoryAnswerEntry,
   MemoryConceptEntry,
   ReadinessClaim,
-} from "../pedagogy/core/loop.ts";
+} from "../pedagogy-core/index.ts";
 
 export {
   buildReadinessReport,
@@ -16,5 +16,5 @@ export {
   buildDeepOwnershipMemory,
   createReadinessClaim,
   isRepeatedUnsupportedAnswer,
-} from "../pedagogy/core/loop.ts";
+} from "../pedagogy-core/index.ts";
 export { validateReadinessClaim } from "../deep-ownership/index.ts";
