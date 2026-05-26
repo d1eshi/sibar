@@ -16,7 +16,7 @@ import type {
   EvidenceSourceType,
   SkipRecord,
   UnknownZone,
-} from "../../pedagogy/core/evidence-types.ts";
+} from "../../pedagogy-core/index.ts";
 import {
   now,
   type ArtifactSession,

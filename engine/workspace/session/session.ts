@@ -3,10 +3,10 @@ import { existsSync } from "node:fs";
 import { resolve } from "node:path";
 
 import { createArtifactSessionCommand } from "../../artifacts/session.ts";
-import { captureAndEvaluate } from "../../pedagogy/core/attempt-evaluation/capture-and-evaluate.ts";
+import { captureAndEvaluate } from "../../pedagogy-core/index.ts";
 import type {
   WorkspaceSnapshot,
-} from "../../pedagogy/core/loop-types.ts";
+} from "../../pedagogy-core/index.ts";
 import { projectWorkspaceSnapshot } from "../../deep-ownership/snapshot.ts";
 import { buildWorkspaceInventory } from "./context.ts";
 import { readState, writeState } from "../../persistence/state.ts";

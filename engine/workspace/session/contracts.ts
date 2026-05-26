@@ -5,12 +5,12 @@ import type {
   ReadinessClaim,
   RepairAction,
   UserAttempt,
-} from "../../pedagogy/core/loop-types.ts";
+} from "../../pedagogy-core/index.ts";
 import type {
   EvidenceInventoryEntry,
   EvidenceRef,
   ThinkingArtifact,
-} from "../../pedagogy/core/evidence-types.ts";
+} from "../../pedagogy-core/index.ts";
 import type { RuntimeWorkspaceSession } from "../../runtime/contracts.ts";
 
 export type WorkspaceArtifactKind =

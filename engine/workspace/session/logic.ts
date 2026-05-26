@@ -13,13 +13,13 @@ import type {
   ReadinessClaim,
   RepairAction,
   UserAttempt,
-} from "../../pedagogy/core/loop-types.ts";
+} from "../../pedagogy-core/index.ts";
 import type {
   EvidenceRef,
   EvidenceInventoryEntry,
   ThinkingArtifact,
   UserOperation,
-} from "../../pedagogy/core/evidence-types.ts";
+} from "../../pedagogy-core/index.ts";
 import type {
   ArtifactSession,
   EvidenceCitation,
