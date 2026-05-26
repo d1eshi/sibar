@@ -90,7 +90,7 @@ export const PEDAGOGOAI_BOUNDARIES: PedagogoAIModuleBoundary[] = [
     ],
     adapters: [
       "engine/study/readiness.ts",
-      "engine/pedagogy/core/loop.ts",
+      "engine/pedagogy-core/index.ts",
       "engine/deep-ownership/index.ts",
     ],
     track: "core-workspace",
@@ -107,8 +107,7 @@ export const PEDAGOGOAI_BOUNDARIES: PedagogoAIModuleBoundary[] = [
     ],
     adapters: [
       "engine/study/gap-detection.ts",
-      "engine/pedagogy/core/attempt-evaluation.ts",
-      "engine/pedagogy/core/loop.ts",
+      "engine/pedagogy-core/index.ts",
     ],
     track: "core-workspace",
   },
@@ -124,7 +123,7 @@ export const PEDAGOGOAI_BOUNDARIES: PedagogoAIModuleBoundary[] = [
     adapters: [
       "engine/memory/understanding-memory.ts",
       "engine/study/practice.ts",
-      "engine/pedagogy/core/loop.ts",
+      "engine/pedagogy-core/index.ts",
     ],
     track: "core-workspace",
   },

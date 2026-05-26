@@ -3,7 +3,7 @@ export type {
   MemoryAnswerEntry,
   MemoryConceptEntry,
   MisconceptionMemory,
-} from "../pedagogy/core/loop.ts";
+} from "../pedagogy-core/index.ts";
 export type {
   PracticeChallenge,
   UnderstandingMemory,
@@ -15,6 +15,6 @@ export type {
 export {
   buildDeepOwnershipMemory,
   trackMisconception,
-} from "../pedagogy/core/loop.ts";
+} from "../pedagogy-core/index.ts";
 export { buildUnderstandingMemory, getUnderstandingMemoryCommand } from "../memory/understanding-memory.ts";
 export { generatePracticeChallengesCommand } from "../study/practice.ts";

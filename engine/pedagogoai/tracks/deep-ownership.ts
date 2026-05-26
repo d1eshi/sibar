@@ -16,4 +16,4 @@ export * from "../../deep-ownership/command-safety.ts";
 export * from "../../deep-ownership/intelligence.ts";
 export * from "../../deep-ownership/mutation-editor.ts";
 export * from "../../deep-ownership/snapshot.ts";
-export * from "../../pedagogy/core/loop.ts";
+export * from "../../pedagogy-core/index.ts";
