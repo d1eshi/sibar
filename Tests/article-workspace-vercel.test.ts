@@ -20,9 +20,9 @@ const rootVercelConfig = JSON.parse(readFileSync(join(root, "vercel.json"), "utf
 const vercelConfig = JSON.parse(readFileSync(join(root, "web/vercel.json"), "utf8"));
 
 test("article workspace web deploy is rooted under /web", () => {
-  assert.match(webHtml, /Sibar - De leer papers a construir entendimiento/);
-  assert.match(webHtml, /<link rel="stylesheet" href="styles\/reader\.css">/);
-  assert.match(webHtml, /<script type="module" src="scripts\/landing\.js"><\/script>/);
+  assert.match(webHtml, /Sibi - AI made software faster than understanding/);
+  assert.match(webHtml, /<link rel="stylesheet" href="styles\/main\.css/);
+  assert.doesNotMatch(webHtml, /scripts\/reader\.js|scripts\/landing\.js/);
   assert.match(webApiClient, /fetch\(`\/api\/read\?url=\$\{encodeURIComponent\(url\)\}`\)/);
   assert.equal(vercelConfig.framework, null);
   assert.equal(vercelConfig.cleanUrls, true);
@@ -90,9 +90,21 @@ test("early access Vercel API is server-side only and self-contained", () => {
 
 test("article workspace deploy excludes repository internals", () => {
   assert.equal(rootVercelConfig.outputDirectory, "web");
+  assert.equal(rootVercelConfig.buildCommand, "pnpm run vercel:build");
+  assert.equal(rootVercelConfig.cleanUrls, true);
+  assert.deepEqual(rootVercelConfig.rewrites, [
+    {
+      source: "/sibi",
+      destination: "/sibi/index.html",
+    },
+  ]);
   assert.match(rootVercelIgnore, /^\*$/m);
   assert.match(rootVercelIgnore, /^!web\/index\.html$/m);
   assert.match(rootVercelIgnore, /^!web\/api\/\*\*$/m);
+  assert.match(rootVercelIgnore, /^!sibi\/index\.html$/m);
+  assert.match(rootVercelIgnore, /^!sibi\/vite\.public\.config\.js$/m);
+  assert.match(rootVercelIgnore, /^!sibi\/src\/\*\*$/m);
+  assert.match(rootVercelIgnore, /^!apps\/early-access\/\*\*$/m);
   assert.match(webVercelIgnore, /^\.vercel$/m);
   assert.match(webVercelIgnore, /^ANALYTICS_RESEARCH\.md$/m);
   assert.doesNotMatch(rootVercelIgnore, /^!docs\//m);

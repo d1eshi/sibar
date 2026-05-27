@@ -1,7 +1,90 @@
-# Sibar Research Workspace (Tauri second app)
+# Sibar Research Workspace
 
-This is a static second-app product slice intended to run as a desktop shell
-workspace for the Deep Ownership flow.
+This is the public note-taking workspace slice for Sibar research. The deployed
+Vercel surface is a static Vite app with no LLM integration, no server functions,
+and local browser storage by default.
+
+## Public Vercel Slice
+
+- Build command from the repository root: `pnpm -s workspace:build`
+- App-scoped Vercel config: `apps/sibar-research-workspace/vercel.json`
+- Vercel project root: `apps/sibar-research-workspace`
+- Output directory: `dist`
+- Runtime: static files only; no SSR, API routes, serverless functions, edge
+  functions, or LLM calls.
+- Default persistence: `localStorage` in the user's browser.
+
+The app-scoped Vercel config marks this project as a Vite app, runs the root
+workspace build from the app project directory, and rewrites all routes to the
+static React entry:
+
+```json
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": "vite",
+  "installCommand": "cd ../.. && pnpm install --frozen-lockfile",
+  "buildCommand": "cd ../.. && pnpm -s workspace:build",
+  "outputDirectory": "dist",
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}
+```
+
+## Environment
+
+Copy `.env.example` only when overriding defaults. The public deployment should
+normally leave Supabase unset:
+
+```sh
+VITE_WORKSPACE_STORAGE_MODE=localStorage
+VITE_WORKSPACE_SUPABASE_SYNC_ENABLED=false
+```
+
+Optional future Supabase sync is intentionally not implemented in this slice.
+If it is added later, it must be opt-in and use public browser env only:
+
+```sh
+VITE_WORKSPACE_STORAGE_MODE=supabase
+VITE_WORKSPACE_SUPABASE_SYNC_ENABLED=true
+VITE_SUPABASE_URL=https://example-project.supabase.co
+VITE_SUPABASE_ANON_KEY=example-public-anon-key
+```
+
+Do not add Supabase service-role keys, OpenAI keys, model provider keys, or any
+other secret to Vite env variables. Vite exposes `VITE_*` values to the browser.
+
+## Runtime and Cost Boundaries
+
+- No `@supabase/supabase-js` dependency is included.
+- No remote note sync is active.
+- No fetch calls are made by the React note-taking workspace runtime.
+- Notes, course title, and note metrics are stored locally in browser
+  `localStorage`.
+- The static app can be shared publicly without creating LLM usage or Supabase
+  request/storage costs.
+- If future sync is added, keep it behind
+  `VITE_WORKSPACE_SUPABASE_SYNC_ENABLED=true` and avoid background polling,
+  automatic retries, or analytics beacons by default.
+
+The runtime guard lives in `src/config/publicRuntimeConfig.ts`. Its effective
+storage mode remains `localStorage` until a future implementation adds an
+explicit remote client.
+
+## Optional Supabase Notes Schema
+
+Static public mode does not need Supabase. For a future authenticated sync path,
+`supabase/workspace_notes.sql` defines a minimal notes table with row-level
+security:
+
+- `workspace_notes` stores note body and local context only.
+- `owner_id` is bound to `auth.users`.
+- RLS policies restrict select, insert, update, and delete to the note owner.
+- No LLM prompts, model responses, artifact fixture content, readiness panels,
+  or provider credentials belong in this table.
 
 ## React migration slice 0 (static)
 

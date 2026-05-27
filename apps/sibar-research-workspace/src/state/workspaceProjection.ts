@@ -455,6 +455,9 @@ export function createInitialWorkspaceStateFromFixture(
     selectedMiniNodeId: firstMini?.id ?? "",
     selectedSourceId: fallbackSourceId,
     isReadinessPanelVisible: true,
+    studyCourseTitle: fixture.title,
+    studyNoteDraft: "",
+    studyNotes: [],
     ...overrides,
   };
 }

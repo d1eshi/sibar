@@ -3,6 +3,24 @@ export type WorkspaceSessionState = {
   selectedMiniNodeId: string;
   selectedSourceId: string;
   isReadinessPanelVisible: boolean;
+  studyCourseTitle: string;
+  studyNoteDraft: string;
+  studyNotes: readonly WorkspaceStudyNote[];
+};
+
+export type WorkspaceStudyNote = {
+  id: string;
+  courseTitle: string;
+  sessionTitle: string;
+  nodeName: string;
+  miniNodeQuestion: string;
+  sourceTitle: string;
+  createdAtIso: string;
+  createdAtLabel: string;
+  createdAtEpochMs: number;
+  createdAtDateKey: string;
+  iterationLabel: string;
+  body: string;
 };
 
 export type WorkspaceSessionAction =
@@ -27,6 +45,18 @@ export type WorkspaceSessionAction =
     }
   | {
       type: "toggle_readiness_panel";
+    }
+  | {
+      type: "set_study_course_title";
+      courseTitle: string;
+    }
+  | {
+      type: "set_study_note_draft";
+      noteDraft: string;
+    }
+  | {
+      type: "add_study_note";
+      note: WorkspaceStudyNote;
     };
 
 export function workspaceSessionReducer(
@@ -65,6 +95,28 @@ export function workspaceSessionReducer(
     return {
       ...state,
       isReadinessPanelVisible: !state.isReadinessPanelVisible,
+    };
+  }
+
+  if (action.type === "set_study_course_title") {
+    return {
+      ...state,
+      studyCourseTitle: action.courseTitle,
+    };
+  }
+
+  if (action.type === "set_study_note_draft") {
+    return {
+      ...state,
+      studyNoteDraft: action.noteDraft,
+    };
+  }
+
+  if (action.type === "add_study_note") {
+    return {
+      ...state,
+      studyNoteDraft: "",
+      studyNotes: [action.note, ...state.studyNotes],
     };
   }
 
