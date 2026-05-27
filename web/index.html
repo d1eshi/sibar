@@ -3,10 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sibar - De leer papers a construir entendimiento</title>
-<meta name="description" content="Sibar convierte research tecnico en un workspace de evidencia, artifacts, codigo y memoria para estudiar profundo aplicando lo aprendido.">
-<meta property="og:title" content="Sibar - Research workspace para estudiar profundo">
-<meta property="og:description" content="De leer papers, blogs, lecturas y apuntes a construir entendimiento con evidencia, artifacts, codigo y memoria.">
+<title>Sibi - AI made software faster than understanding</title>
+<meta name="description" content="Sibi convierte cognitive debt en ownership demostrado: prove it, diagnose the gap, repair the boundary.">
+<meta property="og:title" content="Sibi - Cognitive debt is code you cannot defend">
+<meta property="og:description" content="Ownership is a practice, not a feeling. Sibi helps engineering teams prove ownership over AI-generated software.">
 <script>
 window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
 window.va("beforeSend", (event) => {
@@ -26,197 +26,185 @@ if (location.protocol !== "file:" && location.hostname !== "localhost" && locati
   document.head.appendChild(analyticsScript);
 }
 </script>
-<link rel="stylesheet" href="styles/reader.css">
+<link rel="stylesheet" href="styles/main.css?v=poster-nav">
 </head>
-<body>
-<header class="site-header" aria-label="Navegacion principal">
-  <a class="brand" href="#top" aria-label="Sibar inicio">
-    <span>S</span>
-    <strong>Sibar</strong>
-  </a>
-  <nav class="site-nav" aria-label="Secciones">
-    <a href="#demo">Workspace</a>
-    <a href="#artifacts">Artifacts</a>
-    <a href="#early-access">Early access</a>
+<body class="landing variant-poster">
+<header class="poster-navbar" aria-label="Sibi navigation">
+  <nav class="poster-nav-links" aria-label="Primary">
+    <a class="is-active" href="#top">Manifesto</a>
+    <a href="#artifacts">How it works</a>
+    <a href="#artifacts">Proof</a>
+    <a href="#artifacts">Principles</a>
   </nav>
-  <a class="header-cta" href="#early-access">Pedir acceso</a>
+  <div class="poster-nav-actions">
+    <a class="poster-login" href="#top">Login</a>
+    <a class="poster-try" href="#artifacts">Try Sibi</a>
+  </div>
 </header>
+<main class="poster-page" id="top">
+  <section class="poster-hero" aria-labelledby="hero-title">
+    <div class="poster-main">
+      <h1 id="hero-title">AI made<br>software faster<br>than understanding</h1>
+      <div class="red-underline" aria-hidden="true"></div>
 
-<main id="top">
-  <section class="hero section-band" aria-labelledby="hero-title">
-    <div class="hero-copy">
-      <h1 id="hero-title">De leer <span class="rotating-source" id="rotatingSource" data-terms="papers,blogs,lecturas,apuntes">papers</span> a construir entendimiento.</h1>
-      <p class="hero-lede">Sibar convierte research tecnico en un workspace de evidencia, artifacts, codigo y memoria para estudiar profundo aplicando lo aprendido.</p>
-      <div class="hero-actions">
-        <a class="primary-action" href="#demo">Ver el workspace</a>
-        <a class="secondary-action" href="#early-access">Entrar al early access</a>
+      <div class="hero-lower">
+        <div class="hero-claim">
+          <h2>Cognitive debt is<br>code you cannot defend.</h2>
+          <p>You can generate more code than you can understand.<br>Tests can pass while your mental model falls behind.<br>Sibi exists to close that gap.</p>
+          <a class="poster-button" href="#artifacts">Prove it <span aria-hidden="true">-></span></a>
+        </div>
+        <p class="hand-note">Ownership<br>is the only<br>real velocity.</p>
       </div>
     </div>
-    <aside class="hero-instrument" aria-label="Sibar workflow">
-      <span>Source</span>
-      <strong>Claim selected</strong>
-      <span>Artifact</span>
-      <strong>Notebook check</strong>
-      <span>Memory</span>
-      <strong>Formula ready</strong>
-    </aside>
   </section>
 
-  <section class="workspace-demo section-band" id="demo" aria-label="Sibar workspace preview">
-    <div class="tauri-window">
-      <div class="tauri-titlebar">
-        <span class="window-dot ink"></span>
-        <span class="window-dot amber"></span>
-        <span class="window-dot green"></span>
-        <strong>Sibar Research Workspace</strong>
-        <em>Focused workspace: embeddings</em>
-      </div>
-
-      <div class="workspace-preview">
-        <aside class="preview-path" aria-label="Workspace study path">
-          <div class="preview-path-head">
-            <span class="preview-glyph" aria-hidden="true"></span>
-            <strong>Study Path</strong>
-            <h2>Focused workspace: embeddings</h2>
-            <p>2 of 5</p>
-            <span class="preview-progress"><span></span></span>
+  <section class="poster-artifacts" id="artifacts" aria-labelledby="artifacts-title">
+    <h2 id="artifacts-title">SIBI OWNERSHIP REVIEW DEMO</h2>
+    <div class="demo-mockup" aria-label="Sibi ownership review product mockup">
+      <section class="demo-panel diff-panel-demo" aria-label="Paste diff">
+        <header class="demo-panel-head">
+          <div><span class="demo-icon">⌘</span><strong>Paste diff</strong></div>
+          <button type="button" aria-label="Close diff panel">×</button>
+        </header>
+        <div class="demo-panel-body">
+          <div class="file-line">
+            <strong>src/runtime/compileWorkspaceIntent.ts</strong>
+            <span><b>+423</b> <em>-61</em></span>
           </div>
-          <ol class="preview-node-list">
-            <li data-state="complete">
-              <span>1</span>
-              <strong>Embedding basics</strong>
-            </li>
-            <li data-state="ready" class="selected">
-              <span>2</span>
-              <strong>Failure cases</strong>
-              <ol>
-                <li class="selected"><em>2.1</em> Boundary checks</li>
-                <li><em>2.2</em> Evidence check</li>
-              </ol>
-            </li>
-            <li>
-              <span>3</span>
-              <strong>Toy implementation</strong>
-            </li>
-            <li data-state="locked">
-              <span>4</span>
-              <strong>Retrieval trade-offs</strong>
-            </li>
-          </ol>
-        </aside>
+          <pre class="demo-code"><code>@@ -128,7 +128,13 @@ export function compileWorkspaceIntent(
+128   const plan = buildPlan(input);
+129   const context = loadContext(plan);
+130   const result = execute(plan, context);
 
-        <section class="preview-study" aria-label="Workspace study surface">
-          <header class="preview-study-head">
-            <p>Current study</p>
-            <h2>Where do embeddings fail in real retrieval?</h2>
-          </header>
-          <section class="preview-open-node">
-            <h3>Selected learning node</h3>
+-     if (!result.ok) {
+-       return failure(result.error);
+-     }
+-     return success(result.value);
++     const evaluation = evaluateAttempt(result, context);
++     if (!evaluation.passed) {
++       recordFailure(evaluation);
++       return failure(evaluation.error);
++     }
++     return success(evaluation.value);
+131 }</code></pre>
+          <footer class="diff-footer">
+            <span>Files changed <b>7</b></span>
+            <span>Lines <b>+423</b> <em>-61</em></span>
+            <button type="button">Re-run review</button>
+          </footer>
+        </div>
+      </section>
+
+      <section class="demo-panel attempt-panel-demo" aria-label="Explain what breaks">
+        <header class="demo-panel-head">
+          <div><span class="demo-icon">◎</span><strong>Explain what breaks</strong></div>
+          <span>Boundary: Attempt Evaluation</span>
+        </header>
+        <div class="demo-panel-body">
+          <div class="sibi-asks">
+            <strong>Sibi asks</strong>
+            <ol>
+              <li>What is being evaluated?</li>
+              <li>What evidence proves it?</li>
+              <li>What would break if this layer was removed?</li>
+            </ol>
+          </div>
+          <label class="attempt-box-demo">
+            <span>Your attempt</span>
+            <textarea spellcheck="false">This layer evaluates the attempt result against the context. It gathers rules and checks from the context and runs validations. If we removed it, invalid results could be accepted and downstream metrics would be wrong.
+
+Evidence: evaluateAttempt(), recordFailure(), and the new evaluation type.</textarea>
+          </label>
+          <div class="attempt-actions">
+            <button type="button">Submit attempt</button>
+            <a href="#top">Ask for hint</a>
+          </div>
+          <div class="attempt-progress">
+            <span>2 attempts today</span>
+            <i><b></b></i>
+            <span>Good progress</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="demo-panel debt-panel-demo" aria-label="Debt reduced">
+        <header class="demo-panel-head">
+          <div><span class="demo-icon">↗</span><strong>Debt reduced</strong></div>
+        </header>
+        <div class="demo-panel-body">
+          <article class="debt-metric increase">
             <div>
-              <strong>Failure cases</strong>
-              <span>Resume with equation material in this session.</span>
+              <strong>Cognitive debt</strong>
+              <p>This change increased debt.</p>
+              <span>+18%</span>
+              <em>High increase</em>
             </div>
-          </section>
-          <section class="preview-evidence">
-            <header>
-              <h3>Evidence from sources <span>4</span></h3>
-              <button type="button" tabindex="-1">View all</button>
-            </header>
-            <article>
-              <span data-source="paper"></span>
-              <div>
-                <strong>Embedding overview paper excerpt</strong>
-                <em>Wu et al. - arXiv:2309.12345 - 2023</em>
-              </div>
-              <q>Short queries and out-of-domain language often break semantic generalization...</q>
-            </article>
-            <article>
-              <span data-source="code"></span>
-              <div>
-                <strong>Local toy retrieval notebook</strong>
-                <em>Local artifact - Notebook - 2024</em>
-              </div>
-              <q>Nearest neighbors drift when the query distribution shifts...</q>
-            </article>
-          </section>
-        </section>
-
-        <aside class="preview-tutor" aria-label="Sibar tutor guidance">
-          <header>
-            <span class="preview-tutor-glyph" aria-hidden="true"></span>
-            <strong>Sibar Tutor</strong>
-          </header>
-          <section class="preview-status">
-            <strong>You're on track</strong>
-            <p>Keep going with purpose.</p>
-            <span><span></span></span>
-          </section>
-          <section class="preview-guidance">
-            <h3>Focus guidance</h3>
-            <article>
-              <strong>Focus</strong>
-              <p>Identify the failure case.</p>
-            </article>
-            <article>
-              <strong>Consider</strong>
-              <p>Compare source claim and artifact.</p>
-            </article>
-            <article>
-              <strong>Produce</strong>
-              <p>Create one evidence-backed note.</p>
-            </article>
-          </section>
-          <section class="preview-readiness">
-            <h3>Readiness</h3>
-            <strong>78%</strong>
-            <p>Good readiness</p>
-          </section>
-        </aside>
-      </div>
+            <svg viewBox="0 0 260 90" aria-hidden="true">
+              <polyline points="12,58 48,42 75,56 104,54 136,42 170,20 205,36 232,24 252,10"></polyline>
+              <circle cx="252" cy="10" r="7"></circle>
+            </svg>
+          </article>
+          <article class="debt-metric recovered">
+            <div>
+              <strong>Ownership recovered</strong>
+              <p>After your attempt</p>
+              <span>-14%</span>
+              <em>Debt reduced</em>
+            </div>
+            <svg viewBox="0 0 260 90" aria-hidden="true">
+              <polyline points="12,25 50,28 76,12 108,25 142,50 176,54 210,66 252,78"></polyline>
+              <circle cx="252" cy="78" r="7"></circle>
+            </svg>
+          </article>
+          <div class="recovered-callout">
+            <strong>Ownership recovered</strong>
+            <p>You demonstrated understanding of this boundary.</p>
+          </div>
+          <a class="read-path-button" href="#top">View updated read path <span aria-hidden="true">-></span></a>
+        </div>
+      </section>
     </div>
   </section>
 
-  <section class="signal-section section-band" id="artifacts" aria-labelledby="artifacts-title">
-    <div class="signal-intro">
-      <p class="eyebrow">Artifacts generables</p>
-      <h2 id="artifacts-title">El estudio termina en piezas que podes volver a usar.</h2>
+  <footer class="poster-footer-cta" aria-label="Sibi call to action">
+    <div class="footer-actions">
+      <a class="footer-primary" href="#top">Try Sibi free <span aria-hidden="true">-></span></a>
+      <a class="footer-secondary" href="#artifacts">See how it works</a>
     </div>
-    <div class="signal-stack">
-      <div class="signal-card active">
-        <span>paper / evidencia</span>
-        <strong>Fuentes seleccionadas, claims y dudas en un mismo lugar.</strong>
-        <p>El workspace separa evidencia, notas y preguntas abiertas para que cada lectura tenga trazabilidad.</p>
-      </div>
-      <div class="signal-card">
-        <span>codigo reproducible</span>
-        <strong>Pequenos experimentos que prueban si entendiste.</strong>
-        <p>Converti una idea del material en un snippet, notebook o verificacion local que puedas repetir.</p>
-      </div>
-      <div class="signal-card">
-        <span>conocimiento / formulas</span>
-        <strong>Reglas, formulas y conexiones listas para aplicar.</strong>
-        <p>Lo aprendido queda como memoria de trabajo: definiciones, relaciones y pasos para volver sin empezar de cero.</p>
-      </div>
-    </div>
-  </section>
 
-  <section class="access-section section-band" id="early-access" aria-labelledby="access-title">
-    <div class="access-copy-block">
-      <p class="eyebrow">Early access</p>
-      <h2 id="access-title">Estoy abriendo Sibar con builders que ya sienten esta deuda.</h2>
-      <p>Deja tu correo y, si queres, tu handle de X. La siguiente tanda va a probar Sibar sobre papers, notas, codigo, formulas y loops de entendimiento durable.</p>
+    <div class="footer-principles" aria-label="Sibi principles">
+      <article>
+        <span class="footer-icon target-icon" aria-hidden="true"></span>
+        <div>
+          <strong>Focus on boundaries</strong>
+          <p>Not files. Understand responsibilities.</p>
+        </div>
+      </article>
+      <article>
+        <span class="footer-icon proof-icon" aria-hidden="true"></span>
+        <div>
+          <strong>Prove, don't assume</strong>
+          <p>Attempt, get feedback, close the gap.</p>
+        </div>
+      </article>
+      <article>
+        <span class="footer-icon track-icon" aria-hidden="true">
+          <i></i><i></i><i></i>
+        </span>
+        <div>
+          <strong>Track what matters</strong>
+          <p>Ownership coverage and cognitive debt over time.</p>
+        </div>
+      </article>
+      <article>
+        <span class="footer-icon ship-icon" aria-hidden="true"></span>
+        <div>
+          <strong>Ship with confidence</strong>
+          <p>Merge when ownership is proven.</p>
+        </div>
+      </article>
     </div>
-    <form class="access-form" id="earlyAccessForm">
-      <label for="earlyAccessEmail">Email</label>
-      <input id="earlyAccessEmail" name="email" type="email" placeholder="tu@email.com" autocomplete="email" required>
-      <label for="earlyAccessXHandle">X handle <span>opcional</span></label>
-      <input id="earlyAccessXHandle" name="x_handle" type="text" placeholder="@usuario" autocomplete="off" inputmode="text">
-      <button class="primary-action" type="submit">Pedir early access</button>
-      <p class="form-status" id="earlyAccessStatus" aria-live="polite"></p>
-    </form>
-  </section>
+  </footer>
 </main>
-
-<script type="module" src="scripts/landing.js"></script>
 </body>
 </html>
