@@ -5,8 +5,8 @@ import {
   createAttempt,
   evaluateAttempt,
   classifyGapTaxonomy,
-} from "../../src/runtime-attempt-evaluation.ts";
-import type { EvidenceCheck, UserAttempt } from "../../src/runtime-deep-ownership.ts";
+} from "../../engine/pedagogy/core/attempt-evaluation.ts";
+import type { EvidenceCheck, UserAttempt } from "../../engine/deep-ownership/index.ts";
 import { makeArtifact, makeEvidenceRef, makeOperation } from "./fixtures.ts";
 
 describe("VAL-PED-010: Gap Taxonomy", () => {

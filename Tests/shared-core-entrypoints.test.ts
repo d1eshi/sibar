@@ -4,11 +4,11 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import test from "node:test";
 
-import * as ownershipCore from "../src/ownership-core/index.ts";
-import * as pedagogyCore from "../src/pedagogy-core/index.ts";
-import * as memoryCore from "../src/memory-core/index.ts";
+import * as ownershipCore from "../engine/ownership-core/index.ts";
+import * as pedagogyCore from "../engine/pedagogy-core/index.ts";
+import * as memoryCore from "../engine/memory-core/index.ts";
 
-type CoreModulePath = "../src/ownership-core/index.ts" | "../src/pedagogy-core/index.ts" | "../src/memory-core/index.ts";
+type CoreModulePath = "../engine/ownership-core/index.ts" | "../engine/pedagogy-core/index.ts" | "../engine/memory-core/index.ts";
 
 const TEST_DIR = dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = join(TEST_DIR, "..");
@@ -21,8 +21,18 @@ function expectNoSurfaceImports(modulePath: CoreModulePath): void {
   assert.doesNotMatch(source, /from\s+["'][^"']*sibi\//);
   assert.doesNotMatch(source, /from\s+["'][^"']*web\//);
   assert.doesNotMatch(source, /from\s+["'][^"']*apps\/sibar-research-workspace\//);
-  assert.doesNotMatch(source, /from\s+["']\.{1,2}\/(?:runtime-state|store|pedagogoai\/workspace-(?:intent|int(?:ent)?-adapter|compiler-runner))/);
-  assert.doesNotMatch(source, /from\s+["'][^"']*runtime-workspace-(?:context|session)/);
+  assert.doesNotMatch(source, /from\s+["'][^"']*(?:persistence\/|memory\/|pedagogoai\/workspace-(?:intent|int(?:ent)?-adapter|compiler-runner))/);
+  assert.doesNotMatch(source, /from\s+["'][^"']*workspace\/session/);
+}
+
+function expectNoSourceMissionPlanningAdapters(modulePath: CoreModulePath): void {
+  const absolutePath = join(REPO_ROOT, modulePath.replace(/^\.\.\//, ""));
+  const source = readFileSync(absolutePath, "utf8");
+
+  assert.doesNotMatch(source, /from\s+["'][^"']*workspace\/source-mission/);
+  assert.doesNotMatch(source, /from\s+["'][^"']*workspace\/traces\/source-mission/);
+  assert.doesNotMatch(source, /from\s+["'][^"']*article-workspace/);
+  assert.doesNotMatch(source, /from\s+["'][^"']*pedagogoai\/workspace-intent/);
 }
 
 test("shared core entrypoints exist and are deterministic boundary facades", () => {
@@ -34,14 +44,34 @@ test("shared core entrypoints exist and are deterministic boundary facades", () 
   assert.equal(typeof pedagogyCore.evaluateFullLoop, "function");
   assert.equal(typeof pedagogyCore.createReadinessClaim, "function");
   assert.equal(typeof pedagogyCore.createAttempt, "function");
+  assert.equal(typeof pedagogyCore.attemptToReadiness, "function");
   assert.equal(typeof pedagogyCore.classifyGapTaxonomy, "function");
+  assert.equal(Object.hasOwn(pedagogyCore, "SOURCE_MISSION_TRACE_SCHEMA_VERSION"), false);
+  assert.equal(Object.hasOwn(pedagogyCore, "buildSourceMissionTraceRecord"), false);
+  assert.ok(pedagogyCore.RECOGNIZED_OPERATION_KINDS.includes("explain"));
+  assert.ok(pedagogyCore.RECOGNIZED_OPERATION_KINDS.includes("trace"));
+  assert.ok(pedagogyCore.RECOGNIZED_ARTIFACT_KINDS.includes("paper_excerpt"));
+  assert.ok(pedagogyCore.RECOGNIZED_ARTIFACT_KINDS.includes("test_oracle"));
+  assert.ok(pedagogyCore.RECOGNIZED_EVIDENCE_ROLES.includes("source_truth"));
+  assert.ok(pedagogyCore.RECOGNIZED_EVIDENCE_ROLES.includes("counterexample"));
+
+  const attempt = pedagogyCore.createAttempt({
+    operation_id: "operation-1",
+    answer_text: "I can explain this from the cited source slice.",
+    selected_evidence: ["evidence-1"],
+    declared_confidence: "medium",
+    declared_unknowns: ["implementation detail"],
+  });
+  assert.equal(attempt.operation_id, "operation-1");
+  assert.deepEqual(attempt.selected_evidence, ["evidence-1"]);
 
   assert.equal(memoryCore.MEMORY_CORE_VERSION, "0.1.0");
   assert.equal(memoryCore.MEMORY_CORE_STORE_VERSION, "memory-core@0.1.0");
 
-  expectNoSurfaceImports("../src/ownership-core/index.ts");
-  expectNoSurfaceImports("../src/pedagogy-core/index.ts");
-  expectNoSurfaceImports("../src/memory-core/index.ts");
+  expectNoSurfaceImports("../engine/ownership-core/index.ts");
+  expectNoSurfaceImports("../engine/pedagogy-core/index.ts");
+  expectNoSurfaceImports("../engine/memory-core/index.ts");
+  expectNoSourceMissionPlanningAdapters("../engine/pedagogy-core/index.ts");
 });
 
 test("memory core starts empty and append helpers are non-mutating", () => {

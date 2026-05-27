@@ -4,7 +4,7 @@ import { mkdtempSync, readFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
-import { runLlmRuntimeTraceEvals } from "../src/evals/llm-runtime-trace.ts";
+import { runLlmRuntimeTraceEvals } from "../engine/evals/llm-runtime-trace.ts";
 
 test("LLM runtime trace evals compare required Codex configs over identical fixture cases", () => {
   const previousCommand = process.env.SIBI_CODEX_COMMAND;

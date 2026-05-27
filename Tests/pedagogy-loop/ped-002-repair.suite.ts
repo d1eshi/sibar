@@ -4,13 +4,13 @@ import assert from "node:assert/strict";
 import {
   createOwnershipGap,
   createRepairAction,
-} from "../../src/runtime-pedagogy-loop.ts";
-import { evaluateAttempt } from "../../src/runtime-attempt-evaluation.ts";
+} from "../../engine/pedagogy/core/loop.ts";
+import { evaluateAttempt } from "../../engine/pedagogy/core/attempt-evaluation.ts";
 import {
   RECOGNIZED_OPERATION_KINDS,
   type OwnershipGap,
   type OwnershipGapKind,
-} from "../../src/runtime-deep-ownership.ts";
+} from "../../engine/deep-ownership/index.ts";
 import {
   evaluateShallowAttempt,
   makeConceptSlice,

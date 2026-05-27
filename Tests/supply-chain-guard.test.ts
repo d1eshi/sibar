@@ -22,7 +22,7 @@ import {
   runGuard,
   SCAN_FILES,
   checkDemoFiles,
-} from "../src/scripts/guard-supply-chain.ts";
+} from "../engine/scripts/guard-supply-chain.ts";
 
 function tempFile(content: string, ext = ".md"): string {
   const dir = mkdtempSync(join(tmpdir(), "sibar-guard-test-"));

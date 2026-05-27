@@ -1,7 +1,7 @@
 import test, { describe } from "node:test";
 import assert from "node:assert/strict";
 
-import type { EvidenceInventoryEntry } from "../../src/runtime-deep-ownership.ts";
+import type { EvidenceInventoryEntry } from "../../engine/deep-ownership/index.ts";
 import {
   AUTHORITY_RANK,
   generateCodeSliceArtifact,
@@ -10,7 +10,7 @@ import {
   resolveEvidenceAuthority,
   validateArtifactCitations,
   type GeneratedNode,
-} from "../../src/runtime-artifact-generation.ts";
+} from "../../engine/artifacts/generation.ts";
 import { loadFixture, makeConceptSlice, makeEvidenceEntry } from "./helpers.ts";
 
 describe("VAL-INTEL-004: Source Authority Handling", () => {

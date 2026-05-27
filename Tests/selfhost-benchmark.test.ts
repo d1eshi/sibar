@@ -5,7 +5,7 @@ import { spawnSync } from "node:child_process";
 import test from "node:test";
 import assert from "node:assert/strict";
 
-import { runSelfhostBenchmark } from "../src/evals/selfhost-benchmark.ts";
+import { runSelfhostBenchmark } from "../engine/evals/selfhost-benchmark.ts";
 
 const DEFAULT_MANIFEST_PATH = "evals/attempt-readiness/manifest.json";
 const DEFAULT_GOLD_CASE_INDEX = "evals/attempt-readiness/gold-cases/index.json";
@@ -205,7 +205,7 @@ test("CLI writes benchmark report with space-separated report flag", () => {
   try {
     const result = spawnSync(process.execPath, [
       "--experimental-strip-types",
-      resolve("src/evals/selfhost-benchmark.ts"),
+      resolve("engine/evals/selfhost-benchmark.ts"),
       "--report",
       reportPath,
     ], {
@@ -237,7 +237,7 @@ test("CLI exits nonzero for temp index mutation", () => {
   try {
     const result = spawnSync(process.execPath, [
       "--experimental-strip-types",
-      resolve("src/evals/selfhost-benchmark.ts"),
+      resolve("engine/evals/selfhost-benchmark.ts"),
       "--index",
       tempPath,
     ], {

@@ -1,11 +1,17 @@
 import * as React from "react";
 import shellStyles from "../../App.module.css";
 import styles from "./onboarding.module.css";
+import {
+  compileFrontierLabMissionFromSource,
+  type FrontierLabMissionCompileDiagnostic,
+  type FrontierLabMissionCompileResult,
+} from "../../../../../engine/workspace/source-mission/frontier-lab-compiler.ts";
+import { FRONTIER_LAB_BLOG_URL } from "../../../../../engine/workspace/source-mission/frontier-lab-fixture.ts";
+import type { MissionUiProjection } from "../../../../../engine/workspace/source-mission/ui-projection.ts";
 
 const fieldDefaults = {
-  intent:
-    "I want to understand embeddings so I can build one small retrieval feature and explain trade-offs quickly.",
-  source: "URL, pasted text, paper, or repository",
+  intent: "Why should this source become a mission now?",
+  source: FRONTIER_LAB_BLOG_URL,
   constraint:
     "Keep scope tight, prioritize practical examples, and finish quickly.",
   known: "What background can the plan assume?",
@@ -15,21 +21,21 @@ const fieldDefaults = {
 };
 
 const onboardingCopy = {
-  eyebrow: "New workspace",
-  heading: "What do you want to study or build?",
-  intro: "Turn one question and its sources into a focused first session.",
-  cta: "Review workspace plan",
-  sectionLabel: "Proposed plan",
+  eyebrow: "New mission",
+  heading: "What source should become a mission?",
+  intro: "Compile a supported source URL or pasted text and your reason into a focused Mission Brief.",
+  cta: "Review mission",
+  sectionLabel: "Mission preview",
   optionalLabel: "Optional background",
-  openWorkspaceLabel: "Open workspace",
+  openWorkspaceLabel: "Open Mission Brief",
   knownLabel: "What do you already know?",
   unknownLabel: "What do you not know yet?",
   desiredOutputLabel: "Desired output",
-  sourceLabel: "Source, repo, paper, or note",
-  intentLabel: "What are you trying to build or understand?",
+  sourceLabel: "Source URL or pasted text",
+  intentLabel: "Reason or goal",
   constraintLabel: "Constraint or reason",
-  statusReady: "Workspace plan is ready. You can review the learning path.",
-  statusWaiting: "Update fields and click Review workspace plan to regenerate the preview.",
+  statusReady: "Mission preview is compiled from the supported frontier-lab source.",
+  statusWaiting: "Enter a source URL or pasted text and reason, then review the mission.",
 };
 
 type FieldName = keyof typeof fieldDefaults;
@@ -43,21 +49,38 @@ type OnboardingIntent = {
   desiredOutput: string;
 };
 
-type WorkspacePlanPreview = {
+type MissionPlanPreview = {
   title: string;
-  firstSession: string;
-  outputs: [string, string, string];
+  sourceTitle: string;
+  sourceKind: string;
+  canonicalUrl: string | null;
+  userReason: string;
+  contextMessage: string;
+  sourceSignals: readonly {
+    label: string;
+    status: string;
+  }[];
+  tracks: readonly {
+    title: string;
+    status: string;
+  }[];
+  focusedQueue: readonly {
+    title: string;
+    status: string;
+    artifactHints: readonly string[];
+  }[];
 };
 
 type FlowState = {
   fields: OnboardingIntent;
   isOptionalOpen: boolean;
-  preview: WorkspacePlanPreview;
+  compileResult: FrontierLabMissionCompileResult | null;
+  preview: MissionPlanPreview | null;
   reviewedSignature: string | null;
 };
 
 type OnboardingFlowProps = {
-  onOpenWorkspace: () => void;
+  onOpenWorkspace: (missionProjection: MissionUiProjection) => void;
 };
 
 type FlowAction =
@@ -68,39 +91,20 @@ type FlowAction =
 const initialState: FlowState = {
   fields: {
     intent: "",
-    source: "",
+    source: FRONTIER_LAB_BLOG_URL,
     constraint: "",
     known: "",
     unknown: "",
     desiredOutput: "",
   },
   isOptionalOpen: false,
-  preview: {
-    title: "Workspace preview",
-    firstSession: "Add an intent and a source, then generate your workspace plan.",
-    outputs: [
-      "One bounded study path",
-      "One concrete first session artifact",
-      "One progress checkpoint",
-    ],
-  },
+  compileResult: null,
+  preview: null,
   reviewedSignature: null,
 };
 
 function normalizeText(value: string): string {
   return value.trim().replace(/\s+/g, " ");
-}
-
-function textPreviewFrom(value: string, maxWords: number): string {
-  const cleaned = normalizeText(value);
-  if (!cleaned) {
-    return "";
-  }
-  const words = cleaned.split(" ");
-  if (words.length <= maxWords) {
-    return cleaned;
-  }
-  return `${words.slice(0, maxWords).join(" ")}...`;
 }
 
 function buildSignature(values: OnboardingIntent): string {
@@ -114,46 +118,50 @@ function buildSignature(values: OnboardingIntent): string {
   });
 }
 
-function splitOutputList(raw: string): string[] {
-  return raw
-    .split(/[;,]| and /i)
-    .map((item) => normalizeText(item))
-    .filter(Boolean)
-    .filter((item) => item.length > 0);
+function compileDiagnosticsForEmptyReason(): FrontierLabMissionCompileDiagnostic[] {
+  return [
+    {
+      code: "source_intent_input_user_reason",
+      message: "Reason or goal is required before compiling a mission.",
+      severity: "error",
+      path: "user_reason",
+    },
+  ];
 }
 
-function makeWorkspacePreview(values: OnboardingIntent): WorkspacePlanPreview {
-  const intentSummary = textPreviewFrom(values.intent, 10);
-  const sourceSummary = normalizeText(values.source);
-  const constraintSummary = normalizeText(values.constraint);
-  const knownSummary = normalizeText(values.known);
-  const unknownSummary = normalizeText(values.unknown);
-  const desiredOutputList = splitOutputList(values.desiredOutput);
+function formatSourceKind(value: MissionUiProjection["mission_brief"]["source_context"]["source_kind"]): string {
+  return value === "url" ? "Blog URL" : value.replaceAll("_", " ");
+}
 
-  const title = "One focused session";
-  const fallbackSourceLine =
-    sourceSummary.length > 78
-      ? `${sourceSummary.slice(0, 75).trim()}...`
-      : sourceSummary || "the first source you add";
-  const firstSession = `Read one source slice from ${fallbackSourceLine}, produce one artifact scoped by ${constraintSummary.toLowerCase() || "the stated scope"}, and mark readiness once.`;
-  const fallbackOutputs = [
-    `One source-backed study path for ${intentSummary || "the chosen topic"}`,
-    "One first-session artifact proving what changed",
-    `One readiness checkpoint tied to ${unknownSummary || knownSummary || "the topic"}`,
-  ];
-  const outputs = [
-    ...desiredOutputList.slice(0, 2),
-    ...fallbackOutputs,
+function buildPreviewFromProjection(uiProjection: MissionUiProjection): MissionPlanPreview {
+  const sourceContext = uiProjection.mission_brief.source_context;
+  const focusedSessions = [
+    ...uiProjection.focused_queue.visible_sessions,
+    ...uiProjection.focused_queue.deferred_sessions,
+    ...uiProjection.focused_queue.locked_sessions,
   ];
 
   return {
-    title,
-    firstSession,
-    outputs: [
-      outputs[0] || fallbackOutputs[0],
-      outputs[1] || fallbackOutputs[1],
-      outputs[2] || fallbackOutputs[2],
-    ],
+    title: uiProjection.mission_brief.title,
+    sourceTitle: sourceContext.title ?? "Untitled source",
+    sourceKind: formatSourceKind(sourceContext.source_kind),
+    canonicalUrl: sourceContext.canonical_url,
+    userReason: sourceContext.user_reason,
+    contextMessage:
+      "This preview comes from the blog source plus your reason. It is a compact Mission Brief, not a long curriculum.",
+    sourceSignals: uiProjection.source_map.signals.slice(0, 3).map((signal) => ({
+      label: signal.label,
+      status: signal.confidence,
+    })),
+    tracks: uiProjection.mission_brief.tracks.slice(0, 3).map((track) => ({
+      title: track.title,
+      status: track.status,
+    })),
+    focusedQueue: focusedSessions.slice(0, 3).map((session) => ({
+      title: session.title,
+      status: session.status,
+      artifactHints: session.artifacts.slice(0, 3).map((artifact) => artifact.title),
+    })),
   };
 }
 
@@ -162,6 +170,8 @@ function reducer(state: FlowState, action: FlowAction): FlowState {
     return {
       ...state,
       fields: { ...state.fields, [action.field]: action.value },
+      compileResult: null,
+      preview: null,
       reviewedSignature: null,
     };
   }
@@ -175,9 +185,27 @@ function reducer(state: FlowState, action: FlowAction): FlowState {
 
   if (action.type === "review_workspace_plan") {
     const values = { ...state.fields };
+    const userReason = normalizeText(values.intent);
+    const result = userReason
+      ? compileFrontierLabMissionFromSource({
+          source: normalizeText(values.source),
+          user_reason: userReason,
+          optional_goal: normalizeText(values.desiredOutput) || undefined,
+          optional_constraints: [values.constraint, values.known, values.unknown]
+            .map((item) => normalizeText(item))
+            .filter(Boolean),
+        })
+      : {
+          ok: false,
+          diagnostics: compileDiagnosticsForEmptyReason(),
+        } satisfies FrontierLabMissionCompileResult;
+
     return {
       ...state,
-      preview: makeWorkspacePreview(values),
+      compileResult: result,
+      preview: result.ok && result.ui_projection
+        ? buildPreviewFromProjection(result.ui_projection)
+        : null,
       reviewedSignature: buildSignature(values),
     };
   }
@@ -186,7 +214,19 @@ function reducer(state: FlowState, action: FlowAction): FlowState {
 }
 
 function hasReviewedPlan(state: FlowState): boolean {
-  return state.reviewedSignature !== null;
+  return state.reviewedSignature !== null && state.compileResult?.ok === true && Boolean(state.compileResult.ui_projection);
+}
+
+function diagnosticText(state: FlowState): string {
+  if (state.compileResult && !state.compileResult.ok) {
+    return state.compileResult.diagnostics
+      .map((diagnostic) => diagnostic.message)
+      .join(" ");
+  }
+
+  return state.reviewedSignature === null
+    ? onboardingCopy.statusWaiting
+    : "Mission compiler did not return a usable UI projection.";
 }
 
 function IntentForm({
@@ -313,34 +353,98 @@ function IntentPreview({
 }: {
   state: FlowState;
   reviewReady: boolean;
-  onOpenWorkspace: () => void;
+  onOpenWorkspace: (missionProjection: MissionUiProjection) => void;
 }) {
   const statusMessage = reviewReady
     ? onboardingCopy.statusReady
-    : onboardingCopy.statusWaiting;
+    : diagnosticText(state);
+  const compiledProjection = state.compileResult?.ok
+    ? state.compileResult.ui_projection
+    : undefined;
 
   return (
     <aside className={shellStyles.intentPreview} aria-live="polite">
       <p className={shellStyles.sectionKicker}>{onboardingCopy.sectionLabel}</p>
-      <h2>{state.preview.title}</h2>
-      <div className={shellStyles.firstSessionCallout}>
-        <span>First session</span>
-        <strong>{state.preview.firstSession}</strong>
-      </div>
-      <p className={shellStyles.muted}>This workspace will produce:</p>
-      <ul className={shellStyles.itemList}>
-        {state.preview.outputs.map((output) => (
-          <li key={output}>{output}</li>
-        ))}
-      </ul>
+      <h2>{state.preview?.title ?? "No mission preview yet"}</h2>
+      {state.preview ? (
+        <>
+          <p className={shellStyles.muted}>{state.preview.contextMessage}</p>
+          <dl className={styles.previewMeta} aria-label="Source origin">
+            <div>
+              <dt>Source title</dt>
+              <dd>{state.preview.sourceTitle}</dd>
+            </div>
+            <div>
+              <dt>Source</dt>
+              <dd>{state.preview.sourceKind}</dd>
+            </div>
+            <div>
+              <dt>Canonical URL</dt>
+              <dd>{state.preview.canonicalUrl ?? "No canonical URL supplied."}</dd>
+            </div>
+            <div>
+              <dt>User reason</dt>
+              <dd>{state.preview.userReason}</dd>
+            </div>
+          </dl>
+
+          <div className={styles.previewGrid}>
+            <section className={styles.previewSection} aria-label="Source signals">
+              <h3>Detected signals</h3>
+              <ul>
+                {state.preview.sourceSignals.map((signal) => (
+                  <li key={signal.label}>
+                    <span>{signal.label}</span>
+                    <small>{signal.status}</small>
+                  </li>
+                ))}
+              </ul>
+            </section>
+
+            <section className={styles.previewSection} aria-label="Tracks">
+              <h3>Tracks</h3>
+              <ul>
+                {state.preview.tracks.map((track) => (
+                  <li key={track.title}>
+                    <span>{track.title}</span>
+                    <small>{track.status}</small>
+                  </li>
+                ))}
+              </ul>
+            </section>
+
+            <section className={styles.previewSection} aria-label="Focused Queue">
+              <h3>Focused Queue</h3>
+              <ul>
+                {state.preview.focusedQueue.map((session) => (
+                  <li key={session.title}>
+                    <span>{session.title}</span>
+                    <small>{session.status}</small>
+                    {session.artifactHints.length > 0 ? (
+                      <em>Artifact hints: {session.artifactHints.join(", ")}</em>
+                    ) : null}
+                  </li>
+                ))}
+              </ul>
+            </section>
+          </div>
+        </>
+      ) : (
+        <div className={shellStyles.firstSessionCallout}>
+          <span>Mission context</span>
+          <strong>Compile a supported source to preview the Mission, Tracks, Sessions, and Artifacts.</strong>
+        </div>
+      )}
       <p className={`${styles.contractStatus} ${reviewReady ? styles.sessionReady : ""}`} role="status" aria-live="polite">
         {statusMessage}
       </p>
       <button
         type="button"
-        disabled={!reviewReady}
+        disabled={!reviewReady || !compiledProjection}
         className={styles.openButton}
-        onClick={onOpenWorkspace}
+        onClick={() => {
+          if (compiledProjection) onOpenWorkspace(compiledProjection);
+        }}
       >
         {onboardingCopy.openWorkspaceLabel}
       </button>

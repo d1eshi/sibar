@@ -42,7 +42,7 @@
       "validation": "VAL-EVAL-006-selfhost-pilot",
       "title": "Attempt readiness manifest and gold case validator",
       "command": "pnpm eval:selfhost-pilot",
-      "implementation": "src/evals/selfhost-pilot.ts",
+      "implementation": "engine/evals/selfhost-pilot.ts",
       "llm_execution": "disabled",
       "inputs": [
         "evals/attempt-readiness/manifest.json",
@@ -58,7 +58,7 @@
       "validation": "VAL-EVAL-007-selfhost-benchmark",
       "title": "Attempt readiness deterministic benchmark",
       "command": "pnpm eval:selfhost-benchmark",
-      "implementation": "src/evals/selfhost-benchmark.ts",
+      "implementation": "engine/evals/selfhost-benchmark.ts",
       "llm_execution": "disabled",
       "inputs": [
         "evals/attempt-readiness/manifest.json",
@@ -73,7 +73,7 @@
       "validation": "VAL-EVAL-008-selfhost-freeform",
       "title": "Attempt readiness freeform evaluator",
       "command": "pnpm eval:selfhost-freeform",
-      "implementation": "src/evals/selfhost-freeform.ts",
+      "implementation": "engine/evals/selfhost-freeform.ts",
       "llm_execution": "disabled",
       "inputs": [
         "evals/attempt-readiness/manifest.json",

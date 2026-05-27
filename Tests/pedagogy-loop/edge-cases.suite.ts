@@ -6,8 +6,8 @@ import {
   buildPrerequisiteRoute,
   createReadinessClaim,
   createRepairAction,
-} from "../../src/runtime-pedagogy-loop.ts";
-import type { OwnershipGap, OwnershipGapKind } from "../../src/runtime-deep-ownership.ts";
+} from "../../engine/pedagogy/core/loop.ts";
+import type { OwnershipGap, OwnershipGapKind } from "../../engine/deep-ownership/index.ts";
 import { makeConceptSlice, makeEvidenceRef, makeOperation } from "./fixtures.ts";
 
 describe("Edge cases", () => {

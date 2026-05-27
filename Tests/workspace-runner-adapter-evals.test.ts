@@ -8,7 +8,7 @@ import {
   runWorkspaceRunnerAdapterEval,
   type WorkspaceRunnerAdapterEvalReport,
   WORKSPACE_RUNNER_ADAPTER_EVAL_GENERATED_AT,
-} from "../src/evals/workspace-runner-adapter.ts";
+} from "../engine/evals/workspace-runner-adapter.ts";
 
 test("Workspace runner adapter eval covers Rust fixture and offline Codex runner paths", () => {
   const outputDir = mkdtempSync(join(tmpdir(), "sibar-workspace-runner-adapter-eval-"));

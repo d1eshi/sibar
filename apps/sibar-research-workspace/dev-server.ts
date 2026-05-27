@@ -2,7 +2,7 @@ import { createReadStream, existsSync } from "node:fs";
 import { createServer } from "node:http";
 import { extname, join, normalize } from "node:path";
 
-import { runRustWorkspaceCompiler } from "../../src/pedagogoai/workspace-compiler-runner.ts";
+import { runRustWorkspaceCompiler } from "../../engine/pedagogoai/workspace-compiler-runner.ts";
 
 const repoRoot = process.cwd();
 const appRoot = join(process.cwd(), "apps", "sibar-research-workspace");

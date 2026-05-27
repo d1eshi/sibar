@@ -4,7 +4,7 @@ import { readFile, realpath, stat } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { repoInventory } from "../src/repo-inventory/repo-inventory.js";
+import { repoInventory } from "../engine/repo-inventory/repo-inventory.js";
 
 const PIERRE_REACT_DIST_FILE_PATTERN =
   /@pierre[/\\](?<packageName>[^/\\]+)[/\\]dist[/\\]react[/\\](?<filePath>[^"'\\\s]+?\.js)\b/;
