@@ -17,16 +17,16 @@ interface WorkspaceOverviewProps {
 }
 
 function getStudyHeadline(node: WorkspaceStudyNode): string {
-  if (node.id === "goal-correctness") {
-    return "Where do embeddings fail in real retrieval?";
-  }
-
   return node.scope;
 }
 
-function getProgressLabel(nodes: readonly WorkspaceStudyNode[]): string {
+function getProgressStep(nodes: readonly WorkspaceStudyNode[]): number {
   const activeIndex = nodes.findIndex((node) => node.status !== "complete");
-  const currentStep = activeIndex >= 0 ? activeIndex + 1 : nodes.length;
+  return activeIndex >= 0 ? activeIndex + 1 : nodes.length;
+}
+
+function getProgressLabel(nodes: readonly WorkspaceStudyNode[]): string {
+  const currentStep = getProgressStep(nodes);
   return `${currentStep} of ${nodes.length}`;
 }
 
@@ -39,7 +39,7 @@ export function WorkspaceOverview({
   const progressLabel = getProgressLabel(projection.nodes);
   const progressPercent = `${Math.max(
     20,
-    Math.round((2 / Math.max(projection.nodes.length, 1)) * 100),
+    Math.round((getProgressStep(projection.nodes) / Math.max(projection.nodes.length, 1)) * 100),
   )}%`;
 
   function selectNode(node: WorkspaceStudyNode) {
