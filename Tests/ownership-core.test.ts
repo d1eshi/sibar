@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 
-import { reviewOwnership } from "../src/ownership-core/diff-review.ts";
+import { reviewOwnership } from "../engine/ownership-core/diff-review.ts";
 
 const riskyDiffWithoutTests = `diff --git a/backend/auth/session.py b/backend/auth/session.py
 index 123..456 100644

@@ -5,7 +5,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
 
-import { runSelfhostPilotEval } from "../src/evals/selfhost-pilot.ts";
+import { runSelfhostPilotEval } from "../engine/evals/selfhost-pilot.ts";
 
 const DEFAULT_MANIFEST_PATH = "evals/attempt-readiness/manifest.json";
 const DEFAULT_GOLD_CASE_INDEX = "evals/attempt-readiness/gold-cases/index.json";
@@ -135,7 +135,7 @@ test("CLI accepts space-separated report flag and writes report file", () => {
   try {
     const result = spawnSync(process.execPath, [
       "--experimental-strip-types",
-      resolve("src/evals/selfhost-pilot.ts"),
+      resolve("engine/evals/selfhost-pilot.ts"),
       "--report",
       reportPath,
     ], {
@@ -159,7 +159,7 @@ test("CLI accepts space-separated index flag and honors provided index path", ()
   try {
     const result = spawnSync(process.execPath, [
       "--experimental-strip-types",
-      resolve("src/evals/selfhost-pilot.ts"),
+      resolve("engine/evals/selfhost-pilot.ts"),
       "--index",
       missingIndexPath,
     ], {
@@ -178,7 +178,7 @@ test("CLI accepts space-separated index flag and honors provided index path", ()
 test("CLI accepts space-separated manifest flag and exits nonzero for missing manifest", () => {
   const result = spawnSync(process.execPath, [
     "--experimental-strip-types",
-    resolve("src/evals/selfhost-pilot.ts"),
+    resolve("engine/evals/selfhost-pilot.ts"),
     "--manifest",
     "does-not-exist.json",
   ], {

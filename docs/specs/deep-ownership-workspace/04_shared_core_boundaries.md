@@ -32,8 +32,12 @@ ownership gap with evidence, scope, and a next action.
    UI code.
 4. Sibar Workspace may consume ownership, pedagogy, and memory cores through
    adapters that project them into Mission, Track, Session, and Artifact UI.
-5. Existing `runtime-*` entrypoints remain compatibility shims until imports and
-   tests have moved. No destructive rename is allowed before a shim exists.
+5. Existing `runtime-*` legacy entrypoints remain compatibility shims only when
+   there are external consumers or published compatibility contracts to protect.
+   If internal imports and tests have already moved and no external consumer is
+   identified, a layer rename or move may remove the shim in the same validated
+   slice. Do not create new shims by inertia when they would perpetuate
+   incorrect naming.
 6. New core entrypoints should re-export or wrap existing contracts first. Do
    not create a second gap, readiness, evidence, or artifact taxonomy.
 
@@ -62,7 +66,7 @@ Current source of truth to promote first:
 2. `sibi/Tests/sibi-ownership-review.test.ts`
 
 The first extraction should move this deterministic review logic into
-`src/ownership-core/` and leave `sibi/src/ownershipReview.ts` as a shim. Do not
+`engine/ownership-core/` and leave `sibi/src/ownershipReview.ts` as a shim. Do not
 merge it immediately with deep-ownership `EvidenceRef` or `ArtifactBoundary`;
 those contracts belong to the deeper loop and can be bridged later.
 
@@ -88,16 +92,16 @@ It owns:
 
 Current code already contains most of this logic:
 
-1. `src/pedagogy/*`
-2. `src/runtime-attempt-evaluation/*`
-3. `src/runtime-pedagogy-loop/*`
+1. `engine/pedagogy/*`
+2. `engine/pedagogy/core/attempt-evaluation/*`
+3. `engine/pedagogy/core/loop/*`
 4. pure deep-ownership contracts in
-   `src/runtime-deep-ownership-evidence-types.ts`,
-   `src/runtime-deep-ownership-loop-types.ts`,
-   `src/runtime-deep-ownership-boundary.ts`, and
-   `src/runtime-deep-ownership-intelligence.ts`
+   `engine/pedagogy/core/evidence-types.ts`,
+   `engine/pedagogy/core/loop-types.ts`,
+   `engine/deep-ownership/boundary.ts`, and
+   `engine/deep-ownership/intelligence.ts`
 
-The first implementation should create `src/pedagogy-core/` as an API boundary
+The first implementation should create `engine/pedagogy-core/` as an API boundary
 over existing logic. It should not introduce new versions of gap kinds,
 readiness claims, evidence refs, or repair actions.
 
@@ -168,12 +172,12 @@ Adapter-owned:
 
 Known adapter-heavy modules:
 
-1. `src/runtime-workspace-context.ts`
-2. `src/runtime-workspace-session*.ts`
-3. `src/runtime-state.ts`
-4. `src/store.ts`
-5. `src/runtime-deep-ownership-study-artifacts.ts`
-6. `src/pedagogoai/workspace-compiler-runner.ts`
+1. `engine/workspace/session/context.ts`
+2. `engine/workspace/session/*`
+3. `engine/persistence/state.ts`
+4. `engine/persistence/signal-store.ts`
+5. `engine/deep-ownership/study-artifacts.ts`
+6. `engine/pedagogoai/workspace-compiler-runner.ts`
 
 These modules may consume core, but they must not define the shared core
 taxonomy.
@@ -231,8 +235,8 @@ output must preserve these gates:
 
 Create core entrypoints as wrappers or re-exports:
 
-1. `src/ownership-core/index.ts`
-2. `src/pedagogy-core/index.ts`
+1. `engine/ownership-core/index.ts`
+2. `engine/pedagogy-core/index.ts`
 
 Do not move logic yet. Do not delete legacy runtime entrypoints.
 
@@ -248,7 +252,7 @@ Add a small import-boundary test before relying on the new entrypoints.
 
 ### Slice 2: Ownership Review Extraction
 
-Move deterministic Sibi ownership review logic into `src/ownership-core/` and
+Move deterministic Sibi ownership review logic into `engine/ownership-core/` and
 leave `sibi/src/ownershipReview.ts` as a compatibility shim.
 
 Coordinate this slice with any active agent touching `sibi/`.
@@ -262,7 +266,7 @@ pnpm run sibi:build
 
 ### Slice 3: Pedagogy Core Facade
 
-Promote existing deterministic pedagogy modules behind `src/pedagogy-core/`.
+Promote existing deterministic pedagogy modules behind `engine/pedagogy-core/`.
 Prefer aliases and re-exports before moving files.
 
 Verification:
@@ -275,7 +279,7 @@ pnpm eval:pedagogy-core-coverage
 
 ### Slice 4: Memory Core Contract
 
-Add `src/memory-core/` with event types, append helpers, and mappers from current
+Add `engine/memory-core/` with event types, append helpers, and mappers from current
 runtime structures. Do not change public commands in this slice.
 
 Verification:
@@ -306,13 +310,13 @@ pnpm test -- Tests/source-mission-contracts.test.ts
 Do not prune these until the corresponding core entrypoint, shim, and tests are
 stable:
 
-1. `src/runtime-deep-ownership.ts`
-2. `src/runtime-pedagogy-loop.ts`
-3. `src/runtime-attempt-evaluation.ts`
-4. `src/runtime-memory.ts`
-5. `src/runtime-state.ts`
-6. `src/store.ts`
-7. `src/pedagogoai/index.ts`
+1. `engine/deep-ownership/index.ts`
+2. `engine/pedagogy/core/loop.ts`
+3. `engine/pedagogy/core/attempt-evaluation.ts`
+4. `engine/memory/understanding-memory.ts`
+5. `engine/persistence/state.ts`
+6. `engine/persistence/signal-store.ts`
+7. `engine/pedagogoai/index.ts`
 
 The first goal is to make ownership, pedagogy, and memory boundaries explicit.
 Poda comes after imports prove the boundaries are real.

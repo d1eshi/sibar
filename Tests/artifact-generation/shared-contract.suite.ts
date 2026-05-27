@@ -5,13 +5,13 @@ import {
   RECOGNIZED_ARTIFACT_KINDS,
   RECOGNIZED_EVIDENCE_ROLES,
   RECOGNIZED_OPERATION_KINDS,
-} from "../../src/runtime-deep-ownership.ts";
+} from "../../engine/deep-ownership/index.ts";
 import {
   generateCodeSliceArtifact,
   generateDeterministicArtifacts,
   generateFlowDiagramArtifact,
   validateArtifactCitations,
-} from "../../src/runtime-artifact-generation.ts";
+} from "../../engine/artifacts/generation.ts";
 import { loadFixture } from "./helpers.ts";
 
 describe("VAL-ARTIFACT-005: Shared Evidence Contract", () => {

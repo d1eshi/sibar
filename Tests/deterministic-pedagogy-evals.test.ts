@@ -7,9 +7,9 @@ import { join, resolve } from "node:path";
 import {
   runDeterministicPedagogyEvals,
   type DeterministicPedagogyEvalReport,
-} from "../src/evals/deterministic-pedagogy.ts";
-import { materializeFixture } from "../src/evals/deterministic-pedagogy/fixtures.ts";
-import type { EvalCase } from "../src/evals/deterministic-pedagogy/types.ts";
+} from "../engine/evals/deterministic-pedagogy.ts";
+import { materializeFixture } from "../engine/evals/deterministic-pedagogy/fixtures.ts";
+import type { EvalCase } from "../engine/evals/deterministic-pedagogy/types.ts";
 
 test("deterministic pedagogy eval runner loads the E01 dataset and writes explicit results", () => {
   const outputDir = mkdtempSync(join(resolve("."), ".sibi-eval-tmp-report-"));

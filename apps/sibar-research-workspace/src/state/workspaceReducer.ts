@@ -25,6 +25,10 @@ export type WorkspaceStudyNote = {
 
 export type WorkspaceSessionAction =
   | {
+      type: "reset";
+      state: WorkspaceSessionState;
+    }
+  | {
       type: "select_node";
       nodeId: string;
       miniNodeId: string;
@@ -59,6 +63,10 @@ export function workspaceSessionReducer(
   state: WorkspaceSessionState,
   action: WorkspaceSessionAction,
 ): WorkspaceSessionState {
+  if (action.type === "reset") {
+    return action.state;
+  }
+
   if (action.type === "select_node") {
     return {
       ...state,

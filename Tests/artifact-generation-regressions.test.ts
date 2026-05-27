@@ -7,13 +7,13 @@ import {
   type ThinkingArtifact,
   type ConceptSlice,
   type EvidenceInventoryEntry,
-} from "../src/runtime-deep-ownership.ts";
+} from "../engine/deep-ownership/index.ts";
 
 import {
   generateCodeSliceArtifact,
   generateDeterministicArtifacts,
   validateArtifactCitations,
-} from "../src/runtime-artifact-generation.ts";
+} from "../engine/artifacts/generation.ts";
 
 const FIXTURE_PATH = "evals/deep-ownership-workspace/fixtures/sibi-pedagogy-loop.json";
 

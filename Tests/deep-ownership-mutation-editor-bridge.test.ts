@@ -11,7 +11,7 @@ import {
   type DeepOwnershipFixture,
   type DeepOwnershipLoop,
   type EvidenceRef,
-} from "../src/runtime-deep-ownership.ts";
+} from "../engine/deep-ownership/index.ts";
 
 const FIXTURE_PATH = "evals/deep-ownership-workspace/fixtures/sibi-pedagogy-loop.json";
 

@@ -47,6 +47,7 @@ test("workspace app uses the React Vite entry without legacy script loading", ()
 test("React workspace shell remains the runtime surface", () => {
   assert.match(workspaceApp, /data-component="research-workspace-root"/);
   assert.match(workspaceApp, /<WorkspaceShell/);
+  assert.match(workspaceApp, /<MissionOverview/);
   assert.match(workspaceApp, /<WorkspaceSessionLayout/);
   assert.doesNotMatch(workspaceApp, /document\.getElementById/);
   assert.doesNotMatch(workspaceApp, /initResearchWorkspace/);

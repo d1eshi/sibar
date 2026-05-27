@@ -21,7 +21,7 @@
       "title": "ownership-core stays free of host, surface, and adapter imports.",
       "status": "passed",
       "checked_paths": [
-        "src/ownership-core"
+        "engine/ownership-core"
       ],
       "files_checked": 2,
       "violations": []
@@ -31,7 +31,7 @@
       "title": "pedagogy-core stays free of host, surface, and adapter imports.",
       "status": "passed",
       "checked_paths": [
-        "src/pedagogy-core"
+        "engine/pedagogy-core"
       ],
       "files_checked": 1,
       "violations": []
@@ -41,7 +41,7 @@
       "title": "memory-core stays free of host, surface, and adapter imports.",
       "status": "passed",
       "checked_paths": [
-        "src/memory-core"
+        "engine/memory-core"
       ],
       "files_checked": 1,
       "violations": []

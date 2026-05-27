@@ -19,3 +19,82 @@
   opacity: 0.5;
   cursor: not-allowed;
 }
+
+.previewMeta {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 14px 0;
+  border-top: 1px solid var(--divider);
+  border-bottom: 1px solid var(--divider);
+}
+
+.previewMeta div {
+  display: grid;
+  gap: 3px;
+}
+
+.previewMeta dt {
+  color: var(--text-muted);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.previewMeta dd {
+  min-width: 0;
+  margin: 0;
+  overflow-wrap: anywhere;
+  color: var(--text-primary);
+  font-size: 14px;
+}
+
+.previewGrid {
+  display: grid;
+  gap: 14px;
+}
+
+.previewSection {
+  display: grid;
+  gap: 8px;
+}
+
+.previewSection h3 {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: 13px;
+}
+
+.previewSection ul {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.previewSection li {
+  display: grid;
+  gap: 4px;
+  padding: 0 0 8px;
+  border-bottom: 1px solid var(--divider);
+}
+
+.previewSection span {
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+
+.previewSection small {
+  width: fit-content;
+  color: var(--text-muted);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.previewSection em {
+  color: var(--text-muted);
+  font-size: 12px;
+  font-style: normal;
+}

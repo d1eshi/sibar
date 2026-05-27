@@ -11,6 +11,88 @@ accepted specs and iterations, not by raw commit count.
 Use this section for changes that have landed but are not part of a tagged
 release yet.
 
+### Added - Mission Session Bridge
+
+- Added a deterministic Mission -> Session bridge that normalizes source
+  signal/slice refs, maps free-form session operations into the closed pedagogy
+  operation taxonomy, builds stable source-slice excerpt evidence inventory
+  entries, and emits the existing attempt/readiness loop inputs.
+- Added a reusable frontier-lab blog fixture that validates through
+  SourceSignal, SourceSlice, MissionPreview, and MissionSessionBridge with a
+  focused first-session queue.
+- Added a UI-neutral Mission -> Track -> Session -> Artifact projection for the
+  source-mission runtime, including execution job status, bridge-backed queue
+  sessions, bridge-backed active session evidence/artifacts, focused queue
+  limits, secondary Source Map refs, session-scoped readiness, stable
+  reproducibility hashes, and a separated frontier-lab UI fixture helper.
+- Added the frontier-lab blog Mission Brief as the primary Tauri React workspace
+  experience, with Home opening to a focused queue before the active Session and
+  the static web workspace leading with the same mission context.
+- Added a deterministic frontier-lab source mission compiler that accepts the
+  supported blog URL intent, canonicalizes URL variants, clones the static source
+  facts into validated mission output, and rejects unsupported URLs without
+  inventing source signals.
+- Added the frontier-lab compiler to the New Mission UI so supported source URLs
+  and required user reasons produce the active Mission Brief, derived Home
+  projection, and session fixture while unsupported URLs stay blocked with
+  diagnostics.
+- Added deterministic pasted-text support for the frontier-lab New Mission
+  compiler when the source text includes all explicit fixture markers, while
+  preserving pasted/selected source kinds and leaving ambiguous text blocked.
+- Added a bounded New Mission review preview that shows source origin, user
+  reason, detected signals, Tracks, Focused Queue Sessions, and Artifact hints
+  before opening the Mission Brief.
+- Added a pure source-mission trace contract that summarizes frontier-lab intake,
+  mission projection, focused queue status, source/evidence counts, diagnostics,
+  and reproducibility hashes without exposing raw source maps in primary trace
+  output.
+- Added a pure append-only workspace trace store for source-mission compile
+  attempts, preserving completed, blocked, and failed source-intent attempts with
+  bounded intake summaries, compiler decisions, and mission snapshots.
+- Added the first deterministic React Session -> Artifact/Evidence attempt ->
+  scoped readiness loop for the frontier-lab active session, backed by the public
+  `pedagogy-core` facade and bridge-projected concept slice data.
+
+### Changed - Pedagogy Core Facade
+
+- Renamed the top-level TypeScript runtime tree from `src/` to `engine/` and
+  updated runtime scripts, imports, Swift lookup, and eval metadata to use the
+  new engine root.
+- Removed Node-only `crypto` imports from attempt capture/evaluation and loop
+  readiness IDs so the public pedagogy facade can be imported by the Vite React
+  workspace without adding browser polyfills.
+- Split the source-driven workspace mission modules under
+  `engine/workspace/source-mission/` and moved source-mission workspace traces
+  under `engine/workspace/traces/source-mission/`.
+- Grouped live workspace session runtime, contracts, context, constants, and
+  logic under `engine/workspace/session/`.
+- Grouped artifact session and deterministic artifact generation modules under
+  `engine/artifacts/`, replacing the flat `runtime-artifact-*` runtime naming.
+- Grouped project learning agent runner and validation modules under `engine/agent/`.
+- Grouped deep-ownership contracts, evidence, readiness, mutation, snapshot,
+  validation, and study artifact modules under `engine/deep-ownership/`,
+  replacing the previous flat runtime deep-ownership module naming.
+- Grouped study command adapters under `engine/study/` and shared runtime contracts
+  under `engine/runtime/contracts.ts`, leaving `engine/runtime.ts` as the dispatcher.
+- Split persisted runtime state and signal storage under `engine/persistence/`
+  and moved understanding-memory orchestration under `engine/memory/`.
+- Expanded `engine/pedagogy-core/index.ts` to expose the mission
+  attempt/evidence/readiness contracts and closed operation/artifact/evidence
+  taxonomies without re-exporting the adapter-heavy deep ownership runtime
+  entrypoint.
+- Locked the source-mission bridge tests to the public `engine/pedagogy-core`
+  facade, including frontier-lab readiness coverage scoped to the active
+  operation instead of the full mission.
+- Locked source-mission pedagogy contract imports to the public
+  `engine/pedagogy-core` facade, covering bridge, UI projection, and inline
+  contract types instead of direct `pedagogy/core` or `deep-ownership` imports.
+- Updated the frontier-lab React workspace UI so source fixture confidence is
+  shown as source review confidence, while readiness remains pending until a
+  scoped Artifact/Evidence attempt exists.
+- Moved attempt evaluation, pedagogy loop, and pure evidence/loop contract files
+  under `engine/pedagogy/core/` while keeping `engine/pedagogy-core/index.ts`
+  as the public facade.
+
 ### Added - Sibar Study Session Notes
 
 - Added a compact locally persisted study-session notes panel to the research
@@ -38,6 +120,7 @@ release yet.
   while keeping the reusable notebook layout.
 - Moved the default workspace/session seed data out of `workspaceProjection.ts`
   into an explicit workspace catalog so projection code only derives UI state.
+
 ### Changed - Capture PR Entry
 
 - Added a provider selector for PR ingestion so the Capture PR screen can switch
@@ -411,7 +494,7 @@ release yet.
 ### Added - Slice Final Sibi Ownership-Review Wedge
 
 - Converted `sibi/src/ownershipReview.ts` into a direct re-export shim of
-  `src/ownership-core/diff-review.ts` to keep Sibi and core review contracts in
+  `engine/ownership-core/diff-review.ts` to keep Sibi and core review contracts in
   parity by default.
 - Updated `sibi/README.md` and added `sibi/docs/ownership-wedge.md` to document
   the wedge flow (input, goal, gaps, evidence/tests, read path, status),
@@ -445,11 +528,11 @@ release yet.
 
 ### Added - Slice 2 Shared Core Entrypoints
 
-- Added `src/ownership-core/index.ts` as a minimal ownership boundary shim with
+- Added `engine/ownership-core/index.ts` as a minimal ownership boundary shim with
   copyable contract types and explicit extraction-ownership metadata.
-- Added `src/pedagogy-core/index.ts` as a deterministic facade over existing
+- Added `engine/pedagogy-core/index.ts` as a deterministic facade over existing
   pedagogy runtime contracts and functions.
-- Added `src/memory-core/index.ts` with an append-only `MemoryStore`, subject and
+- Added `engine/memory-core/index.ts` with an append-only `MemoryStore`, subject and
   evidence/attempt/gap/repair/review/transfer/artifact/event structures, and pure
   helper functions for immutable updates.
 - Added `Tests/shared-core-entrypoints.test.ts` to validate entrypoint availability,
@@ -457,7 +540,7 @@ release yet.
 
 ### Added - Slice 3 Memory Core Invariants
 
-- Added pure consistency checks for `MemoryStore` in `src/memory-core/index.ts`
+- Added pure consistency checks for `MemoryStore` in `engine/memory-core/index.ts`
   (`getMemoryStoreProblems` + `validateMemoryStore`), including subject,
   attempt, gap, and transfer reference invariants.
 - Added `Tests/memory-core.test.ts` with happy-path, missing-subject, missing-
@@ -468,9 +551,9 @@ release yet.
 ### Added - Slice 4 Ownership Review Deterministic Core Extraction
 
 - Extracted `sibi/src/ownershipReview.ts` heuristics into
-  `src/ownership-core/diff-review.ts` as a deterministic, import-safe core module
+  `engine/ownership-core/diff-review.ts` as a deterministic, import-safe core module
   with unchanged `reviewOwnership` behavior and typed outputs.
-- Added ownership review exports to `src/ownership-core/index.ts` and updated
+- Added ownership review exports to `engine/ownership-core/index.ts` and updated
   `OWNERSHIP_REVIEW_EXTRACTION_STATE.status` to `available`, with `ownedBySlice`
   set to `slice-4`.
 - Added `Tests/ownership-core.test.ts` and updated `sibi/Tests/sibi-ownership-review.test.ts`
@@ -621,10 +704,10 @@ release yet.
 ### Added - Source Mission Runtime Contracts (MVP)
 
 - Added source-to-mission contract definitions in
-  `src/runtime-source-mission-contracts.ts`:
+  `engine/workspace/source-mission/contracts.ts`:
   `SourceIntentInput`, `SourceIntakeResult`, `SourceSignal`, `MissionPreview`,
   `ProposedTrack`, and `ProposedSession`.
-- Added pure validators in `src/runtime-source-mission-validate.ts` for the same
+- Added pure validators in `engine/workspace/source-mission/validate.ts` for the same
   contract chain: source intent/input kinds, intake status/diagnostics, signal
   integrity, and mission preview invariants (`first_sessions` cap, track/session
   references, and source-backed references).
@@ -954,7 +1037,7 @@ release yet.
 - Created the first deterministic Deep Ownership fixture (`sibi-pedagogy-loop.json`)
   describing one scoped loop over the Sibi pedagogy runtime: gap detection,
   practice generation, memory, and readiness.
-- Added runtime type contracts and schema validation (`src/runtime-deep-ownership.ts`)
+- Added runtime type contracts and schema validation (`engine/deep-ownership/index.ts`)
   for evidence identity, role classification, boundary enforcement, unknown zones,
   skip records, thinking artifacts, and scoped readiness claims.
 - Added focused fixture/schema tests (`Tests/deep-ownership-fixture.test.ts`)

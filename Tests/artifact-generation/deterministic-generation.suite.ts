@@ -8,7 +8,7 @@ import {
   validateArtifactCitations,
   type GeneratedEdge,
   type GeneratedNode,
-} from "../../src/runtime-artifact-generation.ts";
+} from "../../engine/artifacts/generation.ts";
 import { loadFixture } from "./helpers.ts";
 
 describe("Deterministic Artifact Generation", () => {

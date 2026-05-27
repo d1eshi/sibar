@@ -1,0 +1,317 @@
+.missionOverview {
+  min-height: 100dvh;
+  display: grid;
+  gap: 22px;
+  padding: 42px clamp(28px, 5vw, 72px) 48px;
+  background: linear-gradient(90deg, var(--surface-panel) 0%, var(--surface-page) 100%);
+  color: var(--surface-ink);
+}
+
+.kicker {
+  margin: 0;
+  color: var(--olive-muted);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.missionHeader {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(240px, 320px);
+  gap: 24px;
+  align-items: end;
+  padding-bottom: 24px;
+  border-bottom: 1px solid var(--divider);
+}
+
+.missionHeader h1 {
+  max-width: 900px;
+  margin: 10px 0 0;
+  color: var(--surface-ink);
+  font-family: var(--font-serif);
+  font-size: clamp(42px, 4vw, 68px);
+  font-weight: 500;
+  line-height: 0.98;
+}
+
+.missionHeader p,
+.contextGrid p,
+.sectionHeader p,
+.trackList p,
+.artifactList p,
+.sessionDetail p {
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+.missionHeader p {
+  max-width: 76ch;
+  margin: 14px 0 0;
+  font-size: 16px;
+}
+
+.readinessCard,
+.contextGrid article,
+.queuePanel,
+.sidePanel,
+.sourceMap {
+  border: 1px solid var(--divider);
+  border-radius: var(--radius);
+  background: rgba(255, 252, 247, 0.74);
+}
+
+.readinessCard {
+  display: grid;
+  gap: 8px;
+  padding: 18px;
+}
+
+.readinessCard span,
+.trackList span,
+.queueButton span,
+.queueButtonActive span {
+  width: fit-content;
+  color: var(--olive-muted);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.readinessCard strong {
+  color: var(--text-primary);
+  font-size: 20px;
+}
+
+.readinessCard p {
+  margin: 0;
+}
+
+.contextGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.contextGrid article {
+  display: grid;
+  align-content: start;
+  gap: 10px;
+  min-height: 196px;
+  padding: 20px;
+}
+
+.contextGrid h2,
+.sectionHeader h2 {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: 22px;
+  line-height: 1.12;
+}
+
+.contextGrid a {
+  overflow-wrap: anywhere;
+  color: var(--olive);
+  font-size: 13px;
+}
+
+.contextGrid p {
+  margin: 0;
+  font-size: 14px;
+}
+
+.mainGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(320px, 0.42fr);
+  gap: 18px;
+  align-items: start;
+}
+
+.queuePanel,
+.sidePanel {
+  display: grid;
+  gap: 18px;
+  padding: 20px;
+}
+
+.sectionHeader {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(220px, 0.5fr);
+  gap: 18px;
+  align-items: start;
+}
+
+.sectionHeader p {
+  margin: 0;
+  font-size: 14px;
+}
+
+.queueList {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.queueList li {
+  border: 1px solid var(--divider);
+  border-radius: 8px;
+  background: var(--surface-panel);
+}
+
+.queueButton,
+.queueButtonActive {
+  width: 100%;
+  display: grid;
+  gap: 7px;
+  padding: 16px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  text-align: left;
+}
+
+.queueButtonActive {
+  background: var(--surface-soft);
+}
+
+.queueButton strong,
+.queueButtonActive strong {
+  color: var(--text-primary);
+  font-size: 17px;
+  line-height: 1.2;
+}
+
+.queueButton em,
+.queueButtonActive em {
+  color: var(--text-muted);
+  font-size: 13px;
+  font-style: normal;
+  line-height: 1.3;
+}
+
+.sessionDetail {
+  display: grid;
+  gap: 12px;
+  padding: 0 16px 16px;
+}
+
+.sessionDetail ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.sessionDetail li {
+  padding: 7px 10px;
+  border-radius: 999px;
+  color: var(--text-secondary);
+  background: var(--surface-soft);
+  font-size: 12px;
+}
+
+.sessionDetail button {
+  justify-self: start;
+  display: inline-flex;
+  gap: 8px;
+  height: 38px;
+  align-items: center;
+  color: var(--surface-panel-warm);
+  background: var(--teal);
+}
+
+.sidePanel {
+  align-content: start;
+}
+
+.sidePanel section,
+.trackList,
+.artifactList {
+  display: grid;
+  gap: 12px;
+}
+
+.trackList article,
+.artifactList article {
+  display: grid;
+  gap: 7px;
+  padding: 14px;
+  border: 1px solid var(--divider);
+  border-radius: 8px;
+  background: var(--surface-panel);
+}
+
+.trackList strong,
+.artifactList strong {
+  color: var(--text-primary);
+  line-height: 1.2;
+}
+
+.trackList p,
+.artifactList p {
+  margin: 0;
+  font-size: 13px;
+}
+
+.sourceMap {
+  padding: 16px 20px;
+}
+
+.sourceMap summary {
+  cursor: pointer;
+  color: var(--text-primary);
+  font-weight: 800;
+}
+
+.sourceMapGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+  margin-top: 18px;
+}
+
+.sourceMap h2 {
+  margin: 0 0 10px;
+  color: var(--text-primary);
+  font-size: 16px;
+}
+
+.sourceMap ul {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.sourceMap li {
+  display: grid;
+  gap: 4px;
+  padding: 10px 0;
+  border-top: 1px solid var(--divider);
+}
+
+.sourceMap strong {
+  color: var(--text-primary);
+  font-size: 14px;
+}
+
+.sourceMap span {
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+@media (max-width: 980px) {
+  .missionHeader,
+  .contextGrid,
+  .mainGrid,
+  .sectionHeader,
+  .sourceMapGrid {
+    grid-template-columns: 1fr;
+  }
+}

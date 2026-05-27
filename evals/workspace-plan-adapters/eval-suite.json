@@ -48,7 +48,7 @@
       "validation": "VAL-EVAL-009-workspace-intent-compiler",
       "title": "Workspace Intent compiler adapter eval",
       "command": "pnpm eval:workspace-intent",
-      "implementation": "src/evals/workspace-intent-compiler.ts",
+      "implementation": "engine/evals/workspace-intent-compiler.ts",
       "llm_execution": "disabled",
       "inputs": [
         "evals/workspace-plan-adapters/workspace-intent-compiler.eval.json"
@@ -62,7 +62,7 @@
       "validation": "VAL-EVAL-010-workspace-runner-adapter",
       "title": "Workspace runner adapter eval",
       "command": "pnpm eval:workspace-runner-adapter",
-      "implementation": "src/evals/workspace-runner-adapter.ts",
+      "implementation": "engine/evals/workspace-runner-adapter.ts",
       "llm_execution": "disabled",
       "inputs": [
         "evals/workspace-plan-adapters/workspace-runner-adapter.eval.json",
@@ -77,7 +77,7 @@
       "validation": "VAL-EVAL-011-workspace-model-io-boundary",
       "title": "Workspace model IO boundary eval",
       "command": "pnpm eval:workspace-model-io-boundary",
-      "implementation": "src/evals/workspace-model-io-boundary.ts",
+      "implementation": "engine/evals/workspace-model-io-boundary.ts",
       "llm_execution": "disabled",
       "inputs": [
         "evals/workspace-plan-adapters/workspace-model-io-boundary.eval.json"

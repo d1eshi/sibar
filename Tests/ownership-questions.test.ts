@@ -4,8 +4,8 @@ import { mkdirSync, mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
-import { handleRequest } from "../src/runtime.ts";
-import type { AutopsyStep, RuntimeQuestion } from "../src/runtime-support.ts";
+import { handleRequest } from "../engine/runtime.ts";
+import type { AutopsyStep, RuntimeQuestion } from "../engine/runtime/contracts.ts";
 
 type Success<T> = { ok: true; data: T };
 

@@ -8,7 +8,7 @@ import {
   runWorkspaceIntentCompilerEval,
   type WorkspaceIntentCompilerEvalReport,
   WORKSPACE_INTENT_COMPILER_EVAL_GENERATED_AT,
-} from "../src/evals/workspace-intent-compiler.ts";
+} from "../engine/evals/workspace-intent-compiler.ts";
 
 test("WorkspaceIntent compiler eval runs deterministic golden cases without an LLM", () => {
   const outputDir = mkdtempSync(join(tmpdir(), "sibar-workspace-intent-eval-"));

@@ -5,9 +5,9 @@ import {
   buildPrerequisiteRoute,
   createOwnershipGap,
   evaluateFullLoop,
-} from "../../src/runtime-pedagogy-loop.ts";
-import { createAttempt, evaluateAttempt } from "../../src/runtime-attempt-evaluation.ts";
-import type { OwnershipGap } from "../../src/runtime-deep-ownership.ts";
+} from "../../engine/pedagogy/core/loop.ts";
+import { createAttempt, evaluateAttempt } from "../../engine/pedagogy/core/attempt-evaluation.ts";
+import type { OwnershipGap } from "../../engine/deep-ownership/index.ts";
 import {
   evaluateShallowAttempt,
   makeConceptSlice,
