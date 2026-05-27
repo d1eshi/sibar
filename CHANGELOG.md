@@ -11,6 +11,33 @@ accepted specs and iterations, not by raw commit count.
 Use this section for changes that have landed but are not part of a tagged
 release yet.
 
+### Added - Sibar Study Session Notes
+
+- Added a compact locally persisted study-session notes panel to the research
+  workspace for capturing Platzi course entries with date, iteration label,
+  note body, and current session/source context.
+- Added app-scoped Vercel deployment config, public runtime storage guardrails,
+  env defaults, and optional Supabase notes schema documentation so the
+  note-taking workspace can ship as a static no-LLM public slice.
+
+### Changed - Sibar Study Workspace
+
+- Simplified the research workspace entry into an active Platzi course study
+  session, with note storage, note metrics, and note creation moved into small
+  runtime modules outside the app/component layer.
+- Reworked the left rail around the current course, selected session/source,
+  compact note outline, and recent notes instead of the previous full study path.
+- Moved the study note composer into the central workspace surface and separated
+  source artifacts/readiness into the right panel.
+- Added a reusable workspace session layout with left rail, main surface, and
+  optional support/artifacts slot, then changed the default Platzi course session
+  to render as a warm light two-column notebook without the artifact panel.
+- Updated the default session identity to `Curso de Estadística y Probabilidad -
+  Platzi` with a central `Clase 8, notas` writing surface.
+- Restored the active study session to the original light/cream workspace palette
+  while keeping the reusable notebook layout.
+- Moved the default workspace/session seed data out of `workspaceProjection.ts`
+  into an explicit workspace catalog so projection code only derives UI state.
 ### Changed - Capture PR Entry
 
 - Added a provider selector for PR ingestion so the Capture PR screen can switch
@@ -795,10 +822,12 @@ release yet.
 
 ### Internal - Deep Ownership Workspace Modularization
 
-- Refactored the monolithic `research-workspace.js` into focused modules
-  (`workspace-data`, `workspace-utils`, `workspace-study-plans`,
-  `workspace-contract`, `workspace-session`, `workspace-render`, and
-  `workspace-app`) while keeping the facade API and behavior stable.
+- Earlier modularized the DOM workspace runtime into focused data, utility,
+  contract, session, render, and app modules while keeping the facade API and
+  behavior stable.
+- Removed the retained DOM workspace facade after the React/Vite app became the
+  only Sibar workspace runtime surface, and updated tests/spec references to
+  reject non-React script loading.
 
 ### Docs - Deep Ownership Workspace Rust Execution Specs
 

@@ -2,13 +2,18 @@
   height: 100dvh;
   min-height: 720px;
   display: grid;
-  grid-template-columns: clamp(250px, 22vw, 350px) minmax(460px, 1fr) clamp(260px, 24vw, 360px);
+  grid-template-columns: clamp(220px, 19vw, 292px) minmax(0, 1fr) clamp(260px, 24vw, 360px);
   overflow: hidden;
-  color: var(--surface-ink);
+  color: var(--text-primary);
   background: var(--surface-page);
 }
 
+.workspaceFrame[data-has-support-slot="false"] {
+  grid-template-columns: clamp(220px, 19vw, 292px) minmax(0, 1fr);
+}
+
 .studyPathRail,
+.studyNotesWorkbench,
 .sessionWorkbench,
 .readinessPanel {
   min-width: 0;
@@ -21,11 +26,11 @@
   grid-template-rows: auto 1fr;
   overflow: auto;
   border-right: 1px solid var(--divider);
-  background: var(--surface);
+  background: var(--surface-panel-warm);
 }
 
 .railHeader {
-  padding: 28px 28px 22px;
+  padding: 24px 20px 18px;
   border-bottom: 1px solid var(--divider);
 }
 
@@ -64,16 +69,157 @@
 }
 
 .railHeader h2 {
-  margin: 34px 0 0;
+  margin: 28px 0 0;
   color: var(--text-primary);
-  font-size: 19px;
+  font-size: 18px;
   line-height: 1.2;
+}
+
+.activeSessionRailBody {
+  min-height: 0;
+  display: grid;
+  align-content: start;
+  gap: 20px;
+  padding: 18px 14px 24px;
+  overflow: auto;
+}
+
+.activeSessionCard,
+.activeSessionOutline,
+.activeSessionNotes {
+  display: grid;
+  gap: 10px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+
+.activeSessionCard h3,
+.activeSessionCard p,
+.activeSessionOutline p,
+.activeSessionNotes p,
+.activeSessionNotes ul {
+  margin: 0;
+}
+
+.activeSessionCard h3 {
+  color: var(--text-primary);
+  font-size: 17px;
+  line-height: 1.25;
+}
+
+.activeSessionCard p:last-child,
+.activeSessionNotes p {
+  color: var(--text-muted);
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.courseNoteTree {
+  display: grid;
+  gap: 6px;
+}
+
+.courseNoteTreeItemActive {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 14px minmax(0, 1fr);
+  gap: 10px;
+  align-items: start;
+  padding: 12px 10px;
+  border: 1px solid var(--divider);
+  border-radius: 6px;
+  color: var(--text-primary);
+  background: var(--surface-panel);
+  text-align: left;
+}
+
+.courseNoteTreeItemActive span {
+  width: 7px;
+  height: 7px;
+  margin-top: 6px;
+  border-radius: 50%;
+  background: var(--olive);
+}
+
+.courseNoteTreeItemActive strong {
+  color: var(--text-primary);
+  font-size: 14px;
+  line-height: 1.2;
+}
+
+.courseNoteTreeItemActive em {
+  grid-column: 2;
+  color: var(--text-muted);
+  font-size: 12px;
+  font-style: normal;
+  line-height: 1.25;
+}
+
+.activeSessionOutline .miniNodeList {
+  margin: 0;
+  padding-left: 0;
+}
+
+.activeSessionOutline .miniNodeList::before {
+  display: none;
+}
+
+.activeSessionOutline .miniNodeButton,
+.activeSessionOutline .miniNodeButtonActive {
+  grid-template-columns: 22px minmax(0, 1fr);
+  padding: 8px 10px;
+}
+
+.activeSessionOutline .miniNodeButton em,
+.activeSessionOutline .miniNodeButtonActive em {
+  grid-column: 2;
+  color: var(--text-muted);
+  font-size: 12px;
+  font-style: normal;
+  line-height: 1.25;
+}
+
+.activeSessionNotes ul {
+  display: grid;
+  gap: 8px;
+  padding: 0;
+  list-style: none;
+}
+
+.activeSessionNotes li {
+  display: grid;
+  gap: 4px;
+  padding-top: 8px;
+  border-top: 1px solid var(--divider);
+}
+
+.activeSessionNotes li:first-child {
+  padding-top: 0;
+  border-top: 0;
+}
+
+.activeSessionNotes strong {
+  color: var(--olive);
+  font-size: 12px;
+  text-transform: uppercase;
+}
+
+.activeSessionNotes span {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  color: var(--text-primary);
+  font-size: 13px;
+  line-height: 1.35;
 }
 
 .kicker {
   margin: 0;
-  color: var(--olive-muted);
-  font-size: 14px;
+  color: var(--olive);
+  font-size: 12px;
   font-weight: 700;
   letter-spacing: 0;
   text-transform: uppercase;
@@ -193,14 +339,14 @@
   padding: 12px 14px;
   border: 0;
   border-radius: 8px;
-  color: var(--text-secondary);
+  color: var(--text-muted);
   background: transparent;
   text-align: left;
 }
 
 .miniNodeButtonActive {
-  color: var(--olive);
-  background: var(--surface-soft);
+  color: var(--text-primary);
+  background: var(--surface);
 }
 
 .miniNodeButton:hover,
@@ -227,6 +373,14 @@
   gap: 18px;
   overflow: hidden;
   padding: 32px clamp(28px, 4vw, 58px) 34px;
+  background: linear-gradient(90deg, var(--surface-panel) 0%, var(--surface-page) 100%);
+}
+
+.studyNotesWorkbench {
+  height: 100dvh;
+  min-height: 0;
+  overflow: hidden;
+  padding: 30px clamp(28px, 5vw, 72px);
   background: linear-gradient(90deg, var(--surface-panel) 0%, var(--surface-page) 100%);
 }
 
@@ -449,33 +603,92 @@
   min-height: 0;
   display: grid;
   align-content: start;
-  gap: 20px;
+  gap: 18px;
   padding: 38px 28px;
   overflow: auto;
   border-left: 1px solid var(--divider);
   background: var(--surface-page);
 }
 
-.readinessPanel h3,
-.readinessPanel p,
-.readinessPanel ul,
-.panelToggle,
-.panelShow {
+.artifactPanel {
+  min-height: 0;
+  display: grid;
+  gap: 16px;
+}
+
+.artifactHeader {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: start;
+}
+
+.artifactHeader h3,
+.artifactHeader p {
   margin: 0;
 }
 
-.readinessPanel h3 {
+.artifactHeader h3 {
+  margin-top: 6px;
   color: var(--text-primary);
   font-size: 18px;
   line-height: 1.25;
 }
 
-.readinessPanel p {
+.artifactHeader p:last-child {
+  margin-top: 6px;
+  color: var(--text-muted);
+  font-size: 13px;
+  line-height: 1.35;
+}
+
+.artifactDocument {
+  max-height: 30dvh;
+  overflow: auto;
+  padding: 16px;
+  border: 1px solid var(--divider);
+  border-radius: 8px;
+  background: var(--surface-panel);
+  color: var(--text-primary);
+  font-family: var(--font-serif);
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.artifactDocument p {
+  margin: 0 0 12px;
+}
+
+.artifactDocument p:last-child {
+  margin-bottom: 0;
+}
+
+.guidePanel {
+  display: grid;
+  align-content: start;
+  gap: 20px;
+}
+
+.guidePanel h3,
+.guidePanel p,
+.guidePanel ul,
+.panelToggle,
+.panelShow {
+  margin: 0;
+}
+
+.guidePanel h3 {
+  color: var(--text-primary);
+  font-size: 18px;
+  line-height: 1.25;
+}
+
+.guidePanel p {
   color: var(--text-muted);
   line-height: 1.45;
 }
 
-.readinessPanel ul {
+.guidePanel ul {
   display: grid;
   gap: 16px;
   padding: 24px;
@@ -485,14 +698,14 @@
   list-style: none;
 }
 
-.readinessPanel li {
+.guidePanel li {
   position: relative;
   padding-left: 24px;
   color: var(--text-primary);
   line-height: 1.4;
 }
 
-.readinessPanel li::before {
+.guidePanel li::before {
   content: "";
   position: absolute;
   left: 0;
@@ -510,10 +723,245 @@
   color: var(--text-secondary);
 }
 
+.studyNotesPanel {
+  height: 100%;
+  min-height: 0;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  gap: 18px;
+  max-width: 1040px;
+  margin: 0 auto;
+}
+
+.studyNotesHeader {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 14px;
+  align-items: start;
+}
+
+.studyNotesHeader h1 {
+  margin: 10px 0 0;
+  color: var(--surface-ink);
+  font-family: var(--font-serif);
+  font-size: clamp(42px, 5vw, 76px);
+  font-weight: 500;
+  line-height: 0.96;
+}
+
+.studyNotesHeader div > p:last-child {
+  max-width: 620px;
+  margin-top: 8px;
+  color: var(--text-muted);
+  font-size: 15px;
+}
+
+.studyNoteStatsLine {
+  align-self: start;
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.studyNoteComposer {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  gap: 18px;
+  min-height: 0;
+  padding: clamp(22px, 4vw, 44px);
+  border: 1px solid var(--divider);
+  border-radius: 8px;
+  background: var(--surface-panel);
+  box-shadow: var(--shadow-lift);
+}
+
+.studyNoteComposer label {
+  display: grid;
+  gap: 6px;
+}
+
+.studyNoteComposer label > span {
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.studyNoteComposer input,
+.studyNoteComposer textarea {
+  color: var(--text-primary);
+  border-color: var(--divider);
+  border-radius: 6px;
+  background: var(--surface-panel-warm);
+}
+
+.studyNoteComposer textarea {
+  min-height: 100%;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background:
+    repeating-linear-gradient(
+      to bottom,
+      transparent 0,
+      transparent 31px,
+      color-mix(in srgb, var(--divider-strong) 48%, transparent) 32px
+    ),
+    var(--surface-panel);
+  color: var(--text-primary);
+  font-family: var(--font-serif);
+  font-size: clamp(20px, 2.2vw, 28px);
+  resize: vertical;
+  line-height: 32px;
+}
+
+.studyNoteComposer button {
+  justify-self: start;
+  padding: 11px 15px;
+  border-color: var(--olive);
+  border-radius: 999px;
+  color: var(--surface-panel);
+  background: var(--olive);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.studyNoteComposer button:disabled {
+  cursor: not-allowed;
+  opacity: 0.48;
+}
+
+.studyNoteContext {
+  display: grid;
+  gap: 6px;
+  align-content: center;
+}
+
+.studyNoteContext span {
+  color: var(--text-muted);
+  font-size: 12px;
+  line-height: 1.25;
+}
+
+.studyNoteContext span:first-child {
+  color: var(--text-primary);
+  font-weight: 700;
+}
+
+.studyNoteMetaRow {
+  display: grid;
+  grid-template-columns: minmax(220px, 0.7fr) minmax(0, 1fr);
+  gap: 20px;
+  align-items: end;
+}
+
+.studyNoteBodyField {
+  min-height: 0;
+}
+
+.studyNoteBodyField > span {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.studyNoteActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+}
+
+.studyNoteActions span {
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.studyNoteList {
+  display: flex;
+  gap: 12px;
+  min-height: 0;
+  padding-bottom: 2px;
+  overflow: auto;
+}
+
+.emptyStudyNotes {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 14px;
+}
+
+.studyNoteCard {
+  flex: 0 0 min(360px, 82vw);
+  display: grid;
+  gap: 10px;
+  padding: 12px 0 0;
+  border-top: 1px solid var(--divider);
+  border-right: 0;
+  border-bottom: 0;
+  border-left: 0;
+  border-radius: 8px;
+  background: transparent;
+}
+
+.studyNoteCard header,
+.studyNoteCard footer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.studyNoteCard header p,
+.studyNoteCard time,
+.studyNoteCard footer span {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 12px;
+  line-height: 1.25;
+}
+
+.studyNoteCard header p {
+  color: var(--olive);
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.studyNoteCard > p {
+  margin: 0;
+  white-space: pre-wrap;
+  color: var(--text-primary);
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.studyNoteCard footer {
+  justify-content: flex-start;
+}
+
+.studyNoteCard footer span {
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+
 @media (max-width: 1080px) {
   .workspaceFrame {
     grid-template-columns: minmax(240px, 30vw) minmax(0, 1fr);
     overflow: auto;
+  }
+
+  .workspaceFrame[data-has-support-slot="false"] {
+    grid-template-columns: minmax(220px, 28vw) minmax(0, 1fr);
   }
 
   .readinessPanel {
@@ -530,7 +978,12 @@
     grid-template-columns: 1fr;
   }
 
+  .workspaceFrame[data-has-support-slot="false"] {
+    grid-template-columns: 1fr;
+  }
+
   .studyPathRail,
+  .studyNotesWorkbench,
   .sessionWorkbench,
   .readinessPanel {
     height: auto;
@@ -542,7 +995,8 @@
     border-bottom: 1px solid var(--divider);
   }
 
-  .sessionWorkbench {
+  .sessionWorkbench,
+  .studyNotesWorkbench {
     padding: 34px 22px;
     overflow: visible;
   }
@@ -567,5 +1021,25 @@
   .readerDocument {
     overflow: visible;
     padding: 22px;
+  }
+
+  .studyNotesPanel {
+    grid-template-rows: auto auto auto;
+  }
+
+  .studyNotesHeader {
+    grid-template-columns: 1fr;
+  }
+
+  .studyNoteStatsLine {
+    white-space: normal;
+  }
+
+  .studyNoteMetaRow {
+    grid-template-columns: 1fr;
+  }
+
+  .studyNoteComposer textarea {
+    min-height: 420px;
   }
 }

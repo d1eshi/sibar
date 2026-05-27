@@ -12,20 +12,19 @@ work must be handed off to the deep-ownership adapter and execution specs.
 
 ## Current Source
 
-Legacy prototype files:
+React/Vite workspace files:
 
 1. `apps/sibar-research-workspace/index.html`
 2. `apps/sibar-research-workspace/styles/tokens.css`
 3. `apps/sibar-research-workspace/styles/base.css`
 4. `apps/sibar-research-workspace/styles/workspace.css`
-5. `apps/sibar-research-workspace/scripts/research-workspace.js`
-6. `apps/sibar-research-workspace/scripts/workspace-app.js`
-7. `apps/sibar-research-workspace/scripts/workspace-render.js`
-8. `apps/sibar-research-workspace/scripts/workspace-session.js`
-9. `apps/sibar-research-workspace/scripts/workspace-intent-adapter.js`
+5. `apps/sibar-research-workspace/src/main.tsx`
+6. `apps/sibar-research-workspace/src/App.tsx`
+7. `apps/sibar-research-workspace/src/flows/workspace/`
+8. `apps/sibar-research-workspace/src/state/`
 
-The migration should preserve fixture behavior while replacing DOM mutation with
-typed React components, reducers, and explicit UI projections.
+The migration should preserve fixture behavior through typed React components,
+reducers, and explicit UI projections.
 
 ## Target Stack
 
