@@ -20,7 +20,7 @@ const rootVercelConfig = JSON.parse(readFileSync(join(root, "vercel.json"), "utf
 const vercelConfig = JSON.parse(readFileSync(join(root, "web/vercel.json"), "utf8"));
 
 test("article workspace web deploy is rooted under /web", () => {
-  assert.match(webHtml, /Sibi - AI made software faster than understanding/);
+  assert.match(webHtml, /Sibar - AI made software faster than understanding/);
   assert.match(webHtml, /<link rel="stylesheet" href="styles\/main\.css/);
   assert.doesNotMatch(webHtml, /scripts\/reader\.js|scripts\/landing\.js/);
   assert.match(webApiClient, /fetch\(`\/api\/read\?url=\$\{encodeURIComponent\(url\)\}`\)/);
@@ -89,6 +89,8 @@ test("early access Vercel API is server-side only and self-contained", () => {
 });
 
 test("article workspace deploy excludes repository internals", () => {
+  assert.equal(rootVercelConfig.framework, null);
+  assert.equal(rootVercelConfig.installCommand, "pnpm install --frozen-lockfile");
   assert.equal(rootVercelConfig.outputDirectory, "web");
   assert.equal(rootVercelConfig.buildCommand, "pnpm run vercel:build");
   assert.equal(rootVercelConfig.cleanUrls, true);

@@ -1,0 +1,542 @@
+{
+  "report_id": "VAL-EVAL-015-ownership-question-planner-2026-05-28T00:00:00.000Z",
+  "generated_at": "2026-05-28T00:00:00.000Z",
+  "validation": "VAL-EVAL-015-ownership-question-planner",
+  "eval_spec_path": "evals/ownership-question-planner/eval-suite.json",
+  "no_llm": true,
+  "command": {
+    "script": "pnpm eval:ownership-question-planner",
+    "executed_with": "v23.11.0",
+    "executed_at": "2026-05-29T00:01:46.163Z",
+    "report_path": "evals/ownership-question-planner/reports/VAL-EVAL-015-ownership-question-planner.json"
+  },
+  "aggregate": {
+    "total_cases": 9,
+    "passed_cases": 9,
+    "failed_cases": 0,
+    "blocked_verification_cases": 1,
+    "accepted_with_questions_cases": 6,
+    "rejected_cases": 1,
+    "projection_batch_cases": 9,
+    "projection_fallback_cases": 1
+  },
+  "cases": [
+    {
+      "id": "OQP-001-LARGE-MULTI-UNITS",
+      "title": "Large React workbench file creates multiple ownership units and accepted local questions.",
+      "case_class": "large-file-multi-unit",
+      "passed": true,
+      "observations": {
+        "fixture_id": "LARGE-REACT-WORKBENCH",
+        "selected_file_path": "evals/ownership-question-planner/fixtures/large-react-workbench.tsx",
+        "baseline_planner_disposition": "accepted",
+        "baseline_unit_count": 19,
+        "baseline_question_count": 10,
+        "baseline_plan_heuristics": {
+          "isLargeFile": true,
+          "isComposite": true,
+          "lineCount": 735
+        },
+        "observed_verification_kind": "accepted",
+        "question_reject_count": 0,
+        "diagnostic_codes": [],
+        "diagnostics_by_severity": {},
+        "batch_disposition": "accepted",
+        "batch_question_count": 10,
+        "batch_question_ids": [
+          "question:c7edcfe8",
+          "question:386d3dff",
+          "question:75b5c524",
+          "question:53534fc0",
+          "question:9088d08f",
+          "question:18ba01b9",
+          "question:bbbdf8de",
+          "question:4400de5b",
+          "question:b6473146",
+          "question:989a9660"
+        ],
+        "batch_diagnostics": [],
+        "batch_codes": []
+      },
+      "mismatches": []
+    },
+    {
+      "id": "OQP-002-SMALL-COMPACT-FILE",
+      "title": "Small React workbench fixture stays compact and stays within a small question budget.",
+      "case_class": "small-file-compact",
+      "passed": true,
+      "observations": {
+        "fixture_id": "SMALL-REACT-WORKBENCH",
+        "selected_file_path": "evals/ownership-question-planner/fixtures/small-react-workbench.tsx",
+        "baseline_planner_disposition": "accepted",
+        "baseline_unit_count": 8,
+        "baseline_question_count": 6,
+        "baseline_plan_heuristics": {
+          "isLargeFile": false,
+          "isComposite": false,
+          "lineCount": 29
+        },
+        "observed_verification_kind": "accepted",
+        "question_reject_count": 0,
+        "diagnostic_codes": [],
+        "diagnostics_by_severity": {},
+        "batch_disposition": "accepted",
+        "batch_question_count": 6,
+        "batch_question_ids": [
+          "question:c7857331",
+          "question:4ed40c67",
+          "question:05f6521f",
+          "question:7b461c32",
+          "question:89cd4a19",
+          "question:0cce720a"
+        ],
+        "batch_diagnostics": [],
+        "batch_codes": []
+      },
+      "mismatches": []
+    },
+    {
+      "id": "OQP-003-INVALID-GENERIC-OVERVIEW",
+      "title": "Generic overview question text is rejected.",
+      "case_class": "invalid-generic-overview",
+      "passed": true,
+      "observations": {
+        "fixture_id": "LARGE-REACT-WORKBENCH",
+        "selected_file_path": "evals/ownership-question-planner/fixtures/large-react-workbench.tsx",
+        "baseline_planner_disposition": "accepted",
+        "baseline_unit_count": 19,
+        "baseline_question_count": 10,
+        "baseline_plan_heuristics": {
+          "isLargeFile": true,
+          "isComposite": true,
+          "lineCount": 735
+        },
+        "observed_verification_kind": "accepted_with_questions",
+        "question_reject_count": 1,
+        "diagnostic_codes": [
+          "question_generic_overview"
+        ],
+        "diagnostics_by_severity": {
+          "blocked": 1
+        },
+        "batch_disposition": "accepted_with_questions",
+        "batch_question_count": 9,
+        "batch_question_ids": [
+          "question:386d3dff",
+          "question:75b5c524",
+          "question:53534fc0",
+          "question:9088d08f",
+          "question:18ba01b9",
+          "question:bbbdf8de",
+          "question:4400de5b",
+          "question:b6473146",
+          "question:989a9660"
+        ],
+        "batch_diagnostics": [
+          {
+            "code": "provider_schema_invalid",
+            "severity": "blocked",
+            "message": "Question 'question:c7edcfe8' is a generic overview question instead of local ownership review.",
+            "questionId": "question:c7edcfe8",
+            "focusCandidateId": "focus:evals/ownership-question-planner/fixtures/large-react-workbench.tsx:74-86:hook_state:bf17f94f"
+          }
+        ],
+        "batch_codes": [
+          "provider_schema_invalid"
+        ]
+      },
+      "mismatches": []
+    },
+    {
+      "id": "OQP-004-INVALID-MISSING-CITATIONS",
+      "title": "Question without citations is rejected with missing-citations diagnostics.",
+      "case_class": "invalid-missing-citations",
+      "passed": true,
+      "observations": {
+        "fixture_id": "LARGE-REACT-WORKBENCH",
+        "selected_file_path": "evals/ownership-question-planner/fixtures/large-react-workbench.tsx",
+        "baseline_planner_disposition": "accepted",
+        "baseline_unit_count": 19,
+        "baseline_question_count": 10,
+        "baseline_plan_heuristics": {
+          "isLargeFile": true,
+          "isComposite": true,
+          "lineCount": 735
+        },
+        "observed_verification_kind": "accepted_with_questions",
+        "question_reject_count": 1,
+        "diagnostic_codes": [
+          "question_missing_citations"
+        ],
+        "diagnostics_by_severity": {
+          "blocked": 1
+        },
+        "batch_disposition": "accepted_with_questions",
+        "batch_question_count": 9,
+        "batch_question_ids": [
+          "question:386d3dff",
+          "question:75b5c524",
+          "question:53534fc0",
+          "question:9088d08f",
+          "question:18ba01b9",
+          "question:bbbdf8de",
+          "question:4400de5b",
+          "question:b6473146",
+          "question:989a9660"
+        ],
+        "batch_diagnostics": [
+          {
+            "code": "provider_schema_invalid",
+            "severity": "blocked",
+            "message": "Question 'question:c7edcfe8' has no citations.",
+            "questionId": "question:c7edcfe8",
+            "focusCandidateId": "focus:evals/ownership-question-planner/fixtures/large-react-workbench.tsx:74-86:hook_state:bf17f94f"
+          }
+        ],
+        "batch_codes": [
+          "provider_schema_invalid"
+        ]
+      },
+      "mismatches": []
+    },
+    {
+      "id": "OQP-005-INVALID-SCOPE-AND-SIGNAL",
+      "title": "Project-level signal wording and out-of-file citation are rejected.",
+      "case_class": "invalid-project-signal-or-out-of-scope-citation",
+      "passed": true,
+      "observations": {
+        "fixture_id": "LARGE-REACT-WORKBENCH",
+        "selected_file_path": "evals/ownership-question-planner/fixtures/large-react-workbench.tsx",
+        "baseline_planner_disposition": "accepted",
+        "baseline_unit_count": 19,
+        "baseline_question_count": 10,
+        "baseline_plan_heuristics": {
+          "isLargeFile": true,
+          "isComposite": true,
+          "lineCount": 735
+        },
+        "observed_verification_kind": "accepted_with_questions",
+        "question_reject_count": 1,
+        "diagnostic_codes": [
+          "question_selected_file_citation_missing",
+          "question_citation_out_of_scope",
+          "question_project_signal_only"
+        ],
+        "diagnostics_by_severity": {
+          "blocked": 3
+        },
+        "batch_disposition": "accepted_with_questions",
+        "batch_question_count": 9,
+        "batch_question_ids": [
+          "question:386d3dff",
+          "question:75b5c524",
+          "question:53534fc0",
+          "question:9088d08f",
+          "question:18ba01b9",
+          "question:bbbdf8de",
+          "question:4400de5b",
+          "question:b6473146",
+          "question:989a9660"
+        ],
+        "batch_diagnostics": [
+          {
+            "code": "provider_schema_invalid",
+            "severity": "blocked",
+            "message": "Question 'question:c7edcfe8' has no citation from selected file evals/ownership-question-planner/fixtures/large-react-workbench.tsx.",
+            "questionId": "question:c7edcfe8",
+            "focusCandidateId": "focus:evals/ownership-question-planner/fixtures/large-react-workbench.tsx:74-86:hook_state:bf17f94f"
+          },
+          {
+            "code": "provider_schema_invalid",
+            "severity": "blocked",
+            "message": "Question 'question:c7edcfe8' cites 'evals/ownership-question-planner/fixtures/large-react-workbench.tsx-external.tsx', which is outside evals/ownership-question-planner/fixtures/large-react-workbench.tsx.",
+            "questionId": "question:c7edcfe8",
+            "focusCandidateId": "focus:evals/ownership-question-planner/fixtures/large-react-workbench.tsx:74-86:hook_state:bf17f94f"
+          },
+          {
+            "code": "provider_schema_invalid",
+            "severity": "blocked",
+            "message": "Question 'question:c7edcfe8' relies on project-level signal rather than selected-file evidence.",
+            "questionId": "question:c7edcfe8",
+            "focusCandidateId": "focus:evals/ownership-question-planner/fixtures/large-react-workbench.tsx:74-86:hook_state:bf17f94f"
+          }
+        ],
+        "batch_codes": [
+          "provider_schema_invalid",
+          "provider_schema_invalid",
+          "provider_schema_invalid"
+        ]
+      },
+      "mismatches": []
+    },
+    {
+      "id": "OQP-006-INVALID-OVER-BUDGET",
+      "title": "Over-budget questions are retained as partial plan and reported as exceeded.",
+      "case_class": "invalid-over-budget",
+      "passed": true,
+      "observations": {
+        "fixture_id": "LARGE-REACT-WORKBENCH",
+        "selected_file_path": "evals/ownership-question-planner/fixtures/large-react-workbench.tsx",
+        "baseline_planner_disposition": "accepted",
+        "baseline_unit_count": 19,
+        "baseline_question_count": 10,
+        "baseline_plan_heuristics": {
+          "isLargeFile": true,
+          "isComposite": true,
+          "lineCount": 735
+        },
+        "observed_verification_kind": "accepted_with_questions",
+        "question_reject_count": 9,
+        "diagnostic_codes": [
+          "question_count_exceeded",
+          "question_count_exceeded",
+          "question_count_exceeded",
+          "question_count_exceeded",
+          "question_count_exceeded",
+          "question_count_exceeded",
+          "question_count_exceeded",
+          "question_count_exceeded",
+          "question_count_exceeded"
+        ],
+        "diagnostics_by_severity": {
+          "warning": 9
+        },
+        "batch_disposition": "accepted_with_questions",
+        "batch_question_count": 1,
+        "batch_question_ids": [
+          "question:c7edcfe8"
+        ],
+        "batch_diagnostics": [
+          {
+            "code": "provider_schema_invalid",
+            "severity": "warning",
+            "message": "Question 'question:386d3dff' exceeds budget 1 and was dropped.",
+            "questionId": "question:386d3dff",
+            "focusCandidateId": "focus:evals/ownership-question-planner/fixtures/large-react-workbench.tsx:99-99:hook_state:2a9ba349"
+          },
+          {
+            "code": "provider_schema_invalid",
+            "severity": "warning",
+            "message": "Question 'question:75b5c524' exceeds budget 1 and was dropped.",
+            "questionId": "question:75b5c524",
+            "focusCandidateId": "focus:evals/ownership-question-planner/fixtures/large-react-workbench.tsx:385-394:hook_state:7c845907"
+          },
+          {
+            "code": "provider_schema_invalid",
+            "severity": "warning",
+            "message": "Question 'question:53534fc0' exceeds budget 1 and was dropped.",
+            "questionId": "question:53534fc0",
+            "focusCandidateId": "focus:evals/ownership-question-planner/fixtures/large-react-workbench.tsx:131-140:api_call:a80dc49a"
+          },
+          {
+            "code": "provider_schema_invalid",
+            "severity": "warning",
+            "message": "Question 'question:9088d08f' exceeds budget 1 and was dropped.",
+            "questionId": "question:9088d08f",
+            "focusCandidateId": "focus:evals/ownership-question-planner/fixtures/large-react-workbench.tsx:375-388:api_call:5f00668b"
+          },
+          {
+            "code": "provider_schema_invalid",
+            "severity": "warning",
+            "message": "Question 'question:18ba01b9' exceeds budget 1 and was dropped.",
+            "questionId": "question:18ba01b9",
+            "focusCandidateId": "focus:evals/ownership-question-planner/fixtures/large-react-workbench.tsx:396-407:route_handler:020de5e3"
+          },
+          {
+            "code": "provider_schema_invalid",
+            "severity": "warning",
+            "message": "Question 'question:bbbdf8de' exceeds budget 1 and was dropped.",
+            "questionId": "question:bbbdf8de",
+            "focusCandidateId": "focus:evals/ownership-question-planner/fixtures/large-react-workbench.tsx:49-49:function:a33247b5"
+          },
+          {
+            "code": "provider_schema_invalid",
+            "severity": "warning",
+            "message": "Question 'question:4400de5b' exceeds budget 1 and was dropped.",
+            "questionId": "question:4400de5b",
+            "focusCandidateId": "focus:evals/ownership-question-planner/fixtures/large-react-workbench.tsx:1-16:unknown:71e95167"
+          },
+          {
+            "code": "provider_schema_invalid",
+            "severity": "warning",
+            "message": "Question 'question:b6473146' exceeds budget 1 and was dropped.",
+            "questionId": "question:b6473146",
+            "focusCandidateId": "focus:evals/ownership-question-planner/fixtures/large-react-workbench.tsx:42-42:function:6edaa9b2"
+          },
+          {
+            "code": "provider_schema_invalid",
+            "severity": "warning",
+            "message": "Question 'question:989a9660' exceeds budget 1 and was dropped.",
+            "questionId": "question:989a9660",
+            "focusCandidateId": "focus:evals/ownership-question-planner/fixtures/large-react-workbench.tsx:56-63:function:0509c2f4"
+          }
+        ],
+        "batch_codes": [
+          "provider_schema_invalid",
+          "provider_schema_invalid",
+          "provider_schema_invalid",
+          "provider_schema_invalid",
+          "provider_schema_invalid",
+          "provider_schema_invalid",
+          "provider_schema_invalid",
+          "provider_schema_invalid",
+          "provider_schema_invalid"
+        ]
+      },
+      "mismatches": []
+    },
+    {
+      "id": "OQP-007-INVALID-EVIDENCE-ID",
+      "title": "Invented evidence id is rejected as non-local evidence.",
+      "case_class": "invalid-invented-evidence-id",
+      "passed": true,
+      "observations": {
+        "fixture_id": "LARGE-REACT-WORKBENCH",
+        "selected_file_path": "evals/ownership-question-planner/fixtures/large-react-workbench.tsx",
+        "baseline_planner_disposition": "accepted",
+        "baseline_unit_count": 19,
+        "baseline_question_count": 10,
+        "baseline_plan_heuristics": {
+          "isLargeFile": true,
+          "isComposite": true,
+          "lineCount": 735
+        },
+        "observed_verification_kind": "accepted_with_questions",
+        "question_reject_count": 1,
+        "diagnostic_codes": [
+          "question_invented_evidence_id"
+        ],
+        "diagnostics_by_severity": {
+          "blocked": 1
+        },
+        "batch_disposition": "accepted_with_questions",
+        "batch_question_count": 9,
+        "batch_question_ids": [
+          "question:386d3dff",
+          "question:75b5c524",
+          "question:53534fc0",
+          "question:9088d08f",
+          "question:18ba01b9",
+          "question:bbbdf8de",
+          "question:4400de5b",
+          "question:b6473146",
+          "question:989a9660"
+        ],
+        "batch_diagnostics": [
+          {
+            "code": "provider_schema_invalid",
+            "severity": "blocked",
+            "message": "Question 'question:c7edcfe8' references invented evidence id 'invented-evidence-id-7f8e9d'.",
+            "questionId": "question:c7edcfe8",
+            "focusCandidateId": "focus:evals/ownership-question-planner/fixtures/large-react-workbench.tsx:74-86:hook_state:bf17f94f"
+          }
+        ],
+        "batch_codes": [
+          "provider_schema_invalid"
+        ]
+      },
+      "mismatches": []
+    },
+    {
+      "id": "OQP-008-INVALID-READINESS-CLAIM",
+      "title": "Readiness/finality claims are rejected.",
+      "case_class": "invalid-readiness-claim",
+      "passed": true,
+      "observations": {
+        "fixture_id": "LARGE-REACT-WORKBENCH",
+        "selected_file_path": "evals/ownership-question-planner/fixtures/large-react-workbench.tsx",
+        "baseline_planner_disposition": "accepted",
+        "baseline_unit_count": 19,
+        "baseline_question_count": 10,
+        "baseline_plan_heuristics": {
+          "isLargeFile": true,
+          "isComposite": true,
+          "lineCount": 735
+        },
+        "observed_verification_kind": "accepted_with_questions",
+        "question_reject_count": 1,
+        "diagnostic_codes": [
+          "question_readiness_or_ownership_claim"
+        ],
+        "diagnostics_by_severity": {
+          "blocked": 1
+        },
+        "batch_disposition": "accepted_with_questions",
+        "batch_question_count": 9,
+        "batch_question_ids": [
+          "question:386d3dff",
+          "question:75b5c524",
+          "question:53534fc0",
+          "question:9088d08f",
+          "question:18ba01b9",
+          "question:bbbdf8de",
+          "question:4400de5b",
+          "question:b6473146",
+          "question:989a9660"
+        ],
+        "batch_diagnostics": [
+          {
+            "code": "provider_schema_invalid",
+            "severity": "blocked",
+            "message": "Question 'question:c7edcfe8' includes readiness/ownership-finality language.",
+            "questionId": "question:c7edcfe8",
+            "focusCandidateId": "focus:evals/ownership-question-planner/fixtures/large-react-workbench.tsx:74-86:hook_state:bf17f94f"
+          }
+        ],
+        "batch_codes": [
+          "provider_schema_invalid"
+        ]
+      },
+      "mismatches": []
+    },
+    {
+      "id": "OQP-009-INVALID-MISSING-REPAIR-GATE",
+      "title": "Missing repair/refactor gating for large/composite files is rejected.",
+      "case_class": "invalid-missing-repair-gate",
+      "passed": true,
+      "observations": {
+        "fixture_id": "LARGE-REACT-WORKBENCH",
+        "selected_file_path": "evals/ownership-question-planner/fixtures/large-react-workbench.tsx",
+        "baseline_planner_disposition": "accepted",
+        "baseline_unit_count": 19,
+        "baseline_question_count": 10,
+        "baseline_plan_heuristics": {
+          "isLargeFile": true,
+          "isComposite": true,
+          "lineCount": 735
+        },
+        "observed_verification_kind": "rejected",
+        "question_reject_count": 10,
+        "diagnostic_codes": [
+          "missing_repair_refactor_gate",
+          "missing_repair_refactor_gate",
+          "missing_repair_refactor_gate",
+          "missing_repair_refactor_gate",
+          "missing_repair_refactor_gate",
+          "missing_repair_refactor_gate",
+          "missing_repair_refactor_gate",
+          "missing_repair_refactor_gate",
+          "missing_repair_refactor_gate",
+          "missing_repair_refactor_gate"
+        ],
+        "diagnostics_by_severity": {
+          "blocked": 10
+        },
+        "batch_disposition": "rejected",
+        "batch_question_count": 0,
+        "batch_question_ids": [],
+        "batch_diagnostics": [
+          {
+            "code": "question_batch_empty",
+            "severity": "blocked",
+            "message": "fallback batch for deterministic evals"
+          }
+        ],
+        "batch_codes": [
+          "question_batch_empty"
+        ]
+      },
+      "mismatches": []
+    }
+  ]
+}
