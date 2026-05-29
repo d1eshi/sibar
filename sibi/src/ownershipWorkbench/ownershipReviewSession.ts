@@ -113,7 +113,7 @@ export function advanceOwnershipSession(
         ...state,
         currentIndex: state.currentIndex + 1,
         weakAttemptStreak: 0,
-        lastFeedback: "Respuesta aceptada. Sibi avanza al siguiente check.",
+        lastFeedback: "Respuesta aceptada. Sibar avanza al siguiente check.",
         showHintLadder: false,
       },
     };
@@ -147,7 +147,7 @@ export function advanceOwnershipSession(
       currentIndex: state.currentIndex + 1,
       weakAttemptStreak,
       observations: nextObservations,
-      lastFeedback: `Gap registrado: ${weakReason}. Sibi avanza al siguiente check.`,
+      lastFeedback: `Gap registrado: ${weakReason}. Sibar avanza al siguiente check.`,
       showHintLadder: weakAttemptStreak >= 2,
     },
   };

@@ -92,6 +92,8 @@ test("repoInventory skip list blocks build outputs and cache directories", async
     await mkdir(join(fixtureRoot, "dist"), { recursive: true });
     await mkdir(join(fixtureRoot, "build"), { recursive: true });
     await mkdir(join(fixtureRoot, ".cache"), { recursive: true });
+    await mkdir(join(fixtureRoot, ".venv"), { recursive: true });
+    await mkdir(join(fixtureRoot, ".vercel"), { recursive: true });
     await mkdir(join(fixtureRoot, "keep"), { recursive: true });
     await mkdir(join(fixtureRoot, "keep", "nested"), { recursive: true });
 
@@ -104,6 +106,8 @@ test("repoInventory skip list blocks build outputs and cache directories", async
     await writeFile(join(fixtureRoot, "dist", "index.js"), "console.log('skip')");
     await writeFile(join(fixtureRoot, "build", "bundle.js"), "console.log('skip')");
     await writeFile(join(fixtureRoot, ".cache", "file"), "skip");
+    await writeFile(join(fixtureRoot, ".venv", "activate"), "skip");
+    await writeFile(join(fixtureRoot, ".vercel", "project.json"), "{}");
 
     const inventory = await repoInventory(fixtureRoot, {
       sourceRootLabel: "fixture",
@@ -139,6 +143,16 @@ test("repoInventory skip list blocks build outputs and cache directories", async
       inventory.files.some((entry) => entry.path === "fixture/.cache/file"),
       false,
       "cache files must be skipped",
+    );
+    assert.equal(
+      inventory.files.some((entry) => entry.path === "fixture/.venv/activate"),
+      false,
+      "virtualenv files must be skipped",
+    );
+    assert.equal(
+      inventory.files.some((entry) => entry.path === "fixture/.vercel/project.json"),
+      false,
+      "vercel output must be skipped",
     );
 
     assert.deepEqual(
@@ -193,6 +207,10 @@ test("classifyRepoInventoryRole classifies tests/docs/config/source/unknown", ()
   assert.equal(classifyRepoInventoryRole("docs/guide.md"), "doc");
   assert.equal(classifyRepoInventoryRole("README.md"), "doc");
   assert.equal(classifyRepoInventoryRole("vite.config.js"), "config");
+  assert.equal(classifyRepoInventoryRole("requirements.txt"), "config");
+  assert.equal(classifyRepoInventoryRole("pyproject.toml"), "config");
   assert.equal(classifyRepoInventoryRole("src/ownershipWorkbench/App.tsx"), "source");
   assert.equal(classifyRepoInventoryRole("src/ownershipWorkbench/logo.ico"), "unknown");
+  assert.equal(classifyRepoInventoryRole("server/api/main.py"), "source");
+  assert.equal(classifyRepoInventoryRole("scripts/task.sh"), "unknown");
 });

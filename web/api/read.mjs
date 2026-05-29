@@ -267,7 +267,7 @@ async function fetchArticleHtml(initialUrl) {
         signal: controller.signal,
         headers: {
           accept: "text/html,application/xhtml+xml",
-          "user-agent": "SibiArticleWorkspace/0.1 Vercel",
+          "user-agent": "SibarArticleWorkspace/0.1 Vercel",
         },
       });
 

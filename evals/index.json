@@ -72,6 +72,22 @@
         "deterministic",
         "no-llm"
       ]
+    },
+    {
+      "suite_id": "ownership-question-planner",
+      "title": "Ownership question planner evals",
+      "summary": "Evaluates deterministic ownership question planning, verifier gates, and projection outcomes for local selected files.",
+      "manifest_path": "evals/ownership-question-planner/eval-suite.json",
+      "docs": [
+        "evals/ownership-question-planner/README.md"
+      ],
+      "tags": [
+        "ownership-question-planner",
+        "question-planning",
+        "verifier-gates",
+        "projection",
+        "no-llm"
+      ]
     }
   ]
 }
