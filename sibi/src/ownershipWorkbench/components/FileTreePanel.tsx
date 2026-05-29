@@ -21,15 +21,19 @@ function makeRowDecoration(
 ): FileTreeRowDecoration {
   const nodeState = getNodeState(node, fileStates);
   const reason = getNodeReason(node, fileStates, fileStateReasons ?? {});
+  const title = reason ?? "";
 
   if (reason && nodeState !== "owned") {
     return {
-      text: `${labelForState(nodeState)} · ${makeReasonSnippet(reason)}`,
-      title: reason,
+      text: [labelForState(nodeState), makeReasonSnippet(reason)].filter(Boolean).join(" · "),
+      title,
     };
   }
 
-  return { text: labelForState(nodeState) };
+  return {
+    text: [labelForState(nodeState)].filter(Boolean).join(" · "),
+    ...(title.length === 0 ? {} : { title }),
+  };
 }
 
 export function FileTreePanel({
@@ -58,13 +62,62 @@ export function FileTreePanel({
       return makeRowDecoration(node, fileStates, fileStateReasons);
     },
   });
+  const selectablePaths = React.useMemo(
+    () => fileTreePaths.filter((path) => fileTreeNodeByPath[path]?.kind === "file"),
+    [fileTreeNodeByPath, fileTreePaths],
+  );
+
+  React.useEffect(() => {
+    const selectedNode = fileTreeNodeByPath[selectedPath];
+    if (selectedNode?.kind !== "file") return;
+
+    const selectedItem = model.getItem(selectedPath);
+    if (selectedItem == null) return;
+
+    const currentlySelectedPaths = model.getSelectedPaths();
+    const isSingleSelection = currentlySelectedPaths.length === 1 && currentlySelectedPaths[0] === selectedPath;
+    const isTargetSelected = currentlySelectedPaths.includes(selectedPath);
+
+    if (!isSingleSelection) {
+      for (const path of currentlySelectedPaths) {
+        if (path === selectedPath) continue;
+        model.getItem(path)?.deselect();
+      }
+    }
+
+    if (!isTargetSelected) {
+      selectedItem.select();
+    }
+
+    if (model.getFocusedPath() !== selectedPath) {
+      selectedItem.focus();
+    }
+
+    model.scrollToPath(selectedPath, { focus: true, offset: "nearest" });
+  }, [model, selectedPath, fileTreeNodeByPath]);
 
   return (
     <aside className="panel fileTreePanel">
       <header className="panelHeader">
-        <span className="brand">Sibi</span>
+        <span className="brand">Sibar</span>
         <p className="panelSub">Ownership Map</p>
       </header>
+      <label className="treePathJump">
+        <span>Review target</span>
+        <select
+          aria-label="Select review path"
+          value={selectedPath}
+          onChange={(event) => {
+            onSelectFile(event.target.value);
+          }}
+        >
+          {selectablePaths.map((path) => (
+            <option key={path} value={path}>
+              {path}
+            </option>
+          ))}
+        </select>
+      </label>
       <div className="treeHost">
         <FileTree model={model} style={{ height: "100%" }} />
       </div>

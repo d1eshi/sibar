@@ -11,7 +11,7 @@ export default defineConfig({
     trace: "on-first-retry",
   },
   webServer: {
-    command: "pnpm run sibi:dev",
+    command: "GEMINI_API_KEY= GOOGLE_API_KEY= pnpm run sibi:dev",
     url: "http://127.0.0.1:5174",
     reuseExistingServer: true,
     timeout: 120_000,

@@ -14,6 +14,8 @@ const DEFAULT_SKIP_NAMES = new Set([
   ".vite",
   ".vite-cache",
   ".vitepress",
+  ".venv",
+  ".vercel",
   "__pycache__",
   "build",
   "coverage",
@@ -24,7 +26,7 @@ const DEFAULT_SKIP_NAMES = new Set([
   "target",
 ]);
 
-const SOURCE_EXTENSIONS = new Set([".css", ".html", ".js", ".jsx", ".mjs", ".ts", ".tsx"]);
+const SOURCE_EXTENSIONS = new Set([".css", ".html", ".js", ".jsx", ".mjs", ".ts", ".tsx", ".py"]);
 
 const DOC_EXTENSIONS = new Set([".md", ".mdx", ".txt"]);
 const DOC_PATH_HINTS = ["/docs/", "\\docs\\", "/doc/", "\\doc\\"];
@@ -40,6 +42,8 @@ const TEST_PATH_HINTS = [
 
 const CONFIG_FILENAMES = new Set([
   ".env.example",
+  "pyproject.toml",
+  "requirements.txt",
   "package.json",
   "playwright.config.ts",
   "tsconfig.json",
@@ -116,12 +120,12 @@ export function classifyRepoInventoryRole(filePath) {
     return "test";
   }
 
-  if (DOC_EXTENSIONS.has(extension) || containsPathHint(normalizedPath, DOC_PATH_HINTS)) {
-    return "doc";
-  }
-
   if (CONFIG_FILENAMES.has(basename) || containsPathHint(normalizedPath, CONFIG_PATH_HINTS) || /\.config\.[cm]?[jt]s$/.test(normalizedPath)) {
     return "config";
+  }
+
+  if (DOC_EXTENSIONS.has(extension) || containsPathHint(normalizedPath, DOC_PATH_HINTS)) {
+    return "doc";
   }
 
   if (SOURCE_EXTENSIONS.has(extension)) {

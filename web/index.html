@@ -3,10 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sibi - AI made software faster than understanding</title>
-<meta name="description" content="Sibi convierte cognitive debt en ownership demostrado: prove it, diagnose the gap, repair the boundary.">
-<meta property="og:title" content="Sibi - Cognitive debt is code you cannot defend">
-<meta property="og:description" content="Ownership is a practice, not a feeling. Sibi helps engineering teams prove ownership over AI-generated software.">
+<title>Sibar - AI made software faster than understanding</title>
+<meta name="description" content="Sibar convierte cognitive debt en ownership demostrado: prove it, diagnose the gap, repair the boundary.">
+<meta property="og:title" content="Sibar - Cognitive debt is code you cannot defend">
+<meta property="og:description" content="Ownership is a practice, not a feeling. Sibar helps engineering teams prove ownership over AI-generated software.">
 <script>
 window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
 window.va("beforeSend", (event) => {
@@ -29,7 +29,7 @@ if (location.protocol !== "file:" && location.hostname !== "localhost" && locati
 <link rel="stylesheet" href="styles/main.css?v=poster-nav">
 </head>
 <body class="landing variant-poster">
-<header class="poster-navbar" aria-label="Sibi navigation">
+<header class="poster-navbar" aria-label="Sibar navigation">
   <nav class="poster-nav-links" aria-label="Primary">
     <a class="is-active" href="#top">Manifesto</a>
     <a href="#artifacts">How it works</a>
@@ -38,7 +38,7 @@ if (location.protocol !== "file:" && location.hostname !== "localhost" && locati
   </nav>
   <div class="poster-nav-actions">
     <a class="poster-login" href="#top">Login</a>
-    <a class="poster-try" href="#artifacts">Try Sibi</a>
+    <a class="poster-try" data-demo-link href="/sibi/?workbench=1&amp;sourceRoot=sibi%2Fdemo%2Freact-fastapi-todo&amp;view=user">Try Sibar</a>
   </div>
 </header>
 <main class="poster-page" id="top">
@@ -50,8 +50,8 @@ if (location.protocol !== "file:" && location.hostname !== "localhost" && locati
       <div class="hero-lower">
         <div class="hero-claim">
           <h2>Cognitive debt is<br>code you cannot defend.</h2>
-          <p>You can generate more code than you can understand.<br>Tests can pass while your mental model falls behind.<br>Sibi exists to close that gap.</p>
-          <a class="poster-button" href="#artifacts">Prove it <span aria-hidden="true">-></span></a>
+          <p>You can generate more code than you can understand.<br>Tests can pass while your mental model falls behind.<br>Sibar exists to close that gap.</p>
+          <a class="poster-button" data-demo-link href="/sibi/?workbench=1&amp;sourceRoot=sibi%2Fdemo%2Freact-fastapi-todo&amp;view=user">Open the React + FastAPI demo <span aria-hidden="true">-></span></a>
         </div>
         <p class="hand-note">Ownership<br>is the only<br>real velocity.</p>
       </div>
@@ -59,8 +59,8 @@ if (location.protocol !== "file:" && location.hostname !== "localhost" && locati
   </section>
 
   <section class="poster-artifacts" id="artifacts" aria-labelledby="artifacts-title">
-    <h2 id="artifacts-title">SIBI OWNERSHIP REVIEW DEMO</h2>
-    <div class="demo-mockup" aria-label="Sibi ownership review product mockup">
+    <h2 id="artifacts-title">SIBAR OWNERSHIP REVIEW DEMO</h2>
+    <div class="demo-mockup" aria-label="Sibar ownership review product mockup">
       <section class="demo-panel diff-panel-demo" aria-label="Paste diff">
         <header class="demo-panel-head">
           <div><span class="demo-icon">⌘</span><strong>Paste diff</strong></div>
@@ -102,7 +102,7 @@ if (location.protocol !== "file:" && location.hostname !== "localhost" && locati
         </header>
         <div class="demo-panel-body">
           <div class="sibi-asks">
-            <strong>Sibi asks</strong>
+            <strong>Sibar asks</strong>
             <ol>
               <li>What is being evaluated?</li>
               <li>What evidence proves it?</li>
@@ -166,13 +166,13 @@ Evidence: evaluateAttempt(), recordFailure(), and the new evaluation type.</text
     </div>
   </section>
 
-  <footer class="poster-footer-cta" aria-label="Sibi call to action">
+  <footer class="poster-footer-cta" aria-label="Sibar call to action">
     <div class="footer-actions">
-      <a class="footer-primary" href="#top">Try Sibi free <span aria-hidden="true">-></span></a>
+      <a class="footer-primary" data-demo-link href="/sibi/?workbench=1&amp;sourceRoot=sibi%2Fdemo%2Freact-fastapi-todo&amp;view=user">Try Sibar free <span aria-hidden="true">-></span></a>
       <a class="footer-secondary" href="#artifacts">See how it works</a>
     </div>
 
-    <div class="footer-principles" aria-label="Sibi principles">
+    <div class="footer-principles" aria-label="Sibar principles">
       <article>
         <span class="footer-icon target-icon" aria-hidden="true"></span>
         <div>
@@ -206,5 +206,18 @@ Evidence: evaluateAttempt(), recordFailure(), and the new evaluation type.</text
     </div>
   </footer>
 </main>
+<script>
+(() => {
+  const demoSearch = "?workbench=1&sourceRoot=sibi%2Fdemo%2Freact-fastapi-todo&view=user";
+  const isLocalDemoHost = location.hostname === "localhost" || location.hostname === "127.0.0.1";
+  const demoHref = isLocalDemoHost
+    ? `${location.protocol}//${location.hostname}:5174/${demoSearch}`
+    : `/sibi/${demoSearch}`;
+
+  for (const link of document.querySelectorAll("[data-demo-link]")) {
+    link.href = demoHref;
+  }
+})();
+</script>
 </body>
 </html>

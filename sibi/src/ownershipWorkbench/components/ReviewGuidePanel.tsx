@@ -24,7 +24,7 @@ export function ReviewGuidePanel({
         <p className="panelSub">Review guide</p>
         <h2>Start with the changed boundary.</h2>
         <p>
-          Sibi reviews the touched surface first, then traces only the caller evidence needed for this
+          Sibar reviews the touched surface first, then traces only the caller evidence needed for this
           boundary. The ownership prompt comes after this check is grounded.
         </p>
       </div>
