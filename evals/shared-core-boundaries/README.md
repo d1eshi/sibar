@@ -11,7 +11,7 @@ core implementation is created or moved.
 
 ## Checks
 
-- `src/ownership-core`, `src/pedagogy-core`, and `src/memory-core`, when
+- `engine/ownership-core`, `engine/pedagogy-core`, and `engine/memory-core`, when
   present, do not import host effects, UI surfaces, Sibi, workspace UI,
   workspace adapters, runtime state, workspace session/context, or stores.
 - `sibi/src` does not import WorkspaceIntent, PedagogoAI workspace adapters,

@@ -26,7 +26,7 @@ import {
   findCaseInBenchmarkReport,
   findCaseInFreeformReport,
   type DemoFixtureEntry,
-} from "../src/demo/fixtures.ts";
+} from "../engine/demo/fixtures.ts";
 
 // ---------------------------------------------------------------------------
 // VAL-CROSS-001: Engineering evidence feeds demo fixtures

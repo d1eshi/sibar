@@ -1,0 +1,13 @@
+{
+  "name": "react-fastapi-todo",
+  "private": true,
+  "version": "0.1.0",
+  "scripts": {
+    "dev": "echo \"Demo frontend placeholder\"",
+    "build": "echo \"Demo frontend not built in this project\""
+  },
+  "dependencies": {
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0"
+  }
+}

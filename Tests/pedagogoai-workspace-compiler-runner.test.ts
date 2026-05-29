@@ -7,8 +7,8 @@ import assert from "node:assert/strict";
 import {
   PedagogoAIContracts,
   PedagogoAIWorkspaceCompilerRunner,
-} from "../src/pedagogoai/index.ts";
-import type { RustWorkspacePlan } from "../src/pedagogoai/workspace-compiler-runner.ts";
+} from "../engine/pedagogoai/index.ts";
+import type { RustWorkspacePlan } from "../engine/pedagogoai/workspace-compiler-runner.ts";
 
 const root = process.cwd();
 const sampleInput = {

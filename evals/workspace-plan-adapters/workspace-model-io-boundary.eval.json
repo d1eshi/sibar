@@ -6,7 +6,7 @@
   "purpose": "Verify provider-neutral CandidatePlan output normalization before RustWorkspacePlan projection and WorkspacePlan validation.",
   "runner": {
     "command": "pnpm eval:workspace-model-io-boundary",
-    "implementation": "src/evals/workspace-model-io-boundary.ts",
+    "implementation": "engine/evals/workspace-model-io-boundary.ts",
     "report_path": "evals/workspace-plan-adapters/reports/VAL-EVAL-011-workspace-model-io-boundary.json",
     "llm_execution": "disabled"
   },

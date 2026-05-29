@@ -1,5 +1,8 @@
 node_modules/
 dist/
+.vite-cache/
+.env
+.env.local
 .sibar/
 .lavish-axi/
 .build/

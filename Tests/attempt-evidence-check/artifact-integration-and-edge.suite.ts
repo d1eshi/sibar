@@ -5,7 +5,7 @@ import {
   captureAndEvaluate,
   createAttempt,
   evaluateAttempt,
-} from "../../src/runtime-attempt-evaluation.ts";
+} from "../../engine/pedagogy/core/attempt-evaluation.ts";
 import { makeArtifact, makeEvidenceInventory, makeEvidenceRef, makeOperation } from "./fixtures.ts";
 
 describe("VAL-CROSS-005: Artifact Feeds Attempt Evaluation", () => {

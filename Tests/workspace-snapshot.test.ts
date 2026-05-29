@@ -11,7 +11,7 @@ import {
   type DeepOwnershipFixture,
   type WorkspaceSnapshot,
   RECOGNIZED_OPERATION_KINDS,
-} from "../src/runtime-deep-ownership.ts";
+} from "../engine/deep-ownership/index.ts";
 
 // ── Helpers ───────────────────────────────────────────────────────────
 

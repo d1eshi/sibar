@@ -1,14 +1,14 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { parseModelOutput, parseModelOutputStrict } from "../src/pedagogoai/workspace-intent/parse-model-output.ts";
+import { parseModelOutput, parseModelOutputStrict } from "../engine/pedagogoai/workspace-intent/parse-model-output.ts";
 import {
   WORKSPACE_INTENT_FIXTURE,
   WORKSPACE_PLAN_FIXTURE,
-} from "../src/pedagogoai/workspace-intent/fixtures.ts";
-import { generateWorkspacePlan as generateWorkspacePlanFromFixture } from "../src/pedagogoai/workspace-intent/adapters/fixture.ts";
-import { validateWorkspacePlan } from "../src/pedagogoai/workspace-intent/validate.ts";
-import { PedagogoAIWorkspaceIntent } from "../src/pedagogoai/index.ts";
+} from "../engine/pedagogoai/workspace-intent/fixtures.ts";
+import { generateWorkspacePlan as generateWorkspacePlanFromFixture } from "../engine/pedagogoai/workspace-intent/adapters/fixture.ts";
+import { validateWorkspacePlan } from "../engine/pedagogoai/workspace-intent/validate.ts";
+import { PedagogoAIWorkspaceIntent } from "../engine/pedagogoai/index.ts";
 
 function clone<T>(value: T): T {
   return JSON.parse(JSON.stringify(value)) as T;

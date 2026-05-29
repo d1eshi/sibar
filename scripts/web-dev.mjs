@@ -2,7 +2,7 @@ import { join, normalize } from "node:path";
 
 import { GET as readArticle } from "../web/api/read.mjs";
 import { POST as requestEarlyAccess } from "../web/api/early-access.mjs";
-import { handleRequest } from "../src/runtime.ts";
+import { handleRequest } from "../engine/runtime.ts";
 
 const root = join(process.cwd(), "web");
 const port = Number(process.env.PORT ?? 4180);

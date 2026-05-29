@@ -6,7 +6,7 @@ import { fileURLToPath } from "node:url";
 
 const scriptDir = dirname(fileURLToPath(import.meta.url));
 const repoRoot = resolve(scriptDir, "..");
-const runtimePath = resolve(repoRoot, "src/runtime.ts");
+const runtimePath = resolve(repoRoot, "engine/runtime.ts");
 
 function usage() {
   console.error("Usage: sibi-code-question '{\"project_label\":\"demo\",\"file_path\":\"/tmp/a.ts\",\"start_line\":1}'");

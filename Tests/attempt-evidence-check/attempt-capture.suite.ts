@@ -1,7 +1,7 @@
 import test, { describe } from "node:test";
 import assert from "node:assert/strict";
 
-import { createAttempt } from "../../src/runtime-attempt-evaluation.ts";
+import { createAttempt } from "../../engine/pedagogy/core/attempt-evaluation.ts";
 
 describe("VAL-LOOP-003: Attempt Capture", () => {
   test("createAttempt stores all required fields", () => {

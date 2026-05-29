@@ -1,4 +1,10 @@
 import type { WorkspaceSessionState } from "./workspaceReducer";
+import { buildFrontierLabMissionUiProjection } from "../../../../engine/workspace/source-mission/frontier-lab-ui-projection.ts";
+import type {
+  MissionQueueSessionProjection,
+  MissionSourceSliceProjection,
+  MissionUiProjection,
+} from "../../../../engine/workspace/source-mission/ui-projection.ts";
 
 export type WorkspaceMaterialMode =
   | "paper"
@@ -68,11 +74,14 @@ export type WorkspaceHomeWorkspace = {
   title: string;
   objective: string;
   sourceBoundary: string;
+  sourceOriginUrl?: string;
+  userGoal?: string;
+  whyMissionExists?: string;
   progress: string;
   nextNode: string;
-  readinessHint: string;
-  readinessPercent: number;
-  readinessLevel: string;
+  reviewConfidenceHint: string;
+  reviewConfidencePercent: number;
+  reviewConfidenceLevel: string;
   lastActivity: string;
   icon: "cluster" | "document" | "code";
   status: "active" | "ready" | "draft" | "blocked";
@@ -83,55 +92,161 @@ export type WorkspaceHomeProjection = {
   workspaces: readonly WorkspaceHomeWorkspace[];
 };
 
+export const frontierLabMissionUiProjection = buildFrontierLabMissionUiProjection();
+
+function allMissionQueueSessions(
+  missionProjection: MissionUiProjection,
+): MissionQueueSessionProjection[] {
+  return [
+    ...missionProjection.focused_queue.visible_sessions,
+    ...missionProjection.focused_queue.deferred_sessions,
+    ...missionProjection.focused_queue.locked_sessions,
+  ];
+}
+
+function queueProgressLabel(missionProjection: MissionUiProjection): string {
+  const sessions = allMissionQueueSessions(missionProjection);
+  const activeIndex = sessions.findIndex((session) => session.status === "now");
+  const currentStep = activeIndex >= 0 ? activeIndex + 1 : 1;
+  return `${currentStep} of ${sessions.length} sessions`;
+}
+
+function sessionStatusToStudyStatus(
+  status: MissionQueueSessionProjection["status"],
+): WorkspaceStudyNode["status"] {
+  if (status === "now") return "ready";
+  if (status === "next" || status === "later") return "queued";
+  return "locked";
+}
+
+function sourceModeForSlice(
+  slice: MissionSourceSliceProjection,
+  missionProjection: MissionUiProjection,
+): WorkspaceMaterialMode {
+  const signalKinds = slice.source_signal_ids
+    .map((signalId) =>
+      missionProjection.source_map.signals.find((signal) => signal.id === signalId)?.kind,
+    )
+    .filter(Boolean);
+
+  if (signalKinds.includes("exercise")) return "artifact";
+  if (signalKinds.includes("resource")) return "paper";
+  return "note";
+}
+
+function sourceForSlice(
+  slice: MissionSourceSliceProjection,
+  missionProjection: MissionUiProjection,
+): WorkspaceSource {
+  const sourceTitle =
+    missionProjection.mission_brief.source_context.title ??
+    missionProjection.source_map.source_title ??
+    "Frontier lab source";
+  const signalLabels = slice.source_signal_ids
+    .map((signalId) =>
+      missionProjection.source_map.signals.find((signal) => signal.id === signalId)?.label,
+    )
+    .filter((label): label is string => Boolean(label));
+
+  return {
+    id: slice.id,
+    title: slice.label,
+    type: sourceModeForSlice(slice, missionProjection),
+    metadata: `${sourceTitle} - ${slice.excerpt_ref}`,
+    snippet: signalLabels.length > 0 ? signalLabels.join(" / ") : slice.excerpt_ref,
+    body: [
+      `${slice.label}: ${signalLabels.join(", ") || "source-backed mission slice"}.`,
+      `Source excerpt ref: ${slice.excerpt_ref}.`,
+      `Origin: ${missionProjection.mission_brief.source_context.canonical_url ?? "Frontier lab blog fixture"}.`,
+    ],
+  };
+}
+
+function queueSessionToStudyNode(
+  session: MissionQueueSessionProjection,
+  missionProjection: MissionUiProjection,
+): WorkspaceStudyNode {
+  const sourceIds = session.source_slice_refs.length > 0
+    ? session.source_slice_refs
+    : missionProjection.source_map.slices.slice(0, 1).map((slice) => slice.id);
+
+  return {
+    id: session.id,
+    name: session.title,
+    scope: session.reason,
+    sessionTitle: `Session - ${session.title}`,
+    status: sessionStatusToStudyStatus(session.status),
+    miniNodes: sourceIds.slice(0, 3).map((sourceId, index) => {
+      const slice = missionProjection.source_map.slices.find((item) => item.id === sourceId);
+      return {
+        id: `${session.id}:slice:${index + 1}`,
+        name: slice?.label ?? session.operation_label,
+        question:
+          index === 0
+            ? session.operation_label
+            : `Ground this step in ${slice?.label ?? "the source slice"}.`,
+        sourceId,
+      };
+    }),
+  };
+}
+
+export function buildWorkspaceHomeProjectionFromMission(
+  missionProjection: MissionUiProjection,
+): WorkspaceHomeProjection {
+  const nextSession =
+    missionProjection.focused_queue.visible_sessions.find((session) => session.status === "now") ??
+    missionProjection.focused_queue.visible_sessions[0];
+  const userGoal =
+    missionProjection.mission_brief.source_context.user_reason.trim() ||
+    missionProjection.mission_brief.user_goal;
+
+  return {
+    workspaces: [
+      {
+        id: missionProjection.mission_brief.mission_id,
+        title: missionProjection.mission_brief.title,
+        objective: userGoal,
+        sourceBoundary: missionProjection.mission_brief.source_context.summary,
+        sourceOriginUrl: missionProjection.mission_brief.source_context.canonical_url ?? undefined,
+        userGoal,
+        whyMissionExists: missionProjection.mission_brief.rationale,
+        progress: queueProgressLabel(missionProjection),
+        nextNode: nextSession?.title ?? missionProjection.active_session.title,
+        reviewConfidenceHint: `Source review status from mission fixture: ${missionProjection.active_session.readiness_scope.label}. Artifact readiness is pending an attempt.`,
+        reviewConfidencePercent: missionProjection.mission_brief.confidence === "high" ? 72 : 48,
+        reviewConfidenceLevel: missionProjection.mission_brief.confidence === "high" ? "High confidence" : "Needs review",
+        lastActivity: "Today",
+        icon: "code",
+        status: "active",
+        openTarget: "overview",
+      },
+    ],
+  };
+}
+
+export function buildWorkspaceSessionFixtureFromMission(
+  missionProjection: MissionUiProjection,
+): WorkspaceSessionFixture {
+  const queueSessions = allMissionQueueSessions(missionProjection).slice(0, 5);
+  const sources = missionProjection.source_map.slices.map((slice) =>
+    sourceForSlice(slice, missionProjection),
+  );
+
+  return {
+    title: missionProjection.mission_brief.title,
+    sessionHint: missionProjection.active_session.operation.prompt,
+    nodes: queueSessions.map((session) => queueSessionToStudyNode(session, missionProjection)),
+    sources,
+  };
+}
+
 export const workspaceHomeProjection: WorkspaceHomeProjection = {
-  workspaces: [
-    {
-      id: "embeddings-probe",
-      title: "Embeddings",
-      objective: "Consolidate nearest-neighbor behavior and failure cases.",
-      sourceBoundary: "Paper excerpt + local notebook",
-      progress: "1 of 5 nodes",
-      nextNode: "Boundary checks",
-      readinessHint: "Solid understanding. Continue to the next node.",
-      readinessPercent: 78,
-      readinessLevel: "Good",
-      lastActivity: "Today, 10:24 AM",
-      icon: "cluster",
-      status: "active",
-      openTarget: "session",
-    },
-    {
-      id: "rag-track",
-      title: "RAG",
-      objective: "Evaluate retrieval quality against paraphrase and negation.",
-      sourceBoundary: "Course notes + mini eval corpus",
-      progress: "2 of 6 nodes",
-      nextNode: "Session 03 - compare trade-offs",
-      readinessHint: "Check sources and complete the next node.",
-      readinessPercent: 64,
-      readinessLevel: "Fair",
-      lastActivity: "Yesterday, 6:15 PM",
-      icon: "document",
-      status: "ready",
-      openTarget: "overview",
-    },
-    {
-      id: "jax-lab",
-      title: "JAX",
-      objective: "Prototype tiny learning examples and compare baseline outputs.",
-      sourceBoundary: "Draft intent + reference notebook",
-      progress: "Draft",
-      nextNode: "Define source scope",
-      readinessHint: "Early draft. Add source context before the first node.",
-      readinessPercent: 32,
-      readinessLevel: "Early",
-      lastActivity: "3 days ago",
-      icon: "code",
-      status: "draft",
-      openTarget: "overview",
-    },
-  ],
+  ...buildWorkspaceHomeProjectionFromMission(frontierLabMissionUiProjection),
 };
+
+export const frontierLabWorkspaceSessionFixture =
+  buildWorkspaceSessionFixtureFromMission(frontierLabMissionUiProjection);
 
 export const firstWorkspaceSessionFixture: WorkspaceSessionFixture = {
   title: "Focused workspace: embeddings",
@@ -340,6 +455,9 @@ export function createInitialWorkspaceStateFromFixture(
     selectedMiniNodeId: firstMini?.id ?? "",
     selectedSourceId: fallbackSourceId,
     isReadinessPanelVisible: true,
+    studyCourseTitle: fixture.title,
+    studyNoteDraft: "",
+    studyNotes: [],
     ...overrides,
   };
 }
@@ -420,7 +538,7 @@ export function projectWorkspaceSession(
     nodes: fixture.nodes,
     sources: fixture.sources,
     sourceCount: fixture.sources.length,
-    readinessLabel: "Ready to mark readiness once a source claim is evidenced and one artifact is produced.",
+    readinessLabel: "Readiness is pending until an artifact or evidence attempt is submitted for this Session operation.",
     recallStatus: getRecallStatus(selectedSource.type),
   };
 }

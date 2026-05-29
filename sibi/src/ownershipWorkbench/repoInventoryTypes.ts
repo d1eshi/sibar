@@ -5,4 +5,4 @@ export type {
   RepoInventoryRuntimeOptions,
   RepoInventoryStatus,
   RepoInventoryTreeNode,
-} from "../../../src/repo-inventory/repo-inventory-types.ts";
+} from "../../../engine/repo-inventory/repo-inventory-types.ts";

@@ -10,7 +10,7 @@ import {
   writeStudyArtifact,
   type ArtifactBoundary,
   type EvidenceRef,
-} from "../src/runtime-deep-ownership.ts";
+} from "../engine/deep-ownership/index.ts";
 
 function makeBoundary(rootPath: string): ArtifactBoundary {
   return {

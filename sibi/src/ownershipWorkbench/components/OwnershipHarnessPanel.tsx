@@ -397,8 +397,8 @@ export function OwnershipHarnessPanel({
           <div className="sessionHeader">
             <p className="panelSub">
               {sessionState.isComplete
-                ? `Sibi step ${sessionQuestions.length} / ${sessionQuestions.length}`
-                : `Sibi step ${Math.min(sessionState.currentIndex + 1, sessionQuestions.length)} / ${sessionQuestions.length}`}
+                ? `Sibar step ${sessionQuestions.length} / ${sessionQuestions.length}`
+                : `Sibar step ${Math.min(sessionState.currentIndex + 1, sessionQuestions.length)} / ${sessionQuestions.length}`}
             </p>
             <h2>{currentQuestion ? currentQuestion.title : "Session complete"}</h2>
             {currentQuestion && <p className="sessionFile">{currentQuestion.filePath}</p>}
@@ -406,7 +406,7 @@ export function OwnershipHarnessPanel({
 
           {currentQuestion && (
             <>
-              <section className="sessionQuestion" aria-label="Current Sibi question">
+              <section className="sessionQuestion" aria-label="Current Sibar question">
                 <p>{currentQuestion.prompt}</p>
                 <span>{currentQuestion.intent}</span>
               </section>

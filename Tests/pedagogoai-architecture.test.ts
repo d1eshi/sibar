@@ -1,5 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 
 import {
   PEDAGOGOAI_BOUNDARIES,
@@ -11,7 +12,7 @@ import {
   PedagogoAITracks,
   PedagogoAIWorkspaceIntent,
   boundariesForCapability,
-} from "../src/pedagogoai/index.ts";
+} from "../engine/pedagogoai/index.ts";
 
 test("PedagogoAI exposes a declarative architecture map for core learning capabilities", () => {
   assert.equal(PEDAGOGOAI_LAYER_NAME, "PedagogoAI");
@@ -33,7 +34,7 @@ test("PedagogoAI exposes a declarative architecture map for core learning capabi
   );
 
   assert.equal(PEDAGOGOAI_TRACKS["explain-a-z"].role.includes("track"), true);
-  assert.equal(PEDAGOGOAI_TRACKS["core-workspace"].entrypoint, "src/pedagogoai/index.ts");
+  assert.equal(PEDAGOGOAI_TRACKS["core-workspace"].entrypoint, "engine/pedagogoai/index.ts");
 });
 
 test("PedagogoAI facade reexports existing runtime pieces through stable subdomains", () => {
@@ -46,10 +47,31 @@ test("PedagogoAI facade reexports existing runtime pieces through stable subdoma
 
   const gapRepair = boundariesForCapability("gap-repair");
   assert.equal(gapRepair.length, 1);
-  assert.ok(gapRepair[0].adapters.includes("src/runtime-gap-detection.ts"));
+  assert.ok(gapRepair[0].adapters.includes("engine/study/gap-detection.ts"));
+  assert.ok(gapRepair[0].adapters.includes("engine/pedagogy-core/index.ts"));
+  assert.ok(!gapRepair[0].adapters.includes("engine/pedagogy/core/attempt-evaluation.ts"));
+  assert.ok(!gapRepair[0].adapters.includes("engine/pedagogy/core/loop.ts"));
 
   const workspaceIntent = boundariesForCapability("workspace-intent");
   assert.equal(workspaceIntent.length, 1);
-  assert.equal(workspaceIntent[0].entrypoint, "src/pedagogoai/workspace-intent.ts");
-  assert.ok(workspaceIntent[0].adapters.includes("apps/sibar-research-workspace/scripts/workspace-intent-adapter.js"));
+  assert.equal(workspaceIntent[0].entrypoint, "engine/pedagogoai/workspace-intent.ts");
+  assert.ok(workspaceIntent[0].adapters.includes("engine/pedagogoai/workspace-compiler-runner.ts"));
+  assert.equal(workspaceIntent[0].adapters.some((adapter) => adapter.includes("legacy")), false);
+  assert.equal(workspaceIntent[0].adapters.some((adapter) => adapter.includes("vanilla")), false);
+  assert.equal(workspaceIntent[0].adapters.some((adapter) => adapter.includes("workspace-intent-adapter")), false);
+});
+
+test("PedagogoAI pedagogy facades do not import pedagogy/core directly", () => {
+  const facadeModules = [
+    "../engine/pedagogoai/gap-repair.ts",
+    "../engine/pedagogoai/readiness-mastery.ts",
+    "../engine/pedagogoai/recall-review.ts",
+    "../engine/pedagogoai/workspace-intent-types.ts",
+    "../engine/pedagogoai/tracks/deep-ownership.ts",
+  ];
+  const forbiddenPattern = /(?:from|from\s+["'][^"']*)\s+["'][^"']*pedagogy\/core\//;
+  for (const modulePath of facadeModules) {
+    const source = readFileSync(new URL(modulePath, import.meta.url), "utf8");
+    assert.ok(!forbiddenPattern.test(source), `${modulePath} should import pedagogy through pedagogy-core`);
+  }
 });

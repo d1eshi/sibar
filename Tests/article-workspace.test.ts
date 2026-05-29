@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 
-import { assertHttpUrl, extractReadableArticle } from "../src/article-workspace.ts";
+import { assertHttpUrl, extractReadableArticle } from "../engine/article-workspace.ts";
 
 test("extractReadableArticle prefers article content over page chrome", () => {
   const article = extractReadableArticle({
