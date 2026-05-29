@@ -1,0 +1,41 @@
+{
+  "schema": "SibarEvalSuite",
+  "version": 1,
+  "suite_id": "ownership-question-planner",
+  "title": "Ownership question planner evals",
+  "purpose": "Evaluate deterministic planning, verification, and projection behavior for local ownership questions on selected files.",
+  "protects": [
+    "ownership question planning remains local to selected files",
+    "plan verifier rejects non-local claims, invented evidence, and readiness assertions",
+    "repair/refactor gates are required for large/composite files",
+    "projection preserves verifier dispositions and blocked diagnostics"
+  ],
+  "docs": [
+    "evals/ownership-question-planner/README.md"
+  ],
+  "artifacts": [
+    {
+      "kind": "generated-report",
+      "path": "evals/ownership-question-planner/reports/VAL-EVAL-015-ownership-question-planner.json",
+      "description": "Deterministic no-LLM report for ownership-question-planner behavior."
+    }
+  ],
+  "evaluations": [
+    {
+      "validation": "VAL-EVAL-015-ownership-question-planner",
+      "title": "Ownership question planner deterministic verifier and projection eval",
+      "command": "pnpm eval:ownership-question-planner",
+      "implementation": "engine/evals/ownership-question-planner.ts",
+      "llm_execution": "disabled",
+      "inputs": [
+        "evals/ownership-question-planner/fixtures/large-react-workbench.fixture.json",
+        "evals/ownership-question-planner/fixtures/small-react-workbench.fixture.json",
+        "evals/ownership-question-planner/eval-suite.json"
+      ],
+      "reports": [
+        "evals/ownership-question-planner/reports/VAL-EVAL-015-ownership-question-planner.json"
+      ],
+      "answers": "Does the planner produce stable local questions for large and small fixtures, and are invalid mutations rejected by verifier and projection rules?"
+    }
+  ]
+}

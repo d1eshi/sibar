@@ -362,7 +362,7 @@ test("ownership review session advances valid answers without recording observat
   assert.equal(result.state.currentIndex, 1);
   assert.equal(result.state.isComplete, false);
   assert.equal(result.state.observations.length, 0);
-  assert.equal(result.state.lastFeedback, "Respuesta aceptada. Sibi avanza al siguiente check.");
+  assert.equal(result.state.lastFeedback, "Respuesta aceptada. Sibar avanza al siguiente check.");
 });
 
 test("ownership review session records relation gaps and opens hint ladder after two weak attempts", async () => {
@@ -1583,6 +1583,36 @@ test("App gates state transitions when readiness is ready but transfer has not p
   );
 });
 
+test("submitLiveReadinessAttempt gates local planner fallback before readiness evaluation", async () => {
+  const appSource = readFileSync(new URL("../src/App.tsx", import.meta.url), "utf8");
+
+  assert.match(
+    appSource,
+    /if \(localPlannerFallback\) \{[\s\S]*setLiveReadinessStartedAt\(Date\.now\(\)\);[\s\S]*return;/,
+    "Live submit handler should short-circuit before readiness scoring in fallback mode.",
+  );
+  assert.match(
+    appSource,
+    /if \(localPlannerFallback\)[\s\S]*\}[\s\S]*const attempt = evaluateOwnershipAttemptReadiness\(/,
+    "Live submit handler should evaluate readiness only when fallback is not active.",
+  );
+});
+
+test("local planner fallback exposes limited/readiness study UI in App source contract", async () => {
+  const appSource = readFileSync(new URL("../src/App.tsx", import.meta.url), "utf8");
+
+  assert.match(
+    appSource,
+    /isLabView \|\| !localPlannerFallback \? null : \(\s*<section className="ownershipSection" aria-label="Planner contract status">[\s\S]*Local planner limited[\s\S]*Status: limited · study mode · non-final\./,
+    "Default view should expose local planner limited contract status with study/non-final wording.",
+  );
+  assert.match(
+    appSource,
+    /plannerBoundaryFallbackVisible \? \([\s\S]*Local planner limited[\s\S]*non-final\.[\s\S]*\) : \(\s*<>\s*<h2>Boundary attempt bridge</,
+    "Lab readiness view should switch to limited mode when local planner fallback is active.",
+  );
+});
+
 test("ownership review session completes with a final observation on weak last answer", async () => {
   const fixtures = await loadFixturesModule();
   const session = await loadReviewSessionModule();
@@ -2241,8 +2271,8 @@ test("workbench CSS gives the ownership harness a wide primary desktop column", 
 
   assert.match(
     styles,
-    /grid-template-columns:\s*248px minmax\(430px, 1fr\) minmax\(460px, 32vw\);/,
-    "desktop layout should reserve a wide responsive column for the ownership harness",
+    /grid-template-columns:\s*minmax\(270px, 19vw\) minmax\(560px, 1fr\) minmax\(390px, 30vw\);/,
+    "desktop layout should reserve stable columns for the ownership map, code focus, and review rail",
   );
   assert.match(
     styles,
@@ -2262,13 +2292,18 @@ test("workbench CSS gives the ownership harness a wide primary desktop column", 
 });
 
 test("workbench surface mode is derived from local query params", async () => {
-  const { getWorkbenchSurfaceMode } = await loadSurfaceModeModule();
+  const { getWorkbenchFixtureMode, getWorkbenchSurfaceMode } = await loadSurfaceModeModule();
 
   assert.equal(getWorkbenchSurfaceMode(""), "default");
   assert.equal(getWorkbenchSurfaceMode("?file=src/api/session.ts"), "default");
   assert.equal(getWorkbenchSurfaceMode("?view=lab"), "lab");
   assert.equal(getWorkbenchSurfaceMode("?lab=1"), "lab");
   assert.equal(getWorkbenchSurfaceMode("?view=review&lab=1"), "lab");
+  assert.equal(getWorkbenchFixtureMode(""), false);
+  assert.equal(getWorkbenchFixtureMode("?view=lab"), false);
+  assert.equal(getWorkbenchFixtureMode("?lab=1"), false);
+  assert.equal(getWorkbenchFixtureMode("?fixture=1"), true);
+  assert.equal(getWorkbenchFixtureMode("?fixture=1&view=lab"), true);
 });
 
 test("App passes a query-derived surface mode into the ownership harness", () => {
@@ -2276,18 +2311,33 @@ test("App passes a query-derived surface mode into the ownership harness", () =>
 
   assert.match(
     appSource,
-    /import\s+\{\s*getWorkbenchSurfaceMode\s*\}\s+from\s+["']\.\/ownershipWorkbench\/surfaceMode["']/,
+    /import\s+\{[^}]*getWorkbenchSurfaceMode[^}]*\}\s+from\s+["']\.\/ownershipWorkbench\/surfaceMode["']/,
     "App should use the deterministic surface-mode helper",
   );
   assert.match(
     appSource,
-    /getWorkbenchSurfaceMode\([\s\S]*window\.location\.search[\s\S]*\)/,
-    "App should derive lab mode from the URL query string",
+    /React\.useState\(\(\) =>[\s\S]*window\.location\.search[\s\S]*\)/,
+    "App should keep the current URL query string in state",
+  );
+  assert.match(
+    appSource,
+    /getWorkbenchSurfaceMode\(locationSearch\)/,
+    "App should derive lab mode from the current URL query string",
   );
   assert.match(
     appSource,
     /surfaceMode=\{workbenchSurfaceMode\}/,
     "App should pass the derived mode into OwnershipHarnessPanel",
+  );
+  assert.match(
+    appSource,
+    /getWorkbenchFixtureMode\(locationSearch\)/,
+    "App should derive fixture mode only from the explicit fixture query",
+  );
+  assert.match(
+    appSource,
+    /setLocationSearch\(canonicalWorkbenchSearch\)/,
+    "App should update query-derived state when the capture CTA writes the canonical workbench URL",
   );
   assert.match(
     appSource,

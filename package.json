@@ -16,6 +16,7 @@
     "eval:pedagogy-coverage": "node --experimental-strip-types engine/evals/pedagogy-coverage.ts",
     "eval:pedagogy-core-coverage": "node --experimental-strip-types engine/evals/pedagogy-core-coverage.ts",
     "eval:shared-core-boundaries": "node --experimental-strip-types engine/evals/shared-core-boundaries.ts",
+    "eval:ownership-question-planner": "node --experimental-strip-types engine/evals/ownership-question-planner.ts",
     "eval:selfhost-pilot": "node --experimental-strip-types engine/evals/selfhost-pilot.ts",
     "eval:selfhost-freeform": "node --experimental-strip-types engine/evals/selfhost-freeform.ts",
     "eval:selfhost-benchmark": "node --experimental-strip-types engine/evals/selfhost-benchmark.ts",

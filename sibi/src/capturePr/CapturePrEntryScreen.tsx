@@ -1,7 +1,9 @@
 import * as React from "react";
 
 interface CapturePrEntryScreenProps {
-  onAnalyze: () => void;
+  onAnalyze: (sourceRoot: string) => void;
+  sourceRootDefault?: string;
+  showSourceRootInput?: boolean;
 }
 
 const prProviders = {
@@ -28,10 +30,16 @@ function detectPrProvider(url: string): PrProvider | null {
   return null;
 }
 
-export function CapturePrEntryScreen({ onAnalyze }: CapturePrEntryScreenProps): React.ReactElement {
+export function CapturePrEntryScreen({
+  onAnalyze,
+  sourceRootDefault = "sibi",
+  showSourceRootInput = false,
+}: CapturePrEntryScreenProps): React.ReactElement {
   const [selectedProvider, setSelectedProvider] = React.useState<PrProvider>("github");
   const [prUrl, setPrUrl] = React.useState(prProviders.github.sampleUrl);
+  const [sourceRoot, setSourceRoot] = React.useState(sourceRootDefault);
   const visibleProvider = detectPrProvider(prUrl) ?? selectedProvider;
+  const isSourceRootMode = true;
 
   function changePrUrl(event: React.ChangeEvent<HTMLInputElement>): void {
     const nextUrl = event.target.value;
@@ -55,20 +63,20 @@ export function CapturePrEntryScreen({ onAnalyze }: CapturePrEntryScreenProps): 
 
   function submitCapture(event: React.FormEvent<HTMLFormElement>): void {
     event.preventDefault();
-    onAnalyze();
+    onAnalyze(sourceRoot);
   }
 
   return (
     <main className="captureRoot">
-      <form className="capturePanel" aria-label="Capture PR" onSubmit={submitCapture}>
-        <div className="captureBrand">Sibi</div>
+      <form className="capturePanel" aria-label="Live ownership intake" onSubmit={submitCapture}>
+        <div className="captureBrand">Sibar</div>
         <section className="captureIntro">
-          <h1>Capture PR</h1>
-          <p>Capture a GitHub pull request and turn it into an ownership artifact.</p>
+          <h1>Local ownership intake</h1>
+          <p>Start a live review from a local source root or demo workspace.</p>
         </section>
 
         <div className="captureInput">
-          <label htmlFor="capturePrUrl">Pull request URL</label>
+          <label htmlFor="capturePrUrl">Pull request URL (coming soon)</label>
           <div className="captureInputControl">
             <span
               className={`providerGlyph ${visibleProvider}Glyph`}
@@ -80,6 +88,7 @@ export function CapturePrEntryScreen({ onAnalyze }: CapturePrEntryScreenProps): 
               onChange={changeProvider}
               aria-label="Pull request provider"
               className="providerSelect"
+              disabled={isSourceRootMode}
             >
               {Object.entries(prProviders).map(([provider, config]) => (
                 <option key={provider} value={provider}>
@@ -92,21 +101,36 @@ export function CapturePrEntryScreen({ onAnalyze }: CapturePrEntryScreenProps): 
               value={prUrl}
               onChange={changePrUrl}
               placeholder={prProviders[selectedProvider].placeholder}
+              disabled={isSourceRootMode}
+              aria-label="Pull request URL (coming soon)"
             />
-            <span className="captureCheck" aria-hidden="true">✓</span>
+            <span className="captureCheck" aria-hidden="true">!</span>
           </div>
+          <p className="captureIntakeNotice">
+            <strong>MVP intake scope:</strong> PR URL and paste-diff are not wired yet; use source root to enter a local or demo review.
+          </p>
         </div>
 
-        <div className="captureDivider">
-          <span />
-          <p>or</p>
-          <span />
-        </div>
+        {showSourceRootInput ? (
+          <div className="captureInput">
+            <label htmlFor="captureSourceRoot">Source root</label>
+            <div className="captureInputControl captureInputControlCompact">
+              <input
+                id="captureSourceRoot"
+                value={sourceRoot}
+                onChange={(event) => setSourceRoot(event.target.value)}
+                placeholder="sibi/demo/react-fastapi-todo"
+              />
+            </div>
+          </div>
+        ) : null}
 
-        <button className="pasteDiffDropzone" type="button" aria-label="Paste diff">
+        <p>Future connectors</p>
+
+        <button className="pasteDiffDropzone" type="button" aria-label="Paste diff" disabled>
           <span className="documentGlyph" aria-hidden="true">&lt;/&gt;</span>
-          <strong>Paste diff</strong>
-          <small>Paste a unified diff to analyze ownership</small>
+          <strong>Paste diff (coming soon)</strong>
+          <small>Unified diff intake is available in a future controlled version.</small>
         </button>
 
         <button className="capturePrimary" type="submit" aria-label="Analyze ownership">
@@ -122,35 +146,35 @@ export function CapturePrEntryScreen({ onAnalyze }: CapturePrEntryScreenProps): 
 
         <div className="routeCanvas">
           <div className="routeSlideDeck" aria-label="Automatic ownership route guide">
-            <article className="routeSlide slideOne" aria-label="Step 1 Capture PR">
+            <article className="routeSlide slideOne" aria-label="Step 1 Source root">
               <div className="slideTopline">
                 <span className="slideStep">Step 1</span>
-                <span className="slideProgressText">Capture PR</span>
+                <span className="slideProgressText">Source root</span>
               </div>
-              <h3>Give Sibi one real change to inspect.</h3>
-              <p>Paste the PR URL or a unified diff. The first job is narrowing ownership to this review, not the whole repo.</p>
+              <h3>Point to a local path and start there.</h3>
+              <p>Use a source root or demo workspace to keep the review bounded and actionable.</p>
               <div className="slidePreview prMini" aria-hidden="true">
                 <span className="prAvatar" />
                 <div>
-                  <strong>#18</strong>
-                  <small>Sibi ownership workbench</small>
+                  <strong>sibi/demo</strong>
+                  <small>react-fastapi-todo</small>
                 </div>
-                <span className="miniToken">8 files</span>
+                <span className="miniToken">12 files</span>
               </div>
               <div className="slideMeter" aria-hidden="true"><span /></div>
             </article>
-            <article className="routeSlide slideTwo" aria-label="Step 2 Sibi reads the diff">
+            <article className="routeSlide slideTwo" aria-label="Step 2 Live evidence">
               <div className="slideTopline">
                 <span className="slideStep">Step 2</span>
-                <span className="slideProgressText">Read diff</span>
+                <span className="slideProgressText">Live evidence</span>
               </div>
-              <h3>The diff becomes a bounded reading path.</h3>
-              <p>Sibi extracts touched files, caller hints, tests, and missing evidence before it asks you to claim ownership.</p>
+              <h3>Build a bounded evidence rail.</h3>
+              <p>Sibar extracts local file context, callers, tests, and missing evidence before asking for a focused claim.</p>
               <div className="slidePreview diffMini" aria-hidden="true">
                 <span />
                 <span />
                 <span />
-                <small>{"Touched lines -> evidence anchors"}</small>
+                <small>{"Evidence -> gap candidates"}</small>
               </div>
               <div className="slideMeter" aria-hidden="true"><span /></div>
             </article>
@@ -170,13 +194,13 @@ export function CapturePrEntryScreen({ onAnalyze }: CapturePrEntryScreenProps): 
               </div>
               <div className="slideMeter" aria-hidden="true"><span /></div>
             </article>
-            <article className="routeSlide slideFour" aria-label="Step 4 Ownership artifact">
+            <article className="routeSlide slideFour" aria-label="Step 4 Report">
               <div className="slideTopline">
                 <span className="slideStep">Step 4</span>
-                <span className="slideProgressText">Ownership artifact</span>
+                <span className="slideProgressText">Report</span>
               </div>
-              <h3>Leave with a reviewable ownership artifact.</h3>
-              <p>Your answers become a compact route: what you own, what only supports the claim, and what remains unresolved.</p>
+              <h3>Take away a reviewable ownership report.</h3>
+              <p>Your answers become a compact output: what you own, what supports that claim, and what remains open.</p>
               <div className="slidePreview artifactMini" aria-hidden="true">
                 <span className="artifactState owned">
                   <i />

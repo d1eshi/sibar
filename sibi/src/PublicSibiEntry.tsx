@@ -9,15 +9,20 @@ export default function PublicSibiEntry(): React.ReactElement {
 
   return (
     <>
-      <CapturePrEntryScreen onAnalyze={() => setEarlyAccessOpen(true)} />
+      <CapturePrEntryScreen
+        onAnalyze={() => {
+          setEarlyAccessOpen(true);
+        }}
+        showSourceRootInput={false}
+      />
       <EarlyAccessModal
         open={earlyAccessOpen}
         onClose={() => setEarlyAccessOpen(false)}
         copy={{
           title: "Bring one real PR. I will open the workbench next.",
           description:
-            "Sibi is opening with builders who want reproducible ownership over real changes. Leave an email and an optional X handle.",
-          successMessage: "You're on the list. I'll reach out with the next Sibi opening.",
+            "Sibar is opening with builders who want reproducible ownership over real changes. Leave an email and an optional X handle.",
+          successMessage: "You're on the list. I'll reach out with the next Sibar opening.",
         }}
       />
     </>
