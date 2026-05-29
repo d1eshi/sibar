@@ -66,26 +66,3 @@ export type {
 } from "../workspace/session/contracts.ts";
 
 export { buildWorkspaceSessionContract } from "../workspace/session/contracts.ts";
-
-export {
-  buildRustWorkspaceCompilerCommand,
-  buildRustWorkspaceIntent,
-  parseRustWorkspacePlan,
-  runRustWorkspaceCompiler,
-  rustWorkspacePlanToPedagogoPlan,
-} from "./workspace-compiler-runner.ts";
-export type {
-  RustEvidenceRef,
-  RustNextAction,
-  RustSourceBundle,
-  RustSourceLink,
-  RustUIProjection,
-  RustWorkspaceArtifactRequirement,
-  RustWorkspaceCompilerOptions,
-  RustWorkspaceIntent,
-  RustWorkspaceNode,
-  RustWorkspacePlan,
-  RustWorkspaceRunnerArgs,
-  WorkspaceCompilerRunnerAdapter,
-  WorkspaceCompilerRunnerResult,
-} from "./workspace-compiler-runner.ts";

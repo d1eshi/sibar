@@ -46,7 +46,7 @@ export const PEDAGOGOAI_BOUNDARIES: PedagogoAIModuleBoundary[] = [
       "WorkspacePlan, SessionPlan, and EvidencePlan compile boundary",
       "deterministic create-workspace builders and validators",
     ],
-    adapters: ["engine/pedagogoai/workspace-compiler-runner.ts"],
+    adapters: [],
     track: "core-workspace",
   },
   {

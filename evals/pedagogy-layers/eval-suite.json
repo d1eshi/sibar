@@ -10,10 +10,7 @@
     "coverage gaps in critical semantic dimensions fail closed unless explicitly allowed for exploration"
   ],
   "docs": [
-    "evals/pedagogy-layers/README.md",
-    "evals/pedagogy-layers/docs/01_dataset_contract.md",
-    "evals/pedagogy-layers/docs/02_deterministic_pedagogy_evals.md",
-    "evals/pedagogy-layers/docs/dataset_sizing_research.md"
+    "evals/pedagogy-layers/README.md"
   ],
   "artifacts": [
     {

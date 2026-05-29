@@ -29,50 +29,6 @@
         "schema_rejection",
         "pedagogy_rejection"
       ]
-    },
-    {
-      "validation": "VAL-EVAL-010-workspace-runner-adapter",
-      "title": "Workspace runner adapter eval",
-      "manifest_path": "workspace-runner-adapter.eval.json",
-      "report_path": "evals/workspace-plan-adapters/reports/VAL-EVAL-010-workspace-runner-adapter.json",
-      "command": "pnpm eval:workspace-runner-adapter",
-      "source_prs": [
-        "#11 codex/rust-workspace-compiler"
-      ],
-      "intent_tags": [
-        "rust-runner",
-        "codex-exec",
-        "adapter-selection",
-        "fallback-audit",
-        "workspace-plan-projection"
-      ],
-      "case_classes": [
-        "rust_fixture_completed",
-        "rust_fixture_missing",
-        "codex_exec_blocked"
-      ]
-    },
-    {
-      "validation": "VAL-EVAL-011-workspace-model-io-boundary",
-      "title": "Workspace model IO boundary eval",
-      "manifest_path": "workspace-model-io-boundary.eval.json",
-      "report_path": "evals/workspace-plan-adapters/reports/VAL-EVAL-011-workspace-model-io-boundary.json",
-      "command": "pnpm eval:workspace-model-io-boundary",
-      "intent_tags": [
-        "provider-neutral",
-        "candidate-plan",
-        "json-extraction",
-        "adapter-selection",
-        "schema-validation"
-      ],
-      "case_classes": [
-        "direct_json_valid",
-        "candidate_plan_envelope_valid",
-        "stdout_contaminated_valid",
-        "malformed_output_rejected",
-        "invalid_candidate_plan_rejected",
-        "unknown_adapter_rejected"
-      ]
     }
   ]
 }

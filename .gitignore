@@ -9,4 +9,4 @@ dist/
 .swiftpm/
 .DS_Store
 docs/missions
-apps/sibar-research-workspace/src-tauri/gen/
+.goals/

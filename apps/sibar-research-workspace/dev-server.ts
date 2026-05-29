@@ -2,7 +2,10 @@ import { createReadStream, existsSync } from "node:fs";
 import { createServer } from "node:http";
 import { extname, join, normalize } from "node:path";
 
-import { runRustWorkspaceCompiler } from "../../engine/pedagogoai/workspace-compiler-runner.ts";
+import {
+  buildWorkspaceIntent,
+  compileWorkspacePlanFromIntent,
+} from "../../engine/pedagogoai/workspace-intent.ts";
 
 const repoRoot = process.cwd();
 const appRoot = join(process.cwd(), "apps", "sibar-research-workspace");
@@ -54,17 +57,17 @@ const server = createServer(async (request, response) => {
   if (url.pathname === "/api/workspace-intent/compiler" && request.method === "POST") {
     const payload = await readBody(request) as {
       input?: unknown;
-      adapter?: "fixture" | "codex-exec";
-      runCodex?: boolean;
-      fixturePath?: string;
     };
-    const result = runRustWorkspaceCompiler(payload.input as never, {
-      adapter: payload.adapter || "codex-exec",
-      runCodex: payload.runCodex === true,
-      fixturePath: payload.fixturePath,
-      rootPath: process.cwd(),
+    const intent = buildWorkspaceIntent(payload.input as never);
+    const workspacePlan = compileWorkspacePlanFromIntent(intent);
+    sendJson(response, {
+      compiler: {
+        adapter: "engine/workspace-intent",
+        status: "completed",
+      },
+      intent,
+      workspace_plan: workspacePlan,
     });
-    sendJson(response, result, result.runner.status === "failed" ? 500 : 200);
     return;
   }
 

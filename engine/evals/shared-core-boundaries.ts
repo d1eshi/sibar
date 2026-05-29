@@ -98,13 +98,11 @@ const CORE_FORBIDDEN_IMPORTS: ForbiddenImportRule[] = [
   exactModules(["node:fs", "node:fs/promises", "fs", "fs/promises"], "filesystem imports belong to adapters"),
   exactModules(["node:child_process", "child_process"], "shell execution belongs to adapters"),
   exactModules(["node:worker_threads", "worker_threads"], "worker threads belong to adapters"),
-  modulePattern(/^@tauri-apps\//, "Tauri imports belong to surfaces or adapters"),
   modulePattern(/^react(?:$|\/)|^react-dom(?:$|\/)|^lucide-react$/, "UI imports belong to surfaces"),
   modulePattern(/^vite(?:$|\/)|^@vitejs\//, "workspace UI build imports belong to surfaces"),
   repoPathPattern(/^sibi\//, "Sibi is a surface and must not be imported by shared core"),
   repoPathPattern(/^web\//, "web is a surface and must not be imported by shared core"),
   repoPathPattern(/^apps\/sibar-research-workspace\//, "workspace UI is a surface"),
-  repoPathPattern(/^engine\/pedagogoai\/workspace-compiler-runner/, "workspace compiler runners are adapters"),
   repoPathPattern(/^engine\/pedagogoai\/workspace-intent/, "WorkspaceIntent belongs outside shared core"),
   repoPathPattern(/^engine\/persistence\//, "persistence is adapter-owned"),
   repoPathPattern(/^engine\/memory\//, "understanding memory is a separate memory layer"),
@@ -116,8 +114,8 @@ const SIBI_FORBIDDEN_IMPORTS: ForbiddenImportRule[] = [
   repoPathPattern(/^engine\/pedagogoai(?:\/|$)/, "Sibi must not import PedagogoAI workspace contracts or adapters"),
   repoPathPattern(/^apps\/sibar-research-workspace\//, "Sibi must not import the Sibar Workspace UI"),
   moduleTextPattern(/\bWorkspaceIntent\b/, "Sibi handoff must not import WorkspaceIntent"),
-  modulePattern(/workspace-(?:intent-)?adapter|workspace-compiler-runner/, "Sibi must not import workspace adapters"),
-  repoPathPattern(/workspace-(?:intent-)?adapter|workspace-compiler-runner/, "Sibi must not import workspace adapters"),
+  modulePattern(/workspace-(?:intent-)?adapter/, "Sibi must not import workspace adapters"),
+  repoPathPattern(/workspace-(?:intent-)?adapter/, "Sibi must not import workspace adapters"),
 ];
 
 const SPEC_GATE_CHECKS = [

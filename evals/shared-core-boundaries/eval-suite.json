@@ -10,8 +10,7 @@
     "the shared core boundary spec keeps the essential global gates explicit before implementation extraction"
   ],
   "docs": [
-    "evals/shared-core-boundaries/README.md",
-    "docs/specs/deep-ownership-workspace/04_shared_core_boundaries.md"
+    "evals/shared-core-boundaries/README.md"
   ],
   "artifacts": [
     {
@@ -31,7 +30,6 @@
         "sibi/src"
       ],
       "documented_inputs": [
-        "docs/specs/deep-ownership-workspace/04_shared_core_boundaries.md",
         "engine/ownership-core",
         "engine/pedagogy-core",
         "engine/memory-core"

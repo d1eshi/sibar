@@ -10,9 +10,7 @@
     "repair/refactor gates are required for large/composite files",
     "projection preserves verifier dispositions and blocked diagnostics"
   ],
-  "docs": [
-    "evals/ownership-question-planner/README.md"
-  ],
+  "docs": [],
   "artifacts": [
     {
       "kind": "generated-report",
