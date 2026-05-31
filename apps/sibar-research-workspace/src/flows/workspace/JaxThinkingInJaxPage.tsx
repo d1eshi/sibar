@@ -250,8 +250,8 @@ export function JaxThinkingInJaxPage() {
                     type="button"
                     className={
                       section.id === selectedSectionId
-                        ? styles.treeSectionActive
-                        : styles.treeSection
+                        ? `${styles.treeSectionActive} ${styles[`treeSectionLevel${section.level}`]}`
+                        : `${styles.treeSection} ${styles[`treeSectionLevel${section.level}`]}`
                     }
                     onClick={() => scrollToSection(section.id)}
                   >

@@ -450,6 +450,18 @@
   padding-left: 18px;
 }
 
+.treeSectionLevel1 {
+  padding-left: 8px;
+}
+
+.treeSectionLevel2 {
+  padding-left: 18px;
+}
+
+.treeSectionLevel3 {
+  padding-left: 34px;
+}
+
 .treeSectionActive::before,
 .treeLinkActive::before {
   content: "";

@@ -103,6 +103,9 @@ release yet.
 - Restyled the `/jax/thinking-in-jax` scraped HTML reader and file tree to use
   the Sibar reader/workspace surface, typography, links, and code block
   formatting instead of mirroring the official JAX documentation skin.
+- Added a reproducible JAX notebook scraper that fetches the official
+  `thinking_in_jax.html`, extracts `article.bd-article`, sanitizes the HTML for
+  the local reader, and regenerates the full first-episode section tree.
 - Moved attempt evaluation, pedagogy loop, and pure evidence/loop contract files
   under `engine/pedagogy/core/` while keeping `engine/pedagogy-core/index.ts`
   as the public facade.

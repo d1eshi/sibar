@@ -29,6 +29,7 @@ const workspaceReducerSource = readFileSync(
   join(root, "apps/sibar-research-workspace/src/state/workspaceReducer.ts"),
   "utf8",
 );
+const packageSource = readFileSync(join(root, "package.json"), "utf8");
 const missionOverviewSource = readFileSync(
   join(root, "apps/sibar-research-workspace/src/flows/workspace/MissionOverview.tsx"),
   "utf8",
@@ -43,6 +44,10 @@ const jaxThinkingInJaxSource = readFileSync(
 );
 const jaxThinkingInJaxSourceData = readFileSync(
   join(root, "apps/sibar-research-workspace/src/flows/workspace/jaxThinkingInJaxSource.ts"),
+  "utf8",
+);
+const jaxThinkingInJaxScraperSource = readFileSync(
+  join(root, "scripts/scrape-jax-thinking-in-jax.mjs"),
   "utf8",
 );
 const webWorkspaceHtml = readFileSync(join(root, "web/workspace.html"), "utf8");
@@ -108,11 +113,21 @@ test("App exposes a concrete JAX thinking route outside mission and notes flows"
   assert.match(jaxThinkingInJaxSource, /kindHighlight|kindQuestion|kindKey/);
   assert.match(jaxThinkingInJaxSource, /pendingSelection/);
   assert.match(jaxThinkingInJaxSource, /setSelectionKind|saveSelection/);
+  assert.match(jaxThinkingInJaxSource, /treeSectionLevel/);
   assert.match(jaxThinkingInJaxSourceData, /jaxThinkingInJaxHtml/);
+  assert.match(jaxThinkingInJaxSourceData, /jaxThinkingInJaxScrapeSelector = "article\.bd-article"/);
   assert.match(jaxThinkingInJaxSourceData, /Open in Colab/);
   assert.match(jaxThinkingInJaxSourceData, /Python Package Index/);
   assert.match(jaxThinkingInJaxSourceData, /highlight-ipython3/);
-  assert.match(jaxThinkingInJaxSourceData, /pip install -U "jax\[cuda13\]"/);
+  assert.match(jaxThinkingInJaxSourceData, /Just-in-time compilation with jax\.jit/);
+  assert.match(jaxThinkingInJaxSourceData, /Auto-vectorization with jax\.vmap/);
+  assert.match(jaxThinkingInJaxSourceData, /Pseudorandom numbers/);
+  assert.match(jaxThinkingInJaxSourceData, /jax\.debug\.print/);
+  assert.match(jaxThinkingInJaxSourceData, /jax\[cuda13\]/);
+  assert.match(jaxThinkingInJaxScraperSource, /extractArticle/);
+  assert.match(jaxThinkingInJaxScraperSource, /articleSelector = "article\.bd-article"/);
+  assert.match(jaxThinkingInJaxScraperSource, /sections\.length < 10/);
+  assert.match(packageSource, /scrape:jax-thinking/);
   assert.match(
     jaxThinkingInJaxSourceData,
     /https:\/\/docs\.jax\.dev\/en\/latest\/notebooks\/thinking_in_jax\.html/,
