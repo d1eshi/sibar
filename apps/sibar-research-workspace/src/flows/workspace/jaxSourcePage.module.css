@@ -28,6 +28,27 @@
   border-left: 1px solid var(--divider);
 }
 
+.jaxReaderDocument {
+  position: relative;
+}
+
+.atomicHighlight {
+  padding: 0 1px;
+  border-radius: 4px;
+}
+
+.kindHighlight {
+  background: linear-gradient(#ffef9f, #ffef9f) 0 100%/100% 22% no-repeat;
+}
+
+.kindQuestion {
+  background: linear-gradient(#d4ecff, #d4ecff) 0 100%/100% 22% no-repeat;
+}
+
+.kindKey {
+  background: linear-gradient(#d6f0dd, #d6f0dd) 0 100%/100% 22% no-repeat;
+}
+
 .contextPanel h1,
 .capturePanel h2,
 .captureList h3 {
@@ -93,23 +114,85 @@
   gap: 10px;
 }
 
+.selectionKind {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.kindButton {
+  padding: 8px 10px;
+  border: 1px solid var(--divider);
+  border-radius: 999px;
+  color: var(--text-secondary);
+  background: transparent;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.kindButtonActive {
+  border-color: var(--olive);
+  color: var(--surface-panel);
+  background: var(--olive);
+}
+
+.selectionActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.selectionActions button {
+  width: fit-content;
+  padding: 10px 12px;
+  border: 1px solid var(--divider);
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.selectionActions button:first-child {
+  color: var(--surface-panel);
+  border-color: var(--olive);
+  background: var(--olive);
+}
+
+.selectionActions button:last-child {
+  color: var(--text-primary);
+  background: transparent;
+}
+
+.evidenceItem {
+  display: grid;
+  gap: 8px;
+}
+
+.evidenceKind {
+  width: fit-content;
+  padding: 3px 8px;
+  border-radius: 999px;
+  color: var(--surface-panel);
+  background: var(--olive);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.evidenceKind.kindQuestion {
+  color: var(--surface-panel);
+  background: #2d7dcf;
+}
+
+.evidenceKind.kindKey {
+  color: var(--surface-ink);
+  background: #5bb07c;
+}
+
 .activeSelection,
 .captureList article {
   padding: 16px;
   border: 1px solid var(--divider);
   border-radius: 8px;
   background: var(--surface-panel);
-}
-
-.activeSelection button {
-  width: fit-content;
-  padding: 10px 12px;
-  border-color: var(--olive);
-  border-radius: 6px;
-  color: var(--surface-panel);
-  background: var(--olive);
-  font-size: 13px;
-  font-weight: 700;
 }
 
 .emptySelection {

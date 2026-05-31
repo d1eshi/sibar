@@ -93,6 +93,11 @@ release yet.
 - Updated the frontier-lab React workspace UI so source fixture confidence is
   shown as source review confidence, while readiness remains pending until a
   scoped Artifact/Evidence attempt exists.
+- Updated `/jax/thinking-in-jax` reader behavior to match the existing
+  `web/article-workspace` HTML-scrape reader pattern: selection now uses
+  `window.getSelection()`, paragraph DOM nodes include `data-paragraph-index` and
+  `data-source-ref`, and evidence markers now render with atomic `highlight`,
+  `question`, and `key` semantics. Also removed the header `paper` visual badge.
 - Moved attempt evaluation, pedagogy loop, and pure evidence/loop contract files
   under `engine/pedagogy/core/` while keeping `engine/pedagogy-core/index.ts`
   as the public facade.
