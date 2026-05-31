@@ -100,6 +100,9 @@ release yet.
   semantics. Also removed the header `paper` visual badge and replaced the
   manually summarized JAX source paragraphs with a sanitized HTML scrape that
   preserves source headings, links, badges, lists, images, and code blocks.
+- Restyled the `/jax/thinking-in-jax` scraped HTML reader and file tree to use
+  the Sibar reader/workspace surface, typography, links, and code block
+  formatting instead of mirroring the official JAX documentation skin.
 - Moved attempt evaluation, pedagogy loop, and pure evidence/loop contract files
   under `engine/pedagogy/core/` while keeping `engine/pedagogy-core/index.ts`
   as the public facade.
