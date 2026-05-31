@@ -101,16 +101,18 @@ test("App exposes a concrete JAX thinking route outside mission and notes flows"
   assert.match(appSource, /<JaxThinkingInJaxPage \/>/);
   assert.match(jaxThinkingInJaxSource, /JAX tutorials and Scaling Book first step/);
   assert.match(jaxThinkingInJaxSource, /Scraped HTML reader/);
-  assert.match(jaxThinkingInJaxSource, /data-paragraph-index/);
+  assert.match(jaxThinkingInJaxSource, /dangerouslySetInnerHTML/);
   assert.match(jaxThinkingInJaxSource, /data-source-ref/);
   assert.match(jaxThinkingInJaxSource, /Esta parte no entiendo/);
   assert.match(jaxThinkingInJaxSource, /window\.getSelection/);
   assert.match(jaxThinkingInJaxSource, /kindHighlight|kindQuestion|kindKey/);
   assert.match(jaxThinkingInJaxSource, /pendingSelection/);
   assert.match(jaxThinkingInJaxSource, /setSelectionKind|saveSelection/);
-  assert.match(jaxThinkingInJaxSource, /renderParagraph/);
-  assert.match(jaxThinkingInJaxSourceData, /Quickstart overview/);
-  assert.match(jaxThinkingInJaxSourceData, /automatic differentiation and JIT compilation/);
+  assert.match(jaxThinkingInJaxSourceData, /jaxThinkingInJaxHtml/);
+  assert.match(jaxThinkingInJaxSourceData, /Open in Colab/);
+  assert.match(jaxThinkingInJaxSourceData, /Python Package Index/);
+  assert.match(jaxThinkingInJaxSourceData, /highlight-ipython3/);
+  assert.match(jaxThinkingInJaxSourceData, /pip install -U "jax\[cuda13\]"/);
   assert.match(
     jaxThinkingInJaxSourceData,
     /https:\/\/docs\.jax\.dev\/en\/latest\/notebooks\/thinking_in_jax\.html/,

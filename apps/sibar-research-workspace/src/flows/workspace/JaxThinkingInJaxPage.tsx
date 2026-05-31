@@ -2,28 +2,24 @@ import * as React from "react";
 import readerStyles from "./workspace.module.css";
 import styles from "./jaxSourcePage.module.css";
 import {
+  jaxThinkingInJaxHtml,
   jaxThinkingInJaxScrapedAt,
+  jaxThinkingInJaxSections,
   jaxThinkingInJaxSourceUrl,
-  jaxThinkingInJaxSources,
 } from "./jaxThinkingInJaxSource";
-import type { WorkspaceSource } from "../../state/workspaceProjection";
 
 type MarkKind = "highlight" | "question" | "key";
 
 type CapturedConfusion = {
   id: string;
-  sourceId: string;
   sourceRef: string;
-  paragraphIndex: number;
   kind: MarkKind;
   excerpt: string;
 };
 
 type PendingSelection = {
   id: string;
-  sourceId: string;
   sourceRef: string;
-  paragraphIndex: number;
   excerpt: string;
 };
 
@@ -55,107 +51,25 @@ const jax101ReferenceItems = [
   "Configuration Options",
 ];
 
-function sourceRefFor(source: WorkspaceSource, paragraphIndex: number): string {
-  return `${source.id}#p-${paragraphIndex + 1}`;
-}
-
-type MarkRange = {
-  id: string;
-  start: number;
-  end: number;
-  kind: MarkKind;
-};
-
-function rangesForParagraph(
-  paragraph: string,
-  index: number,
-  notes: readonly CapturedConfusion[],
-): MarkRange[] {
-  const paragraphNotes = notes
-    .filter((note) => note.paragraphIndex === index)
-    .sort((a, b) => b.excerpt.length - a.excerpt.length);
-
-  const ranges: MarkRange[] = [];
-
-  for (const note of paragraphNotes) {
-    const start = paragraph.indexOf(note.excerpt);
-    const end = start + note.excerpt.length;
-
-    if (start < 0) {
-      continue;
-    }
-
-    if (ranges.some((range) => start < range.end && end > range.start)) {
-      continue;
-    }
-
-    ranges.push({
-      id: note.id,
-      start,
-      end,
-      kind: note.kind,
-    });
-  }
-
-  return ranges.sort((a, b) => a.start - b.start);
-}
-
-function renderParagraph(paragraph: string, index: number, notes: readonly CapturedConfusion[]): React.ReactNode[] {
-  const ranges = rangesForParagraph(paragraph, index, notes);
-
-  if (ranges.length === 0) {
-    return [paragraph];
-  }
-
-  const parts: React.ReactNode[] = [];
-  let cursor = 0;
-
-  for (const range of ranges) {
-    if (range.start > cursor) {
-      parts.push(paragraph.slice(cursor, range.start));
-    }
-
-    parts.push(
-      <mark
-        key={`${range.id}-${range.start}-${range.end}`}
-        className={`${styles.atomicHighlight} ${KIND_STYLES[range.kind]}`}
-        data-note-id={range.id}
-      >
-        {paragraph.slice(range.start, range.end)}
-      </mark>,
-    );
-
-    cursor = range.end;
-  }
-
-  if (cursor < paragraph.length) {
-    parts.push(paragraph.slice(cursor));
-  }
-
-  return parts;
-}
-
 export function JaxThinkingInJaxPage() {
-  const [selectedSourceId, setSelectedSourceId] = React.useState(
-    jaxThinkingInJaxSources[0]?.id ?? "",
+  const [selectedSectionId, setSelectedSectionId] = React.useState(
+    jaxThinkingInJaxSections[0]?.id ?? "",
   );
   const [pendingSelection, setPendingSelection] = React.useState<PendingSelection | null>(null);
   const [pendingKind, setPendingKind] = React.useState<MarkKind>("highlight");
   const [confusions, setConfusions] = React.useState<CapturedConfusion[]>([]);
-  const selectedSource =
-    jaxThinkingInJaxSources.find((source) => source.id === selectedSourceId) ??
-    jaxThinkingInJaxSources[0];
   const articleBodyRef = React.useRef<HTMLElement>(null);
-
-  const sourceConfusions = React.useMemo(
-    () => confusions.filter((entry) => entry.sourceId === selectedSource.id),
-    [confusions, selectedSource.id],
-  );
 
   function clearPendingSelection(): void {
     setPendingSelection(null);
     setPendingKind("highlight");
     window.getSelection()?.removeAllRanges();
+  }
+
+  function scrollToSection(sectionId: string): void {
+    setSelectedSectionId(sectionId);
+    const section = articleBodyRef.current?.querySelector(`#${sectionId}`);
+    section?.scrollIntoView({ block: "start", behavior: "smooth" });
   }
 
   function handleParagraphSelection(): void {
@@ -189,24 +103,15 @@ export function JaxThinkingInJaxPage() {
       range.startContainer.nodeType === Node.TEXT_NODE
         ? range.startContainer.parentElement
         : range.startContainer;
-    const paragraph = startNode?.closest?.("[data-paragraph-index]") as HTMLElement | null;
-    if (!paragraph) {
-      clearPendingSelection();
-      return;
-    }
+    const sourceElement = startNode?.closest?.("[data-source-ref]") as HTMLElement | null;
+    const sectionElement = startNode?.closest?.("section[id]") as HTMLElement | null;
+    const sourceRef =
+      sourceElement?.dataset.sourceRef ??
+      (sectionElement?.id ? `thinking-in-jax#${sectionElement.id}` : "thinking-in-jax#selection");
 
-    const paragraphIndex = Number(paragraph.dataset.paragraphIndex);
-    if (Number.isNaN(paragraphIndex)) {
-      clearPendingSelection();
-      return;
-    }
-
-    const sourceRef = sourceRefFor(selectedSource, paragraphIndex);
     setPendingSelection({
       id: `pending:${sourceRef}`,
-      sourceId: selectedSource.id,
       sourceRef,
-      paragraphIndex,
       excerpt: selectedText,
     });
     setPendingKind("highlight");
@@ -224,7 +129,6 @@ export function JaxThinkingInJaxPage() {
     if (
       confusions.some(
         (entry) =>
-          entry.sourceId === selectedSource.id &&
           entry.sourceRef === pendingSelection.sourceRef &&
           entry.excerpt === pendingSelection.excerpt &&
           entry.kind === pendingKind,
@@ -284,10 +188,6 @@ export function JaxThinkingInJaxPage() {
     };
   }, [pendingSelection, pendingKind, saveSelection, clearPendingSelection, cycleKind]);
 
-  React.useEffect(() => {
-    clearPendingSelection();
-  }, [selectedSource.id]);
-
   return (
     <main className={styles.sourceReaderPage} data-route="jax-thinking-in-jax">
       <section className={styles.readerShell} aria-label="JAX source reader">
@@ -319,7 +219,10 @@ export function JaxThinkingInJaxPage() {
           </dl>
         </aside>
 
-        <section className={readerStyles.readerWorkspace} aria-label="Scraped HTML reader">
+        <section
+          className={`${readerStyles.readerWorkspace} ${styles.htmlReaderWorkspace}`}
+          aria-label="Scraped HTML reader"
+        >
           <aside className={styles.playbookTree} aria-label="JAX 101 playbook file tree">
             <section className={styles.treeGroup} aria-label="Getting started">
               <h2>Getting started</h2>
@@ -329,7 +232,7 @@ export function JaxThinkingInJaxPage() {
               <button
                 type="button"
                 className={styles.treeLinkActive}
-                onClick={() => setSelectedSourceId("thinking-in-jax-overview")}
+                onClick={() => scrollToSection("quickstart-how-to-think-in-jax")}
               >
                 Quickstart: How to think in JAX
               </button>
@@ -341,18 +244,18 @@ export function JaxThinkingInJaxPage() {
             <section className={styles.treeGroup} aria-label="JAX 101 page sections">
               <h2>JAX 101</h2>
               <div className={styles.treeSourceList}>
-                {jaxThinkingInJaxSources.map((source) => (
+                {jaxThinkingInJaxSections.map((section) => (
                   <button
-                    key={source.id}
+                    key={section.id}
                     type="button"
                     className={
-                      source.id === selectedSource.id
+                      section.id === selectedSectionId
                         ? styles.treeSectionActive
                         : styles.treeSection
                     }
-                    onClick={() => setSelectedSourceId(source.id)}
+                    onClick={() => scrollToSection(section.id)}
                   >
-                    <strong>{source.title}</strong>
+                    <strong>{section.title}</strong>
                   </button>
                 ))}
               </div>
@@ -370,33 +273,18 @@ export function JaxThinkingInJaxPage() {
             </section>
           </aside>
 
-          <main className={readerStyles.readerCanvas} aria-label="Selected JAX source section">
-            <header className={readerStyles.readerHeader}>
-              <div>
-                <p className={readerStyles.kicker}>Scraped HTML section</p>
-                <h2>{selectedSource.title}</h2>
-                <p>{selectedSource.metadata}</p>
-              </div>
-            </header>
-
+          <main
+            className={`${readerStyles.readerCanvas} ${styles.htmlReaderCanvas}`}
+            aria-label="Selected JAX source section"
+          >
             <article
               ref={articleBodyRef}
-              className={`${readerStyles.readerDocument} ${styles.jaxReaderDocument}`}
-              data-mode={selectedSource.type}
+              className={`${readerStyles.readerDocument} ${styles.jaxReaderDocument} ${styles.scrapedHtmlDocument}`}
+              data-mode="scraped-html"
+              data-source-ref="thinking-in-jax#document"
               onMouseUp={() => window.setTimeout(handleParagraphSelection, 0)}
-            >
-              {selectedSource.body.map((paragraph, index) => {
-                const sourceRef = sourceRefFor(selectedSource, index);
-
-                return (
-                  <p key={sourceRef} data-paragraph-index={index} data-source-ref={sourceRef}>
-                    {renderParagraph(paragraph, index, sourceConfusions).map((chunk, chunkIndex) => (
-                      <React.Fragment key={`${sourceRef}-${chunkIndex}`}>{chunk}</React.Fragment>
-                    ))}
-                  </p>
-                );
-              })}
-            </article>
+              dangerouslySetInnerHTML={{ __html: jaxThinkingInJaxHtml }}
+            />
           </main>
         </section>
 
@@ -436,10 +324,10 @@ export function JaxThinkingInJaxPage() {
 
           <section className={styles.captureList} aria-label="Captured confusing passages">
             <h3>Captured evidence</h3>
-            {sourceConfusions.length === 0 ? (
+            {confusions.length === 0 ? (
               <p>No confusing passages captured yet.</p>
             ) : (
-              sourceConfusions.map((entry) => (
+              confusions.map((entry) => (
                 <article key={entry.id} className={styles.evidenceItem}>
                   <span className={`${styles.evidenceKind} ${KIND_STYLES[entry.kind]}`}>
                     {KIND_LABELS[entry.kind]}

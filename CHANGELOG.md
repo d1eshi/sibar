@@ -95,9 +95,11 @@ release yet.
   scoped Artifact/Evidence attempt exists.
 - Updated `/jax/thinking-in-jax` reader behavior to match the existing
   `web/article-workspace` HTML-scrape reader pattern: selection now uses
-  `window.getSelection()`, paragraph DOM nodes include `data-paragraph-index` and
-  `data-source-ref`, and evidence markers now render with atomic `highlight`,
-  `question`, and `key` semantics. Also removed the header `paper` visual badge.
+  `window.getSelection()`, scraped source DOM nodes include `data-source-ref`,
+  and evidence markers now render with atomic `highlight`, `question`, and `key`
+  semantics. Also removed the header `paper` visual badge and replaced the
+  manually summarized JAX source paragraphs with a sanitized HTML scrape that
+  preserves source headings, links, badges, lists, images, and code blocks.
 - Moved attempt evaluation, pedagogy loop, and pure evidence/loop contract files
   under `engine/pedagogy/core/` while keeping `engine/pedagogy-core/index.ts`
   as the public facade.
