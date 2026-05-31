@@ -42,6 +42,10 @@ const jaxThinkingInJaxSource = readFileSync(
   join(root, "apps/sibar-research-workspace/src/flows/workspace/JaxThinkingInJaxPage.tsx"),
   "utf8",
 );
+const jaxThinkingInJaxStyles = readFileSync(
+  join(root, "apps/sibar-research-workspace/src/flows/workspace/jaxSourcePage.module.css"),
+  "utf8",
+);
 const jaxThinkingInJaxSourceData = readFileSync(
   join(root, "apps/sibar-research-workspace/src/flows/workspace/jaxThinkingInJaxSource.ts"),
   "utf8",
@@ -114,6 +118,11 @@ test("App exposes a concrete JAX thinking route outside mission and notes flows"
   assert.match(jaxThinkingInJaxSource, /pendingSelection/);
   assert.match(jaxThinkingInJaxSource, /setSelectionKind|saveSelection/);
   assert.match(jaxThinkingInJaxSource, /treeSectionLevel/);
+  assert.match(jaxThinkingInJaxSource, /article\.scrollTo/);
+  assert.doesNotMatch(jaxThinkingInJaxSource, /scrollIntoView/);
+  assert.match(jaxThinkingInJaxStyles, /\.sourceReaderPage\s*\{[\s\S]*height: 100dvh;[\s\S]*overflow: hidden;/);
+  assert.match(jaxThinkingInJaxStyles, /\.readerShell\s*\{[\s\S]*height: 100%;[\s\S]*overflow: hidden;/);
+  assert.match(jaxThinkingInJaxStyles, /\.scrapedHtmlDocument\s*\{[\s\S]*height: 100%;[\s\S]*overflow: auto;/);
   assert.match(jaxThinkingInJaxSourceData, /jaxThinkingInJaxHtml/);
   assert.match(jaxThinkingInJaxSourceData, /jaxThinkingInJaxScrapeSelector = "article\.bd-article"/);
   assert.match(jaxThinkingInJaxSourceData, /Open in Colab/);

@@ -1,23 +1,37 @@
 .sourceReaderPage {
-  min-height: 100dvh;
+  height: 100dvh;
+  min-height: 0;
+  overflow: hidden;
   color: var(--text-primary);
   background: var(--surface-page);
 }
 
 .readerShell {
-  min-height: 100dvh;
+  height: 100%;
+  min-height: 0;
   display: grid;
   grid-template-columns: minmax(240px, 300px) minmax(0, 1fr) minmax(260px, 340px);
+  overflow: hidden;
 }
 
 .contextPanel,
 .capturePanel {
   min-width: 0;
+  min-height: 0;
   display: grid;
   align-content: start;
   gap: 18px;
   padding: 28px 22px;
+  overflow: auto;
+  scrollbar-width: none;
   background: var(--surface-panel-warm);
+}
+
+.contextPanel::-webkit-scrollbar,
+.capturePanel::-webkit-scrollbar,
+.playbookTree::-webkit-scrollbar,
+.scrapedHtmlDocument::-webkit-scrollbar {
+  display: none;
 }
 
 .contextPanel {
@@ -31,6 +45,7 @@
 .htmlReaderWorkspace,
 .htmlReaderCanvas {
   min-width: 0;
+  min-height: 0;
   max-width: 100%;
 }
 
@@ -46,8 +61,10 @@
 .scrapedHtmlDocument {
   max-width: 100%;
   min-width: 0;
+  height: 100%;
   padding: 34px 38px 60px;
-  overflow-x: hidden;
+  overflow: auto;
+  scrollbar-width: none;
   color: var(--text-primary);
   background: var(--surface-panel);
   font-family: var(--font-serif);
@@ -394,6 +411,7 @@
   gap: 18px;
   padding: 18px 0 22px;
   overflow: auto;
+  scrollbar-width: none;
   border: 1px solid var(--divider);
   border-radius: var(--radius);
   background: var(--surface-panel);

@@ -68,8 +68,16 @@ export function JaxThinkingInJaxPage() {
 
   function scrollToSection(sectionId: string): void {
     setSelectedSectionId(sectionId);
-    const section = articleBodyRef.current?.querySelector(`#${sectionId}`);
-    section?.scrollIntoView({ block: "start", behavior: "smooth" });
+    const article = articleBodyRef.current;
+    const section = article?.querySelector(`#${sectionId}`) as HTMLElement | null;
+    if (!article || !section) {
+      return;
+    }
+
+    article.scrollTo({
+      top: section.offsetTop - article.offsetTop - 8,
+      behavior: "smooth",
+    });
   }
 
   function handleParagraphSelection(): void {

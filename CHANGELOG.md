@@ -106,6 +106,9 @@ release yet.
 - Added a reproducible JAX notebook scraper that fetches the official
   `thinking_in_jax.html`, extracts `article.bd-article`, sanitizes the HTML for
   the local reader, and regenerates the full first-episode section tree.
+- Constrained the `/jax/thinking-in-jax` reader route to viewport height so the
+  scraped article scrolls inside the reader while the file tree and selection
+  capture panel stay available.
 - Moved attempt evaluation, pedagogy loop, and pure evidence/loop contract files
   under `engine/pedagogy/core/` while keeping `engine/pedagogy-core/index.ts`
   as the public facade.
