@@ -14,6 +14,21 @@ type CapturedConfusion = {
   excerpt: string;
 };
 
+const jax101ReferenceItems = [
+  "Key concepts",
+  "Resources and Advanced Guides",
+  "API Reference",
+  "Developer notes",
+  "Extension guides",
+  "Notes",
+  "Pallas: a JAX kernel language",
+  "About the project",
+  "Frequently asked questions (FAQ)",
+  "Change log",
+  "Glossary of terms",
+  "Configuration Options",
+];
+
 function sourceRefFor(source: WorkspaceSource, paragraphIndex: number): string {
   return `${source.id}#p-${paragraphIndex + 1}`;
 }
@@ -89,26 +104,54 @@ export function JaxThinkingInJaxPage() {
         </aside>
 
         <section className={readerStyles.readerWorkspace} aria-label="Scraped HTML reader">
-          <aside className={readerStyles.materialTree} aria-label="Scraped source file tree">
-            <p className={readerStyles.kicker}>File tree</p>
-            <div className={readerStyles.materialTreeList}>
-              {jaxThinkingInJaxSources.map((source) => (
-                <button
-                  key={source.id}
-                  type="button"
-                  className={
-                    source.id === selectedSource.id
-                      ? readerStyles.materialTreeItemActive
-                      : readerStyles.materialTreeItem
-                  }
-                  onClick={() => setSelectedSourceId(source.id)}
-                >
-                  <span>{source.type}</span>
-                  <strong>{source.title}</strong>
-                  <em>{source.snippet}</em>
-                </button>
-              ))}
-            </div>
+          <aside className={styles.playbookTree} aria-label="JAX 101 playbook file tree">
+            <section className={styles.treeGroup} aria-label="Getting started">
+              <h2>Getting started</h2>
+              <button type="button" className={styles.treeLink}>
+                Installation
+              </button>
+              <button
+                type="button"
+                className={styles.treeLinkActive}
+                onClick={() => setSelectedSourceId("thinking-in-jax-overview")}
+              >
+                Quickstart: How to think in JAX
+              </button>
+              <button type="button" className={styles.treeLink}>
+                🔪 JAX - The Sharp Bits 🔪
+              </button>
+            </section>
+
+            <section className={styles.treeGroup} aria-label="JAX 101 page sections">
+              <h2>JAX 101</h2>
+              <div className={styles.treeSourceList}>
+                {jaxThinkingInJaxSources.map((source) => (
+                  <button
+                    key={source.id}
+                    type="button"
+                    className={
+                      source.id === selectedSource.id
+                        ? styles.treeSectionActive
+                        : styles.treeSection
+                    }
+                    onClick={() => setSelectedSourceId(source.id)}
+                  >
+                    <strong>{source.title}</strong>
+                  </button>
+                ))}
+              </div>
+            </section>
+
+            <section className={styles.treeGroup} aria-label="Resources guides and references">
+              <h2>Resources, guides, and references</h2>
+              <div className={styles.treeSourceList}>
+                {jax101ReferenceItems.map((item) => (
+                  <button key={item} type="button" className={styles.treeLink}>
+                    {item}
+                  </button>
+                ))}
+              </div>
+            </section>
           </aside>
 
           <main className={readerStyles.readerCanvas} aria-label="Selected JAX source section">
