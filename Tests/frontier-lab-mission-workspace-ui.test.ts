@@ -41,6 +41,10 @@ const jaxThinkingInJaxSource = readFileSync(
   join(root, "apps/sibar-research-workspace/src/flows/workspace/JaxThinkingInJaxPage.tsx"),
   "utf8",
 );
+const jaxThinkingInJaxSourceData = readFileSync(
+  join(root, "apps/sibar-research-workspace/src/flows/workspace/jaxThinkingInJaxSource.ts"),
+  "utf8",
+);
 const webWorkspaceHtml = readFileSync(join(root, "web/workspace.html"), "utf8");
 const frontierLabPastedText = [
   "The practical path starts with JAX tutorials and the Scaling Book.",
@@ -96,9 +100,13 @@ test("App exposes a concrete JAX thinking route outside mission and notes flows"
   assert.match(appSource, /\/jax\/tutorials-and-scaling-book-first-step/);
   assert.match(appSource, /<JaxThinkingInJaxPage \/>/);
   assert.match(jaxThinkingInJaxSource, /JAX tutorials and Scaling Book first step/);
-  assert.match(jaxThinkingInJaxSource, /Quickstart: How to think in JAX/);
+  assert.match(jaxThinkingInJaxSource, /Scraped HTML reader/);
+  assert.match(jaxThinkingInJaxSource, /data-source-ref/);
+  assert.match(jaxThinkingInJaxSource, /Esta parte no entiendo/);
+  assert.match(jaxThinkingInJaxSourceData, /Quickstart overview/);
+  assert.match(jaxThinkingInJaxSourceData, /automatic differentiation and JIT compilation/);
   assert.match(
-    jaxThinkingInJaxSource,
+    jaxThinkingInJaxSourceData,
     /https:\/\/docs\.jax\.dev\/en\/latest\/notebooks\/thinking_in_jax\.html/,
   );
   assert.doesNotMatch(jaxThinkingInJaxSource, /StudySessionNotes|WorkspaceSessionLayout|MissionOverview|SessionWorkbench/);

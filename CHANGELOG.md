@@ -53,9 +53,9 @@ release yet.
   scoped readiness loop for the frontier-lab active session, backed by the public
   `pedagogy-core` facade and bridge-projected concept slice data.
 - Added concrete source routes for the JAX first step at `/jax/thinking-in-jax`
-  and `/jax/tutorials-and-scaling-book-first-step`, rendering the official
-  "Quickstart: How to think in JAX" page outside Mission, Session, and notes
-  flows.
+  and `/jax/tutorials-and-scaling-book-first-step`, rendering scraped official
+  "Quickstart: How to think in JAX" source excerpts in the local reader with
+  selectable evidence refs outside Mission, Session, and notes flows.
 
 ### Changed - Pedagogy Core Facade
 

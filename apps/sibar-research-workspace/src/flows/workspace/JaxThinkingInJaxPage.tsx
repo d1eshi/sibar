@@ -1,116 +1,184 @@
+import * as React from "react";
+import readerStyles from "./workspace.module.css";
 import styles from "./jaxSourcePage.module.css";
+import {
+  jaxThinkingInJaxScrapedAt,
+  jaxThinkingInJaxSourceUrl,
+  jaxThinkingInJaxSources,
+} from "./jaxThinkingInJaxSource";
+import type { WorkspaceSource } from "../../state/workspaceProjection";
 
-const sourceUrl = "https://docs.jax.dev/en/latest/notebooks/thinking_in_jax.html";
+type CapturedConfusion = {
+  id: string;
+  sourceRef: string;
+  excerpt: string;
+};
 
-const sourceSections = [
-  "Installation",
-  "JAX vs. NumPy",
-  "JAX arrays (jax.Array)",
-  "Just-in-time compilation with jax.jit",
-  "Taking derivatives with jax.grad",
-  "Auto-vectorization with jax.vmap",
-  "Pseudorandom numbers",
-  "Debugging",
-];
-
-const studySteps = [
-  {
-    title: "Read the JAX quickstart first",
-    body:
-      "Use this page to anchor the JAX tutorials part of the first step before adding broader scaling-system material.",
-  },
-  {
-    title: "Capture source-backed takeaways",
-    body:
-      "Keep takeaways tied to the concrete tutorial sections: arrays, transformations, JIT, gradients, vectorization, random keys, and debugging.",
-  },
-  {
-    title: "Then map to Scaling Book",
-    body:
-      "After the JAX quickstart is understood, connect the same computation model to the Scaling Book concepts separately.",
-  },
-];
+function sourceRefFor(source: WorkspaceSource, paragraphIndex: number): string {
+  return `${source.id}#p-${paragraphIndex + 1}`;
+}
 
 export function JaxThinkingInJaxPage() {
+  const [selectedSourceId, setSelectedSourceId] = React.useState(
+    jaxThinkingInJaxSources[0]?.id ?? "",
+  );
+  const [activeSelection, setActiveSelection] =
+    React.useState<CapturedConfusion | null>(null);
+  const [confusions, setConfusions] = React.useState<CapturedConfusion[]>([]);
+  const selectedSource =
+    jaxThinkingInJaxSources.find((source) => source.id === selectedSourceId) ??
+    jaxThinkingInJaxSources[0];
+
+  function captureSelection(excerpt: string, sourceRef: string): void {
+    setActiveSelection({
+      id: `active:${sourceRef}`,
+      sourceRef,
+      excerpt,
+    });
+  }
+
+  function markConfusing(): void {
+    if (!activeSelection) {
+      return;
+    }
+
+    setConfusions((current) => {
+      if (current.some((entry) => entry.sourceRef === activeSelection.sourceRef)) {
+        return current;
+      }
+
+      return [
+        {
+          ...activeSelection,
+          id: `confusion:${activeSelection.sourceRef}`,
+        },
+        ...current,
+      ];
+    });
+  }
+
   return (
-    <main className={styles.sourcePage} data-route="jax-thinking-in-jax">
-      <aside className={styles.sourceRail} aria-label="Source context">
-        <p className={styles.eyebrow}>Concrete route</p>
-        <h1>JAX tutorials and Scaling Book first step</h1>
-        <p>
-          A direct reading page for the official JAX quickstart, separate from
-          mission briefs and study-session controls.
-        </p>
-        <a href={sourceUrl} target="_blank" rel="noreferrer">
-          Open official source
-        </a>
-      </aside>
-
-      <article className={styles.sourceArticle} aria-label="JAX quickstart reader">
-        <header className={styles.articleHeader}>
-          <p className={styles.eyebrow}>Official JAX docs</p>
-          <h2>Quickstart: How to think in JAX</h2>
+    <main className={styles.sourceReaderPage} data-route="jax-thinking-in-jax">
+      <section className={styles.readerShell} aria-label="JAX source reader">
+        <aside className={styles.contextPanel} aria-label="JAX source context">
+          <p className={readerStyles.kicker}>Concrete source route</p>
+          <h1>JAX tutorials and Scaling Book first step</h1>
           <p>
-            This source introduces JAX as NumPy-like array computation with
-            automatic differentiation, JIT compilation, vectorization, and device
-            execution for machine learning research.
+            Scraped from the official JAX HTML and rendered here as selectable
+            source evidence.
           </p>
-        </header>
 
-        <section className={styles.sourceMeta} aria-label="Source metadata">
-          <div>
-            <span>Source URL</span>
-            <strong>{sourceUrl}</strong>
-          </div>
-          <div>
-            <span>Route</span>
-            <strong>/jax/thinking-in-jax</strong>
-          </div>
-          <div>
-            <span>Alias</span>
-            <strong>/jax/tutorials-and-scaling-book-first-step</strong>
-          </div>
-        </section>
+          <dl>
+            <div>
+              <dt>Official source</dt>
+              <dd>
+                <a href={jaxThinkingInJaxSourceUrl} target="_blank" rel="noreferrer">
+                  thinking_in_jax.html
+                </a>
+              </dd>
+            </div>
+            <div>
+              <dt>Scraped</dt>
+              <dd>{jaxThinkingInJaxScrapedAt}</dd>
+            </div>
+            <div>
+              <dt>Route</dt>
+              <dd>/jax/thinking-in-jax</dd>
+            </div>
+          </dl>
+        </aside>
 
-        <section className={styles.contentGrid} aria-label="Reading outline">
-          <div className={styles.outlinePanel}>
-            <p className={styles.eyebrow}>Page contents</p>
-            <ol>
-              {sourceSections.map((section) => (
-                <li key={section}>{section}</li>
+        <section className={readerStyles.readerWorkspace} aria-label="Scraped HTML reader">
+          <aside className={readerStyles.materialTree} aria-label="Scraped source file tree">
+            <p className={readerStyles.kicker}>File tree</p>
+            <div className={readerStyles.materialTreeList}>
+              {jaxThinkingInJaxSources.map((source) => (
+                <button
+                  key={source.id}
+                  type="button"
+                  className={
+                    source.id === selectedSource.id
+                      ? readerStyles.materialTreeItemActive
+                      : readerStyles.materialTreeItem
+                  }
+                  onClick={() => setSelectedSourceId(source.id)}
+                >
+                  <span>{source.type}</span>
+                  <strong>{source.title}</strong>
+                  <em>{source.snippet}</em>
+                </button>
               ))}
-            </ol>
-          </div>
+            </div>
+          </aside>
 
-          <div className={styles.notePanel}>
-            <p className={styles.eyebrow}>Why this page</p>
-            <h3>Start with the mechanics before the scaling layer.</h3>
-            <p>
-              The frontier-lab first step mentions JAX tutorials and the Scaling
-              Book. This route shows the JAX tutorial source directly so the user
-              can inspect the first concrete document instead of landing in the
-              generic mission/session UI.
-            </p>
-          </div>
-        </section>
+          <main className={readerStyles.readerCanvas} aria-label="Selected JAX source section">
+            <header className={readerStyles.readerHeader}>
+              <div>
+                <p className={readerStyles.kicker}>Scraped HTML section</p>
+                <h2>{selectedSource.title}</h2>
+                <p>{selectedSource.metadata}</p>
+              </div>
+              <span className={readerStyles.sourceTypeBadge}>{selectedSource.type}</span>
+            </header>
 
-        <section className={styles.steps} aria-label="Study sequence">
-          {studySteps.map((step, index) => (
-            <article key={step.title}>
-              <span>{String(index + 1).padStart(2, "0")}</span>
-              <h3>{step.title}</h3>
-              <p>{step.body}</p>
+            <article className={readerStyles.readerDocument} data-mode={selectedSource.type}>
+              {selectedSource.body.map((paragraph, index) => {
+                const sourceRef = sourceRefFor(selectedSource, index);
+
+                return (
+                  <p
+                    key={sourceRef}
+                    role="button"
+                    tabIndex={0}
+                    data-source-ref={sourceRef}
+                    onClick={() => captureSelection(paragraph, sourceRef)}
+                    onKeyDown={(event) => {
+                      if (event.key === "Enter" || event.key === " ") {
+                        event.preventDefault();
+                        captureSelection(paragraph, sourceRef);
+                      }
+                    }}
+                  >
+                    {paragraph}
+                  </p>
+                );
+              })}
             </article>
-          ))}
+          </main>
         </section>
 
-        <section className={styles.codeBlock} aria-label="First command">
-          <p className={styles.eyebrow}>First command from the source</p>
-          <pre>
-            <code>pip install jax</code>
-          </pre>
-        </section>
-      </article>
+        <aside className={styles.capturePanel} aria-label="Source evidence capture">
+          <p className={readerStyles.kicker}>Selection capture</p>
+          <h2>Esta parte no entiendo</h2>
+          {activeSelection ? (
+            <section className={styles.activeSelection}>
+              <span>{activeSelection.sourceRef}</span>
+              <p>{activeSelection.excerpt}</p>
+              <button type="button" onClick={markConfusing}>
+                Mark as confusing
+              </button>
+            </section>
+          ) : (
+            <p className={styles.emptySelection}>
+              Select a paragraph in the reader to capture a source-backed question.
+            </p>
+          )}
+
+          <section className={styles.captureList} aria-label="Captured confusing passages">
+            <h3>Captured evidence</h3>
+            {confusions.length === 0 ? (
+              <p>No confusing passages captured yet.</p>
+            ) : (
+              confusions.map((entry) => (
+                <article key={entry.id}>
+                  <span>{entry.sourceRef}</span>
+                  <p>{entry.excerpt}</p>
+                </article>
+              ))
+            )}
+          </section>
+        </aside>
+      </section>
     </main>
   );
 }
