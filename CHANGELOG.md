@@ -111,6 +111,9 @@ release yet.
   capture panel stay available.
 - Removed the `/jax/thinking-in-jax` route metadata sidebar so the reader opens
   directly with the JAX file tree, scraped article, and selection capture panel.
+- Changed the `/jax/thinking-in-jax` selection capture panel into a simple
+  annotation chat: each selected passage accepts one user note/doubt, stores the
+  source ref and selected text, and prepares a bounded LLM-ingestion payload.
 - Moved attempt evaluation, pedagogy loop, and pure evidence/loop contract files
   under `engine/pedagogy/core/` while keeping `engine/pedagogy-core/index.ts`
   as the public facade.

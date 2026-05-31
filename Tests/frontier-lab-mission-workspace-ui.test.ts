@@ -115,7 +115,14 @@ test("App exposes a concrete JAX thinking route outside mission and notes flows"
   assert.match(jaxThinkingInJaxSource, /window\.getSelection/);
   assert.match(jaxThinkingInJaxSource, /kindHighlight|kindQuestion|kindKey/);
   assert.match(jaxThinkingInJaxSource, /pendingSelection/);
-  assert.match(jaxThinkingInJaxSource, /setSelectionKind|saveSelection/);
+  assert.match(jaxThinkingInJaxSource, /pendingNote/);
+  assert.match(jaxThinkingInJaxSource, /SourceAnnotation/);
+  assert.match(jaxThinkingInJaxSource, /sendAnnotationToLlm/);
+  assert.match(jaxThinkingInJaxSource, /AnnotationLlmPayload/);
+  assert.match(jaxThinkingInJaxSource, /selectedText/);
+  assert.match(jaxThinkingInJaxSource, /userNote/);
+  assert.match(jaxThinkingInJaxSource, /Annotation chat/);
+  assert.match(jaxThinkingInJaxSource, /Enviar al LLM/);
   assert.match(jaxThinkingInJaxSource, /treeSectionLevel/);
   assert.match(jaxThinkingInJaxSource, /article\.scrollTo/);
   assert.doesNotMatch(jaxThinkingInJaxSource, /scrollIntoView/);

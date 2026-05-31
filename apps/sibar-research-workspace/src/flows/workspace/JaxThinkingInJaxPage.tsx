@@ -8,11 +8,13 @@ import {
 
 type MarkKind = "highlight" | "question" | "key";
 
-type CapturedConfusion = {
+type SourceAnnotation = {
   id: string;
   sourceRef: string;
   kind: MarkKind;
   excerpt: string;
+  note: string;
+  llmPayload: AnnotationLlmPayload;
 };
 
 type PendingSelection = {
@@ -21,11 +23,11 @@ type PendingSelection = {
   excerpt: string;
 };
 
-const KIND_ORDER: MarkKind[] = ["highlight", "question", "key"];
-const KIND_LABELS: Record<MarkKind, string> = {
-  highlight: "Highlight",
-  question: "Pregunta",
-  key: "Idea",
+type AnnotationLlmPayload = {
+  route: "/jax/thinking-in-jax";
+  sourceRef: string;
+  selectedText: string;
+  userNote: string;
 };
 
 const KIND_STYLES: Record<MarkKind, string> = {
@@ -54,13 +56,13 @@ export function JaxThinkingInJaxPage() {
     jaxThinkingInJaxSections[0]?.id ?? "",
   );
   const [pendingSelection, setPendingSelection] = React.useState<PendingSelection | null>(null);
-  const [pendingKind, setPendingKind] = React.useState<MarkKind>("highlight");
-  const [confusions, setConfusions] = React.useState<CapturedConfusion[]>([]);
+  const [pendingNote, setPendingNote] = React.useState("");
+  const [annotations, setAnnotations] = React.useState<SourceAnnotation[]>([]);
   const articleBodyRef = React.useRef<HTMLElement>(null);
 
   function clearPendingSelection(): void {
     setPendingSelection(null);
-    setPendingKind("highlight");
+    setPendingNote("");
     window.getSelection()?.removeAllRanges();
   }
 
@@ -120,47 +122,49 @@ export function JaxThinkingInJaxPage() {
       sourceRef,
       excerpt: selectedText,
     });
-    setPendingKind("highlight");
+    setPendingNote("");
   }
 
-  function setSelectionKind(kind: MarkKind): void {
-    setPendingKind(kind);
-  }
-
-  function saveSelection(): void {
+  function sendAnnotationToLlm(): void {
     if (!pendingSelection) {
       return;
     }
 
+    const note = pendingNote.trim();
+    if (note.length === 0) {
+      return;
+    }
+
     if (
-      confusions.some(
+      annotations.some(
         (entry) =>
           entry.sourceRef === pendingSelection.sourceRef &&
           entry.excerpt === pendingSelection.excerpt &&
-          entry.kind === pendingKind,
+          entry.note === note,
       )
     ) {
       clearPendingSelection();
       return;
     }
 
-    setConfusions((current) => {
+    setAnnotations((current) => {
       return [
         {
           ...pendingSelection,
-          kind: pendingKind,
-          id: `confusion:${pendingSelection.sourceRef}:${pendingSelection.excerpt}`,
+          kind: "question",
+          note,
+          llmPayload: {
+            route: "/jax/thinking-in-jax",
+            sourceRef: pendingSelection.sourceRef,
+            selectedText: pendingSelection.excerpt,
+            userNote: note,
+          },
+          id: `annotation:${pendingSelection.sourceRef}:${pendingSelection.excerpt}:${note}`,
         },
         ...current,
       ];
     });
     clearPendingSelection();
-  }
-
-  function cycleKind(direction: number): void {
-    const index = KIND_ORDER.indexOf(pendingKind);
-    const nextIndex = (index + direction + KIND_ORDER.length) % KIND_ORDER.length;
-    setPendingKind(KIND_ORDER[nextIndex]);
   }
 
   React.useEffect(() => {
@@ -169,15 +173,9 @@ export function JaxThinkingInJaxPage() {
         return;
       }
 
-      if (event.key === "Tab") {
-        event.preventDefault();
-        cycleKind(event.shiftKey ? -1 : 1);
-        return;
-      }
-
       if (event.key === "Enter" && (event.metaKey || event.ctrlKey)) {
         event.preventDefault();
-        saveSelection();
+        sendAnnotationToLlm();
         return;
       }
 
@@ -192,7 +190,7 @@ export function JaxThinkingInJaxPage() {
     return () => {
       window.removeEventListener("keydown", onKeyDown);
     };
-  }, [pendingSelection, pendingKind, saveSelection, clearPendingSelection, cycleKind]);
+  }, [pendingSelection, pendingNote, sendAnnotationToLlm, clearPendingSelection]);
 
   return (
     <main className={styles.sourceReaderPage} data-route="jax-thinking-in-jax">
@@ -273,21 +271,22 @@ export function JaxThinkingInJaxPage() {
             <section className={styles.activeSelection}>
               <span>{pendingSelection.sourceRef}</span>
               <p>{pendingSelection.excerpt}</p>
-              <div className={styles.selectionKind}>
-                {KIND_ORDER.map((kind) => (
-                  <button
-                    type="button"
-                    key={kind}
-                    className={`${styles.kindButton} ${pendingKind === kind ? styles.kindButtonActive : ""}`}
-                    onClick={() => setSelectionKind(kind)}
-                  >
-                    {KIND_LABELS[kind]}
-                  </button>
-                ))}
-              </div>
+              <label className={styles.annotationComposer}>
+                <span>Duda o nota para el LLM</span>
+                <textarea
+                  rows={5}
+                  value={pendingNote}
+                  placeholder="Escribi una duda concreta sobre esta seleccion..."
+                  onChange={(event) => setPendingNote(event.currentTarget.value)}
+                />
+              </label>
               <div className={styles.selectionActions}>
-                <button type="button" onClick={saveSelection}>
-                  Guardar evidencia ({KIND_LABELS[pendingKind]})
+                <button
+                  type="button"
+                  onClick={sendAnnotationToLlm}
+                  disabled={pendingNote.trim().length === 0}
+                >
+                  Enviar al LLM
                 </button>
                 <button type="button" onClick={clearPendingSelection}>
                   Limpiar selección
@@ -296,19 +295,19 @@ export function JaxThinkingInJaxPage() {
             </section>
           ) : (
             <p className={styles.emptySelection}>
-              Seleccioná texto en el artículo para marcar highlight, pregunta o idea y guardar evidencia.
+              Seleccioná texto en el artículo para escribir una duda o nota y dejarla como annotation.
             </p>
           )}
 
-          <section className={styles.captureList} aria-label="Captured confusing passages">
-            <h3>Captured evidence</h3>
-            {confusions.length === 0 ? (
-              <p>No confusing passages captured yet.</p>
+          <section className={styles.captureList} aria-label="Annotation chat">
+            <h3>Annotations</h3>
+            {annotations.length === 0 ? (
+              <p>No hay annotations todavía.</p>
             ) : (
-              confusions.map((entry) => (
+              annotations.map((entry) => (
                 <article key={entry.id} className={styles.evidenceItem}>
                   <span className={`${styles.evidenceKind} ${KIND_STYLES[entry.kind]}`}>
-                    {KIND_LABELS[entry.kind]}
+                    LLM annotation
                   </span>
                   <span>{entry.sourceRef}</span>
                   <p>
@@ -316,6 +315,14 @@ export function JaxThinkingInJaxPage() {
                       {entry.excerpt}
                     </mark>
                   </p>
+                  <div className={styles.chatBubble}>
+                    <span>Vos</span>
+                    <p>{entry.note}</p>
+                  </div>
+                  <div className={styles.chatBubbleAssistant}>
+                    <span>LLM</span>
+                    <p>Annotation lista para discutir con el modelo usando solo esta selección.</p>
+                  </div>
                 </article>
               ))
             )}
