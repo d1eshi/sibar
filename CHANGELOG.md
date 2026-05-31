@@ -109,6 +109,8 @@ release yet.
 - Constrained the `/jax/thinking-in-jax` reader route to viewport height so the
   scraped article scrolls inside the reader while the file tree and selection
   capture panel stay available.
+- Removed the `/jax/thinking-in-jax` route metadata sidebar so the reader opens
+  directly with the JAX file tree, scraped article, and selection capture panel.
 - Moved attempt evaluation, pedagogy loop, and pure evidence/loop contract files
   under `engine/pedagogy/core/` while keeping `engine/pedagogy-core/index.ts`
   as the public facade.

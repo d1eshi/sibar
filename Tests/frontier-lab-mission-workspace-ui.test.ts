@@ -108,7 +108,6 @@ test("App exposes a concrete JAX thinking route outside mission and notes flows"
   assert.match(appSource, /\/jax\/thinking-in-jax/);
   assert.match(appSource, /\/jax\/tutorials-and-scaling-book-first-step/);
   assert.match(appSource, /<JaxThinkingInJaxPage \/>/);
-  assert.match(jaxThinkingInJaxSource, /JAX tutorials and Scaling Book first step/);
   assert.match(jaxThinkingInJaxSource, /Scraped HTML reader/);
   assert.match(jaxThinkingInJaxSource, /dangerouslySetInnerHTML/);
   assert.match(jaxThinkingInJaxSource, /data-source-ref/);
@@ -120,8 +119,10 @@ test("App exposes a concrete JAX thinking route outside mission and notes flows"
   assert.match(jaxThinkingInJaxSource, /treeSectionLevel/);
   assert.match(jaxThinkingInJaxSource, /article\.scrollTo/);
   assert.doesNotMatch(jaxThinkingInJaxSource, /scrollIntoView/);
+  assert.doesNotMatch(jaxThinkingInJaxSource, /JAX source context|Concrete source route/);
   assert.match(jaxThinkingInJaxStyles, /\.sourceReaderPage\s*\{[\s\S]*height: 100dvh;[\s\S]*overflow: hidden;/);
   assert.match(jaxThinkingInJaxStyles, /\.readerShell\s*\{[\s\S]*height: 100%;[\s\S]*overflow: hidden;/);
+  assert.doesNotMatch(jaxThinkingInJaxStyles, /contextPanel/);
   assert.match(jaxThinkingInJaxStyles, /\.scrapedHtmlDocument\s*\{[\s\S]*height: 100%;[\s\S]*overflow: auto;/);
   assert.match(jaxThinkingInJaxSourceData, /jaxThinkingInJaxHtml/);
   assert.match(jaxThinkingInJaxSourceData, /jaxThinkingInJaxScrapeSelector = "article\.bd-article"/);

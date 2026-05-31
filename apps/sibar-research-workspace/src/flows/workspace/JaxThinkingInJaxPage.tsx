@@ -3,9 +3,7 @@ import readerStyles from "./workspace.module.css";
 import styles from "./jaxSourcePage.module.css";
 import {
   jaxThinkingInJaxHtml,
-  jaxThinkingInJaxScrapedAt,
   jaxThinkingInJaxSections,
-  jaxThinkingInJaxSourceUrl,
 } from "./jaxThinkingInJaxSource";
 
 type MarkKind = "highlight" | "question" | "key";
@@ -199,34 +197,6 @@ export function JaxThinkingInJaxPage() {
   return (
     <main className={styles.sourceReaderPage} data-route="jax-thinking-in-jax">
       <section className={styles.readerShell} aria-label="JAX source reader">
-        <aside className={styles.contextPanel} aria-label="JAX source context">
-          <p className={readerStyles.kicker}>Concrete source route</p>
-          <h1>JAX tutorials and Scaling Book first step</h1>
-          <p>
-            Scraped from the official JAX HTML and rendered here as selectable
-            source evidence.
-          </p>
-
-          <dl>
-            <div>
-              <dt>Official source</dt>
-              <dd>
-                <a href={jaxThinkingInJaxSourceUrl} target="_blank" rel="noreferrer">
-                  thinking_in_jax.html
-                </a>
-              </dd>
-            </div>
-            <div>
-              <dt>Scraped</dt>
-              <dd>{jaxThinkingInJaxScrapedAt}</dd>
-            </div>
-            <div>
-              <dt>Route</dt>
-              <dd>/jax/thinking-in-jax</dd>
-            </div>
-          </dl>
-        </aside>
-
         <section
           className={`${readerStyles.readerWorkspace} ${styles.htmlReaderWorkspace}`}
           aria-label="Scraped HTML reader"
