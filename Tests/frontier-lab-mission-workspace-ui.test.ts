@@ -37,6 +37,10 @@ const workspaceHomeSource = readFileSync(
   join(root, "apps/sibar-research-workspace/src/flows/workspace/WorkspaceHome.tsx"),
   "utf8",
 );
+const jaxThinkingInJaxSource = readFileSync(
+  join(root, "apps/sibar-research-workspace/src/flows/workspace/JaxThinkingInJaxPage.tsx"),
+  "utf8",
+);
 const webWorkspaceHtml = readFileSync(join(root, "web/workspace.html"), "utf8");
 const frontierLabPastedText = [
   "The practical path starts with JAX tutorials and the Scaling Book.",
@@ -84,6 +88,20 @@ test("App opens Home and routes workspace opens to Mission Brief before Session"
   assert.match(workspaceProjectionSource, /openTarget: "overview"/);
   assert.match(workspaceReducerSource, /type: "reset"/);
   assert.doesNotMatch(workspaceProjectionSource, /openTarget: "session"/);
+});
+
+test("App exposes a concrete JAX thinking route outside mission and notes flows", () => {
+  assert.match(appSource, /jaxThinkingInJaxRoutes/);
+  assert.match(appSource, /\/jax\/thinking-in-jax/);
+  assert.match(appSource, /\/jax\/tutorials-and-scaling-book-first-step/);
+  assert.match(appSource, /<JaxThinkingInJaxPage \/>/);
+  assert.match(jaxThinkingInJaxSource, /JAX tutorials and Scaling Book first step/);
+  assert.match(jaxThinkingInJaxSource, /Quickstart: How to think in JAX/);
+  assert.match(
+    jaxThinkingInJaxSource,
+    /https:\/\/docs\.jax\.dev\/en\/latest\/notebooks\/thinking_in_jax\.html/,
+  );
+  assert.doesNotMatch(jaxThinkingInJaxSource, /StudySessionNotes|WorkspaceSessionLayout|MissionOverview|SessionWorkbench/);
 });
 
 test("New mission flow uses the frontier-lab compiler instead of generic preview fabrication", () => {
