@@ -22,6 +22,7 @@
     "web:dev": "bun --hot scripts/web-dev.mjs",
     "article:workspace": "node --experimental-strip-types engine/article-workspace-server.ts",
     "article:vercel:check": "node --test --test-concurrency=1 --experimental-strip-types Tests/article-workspace-vercel.test.ts",
+    "scrape:jax-thinking": "node scripts/scrape-jax-thinking-in-jax.mjs",
     "test": "node --test --test-concurrency=1 --experimental-strip-types Tests/**/*.test.ts sibi/Tests/**/*.test.ts",
     "typecheck": "pnpm exec tsc -p tsconfig.json --noEmit",
     "guard:supply-chain": "node --experimental-strip-types engine/scripts/guard-supply-chain.ts",

@@ -52,6 +52,10 @@ release yet.
 - Added the first deterministic React Session -> Artifact/Evidence attempt ->
   scoped readiness loop for the frontier-lab active session, backed by the public
   `pedagogy-core` facade and bridge-projected concept slice data.
+- Added concrete source routes for the JAX first step at `/jax/thinking-in-jax`
+  and `/jax/tutorials-and-scaling-book-first-step`, rendering scraped official
+  "Quickstart: How to think in JAX" source excerpts in the local reader with
+  selectable evidence refs outside Mission, Session, and notes flows.
 
 ### Changed - Pedagogy Core Facade
 
@@ -89,6 +93,27 @@ release yet.
 - Updated the frontier-lab React workspace UI so source fixture confidence is
   shown as source review confidence, while readiness remains pending until a
   scoped Artifact/Evidence attempt exists.
+- Updated `/jax/thinking-in-jax` reader behavior to match the existing
+  `web/article-workspace` HTML-scrape reader pattern: selection now uses
+  `window.getSelection()`, scraped source DOM nodes include `data-source-ref`,
+  and evidence markers now render with atomic `highlight`, `question`, and `key`
+  semantics. Also removed the header `paper` visual badge and replaced the
+  manually summarized JAX source paragraphs with a sanitized HTML scrape that
+  preserves source headings, links, badges, lists, images, and code blocks.
+- Restyled the `/jax/thinking-in-jax` scraped HTML reader and file tree to use
+  the Sibar reader/workspace surface, typography, links, and code block
+  formatting instead of mirroring the official JAX documentation skin.
+- Added a reproducible JAX notebook scraper that fetches the official
+  `thinking_in_jax.html`, extracts `article.bd-article`, sanitizes the HTML for
+  the local reader, and regenerates the full first-episode section tree.
+- Constrained the `/jax/thinking-in-jax` reader route to viewport height so the
+  scraped article scrolls inside the reader while the file tree and selection
+  capture panel stay available.
+- Removed the `/jax/thinking-in-jax` route metadata sidebar so the reader opens
+  directly with the JAX file tree, scraped article, and selection capture panel.
+- Changed the `/jax/thinking-in-jax` selection capture panel into a simple
+  annotation chat: each selected passage accepts one user note/doubt, stores the
+  source ref and selected text, and prepares a bounded LLM-ingestion payload.
 - Moved attempt evaluation, pedagogy loop, and pure evidence/loop contract files
   under `engine/pedagogy/core/` while keeping `engine/pedagogy-core/index.ts`
   as the public facade.

@@ -3,6 +3,7 @@ import styles from "./App.module.css";
 import { OnboardingFlow } from "./flows/onboarding/OnboardingFlow";
 import { WorkspaceShell } from "./flows/workspace/WorkspaceShell";
 import { WorkspaceHome } from "./flows/workspace/WorkspaceHome";
+import { JaxThinkingInJaxPage } from "./flows/workspace/JaxThinkingInJaxPage";
 import { MissionOverview } from "./flows/workspace/MissionOverview";
 import { StudyPathRail } from "./flows/workspace/StudyPathRail";
 import { StudySessionNotes } from "./flows/workspace/StudySessionNotes";
@@ -46,6 +47,21 @@ type AttemptReadinessResult = {
   repairAction: RepairAction | null;
 };
 
+const jaxThinkingInJaxRoutes = new Set([
+  "/jax/thinking-in-jax",
+  "/jax/tutorials-and-scaling-book-first-step",
+]);
+
+function normalizeRoutePath(pathname: string): string {
+  const normalized = pathname.replace(/\/+$/, "");
+
+  return normalized.length > 0 ? normalized : "/";
+}
+
+function isJaxThinkingInJaxRoute(pathname: string): boolean {
+  return jaxThinkingInJaxRoutes.has(normalizeRoutePath(pathname));
+}
+
 function listPreview(values: readonly string[], fallback: string): string {
   if (values.length === 0) {
     return fallback;
@@ -73,7 +89,7 @@ function readinessPendingCopy(activeSession: ActiveSessionProjection) {
   };
 }
 
-export default function App() {
+function MissionWorkspaceApp() {
   type AppFlowStep = "home" | "onboarding" | "overview" | "session";
   const [flowStep, setFlowStep] = React.useState<AppFlowStep>("home");
   const [activeMissionProjection, setActiveMissionProjection] =
@@ -371,4 +387,15 @@ export default function App() {
       </WorkspaceShell>
     </main>
   );
+}
+
+export default function App() {
+  const routePath =
+    typeof window === "undefined" ? "/" : window.location.pathname;
+
+  if (isJaxThinkingInJaxRoute(routePath)) {
+    return <JaxThinkingInJaxPage />;
+  }
+
+  return <MissionWorkspaceApp />;
 }

@@ -29,12 +29,29 @@ const workspaceReducerSource = readFileSync(
   join(root, "apps/sibar-research-workspace/src/state/workspaceReducer.ts"),
   "utf8",
 );
+const packageSource = readFileSync(join(root, "package.json"), "utf8");
 const missionOverviewSource = readFileSync(
   join(root, "apps/sibar-research-workspace/src/flows/workspace/MissionOverview.tsx"),
   "utf8",
 );
 const workspaceHomeSource = readFileSync(
   join(root, "apps/sibar-research-workspace/src/flows/workspace/WorkspaceHome.tsx"),
+  "utf8",
+);
+const jaxThinkingInJaxSource = readFileSync(
+  join(root, "apps/sibar-research-workspace/src/flows/workspace/JaxThinkingInJaxPage.tsx"),
+  "utf8",
+);
+const jaxThinkingInJaxStyles = readFileSync(
+  join(root, "apps/sibar-research-workspace/src/flows/workspace/jaxSourcePage.module.css"),
+  "utf8",
+);
+const jaxThinkingInJaxSourceData = readFileSync(
+  join(root, "apps/sibar-research-workspace/src/flows/workspace/jaxThinkingInJaxSource.ts"),
+  "utf8",
+);
+const jaxThinkingInJaxScraperSource = readFileSync(
+  join(root, "scripts/scrape-jax-thinking-in-jax.mjs"),
   "utf8",
 );
 const webWorkspaceHtml = readFileSync(join(root, "web/workspace.html"), "utf8");
@@ -84,6 +101,55 @@ test("App opens Home and routes workspace opens to Mission Brief before Session"
   assert.match(workspaceProjectionSource, /openTarget: "overview"/);
   assert.match(workspaceReducerSource, /type: "reset"/);
   assert.doesNotMatch(workspaceProjectionSource, /openTarget: "session"/);
+});
+
+test("App exposes a concrete JAX thinking route outside mission and notes flows", () => {
+  assert.match(appSource, /jaxThinkingInJaxRoutes/);
+  assert.match(appSource, /\/jax\/thinking-in-jax/);
+  assert.match(appSource, /\/jax\/tutorials-and-scaling-book-first-step/);
+  assert.match(appSource, /<JaxThinkingInJaxPage \/>/);
+  assert.match(jaxThinkingInJaxSource, /Scraped HTML reader/);
+  assert.match(jaxThinkingInJaxSource, /dangerouslySetInnerHTML/);
+  assert.match(jaxThinkingInJaxSource, /data-source-ref/);
+  assert.match(jaxThinkingInJaxSource, /Esta parte no entiendo/);
+  assert.match(jaxThinkingInJaxSource, /window\.getSelection/);
+  assert.match(jaxThinkingInJaxSource, /kindHighlight|kindQuestion|kindKey/);
+  assert.match(jaxThinkingInJaxSource, /pendingSelection/);
+  assert.match(jaxThinkingInJaxSource, /pendingNote/);
+  assert.match(jaxThinkingInJaxSource, /SourceAnnotation/);
+  assert.match(jaxThinkingInJaxSource, /sendAnnotationToLlm/);
+  assert.match(jaxThinkingInJaxSource, /AnnotationLlmPayload/);
+  assert.match(jaxThinkingInJaxSource, /selectedText/);
+  assert.match(jaxThinkingInJaxSource, /userNote/);
+  assert.match(jaxThinkingInJaxSource, /Annotation chat/);
+  assert.match(jaxThinkingInJaxSource, /Enviar al LLM/);
+  assert.match(jaxThinkingInJaxSource, /treeSectionLevel/);
+  assert.match(jaxThinkingInJaxSource, /article\.scrollTo/);
+  assert.doesNotMatch(jaxThinkingInJaxSource, /scrollIntoView/);
+  assert.doesNotMatch(jaxThinkingInJaxSource, /JAX source context|Concrete source route/);
+  assert.match(jaxThinkingInJaxStyles, /\.sourceReaderPage\s*\{[\s\S]*height: 100dvh;[\s\S]*overflow: hidden;/);
+  assert.match(jaxThinkingInJaxStyles, /\.readerShell\s*\{[\s\S]*height: 100%;[\s\S]*overflow: hidden;/);
+  assert.doesNotMatch(jaxThinkingInJaxStyles, /contextPanel/);
+  assert.match(jaxThinkingInJaxStyles, /\.scrapedHtmlDocument\s*\{[\s\S]*height: 100%;[\s\S]*overflow: auto;/);
+  assert.match(jaxThinkingInJaxSourceData, /jaxThinkingInJaxHtml/);
+  assert.match(jaxThinkingInJaxSourceData, /jaxThinkingInJaxScrapeSelector = "article\.bd-article"/);
+  assert.match(jaxThinkingInJaxSourceData, /Open in Colab/);
+  assert.match(jaxThinkingInJaxSourceData, /Python Package Index/);
+  assert.match(jaxThinkingInJaxSourceData, /highlight-ipython3/);
+  assert.match(jaxThinkingInJaxSourceData, /Just-in-time compilation with jax\.jit/);
+  assert.match(jaxThinkingInJaxSourceData, /Auto-vectorization with jax\.vmap/);
+  assert.match(jaxThinkingInJaxSourceData, /Pseudorandom numbers/);
+  assert.match(jaxThinkingInJaxSourceData, /jax\.debug\.print/);
+  assert.match(jaxThinkingInJaxSourceData, /jax\[cuda13\]/);
+  assert.match(jaxThinkingInJaxScraperSource, /extractArticle/);
+  assert.match(jaxThinkingInJaxScraperSource, /articleSelector = "article\.bd-article"/);
+  assert.match(jaxThinkingInJaxScraperSource, /sections\.length < 10/);
+  assert.match(packageSource, /scrape:jax-thinking/);
+  assert.match(
+    jaxThinkingInJaxSourceData,
+    /https:\/\/docs\.jax\.dev\/en\/latest\/notebooks\/thinking_in_jax\.html/,
+  );
+  assert.doesNotMatch(jaxThinkingInJaxSource, /StudySessionNotes|WorkspaceSessionLayout|MissionOverview|SessionWorkbench/);
 });
 
 test("New mission flow uses the frontier-lab compiler instead of generic preview fabrication", () => {
